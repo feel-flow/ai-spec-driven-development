@@ -8,6 +8,144 @@
 - **行長制限**: 100文字
 - **ファイル末尾**: 改行で終了
 
+## 定数・設定とマジックナンバー禁止ガイド
+
+コードの可読性・保守性・安全性のため、マジックナンバー（意味のない数値／文字列リテラルの直接埋め込み）やハードコードを禁止します。以下の原則・具体例・リンター設定を適用してください。
+
+### 原則（必須）
+- 直接値の埋め込み禁止：意味を持つ数値・文字列は必ず「名前付き定数」または「設定」へ抽出する
+- 単位・範囲の明示：定数名・コメント・型で単位（ms, KB, °C 等）や有効範囲を示す
+- 層の責務に沿う配置：
+  - Domain層…ビジネスルール由来のしきい値・規則（例: 最大試行回数、割引率上限）
+  - Application層…ユースケース固有の値（例: ページサイズ既定値）
+  - Infrastructure層…接続情報・タイムアウト・URL等は環境変数／設定で注入
+- 構成の検証：起動時に設定をスキーマ検証（欠落・型・範囲）し、起動失敗で早期に気付く
+- 多言語化／文言：UI文言はハードコードせずリソース管理（i18n）へ
+- 機能切替：条件分岐に直接値を置かず、フラグ／トグル／ポリシーとして表現
+
+### 反パターンと改善例
+
+#### TypeScript/JavaScript
+Bad（反パターン）：
+```ts
+// 何の 5000 か不明、URL 直書き
+await fetch("https://api.example.com/v1/users", { timeout: 5000 });
+```
+
+Good（改善）：
+```ts
+// config.ts
+export const ApiConfig = Object.freeze({
+  baseUrl: process.env.API_BASE_URL!,
+  requestTimeoutMs: 5_000, // APIのタイムアウト(ms)
+} as const);
+
+// use
+await fetch(`${ApiConfig.baseUrl}/v1/users`, { /* ライブラリに応じて */ });
+```
+
+設定のスキーマ検証例（Zod）：
+```ts
+import { z } from 'zod';
+
+const EnvSchema = z.object({
+  API_BASE_URL: z.string().url(),
+  REQUEST_TIMEOUT_MS: z.coerce.number().int().min(100).max(60_000),
+});
+
+export const ENV = EnvSchema.parse(process.env);
+```
+
+#### Python
+Bad（反パターン）：
+```py
+TIMEOUT = 5000
+API_URL = "https://api.example.com"
+```
+
+Good（改善：pydantic Settings）：
+```py
+from pydantic_settings import BaseSettings
+from pydantic import AnyUrl, Field
+
+class Settings(BaseSettings):
+    api_base_url: AnyUrl
+    request_timeout_ms: int = Field(ge=100, le=60000)
+
+settings = Settings()  # .env や環境変数から読み込み
+```
+
+#### Go
+Bad（反パターン）：
+```go
+resp, err := httpClient.Do(req.WithContext(ctx)) // 直前で 10*time.Second を直書き
+```
+
+Good（改善）：
+```go
+const (
+    DefaultRequestTimeout = 10 * time.Second
+)
+
+type Config struct {
+    APIBaseURL string
+    RequestTimeout time.Duration
+}
+```
+
+### リンター／静的解析の推奨設定
+
+#### TypeScript/JavaScript（ESLint）
+```json
+{
+  "rules": {
+    "no-magic-numbers": [
+      "warn",
+      {
+        "ignore": [0, 1, -1],
+        "ignoreDefaultValues": true,
+        "enforceConst": true,
+        "detectObjects": true
+      }
+    ]
+  }
+}
+```
+
+#### Python（Ruff）
+`PLR2004` ルール（比較でのマジック値）等を有効化：
+```toml
+# pyproject.toml
+[tool.ruff]
+select = ["E", "F", "PL"]
+ignore = []
+```
+
+#### Go（golangci-lint）
+`gomnd`（magic numbers）、`gocritic` を有効化：
+```yaml
+linters:
+  enable:
+    - gomnd
+    - gocritic
+linters-settings:
+  gomnd:
+    settings:
+      mnd:
+        ignored-numbers: [0,1,-1]
+```
+
+### ドメイン定数の扱い（設計指針）
+- 事業上のルール由来の値（例：割引率最大 30%）は Domain 層で Value Object/定数として表現し、理由をコメントで残す
+- UI や API プロトコル都合（例：既定ページサイズ）は Application 層に置く
+- 接続情報やタイムアウト／リトライは Infrastructure 層の設定で管理し、DIで注入
+
+### 文字列のハードコード回避
+- URL・パス・トピック名・キュー名・ヘッダ名・エラーコードは定数化
+- UI 文言は i18n リソースへ（キーは命名規約に従い一貫性を維持）
+
+### AI への指示（プロンプト追加文）
+> 出力するコードでは、マジックナンバー／ハードコードを使用しない。意味のある定数名に抽出し、設定値は環境変数または設定モジュールから注入する。単位・範囲をコメントまたは型で明示すること。
 ### 命名規則
 | 種別 | 規則 | 良い例 | 悪い例 |
 |------|------|--------|--------|
