@@ -8,6 +8,70 @@
 - **行長制限**: 100文字
 - **ファイル末尾**: 改行で終了
 
+### ファイル行数ガイド（ファイル長）
+- 目的: 可読性・変更容易性・衝突低減のため、巨大ファイル化を避ける
+- 目安（アプリケーションコード）:
+  - ソフト上限: 500行（超えたら分割を検討）
+  - ハード上限: 800行（例外: 生成コード、スキーマ定義大規模ファイル等）
+- 推奨分割基準:
+  - 責務ごとにモジュール分割（関心の分離）
+  - UIはコンポーネント分割、ドメインは集約/VO/リポジトリ単位に分割
+  - テストは対象クラス/ユースケース単位でファイル分割
+- 例外の扱い:
+  - 自動生成コード、マイグレーション、スキーマ/辞書の長大定義は対象外
+  - 例外適用時はファイル先頭コメントで理由を明示
+
+#### Linter/静的解析 設定例
+TypeScript/JavaScript（ESLint）
+```json
+{
+  "rules": {
+    "max-lines": [
+      "warn",
+      { "max": 500, "skipBlankLines": true, "skipComments": true }
+    ],
+    "max-lines-per-function": [
+      "warn",
+      { "max": 30, "skipBlankLines": true, "skipComments": true }
+    ],
+    "complexity": ["warn", 10]
+  }
+}
+```
+
+Python（Ruff + Pylint 併用例）
+```toml
+# pyproject.toml（Ruff）
+[tool.ruff]
+select = ["E", "F", "PL", "C90"] # C90: McCabe複雑度（C901）
+
+[tool.ruff.lint.mccabe]
+max-complexity = 10
+```
+
+```ini
+# .pylintrc（任意。ファイル長の上限を持つ）
+[FORMAT]
+max-module-lines=500
+
+[DESIGN]
+max-statements=50
+```
+
+Go（golangci-lint）
+```yaml
+linters:
+  enable:
+    - funlen   # 関数長
+    - gocyclo  # 循環的複雑度
+linters-settings:
+  funlen:
+    lines: 80
+    statements: 50
+  gocyclo:
+    min-complexity: 10
+```
+
 ## 定数・設定とマジックナンバー禁止ガイド
 
 コードの可読性・保守性・安全性のため、マジックナンバー（意味のない数値／文字列リテラルの直接埋め込み）やハードコードを禁止します。以下の原則・具体例・リンター設定を適用してください。
