@@ -96,28 +96,65 @@ describe('User API Integration', () => {
 - 複雑な画面遷移
 
 **ツール**:
-- Playwright
+- Playwright + Playwright MCP（AI駆動デバッグ）
 - Cypress
 - Selenium
 
-**シナリオ例**:
+#### Playwright MCP統合（AI駆動デバッグ）
+**概要**: AIエージェントがブラウザを直接操作してリアルタイムデバッグ・テスト生成を行うMCPプロトコル実装
+
+**利点**:
+- AIによるビジュアルデバッグ（スクリーンショット、要素検査）
+- 失敗テストの自動分析と修正提案
+- ユーザー報告問題の自動再現テスト生成
+- プロダクション環境での安全な動作確認
+
+**AIによるデバッグ例**:
 ```typescript
-test('User Registration Flow', async ({ page }) => {
-  // 1. トップページにアクセス
-  await page.goto('/');
+// AIエージェントが自動実行するデバッグセッション例
+test('AI-Assisted Debug Session', async ({ page }) => {
+  // AIが問題のあるページを特定
+  await page.goto('/problematic-page');
   
-  // 2. 登録ボタンをクリック
-  await page.click('text=Sign Up');
+  // AIが要素の状態を分析
+  const debugInfo = await page.evaluate(() => ({
+    elements: document.querySelectorAll('*').length,
+    errors: window.console.errors || [],
+    performance: performance.getEntriesByType('navigation')[0]
+  }));
   
-  // 3. フォームに入力
-  await page.fill('[name="email"]', 'test@example.com');
-  await page.fill('[name="password"]', 'SecurePass123!');
+  // AIが自動スクリーンショット取得
+  await page.screenshot({ path: 'ai-debug-analysis.png' });
   
-  // 4. 送信
-  await page.click('button[type="submit"]');
-  
-  // 5. 成功メッセージを確認
-  await expect(page.locator('.success-message')).toBeVisible();
+  // AIが修正提案を生成
+  // -> 実際の修正は人間が確認後に適用
+});
+```
+
+**MCP統合設定例**:
+```typescript
+// playwright.config.ts
+import { defineConfig } from '@playwright/test';
+
+export default defineConfig({
+  use: {
+    // MCP統合のための設定
+    baseURL: process.env.BASE_URL || 'http://localhost:3000',
+    trace: 'on-first-retry',
+    screenshot: 'only-on-failure',
+    // AI分析用の詳細ログ
+    video: 'retain-on-failure',
+  },
+  projects: [
+    {
+      name: 'ai-debug',
+      use: {
+        // AIデバッグ用の専用設定
+        browserName: 'chromium',
+        headless: false, // AIが画面を確認できるように
+      },
+    },
+  ],
 });
 ```
 

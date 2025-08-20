@@ -810,6 +810,119 @@ class TokenManager {
 }
 ```
 
+## AI駆動デバッグパターン（Playwright MCP）
+
+### MCPによるビジュアルデバッグパターン
+```typescript
+// AI支援によるページ解析パターン
+class AIPageAnalyzer {
+  constructor(private page: Page) {}
+
+  async analyzePageState(): Promise<PageAnalysis> {
+    const analysis = await this.page.evaluate(() => {
+      // DOM構造の分析
+      const elements = Array.from(document.querySelectorAll('*'));
+      const visibleElements = elements.filter(el => 
+        window.getComputedStyle(el).display !== 'none'
+      );
+
+      // コンソールエラーの収集
+      const errors = (window as any).__playwright_errors || [];
+      
+      // パフォーマンス情報
+      const navigation = performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming;
+      
+      return {
+        totalElements: elements.length,
+        visibleElements: visibleElements.length,
+        consoleErrors: errors,
+        loadTime: navigation.loadEventEnd - navigation.loadEventStart,
+        networkRequests: performance.getEntriesByType('resource').length
+      };
+    });
+
+    // AIが判断しやすい形でスクリーンショットを取得
+    await this.page.screenshot({ 
+      path: `debug-analysis-${Date.now()}.png`,
+      fullPage: true 
+    });
+
+    return analysis;
+  }
+
+  async detectInteractionIssues(): Promise<InteractionIssue[]> {
+    const issues: InteractionIssue[] = [];
+    
+    // クリック可能な要素の検証
+    const clickableElements = await this.page.locator('button, a, [onclick], [role="button"]').all();
+    
+    for (const element of clickableElements) {
+      const isVisible = await element.isVisible();
+      const isEnabled = await element.isEnabled();
+      
+      if (!isVisible || !isEnabled) {
+        const text = await element.textContent();
+        issues.push({
+          type: 'interaction',
+          element: text || 'Unknown element',
+          issue: isVisible ? 'Element disabled' : 'Element not visible'
+        });
+      }
+    }
+    
+    return issues;
+  }
+}
+```
+
+### AI対話型デバッグパターン
+```typescript
+// AIとの対話でデバッグを進めるパターン
+class ConversationalDebugger {
+  async investigateIssue(userReport: string, page: Page): Promise<DebugSession> {
+    const session: DebugSession = {
+      userReport,
+      steps: [],
+      findings: [],
+      suggestions: []
+    };
+
+    // Step 1: 初期状態の記録
+    session.steps.push({
+      action: 'capture_initial_state',
+      screenshot: await page.screenshot({ path: 'initial-state.png' }),
+      pageUrl: page.url(),
+      timestamp: new Date()
+    });
+
+    // Step 2: 問題の再現を試行
+    try {
+      await this.reproduceIssue(userReport, page);
+      session.findings.push('Issue successfully reproduced');
+    } catch (error) {
+      session.findings.push(`Could not reproduce: ${error.message}`);
+      session.suggestions.push('Need more specific steps from user');
+    }
+
+    // Step 3: 要素の検査
+    const elements = await this.inspectSuspiciousElements(page);
+    session.findings.push(...elements);
+
+    return session;
+  }
+
+  private async reproduceIssue(description: string, page: Page): Promise<void> {
+    // AIが自然言語の説明からテストステップを生成
+    // 実装は具体的なAIサービスAPIに依存
+    const steps = await this.parseUserDescription(description);
+    
+    for (const step of steps) {
+      await this.executeStep(step, page);
+    }
+  }
+}
+```
+
 ## パフォーマンス最適化パターン
 ### デバウンス
 ```typescript
