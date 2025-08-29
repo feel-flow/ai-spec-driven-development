@@ -52,6 +52,11 @@ AI時代の開発に最適化されたドキュメント構造とその実践方
 
 このプロジェクトは[MITライセンス](./LICENSE)の下で公開されています。
 
+## リリース/変更履歴
+
+- 変更履歴: [CHANGELOG.md](./CHANGELOG.md)
+- リリース一覧: https://github.com/feel-flow/ai-driven-design/releases
+
 ---
 
 **プロジェクト管理者**: FEEL-FLOW  
