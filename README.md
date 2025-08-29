@@ -18,13 +18,14 @@ AI時代の開発に最適化されたドキュメント構造とその実践方
 | ファイル | 内容 |
 |---------|------|
 | [`ai_driven_design.md`](./ai_driven_design.md) | メインドキュメント（全体の理論と実践） |
-| [`MASTER.md`](./MASTER.md) | プロジェクト全体の中心となるマスタードキュメント |
-| [`PROJECT.md`](./PROJECT.md) | ビジョンと要件の統合 |
-| [`ARCHITECTURE.md`](./ARCHITECTURE.md) | システム設計の中核 |
-| [`DOMAIN.md`](./DOMAIN.md) | ビジネスロジックの集約 |
-| [`PATTERNS.md`](./PATTERNS.md) | 実装パターンガイド |
-| [`TESTING.md`](./TESTING.md) | AI駆動テスト戦略 |
-| [`DEPLOYMENT.md`](./DEPLOYMENT.md) | 配布とリリース戦略 |
+| [`docs/GETTING_STARTED.md`](./docs/GETTING_STARTED.md) | Quickstart（AI駆動・ドキュメント基準の始め方） |
+| [`docs/MASTER.md`](./docs/MASTER.md) | プロジェクト全体の中心となるマスタードキュメント |
+| [`docs/01-context/PROJECT.md`](./docs/01-context/PROJECT.md) | ビジョンと要件の統合 |
+| [`docs/02-design/ARCHITECTURE.md`](./docs/02-design/ARCHITECTURE.md) | システム設計の中核 |
+| [`docs/02-design/DOMAIN.md`](./docs/02-design/DOMAIN.md) | ビジネスロジックの集約 |
+| [`docs/03-implementation/PATTERNS.md`](./docs/03-implementation/PATTERNS.md) | 実装パターンガイド |
+| [`docs/04-quality/TESTING.md`](./docs/04-quality/TESTING.md) | AI駆動テスト戦略 |
+| [`docs/05-operations/DEPLOYMENT.md`](./docs/05-operations/DEPLOYMENT.md) | 配布とリリース戦略 |
 
 ## 対象者
 
@@ -41,9 +42,11 @@ AI時代の開発に最適化されたドキュメント構造とその実践方
 
 ## 始め方
 
-1. [`ai_driven_design.md`](./ai_driven_design.md)を読んで全体像を把握
-2. [`MASTER.md`](./MASTER.md)をテンプレートとして自分のプロジェクトに適用
-3. 必要に応じて他のドキュメントをカスタマイズ
+1. まずは [`docs/GETTING_STARTED.md`](./docs/GETTING_STARTED.md) でAI優先の進め方と読み順を確認
+2. [`docs/MASTER.md`](./docs/MASTER.md) をベースにプロジェクト識別・方針を整備（SSOT明確化）
+3. [`docs/01-context/PROJECT.md`](./docs/01-context/PROJECT.md) と [`docs/02-design/ARCHITECTURE.md`](./docs/02-design/ARCHITECTURE.md) を最小セットで充足
+4. テスト方針は [`docs/04-quality/TESTING.md`](./docs/04-quality/TESTING.md) を参照し、機能と同時にテスト生成
+5. 不足は生成物から逆引きで補完（Quickstart参照）
 
 ## ライセンス
 
@@ -52,5 +55,5 @@ AI時代の開発に最適化されたドキュメント構造とその実践方
 ---
 
 **プロジェクト管理者**: FEEL-FLOW  
-**最終更新**: 2025年7月28日  
+**最終更新**: 2025年8月29日  
 **お問い合わせ**: [https://feelflow.co.jp](https://feelflow.co.jp) のお問い合わせフォームへ

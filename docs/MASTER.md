@@ -124,6 +124,7 @@
 ```
 
 ## 関連ドキュメント
+- [GETTING_STARTED.md](./GETTING_STARTED.md) - Quickstart（AI駆動・読み順・プロンプト）
 - [PROJECT.md](./PROJECT.md) - ビジョンと要件
 - [ARCHITECTURE.md](./ARCHITECTURE.md) - システム設計
 - [DOMAIN.md](./DOMAIN.md) - ビジネスロジック
