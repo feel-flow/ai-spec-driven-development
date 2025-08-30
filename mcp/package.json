@@ -1,0 +1,25 @@
+{
+  "name": "ai-driven-design-mcp",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "MCP server exposing AI-driven design docs as resources, tools, and prompts",
+  "main": "index.mjs",
+  "scripts": {
+  "start": "node index.mjs",
+  "check": "node index.mjs --check"
+  },
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "ai",
+    "docs",
+    "ai-driven-design"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+  "@modelcontextprotocol/sdk": "latest",
+  "zod": "^3.23.8"
+  }
+}

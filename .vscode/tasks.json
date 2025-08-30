@@ -1,0 +1,57 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "Install MCP server dependencies",
+			"type": "shell",
+			"command": "npm",
+			"args": [
+				"install"
+			],
+			"options": {
+				"cwd": "${workspaceFolder}/mcp"
+			},
+			"group": "build",
+			"isBackground": false,
+			"problemMatcher": []
+		},
+		{
+			"label": "MCP: Check",
+			"type": "shell",
+			"command": "node",
+			"args": [
+				"index.mjs",
+				"--check"
+			],
+			"options": {
+				"cwd": "${workspaceFolder}/mcp"
+			},
+			"group": "test",
+			"problemMatcher": []
+		},
+		{
+			"label": "MCP: Start (stdio)",
+			"type": "shell",
+			"command": "node",
+			"args": [
+				"index.mjs"
+			],
+			"options": {
+				"cwd": "${workspaceFolder}/mcp"
+			},
+			"isBackground": true,
+			"problemMatcher": []
+		},
+		{
+			"label": "MCP: Check",
+			"type": "shell",
+			"command": "node",
+			"args": [
+				"index.mjs",
+				"--check"
+			],
+			"isBackground": false,
+			"group": "test"
+		}
+	]
+}

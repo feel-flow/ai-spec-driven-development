@@ -27,6 +27,10 @@ AI時代の開発に最適化されたドキュメント構造とその実践方
 | [`docs/04-quality/TESTING.md`](./docs/04-quality/TESTING.md) | AI駆動テスト戦略 |
 | [`docs/05-operations/DEPLOYMENT.md`](./docs/05-operations/DEPLOYMENT.md) | 配布とリリース戦略 |
 
+## MCPサーバー（AIエージェント連携）
+
+このリポジトリ内のドキュメントをAIエージェントから安全に参照できるMCPサーバーを提供しています。セットアップとクライアント設定は [mcp/README.md](./mcp/README.md) を参照してください。
+
 ## 対象者
 
 - AI開発ツールを活用したい開発チーム
