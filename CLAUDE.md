@@ -52,7 +52,7 @@ This is a **documentation-only project** with no executable code. The focus is o
 ### Working with This Repository
 
 When making changes:
-1. Understand the AI-optimization principles in `ai_driven_design.md`
+1. Understand the AI-optimization principles in `ai_spec_driven_development.md`
 2. Follow the 7-document structure templates
 3. Maintain consistency with the established patterns
 4. Keep magic number prohibition guidelines updated

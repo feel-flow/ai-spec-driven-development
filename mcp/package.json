@@ -1,9 +1,9 @@
 {
-  "name": "ai-driven-design-mcp",
+  "name": "ai-spec-driven-development-mcp",
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "description": "MCP server exposing AI-driven design docs as resources, tools, and prompts",
+  "description": "MCP server exposing AI spec-driven development docs as resources, tools, and prompts",
   "main": "index.mjs",
   "scripts": {
   "start": "node index.mjs",
@@ -14,7 +14,7 @@
     "model-context-protocol",
     "ai",
     "docs",
-    "ai-driven-design"
+    "ai-spec-driven-development"
   ],
   "author": "",
   "license": "MIT",

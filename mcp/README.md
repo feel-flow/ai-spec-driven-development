@@ -1,6 +1,6 @@
-# AI-Driven Design MCP Server
+# AI Spec-Driven Development MCP Server
 
-This MCP server exposes the repository's AI-driven design documentation as:
+This MCP server exposes the repository's AI spec-driven development documentation as:
 
 - Resources: each Markdown file and a combined search index
 - Tools: search, section extraction, glossary lookup, and docs listing
@@ -39,8 +39,8 @@ node index.mjs --check
 - このサーバーは標準入出力（stdio）で動作し、MCP対応クライアントから起動されます。
 - 設定例（外部MCPサーバーの登録）:
   - Command: `node`
-  - Args: `/absolute/path/to/ai-driven-design/mcp/index.mjs`
-  - Working Directory: `/absolute/path/to/ai-driven-design/mcp`
+  - Args: `/absolute/path/to/ai-spec-driven-development/mcp/index.mjs`
+  - Working Directory: `/absolute/path/to/ai-spec-driven-development/mcp`
 - 例: Claude Code (VS Code) / Claude Desktop / MCP対応クライアントで上記を登録してください。
 
 4) 直接起動（デバッグ用途）
@@ -72,12 +72,12 @@ npm run check
 
 ## Configure in an MCP client
 
-- Command: `node /absolute/path/to/ai-driven-design/mcp/index.mjs`
+- Command: `node /absolute/path/to/ai-spec-driven-development/mcp/index.mjs`
 - Working directory: repository root or `mcp/`
 
 The server will expose:
 
-- Resources: `file://...` markdown files and `mcp://ai-driven-design/index`
+- Resources: `file://...` markdown files and `mcp://ai-spec-driven-development/index`
 - Tools:
   - `search({ query, limit })`
   - `extract_section({ file, heading })`
@@ -89,8 +89,8 @@ The server will expose:
 
 - Add an external MCP server in the extension settings:
   - Command: `node`
-  - Args: `/absolute/path/to/ai-driven-design/mcp/index.mjs`
-  - Working Directory: `/absolute/path/to/ai-driven-design/mcp`
+  - Args: `/absolute/path/to/ai-spec-driven-development/mcp/index.mjs`
+  - Working Directory: `/absolute/path/to/ai-spec-driven-development/mcp`
 - Open this repository and verify Prompts/Tools/Resources are listed.
 
 ### GitHub Copilot

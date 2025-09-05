@@ -17,7 +17,7 @@ AI時代の開発に最適化されたドキュメント構造とその実践方
 
 | ファイル | 内容 |
 |---------|------|
-| [`ai_driven_design.md`](./ai_driven_design.md) | メインドキュメント（全体の理論と実践） |
+| [`ai_spec_driven_development.md`](./ai_spec_driven_development.md) | メインドキュメント（全体の理論と実践） |
 | [`docs/GETTING_STARTED.md`](./docs/GETTING_STARTED.md) | Quickstart（AI駆動・ドキュメント基準の始め方） |
 | [`docs/MASTER.md`](./docs/MASTER.md) | プロジェクト全体の中心となるマスタードキュメント |
 | [`docs/01-context/PROJECT.md`](./docs/01-context/PROJECT.md) | ビジョンと要件の統合 |
@@ -59,7 +59,7 @@ AI時代の開発に最適化されたドキュメント構造とその実践方
 ## リリース/変更履歴
 
 - 変更履歴: [CHANGELOG.md](./CHANGELOG.md)
-- リリース一覧: https://github.com/feel-flow/ai-driven-design/releases
+- リリース一覧: https://github.com/feel-flow/ai-spec-driven-development/releases
 
 ---
 

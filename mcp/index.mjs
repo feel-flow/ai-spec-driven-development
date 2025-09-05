@@ -62,7 +62,7 @@ function basicSearchIndex(files) {
 // Build index
 const mdFiles = [
   path.join(repoRoot, "README.md"),
-  path.join(repoRoot, "ai_driven_design.md"),
+  path.join(repoRoot, "ai_spec_driven_development.md"),
   ...walkMarkdownFiles(docsRoot)
 ].filter(f => fs.existsSync(f));
 
@@ -135,12 +135,12 @@ if (fs.existsSync(glossaryPath)) {
 }
 
 // MCP server (high-level)
-const mcp = new McpServer({ name: "ai-driven-design-mcp", version: "0.1.0" });
+const mcp = new McpServer({ name: "ai-spec-driven-development-mcp", version: "0.1.0" });
 
 // Register fixed resources for each markdown file
 for (const f of mdFiles) {
   const uri = `file://${path.resolve(f)}`;
-  mcp.resource(path.relative(repoRoot, f), uri, { mimeType: "text/markdown", description: "AI-driven design documentation" }, async (uriObj) => {
+  mcp.resource(path.relative(repoRoot, f), uri, { mimeType: "text/markdown", description: "AI spec-driven development documentation" }, async (uriObj) => {
     const p = url.fileURLToPath(uriObj);
     if (!p.startsWith(repoRoot)) throw new Error("Access denied");
     const text = loadFile(p);
@@ -149,14 +149,14 @@ for (const f of mdFiles) {
 }
 
 // Register virtual search index resource
-mcp.resource("search-index", "mcp://ai-driven-design/index", { mimeType: "application/json", description: "Lightweight search index of docs" }, async (uriObj) => {
+mcp.resource("search-index", "mcp://ai-spec-driven-development/index", { mimeType: "application/json", description: "Lightweight search index of docs" }, async (uriObj) => {
   return { contents: [{ uri: uriObj.toString(), mimeType: "application/json", text: JSON.stringify(searchIndex, null, 2) }] };
 });
 
 // Tools
 mcp.registerTool("search", {
   title: "Search docs",
-  description: "Keyword search over AI-driven design docs. Returns top matches with file and excerpt.",
+  description: "Keyword search over AI spec-driven development docs. Returns top matches with file and excerpt.",
   inputSchema: {
     query: z.string().min(1).describe("Search query"),
     limit: z.number().int().min(1).max(20).default(5).describe("Max results")
@@ -248,5 +248,5 @@ if (process.argv.includes("--check")) {
 // Start server over stdio
 const transport = new StdioServerTransport();
 await mcp.connect(transport);
-console.error("ai-driven-design MCP server started (stdio)");
+console.error("ai-spec-driven-development MCP server started (stdio)");
 // (Removed legacy server API code)
