@@ -7,7 +7,8 @@
       "Bash(git push:*)",
       "Bash(mkdir:*)",
       "Bash(mv:*)",
-      "Bash(rm:*)"
+      "Bash(rm:*)",
+      "WebFetch(domain:github.com)"
     ],
     "deny": []
   }
