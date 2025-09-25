@@ -130,12 +130,16 @@
 
 ## 関連ドキュメント
 - [GETTING_STARTED.md](./GETTING_STARTED.md) - Quickstart（AI駆動・読み順・プロンプト）
-- [PROJECT.md](./PROJECT.md) - ビジョンと要件
-- [ARCHITECTURE.md](./ARCHITECTURE.md) - システム設計
-- [DOMAIN.md](./DOMAIN.md) - ビジネスロジック
-- [PATTERNS.md](./PATTERNS.md) - 実装パターン
-- [TESTING.md](./TESTING.md) - テスト戦略
-- [DEPLOYMENT.md](./DEPLOYMENT.md) - デプロイ戦略
+- [01-context/PROJECT.md](./01-context/PROJECT.md) - ビジョンと要件
+- [02-design/ARCHITECTURE.md](./02-design/ARCHITECTURE.md) - システム設計
+- [02-design/DOMAIN.md](./02-design/DOMAIN.md) - ビジネスロジック
+- [03-implementation/PATTERNS.md](./03-implementation/PATTERNS.md) - 実装パターン
+- [04-quality/TESTING.md](./04-quality/TESTING.md) - テスト戦略
+- [05-operations/DEPLOYMENT.md](./05-operations/DEPLOYMENT.md) - デプロイ戦略
+- [08-knowledge/LESSONS_LEARNED.md](./08-knowledge/LESSONS_LEARNED.md) - 開発過程で得た知見・解決策
+- [08-knowledge/TROUBLESHOOTING.md](./08-knowledge/TROUBLESHOOTING.md) - トラブルシューティング集
+- [08-knowledge/BEST_PRACTICES.md](./08-knowledge/BEST_PRACTICES.md) - ベストプラクティス集
+- [08-knowledge/FAQ.md](./08-knowledge/FAQ.md) - よくある質問と回答
 
 ## コードレビュー チェックリスト（追補）
 - [ ] マジックナンバー/ハードコードがない（定数/設定化、単位・範囲の明示）

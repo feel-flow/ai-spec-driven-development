@@ -26,7 +26,27 @@ AI開発ツール（Claude Code、GitHub Copilot、Cursor）に最適化され�
 
 詳細な説明と実装例は[完全ガイド](./ai_spec_driven_development.md#2-ai駆動開発に最適化されたドキュメント構造)を参照。
 
-## 🤖 MCPサーバー
+## 🤖 AIエージェント向けガイド
+
+### 🚨 重要: 作業開始前に必ずMASTER.mdを参照
+
+すべてのAIエージェントは、このプロジェクトで作業を開始する前に **`docs/MASTER.md`** を必ず読み込んでください。
+
+### エージェント別設定
+
+- **Claude Code**: [`CLAUDE.md`](./CLAUDE.md) - Claude Code専用ガイド
+- **GitHub Copilot**: [`.github/copilot-instructions.md`](./.github/copilot-instructions.md) - Copilot設定
+- **Cursor**: [`.cursorrules`](./.cursorrules) - Cursor設定
+- **その他AIエージェント**: [`AGENTS.md`](./AGENTS.md) - 統一ガイド
+
+### 必須手順
+
+1. **MASTER.mdを読み込む** - プロジェクトの技術スタック、コーディング規約、制約事項を理解
+2. **関連文書を確認** - アーキテクチャ、ドメイン、パターン文書を参照
+3. **コード生成** - MASTER.mdのルールに従って実装
+4. **品質確認** - マジックナンバー禁止、型安全性、エラーハンドリング等をチェック
+
+### MCPサーバー
 
 AIエージェント連携の設定: [`mcp/README.md`](./mcp/README.md)
 

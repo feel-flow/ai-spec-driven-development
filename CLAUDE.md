@@ -2,6 +2,19 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## 🚨 MANDATORY: Always Read MASTER.md First
+
+**Before starting any work on this project, you MUST read and understand the contents of `docs/MASTER.md`.**
+
+This document contains:
+- Project identification and context
+- Technical stack and architecture patterns
+- Mandatory coding rules and constraints
+- AI-specific prompts and guidelines
+- Implementation priorities and phases
+
+**Failure to reference MASTER.md will result in incorrect implementations that violate project standards.**
+
 ## Project Overview
 
 This repository contains a comprehensive guide and template system for AI-driven development documentation strategy. It demonstrates how to optimize documentation for AI development tools (Claude Code, GitHub Copilot, Cursor) through a streamlined 7-document structure instead of traditional 60+ document approaches.
