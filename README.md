@@ -62,5 +62,5 @@ AIエージェント連携の設定: [`mcp/README.md`](./mcp/README.md)
 ---
 
 **プロジェクト管理者**: FEEL-FLOW  
-**最終更新**: 2025年8月29日  
+**最終更新**: 2025年9月25日  
 **お問い合わせ**: [https://feelflow.co.jp](https://feelflow.co.jp) のお問い合わせフォームへ
