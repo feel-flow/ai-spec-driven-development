@@ -4,6 +4,18 @@
 
 ## [Unreleased]
 
+## [v0.4.0] - 2025-09-29
+### Added
+- Chrome DevTools MCPをAI駆動デバッグツールとして追加
+  - Web開発向けリアルタイムデバッグツールとして推奨
+  - DOM操作、ネットワーク監視、パフォーマンス分析機能を活用
+  - Playwright MCPとの使い分けを明確化（E2Eテスト vs リアルタイムデバッグ）
+
+### Changed
+- `docs/MASTER.md`: AI駆動デバッグツールセクションを拡充
+- `.cursorrules`: Chrome DevTools MCP推奨を追加
+- `.github/copilot-instructions.md`: Chrome DevTools MCP推奨を追加
+
 ## [v0.3.0] - 2025-09-25
 ### Added
 - ナレッジ蓄積システム（08-knowledge/フォルダ）の追加
@@ -47,7 +59,8 @@
 - `docs/GETTING_STARTED.md`: AI駆動（ドキュメント基準）開発 Quickstart
 - Quickstart 前提（AI優先・一次情報での検証・時間は目安）
 
-[Unreleased]: https://github.com/feel-flow/ai-spec-driven-development/compare/v0.3.0...HEAD
+[Unreleased]: https://github.com/feel-flow/ai-spec-driven-development/compare/v0.4.0...HEAD
+[v0.4.0]: https://github.com/feel-flow/ai-spec-driven-development/releases/tag/v0.4.0
 [v0.3.0]: https://github.com/feel-flow/ai-spec-driven-development/releases/tag/v0.3.0
 [v0.2.0]: https://github.com/feel-flow/ai-spec-driven-development/releases/tag/v0.2.0
 [v0.1.0]: https://github.com/feel-flow/ai-spec-driven-development/releases/tag/v0.1.0
