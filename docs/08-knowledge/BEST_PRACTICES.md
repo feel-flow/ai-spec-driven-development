@@ -755,6 +755,61 @@ const userService = new UserService(userRepository);
 
 ---
 
+## Gitワークフロー最適化
+
+### Claude Code SessionStart Hook
+
+**推奨**:
+PRマージ後のブランチ切り替え忘れを防ぐため、SessionStart hookを設定します。
+
+```json
+// .claude/settings.json
+{
+  "hooks": {
+    "SessionStart": [
+      {
+        "type": "command",
+        "command": ".claude/hooks/check-branch-status.sh",
+        "description": "Check git branch status and warn if needed"
+      }
+    ]
+  }
+}
+```
+
+**利点**:
+- PRマージ済みブランチでの作業を防止
+- 常に最新のdevelopブランチから作業開始
+- マージ忘れやブランチ混乱を削減
+
+詳細は [DEPLOYMENT.md](../05-operations/DEPLOYMENT.md) の「開発環境の最適化」セクションを参照してください。
+
+### ブランチ命名規則
+
+**推奨**:
+```bash
+# 機能開発
+feature/#123-add-user-authentication
+
+# バグ修正
+fix/#124-correct-login-validation
+
+# その他のタスク
+chore/#125-update-dependencies
+```
+
+**避けるべき**:
+```bash
+# Issue番号なし
+feature/add-user-auth
+
+# 曖昧な命名
+fix/bug
+update/stuff
+```
+
+---
+
 ## 更新履歴
 
 | 日付 | 更新者 | 更新内容 |
@@ -765,3 +820,4 @@ const userService = new UserService(userRepository);
 | 2024-02-01 | 田中 | テスト関連のベストプラクティスを追加 |
 | 2024-02-05 | 佐藤 | パフォーマンス関連のベストプラクティスを追加 |
 | 2024-02-10 | 山田 | アーキテクチャパターンを追加 |
+| 2025-01-XX | システム | Gitワークフロー最適化（SessionStart Hook）を追加 |
