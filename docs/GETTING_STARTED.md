@@ -26,6 +26,9 @@ AI（Claude Code / GitHub Copilot）で迷わず実装できる「最小限の�
   - [ ] 詳細ドキュメントの索引リンク（PROJECT/ARCHITECTURE/DOMAIN/TESTING/DEPLOYMENT）
 - [ ] 06-reference/GLOSSARY.md に用語を1画面分で定義（同義語は排除）
 - [ ] 06-reference/DECISIONS.md に最新の重要決定を1行要約で追記
+- [ ] （推奨）Claude Code SessionStart Hook を設定（詳細は 05-operations/DEPLOYMENT.md 参照）
+  - PRマージ後のブランチ切り替え忘れを防止
+  - `.claude/hooks/check-branch-status.sh` を実行可能に設定
 
 ---
 

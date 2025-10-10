@@ -550,3 +550,219 @@ aws ecs update-service --cluster production --service app --force-new-deployment
 aws rds describe-db-instances --db-instance-identifier production-db
 telnet <db-host> 5432
 ```
+
+---
+
+## 11. 開発環境の最適化
+
+### Claude Code SessionStart Hook設定
+
+PRマージ後のブランチ切り替え忘れを防ぐため、Claude Codeのセッション開始時に自動的にブランチ状態をチェックし、必要に応じて警告を表示します。
+
+#### 実装目的
+- PRマージ後のブランチ切り替え忘れを防止
+- 開発ブランチ（develop）での作業開始を保証
+- Gitワークフローの品質向上
+
+#### 設定手順
+
+**1. ブランチチェックスクリプトの作成**
+
+プロジェクトルートに `.claude/hooks/` ディレクトリを作成し、以下のスクリプトを配置します：
+
+```bash
+# .claude/hooks/check-branch-status.sh
+#!/bin/bash
+
+# =============================================================================
+# Claude Code SessionStart Hook: ブランチ状態チェック
+# =============================================================================
+# 目的: PRマージ後のブランチ切り替え忘れを防ぐ
+# 実行タイミング: Claude Codeセッション開始時（SessionStart）
+#
+# 動作:
+# 1. リモートにブランチが存在しない場合 → PRマージ済みの可能性を警告
+# 2. mainブランチより大幅に遅れている場合 → rebaseを推奨
+# =============================================================================
+
+# 設定: メインブランチ名（プロジェクトに合わせて変更してください）
+MAIN_BRANCH="${MAIN_BRANCH:-develop}"
+
+# 設定: 警告を出すコミット数の閾値
+BEHIND_THRESHOLD="${BEHIND_THRESHOLD:-10}"
+
+# 現在のブランチを取得
+CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD 2>/dev/null)
+
+# Gitリポジトリでない場合はスキップ
+if [ $? -ne 0 ]; then
+  exit 0
+fi
+
+# developブランチにいる場合はチェック不要
+if [ "$CURRENT_BRANCH" = "$MAIN_BRANCH" ]; then
+  exit 0
+fi
+
+# リモートの最新情報を取得（タイムアウト付き）
+# ネットワーク遅延を考慮して短時間で完了させる
+timeout 5s git fetch origin "$MAIN_BRANCH" 2>/dev/null || true
+
+# =============================================================================
+# チェック1: 現在のブランチがリモートに存在するか
+# =============================================================================
+if ! git ls-remote --heads origin "$CURRENT_BRANCH" 2>/dev/null | grep -q "$CURRENT_BRANCH"; then
+  echo ""
+  echo "⚠️  WARNING: 現在のブランチ '$CURRENT_BRANCH' はリモートに存在しません。"
+  echo "   PRがマージ済みの可能性があります。"
+  echo ""
+  echo "   以下のコマンドで $MAIN_BRANCH ブランチに戻ることを推奨します："
+  echo ""
+  echo "   git checkout $MAIN_BRANCH"
+  echo "   git pull origin $MAIN_BRANCH"
+  echo "   git branch -d $CURRENT_BRANCH"
+  echo ""
+  exit 0
+fi
+
+# =============================================================================
+# チェック2: 現在のブランチがmainブランチより大幅に遅れていないか
+# =============================================================================
+BEHIND=$(git rev-list --count HEAD..origin/$MAIN_BRANCH 2>/dev/null)
+
+if [ ! -z "$BEHIND" ] && [ "$BEHIND" -gt "$BEHIND_THRESHOLD" ]; then
+  echo ""
+  echo "ℹ️  INFO: 現在のブランチは $MAIN_BRANCH から $BEHIND コミット遅れています。"
+  echo "   最新の変更を取り込むことを検討してください："
+  echo ""
+  echo "   git checkout $MAIN_BRANCH"
+  echo "   git pull origin $MAIN_BRANCH"
+  echo "   git checkout $CURRENT_BRANCH"
+  echo "   git rebase $MAIN_BRANCH"
+  echo ""
+fi
+
+exit 0
+```
+
+**2. スクリプトに実行権限を付与**
+
+```bash
+chmod +x .claude/hooks/check-branch-status.sh
+```
+
+**3. Claude Code設定ファイルへの追加**
+
+`.claude/settings.json` または `.claude/settings.local.json` に以下を追加：
+
+```json
+{
+  "hooks": {
+    "SessionStart": [
+      {
+        "type": "command",
+        "command": ".claude/hooks/check-branch-status.sh",
+        "description": "Check git branch status and warn if needed"
+      }
+    ]
+  }
+}
+```
+
+**4. 環境変数でのカスタマイズ（オプション）**
+
+メインブランチ名や警告の閾値は、環境変数で変更できます：
+
+```bash
+# シェル設定ファイル（~/.bashrc, ~/.zshrc など）に追加
+
+# メインブランチ名を変更（デフォルト: develop）
+export MAIN_BRANCH="main"
+
+# 警告を出すコミット数の閾値を変更（デフォルト: 10）
+export BEHIND_THRESHOLD="20"
+```
+
+設定を反映：
+```bash
+# シェルをリロード
+source ~/.zshrc  # または source ~/.bashrc
+```
+
+#### 動作例
+
+Claude Codeセッション開始時に以下のような警告が表示されます：
+
+```
+⚠️  WARNING: 現在のブランチ 'feature/#123-add-feature' はリモートに存在しません。
+   PRがマージ済みの可能性があります。
+   以下のコマンドで develop ブランチに戻ることを推奨します：
+
+   git checkout develop
+   git pull origin develop
+   git branch -d feature/#123-add-feature
+```
+
+#### カスタマイズ例
+
+**1. より詳細なチェック**
+
+```bash
+# マージ済みブランチをすべて表示
+git branch --merged $MAIN_BRANCH | grep -v "^*" | grep -v "$MAIN_BRANCH"
+```
+
+**2. 自動切り替え（慎重に使用）**
+
+```bash
+# PRマージ後に自動的にdevelopに切り替え（オプション）
+if ! git ls-remote --heads origin "$CURRENT_BRANCH" | grep -q "$CURRENT_BRANCH"; then
+  echo "自動的に $MAIN_BRANCH ブランチに切り替えます..."
+  git checkout "$MAIN_BRANCH"
+  git pull origin "$MAIN_BRANCH"
+  git branch -d "$CURRENT_BRANCH" 2>/dev/null || true
+fi
+```
+
+**3. Slack/Teams通知（オプション）**
+
+```bash
+# Webhook URLを環境変数で設定
+if [ ! -z "$SLACK_WEBHOOK_URL" ]; then
+  curl -X POST "$SLACK_WEBHOOK_URL" \
+    -H 'Content-Type: application/json' \
+    -d "{\"text\":\"⚠️ Branch $CURRENT_BRANCH may be merged. Please check.\"}"
+fi
+```
+
+#### 注意事項
+
+- スクリプトはタイムアウト付きで実行されるため、ネットワーク遅延による影響を最小化
+- `git fetch` は短時間で完了するよう設計（5秒タイムアウト）
+- 自動切り替えオプションは慎重に使用（未コミットの変更が失われる可能性）
+- チーム全体で統一したブランチ運用ルールを確立することを推奨
+
+#### トラブルシューティング
+
+**問題**: Hookが実行されない
+```bash
+# 実行権限を確認
+ls -la .claude/hooks/check-branch-status.sh
+
+# Claude Code設定を確認
+cat .claude/settings.json | jq '.hooks'
+```
+
+**問題**: Git fetchが遅い
+```bash
+# タイムアウト時間を短縮
+timeout 3s git fetch origin "$MAIN_BRANCH" 2>/dev/null || true
+```
+
+**問題**: 誤検知が多い
+```bash
+# チェック条件を調整（例: 20コミット以上遅れている場合のみ警告）
+if [ "$BEHIND" -gt 20 ]; then
+  echo "WARNING: ..."
+fi
+```
