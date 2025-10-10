@@ -19,3 +19,6 @@ coverage/
 # VS Code
 .vscode/*.log
 .vscode/*.tmp
+
+# Claude Code
+.claude/settings.local.json
