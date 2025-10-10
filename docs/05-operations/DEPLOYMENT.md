@@ -574,8 +574,22 @@ PRマージ後のブランチ切り替え忘れを防ぐため、Claude Codeの�
 # .claude/hooks/check-branch-status.sh
 #!/bin/bash
 
-# 設定: メインブランチ名（プロジェクトに合わせて変更）
-MAIN_BRANCH="develop"
+# =============================================================================
+# Claude Code SessionStart Hook: ブランチ状態チェック
+# =============================================================================
+# 目的: PRマージ後のブランチ切り替え忘れを防ぐ
+# 実行タイミング: Claude Codeセッション開始時（SessionStart）
+#
+# 動作:
+# 1. リモートにブランチが存在しない場合 → PRマージ済みの可能性を警告
+# 2. mainブランチより大幅に遅れている場合 → rebaseを推奨
+# =============================================================================
+
+# 設定: メインブランチ名（プロジェクトに合わせて変更してください）
+MAIN_BRANCH="${MAIN_BRANCH:-develop}"
+
+# 設定: 警告を出すコミット数の閾値
+BEHIND_THRESHOLD="${BEHIND_THRESHOLD:-10}"
 
 # 現在のブランチを取得
 CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD 2>/dev/null)
@@ -591,12 +605,17 @@ if [ "$CURRENT_BRANCH" = "$MAIN_BRANCH" ]; then
 fi
 
 # リモートの最新情報を取得（タイムアウト付き）
+# ネットワーク遅延を考慮して短時間で完了させる
 timeout 5s git fetch origin "$MAIN_BRANCH" 2>/dev/null || true
 
-# 現在のブランチがリモートに存在しない場合（既にマージ済みの可能性）
-if ! git ls-remote --heads origin "$CURRENT_BRANCH" | grep -q "$CURRENT_BRANCH"; then
+# =============================================================================
+# チェック1: 現在のブランチがリモートに存在するか
+# =============================================================================
+if ! git ls-remote --heads origin "$CURRENT_BRANCH" 2>/dev/null | grep -q "$CURRENT_BRANCH"; then
+  echo ""
   echo "⚠️  WARNING: 現在のブランチ '$CURRENT_BRANCH' はリモートに存在しません。"
   echo "   PRがマージ済みの可能性があります。"
+  echo ""
   echo "   以下のコマンドで $MAIN_BRANCH ブランチに戻ることを推奨します："
   echo ""
   echo "   git checkout $MAIN_BRANCH"
@@ -606,9 +625,13 @@ if ! git ls-remote --heads origin "$CURRENT_BRANCH" | grep -q "$CURRENT_BRANCH";
   exit 0
 fi
 
-# 現在のブランチがmainブランチより古い場合
+# =============================================================================
+# チェック2: 現在のブランチがmainブランチより大幅に遅れていないか
+# =============================================================================
 BEHIND=$(git rev-list --count HEAD..origin/$MAIN_BRANCH 2>/dev/null)
-if [ ! -z "$BEHIND" ] && [ "$BEHIND" -gt 10 ]; then
+
+if [ ! -z "$BEHIND" ] && [ "$BEHIND" -gt "$BEHIND_THRESHOLD" ]; then
+  echo ""
   echo "ℹ️  INFO: 現在のブランチは $MAIN_BRANCH から $BEHIND コミット遅れています。"
   echo "   最新の変更を取り込むことを検討してください："
   echo ""
@@ -618,6 +641,8 @@ if [ ! -z "$BEHIND" ] && [ "$BEHIND" -gt 10 ]; then
   echo "   git rebase $MAIN_BRANCH"
   echo ""
 fi
+
+exit 0
 ```
 
 **2. スクリプトに実行権限を付与**
@@ -642,6 +667,26 @@ chmod +x .claude/hooks/check-branch-status.sh
     ]
   }
 }
+```
+
+**4. 環境変数でのカスタマイズ（オプション）**
+
+メインブランチ名や警告の閾値は、環境変数で変更できます：
+
+```bash
+# シェル設定ファイル（~/.bashrc, ~/.zshrc など）に追加
+
+# メインブランチ名を変更（デフォルト: develop）
+export MAIN_BRANCH="main"
+
+# 警告を出すコミット数の閾値を変更（デフォルト: 10）
+export BEHIND_THRESHOLD="20"
+```
+
+設定を反映：
+```bash
+# シェルをリロード
+source ~/.zshrc  # または source ~/.bashrc
 ```
 
 #### 動作例
