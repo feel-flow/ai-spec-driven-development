@@ -1,10 +1,227 @@
-# AI駆動開発における最適なドキュメント戦略 - なぜ少ないほど良いのか
+---
+id: ai-spec-driven-development
+title: AI Spec Driven Development Operational Guide
+version: 2.0.0
+status: active
+created: 2025-10-17
+updated: 2025-10-17
+owner: feel-flow
+phase: mvp
+tags: [docs, structure, ai-agent]
+references:
+   - docs/MASTER.md
+   - docs/02-design/ARCHITECTURE.md
+changeImpact: high
+---
 
-## はじめに：パラダイムシフトの時代
+# AI Spec Driven Development ドキュメント運用ガイド
 
-2025年、我々は開発手法の大きな転換点に立っています。Claude Code、GitHub Copilot、Cursorなどの高度なAI開発ツールの登場により、コード生成の大部分をAIに委ねることが現実的になりました。しかし、多くの開発チームは依然として20世紀から続く「人間中心」のドキュメント体系を使い続けています。
+この文書は「AIエージェントが迷わない最小・高精度なドキュメント構造」を保証するための操作仕様書です。`docs/MASTER.md` を上位規約 (Source of Truth) とし、本書はその実務ガイドライン層に位置します。フォルダ生成、ファイル分類、更新、監査をすべて自動化しやすくするための厳密なルールを定義します。
 
-本記事では、なぜAI駆動開発では従来の膨大なドキュメントが逆効果となるのか、そして最適な文書構造とは何かを、実例を交えて解説します。
+## 目次
+1. PURPOSE / SCOPE
+2. WORKFLOW (起動～更新ライフサイクル)
+3. FOLDER SPEC (必須構造と責務)
+4. REQUIRED MINIMUM FILE SET
+5. FILE CLASSIFICATION MATRIX
+6. NAMING & VERSIONING RULES
+7. FRONTMATTER TEMPLATE（統一メタデータ）
+8. UPDATE / CHANGE POLICY
+9. EXTENSION & SCALING POLICY
+10. AI AGENT EXECUTION CHECKLIST
+11. DO / DO NOT LIST
+12. ERROR HANDLING / RECOVERY
+13. DECISION MATRIX 詳細
+14. REVISION HISTORY ルール
+15. GLOSSARY / LINKING 指針
+16. DIFF IMPACT LEVELS & CHANGELOG 連携
+17. ONBOARDING QUICK START (人間 + AI)
+18. FUTURE EVOLUTION NOTES
+19. 最終チェックリスト
+
+---
+## 1. PURPOSE / SCOPE
+AIモデル (Claude Code / GitHub Copilot / Cursor など) が以下を行う際の唯一の運用仕様:
+1. 初回接続時のフォルダ完全性検証と自動補修
+2. 新規コンテンツの正確な分類と重複排除
+3. 最小文書セット維持と段階的拡張
+4. 更新時の影響度評価と CHANGELOG 連携
+
+本書は「構造と運用」に限定し、技術スタック/設計/ビジネス要件は `MASTER.md` / `PROJECT.md` / `ARCHITECTURE.md` / `DOMAIN.md` に委譲します。
+
+---
+## 2. WORKFLOW (高レベル手順)
+起動時 → 分類時 → 変更時 → 終了時 の4ステージ。
+<!-- Legacy narrative (v1.x article style) removed in v2.0.0 to keep file focused on operational specification. Full historical content remains in git history if needed. -->
+tags: [tag1, tag2]
+references:
+   - docs/MASTER.md
+changeImpact: low | medium | high
+---
+```
+`changeImpact=high` → CHANGELOG 記載必須。
+
+---
+## 8. UPDATE / CHANGE POLICY
+1. 差分解析: 追加/変更行数, セクション種別
+2. impact 決定: low(誤字/整形) / medium(非破壊追加) / high(意味変更)
+3. version bump 規則適用
+4. high のみ CHANGELOG docs セクション追記
+5. リンク整合 / Glossary 同期 (新語追加時)
+
+---
+## 9. EXTENSION & SCALING POLICY
+Phase 移行時の追加例:
+- Optimization でパフォーマンス計測詳細 → `04-quality/VALIDATION.md` or 新 `PERFORMANCE.md` (条件を満たす場合のみ)
+- 新規観測/アラート仕様強化 → `05-operations/MONITORING.md` 拡張
+- 大幅なドメイン拡張 → `DOMAIN.md` Append (分割は 2000 行超え時に検討)
+
+---
+## 10. AI AGENT EXECUTION CHECKLIST
+BEFORE:
+- [ ] MASTER.md 読了宣言
+- [ ] フォルダ 01～08 完全性検証 / 自動補修
+- [ ] 必須ファイル存在確認
+
+DURING:
+- [ ] 分類マトリクス適用
+- [ ] 重複語彙検出 (Glossary)
+- [ ] Frontmatter 挿入 / 更新
+
+AFTER:
+- [ ] 参照リンク検証
+- [ ] impact=high → CHANGELOG 更新
+- [ ] Revision History 行追加
+
+---
+## 11. DO / DO NOT LIST
+DO:
+- 数値プリフィックス維持
+- 単一責務ファイル化
+- 冪等処理 (再実行で副作用なし)
+- Glossary 統合による語彙一貫性
+
+DO NOT:
+- 無番号フォルダ新設
+- 重複概念ファイル生成
+- Draft 30日放置 (deprecated へ提案)
+- 未分類コンテンツ直置き
+
+---
+## 12. ERROR HANDLING / RECOVERY
+| ケース | アクション | 結果コメント |
+|--------|------------|---------------|
+| フォルダ欠損 | 自動生成 | "AUTO CREATED <timestamp>" |
+| 必須ファイル欠損 | 雛形作成 | "AUTO GENERATED <timestamp>" |
+| 重複主題検出 | 統合提案/中断 | "DUPLICATE SUBJECT" |
+| 命名規約違反 | リネーム試行→失敗で中断 | "INVALID NAME" |
+| Frontmatter欠落 | 自動挿入 | "FRONTMATTER INJECTED" |
+
+重大失敗 (構造整合不可) → レポート出力後停止。
+
+---
+## 13. DECISION MATRIX 詳細
+| 質問 | YES → | NO → |
+|------|-------|-------|
+| ビジネス価値/背景か? | 01-context | 次へ |
+| 設計/構造か? | 02-design | 次へ |
+| 実装規約/手法か? | 03-implementation | 次へ |
+| 品質保証か? | 04-quality | 次へ |
+| 運用/監視か? | 05-operations | 次へ |
+| 決定記録/用語か? | 06-reference | 次へ |
+| 計画/進捗/リスクか? | 07-project-management | 次へ |
+| ナレッジ共有/FAQか? | 08-knowledge | 再評価 |
+
+最終行まで NO → コンテンツ再構造化要求 (新規ファイル拒否)。
+
+---
+## 14. REVISION HISTORY ルール
+各ファイル末尾 `Revision History` セクション (表形式)。新規更新ごとに 1 行追加。
+```
+| Date       | Author  | Version | Impact | Summary |
+|------------|---------|---------|--------|---------|
+| 2025-10-17 | agent   | 2.0.0   | high   | Rebuilt structure spec |
+```
+
+---
+## 15. GLOSSARY / LINKING 指針
+- 用語参照形式: `[用語](../06-reference/GLOSSARY.md#term-kebab)`
+- 新語追加条件: ドメインで3回以上再利用 / 曖昧性解消が必要
+- 定義フォーマット: 名称 / 英訳 / 定義 / 使用例 / 逆概念(optional)
+
+---
+## 16. DIFF IMPACT LEVELS & CHANGELOG 連携
+| impact | 例 | CHANGELOG 必須 |
+|--------|----|----------------|
+| low | 誤字 / 句読点 | いいえ |
+| medium | 新セクション追加 | いいえ (任意) |
+| high | 既存概念再定義 / 削除 / 破壊的変更 | はい |
+
+CHANGELOG 記載形式: `docs: <FileName> <summary>`
+
+---
+## 17. ONBOARDING QUICK START
+1. MASTER.md → 全体把握 (5分)
+2. ARCHITECTURE.md / DOMAIN.md → 技術+ビジネス理解 (15分)
+3. PATTERNS.md / TESTING.md → 実装/品質標準 (10分)
+4. FAQ.md → 一般的疑問解消 (5分)
+合計 35分以内で初回稼働可能。
+
+---
+## 18. FUTURE EVOLUTION NOTES
+将来コンテキストウィンドウ拡張 (≥1M tokens) 時:
+- 分割よりもメタ付与と動的抽出最適化へ移行
+- DECISIONS.md をイベント時系列ストリーム化 (JSON Lines)
+- Glossary を階層タグ + 用語間関係グラフ化
+
+---
+## 19. 最終チェックリスト (Committed 前に PASS 必須)
+```
+[ ] 01～08 全フォルダ存在
+[ ] REQUIRED MINIMUM FILE SET 全存在
+[ ] すべて Frontmatter 構文 OK
+[ ] 命名規約違反なし
+[ ] 重複語彙なし (Glossary)
+[ ] リンク切れなし
+[ ] impact=high → CHANGELOG 追記済
+[ ] Revision History 更新
+```
+
+---
+## MUST 命令 (AIエージェント向け抜粋)
+```
+MUST: 起動直後に下記フォルダ存在を検証し、欠損は即時生成すること:
+docs/01-context docs/02-design docs/03-implementation docs/04-quality 
+docs/05-operations docs/06-reference docs/07-project-management docs/08-knowledge
+
+MUST: REQUIRED MINIMUM FILE SET 不足時は空テンプレート＋Frontmatterを生成。
+
+MUST: 新規文書分類時 DECISION MATRIX に従い、曖昧なら既存関連ファイルへ append し新規ファイル作成を避ける。
+
+MUST: 重複主題検出時は統合提案し再生成を停止する。
+```
+
+---
+## Revision History
+| Date       | Author  | Version | Impact | Summary |
+|------------|---------|---------|--------|---------|
+| 2025-10-17 | agent   | 2.0.0   | high   | Replaced prior narrative with structured operational spec |
+
+---
+## 付録: 参考ファイル索引 (Cross-Reference)
+- MASTER.md: 全体統合ルール / 技術スタック / 禁止事項
+- PROJECT.md: ビジョン / 要件 / 非機能指標
+- ARCHITECTURE.md: レイヤー構造 / コンポーネント図 / エラー設計
+- DOMAIN.md: 集約 / エンティティ / ビジネスルール / ドメインイベント
+- PATTERNS.md: 実装/エラー/バリデーション/セキュリティ/パフォーマンス パターン
+- TESTING.md: テストピラミッド / カバレッジ目標 / AAA パターン
+- DEPLOYMENT.md: CI/CD / 環境 / リリース / ロールバック
+- GLOSSARY.md: 用語定義 / 英訳 / 関連語
+- ROADMAP.md: フェーズ計画 / マイルストーン / 依存関係
+- FAQ.md: よくある質問と回答
+
+本書は構造運用専用。ビジネス/設計/実装/品質詳細は上記参照のこと。
+
 
 ## 目次
 

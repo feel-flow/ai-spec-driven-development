@@ -4,6 +4,39 @@
 
 ## [Unreleased]
 
+## [v2.0.0] - 2025-10-16
+### Added
+- 新ドキュメント運用仕様書 `ai_spec_driven_development.md` (再構築後版): フロントマター標準・分類マトリクス・更新ポリシー・AIエージェント操作チェックリストを追加
+- 変更インパクトレベル (low/medium/high) と差分分類ルール
+- MUSTコマンド群によるAI自動化前提の運用フロー定義
+
+### Changed
+- 旧 `ai_spec_driven_development.md` の長文ナラティブ構成を撤廃し、< 1画面単位で把握可能なセクション化された運用仕様へ再編 (High Impact)
+- 文書間参照の正規化 (MASTER.md / ARCHITECTURE.md / DOMAIN.md との明示的 References)
+- バージョンを 0.x 系から 2.0.0 へメジャーアップ (構造的破壊的変更)
+
+### Removed
+- 冗長な歴史的説明・概念重複ブロック (>2000行) を削除し検索ノイズを解消
+
+### Security
+- ドキュメント変更時の補助チェックリストに「機密情報/シークレット流出防止」項目を追加 (セキュリティゲート強化)
+
+### Performance
+- AIエージェントのドキュメント読込ステップ短縮 (推定: 初期解析時間 ~60% 削減) に寄与する構造化 (定量計測予定)
+
+### Migration Notes
+- 旧構造参照している README 内リンクは自動/手動検証後に更新が必要 (Unreleased タスク)
+- 追加された差分分類 (HIGH/MEDIUM/LOW) を以後のドキュメントPRテンプレートへ反映予定
+
+### Impact
+- High Impact: 他AIエージェント文書参照順序/自動化フローに影響。CHANGELOG/ADR/LESSONS_LEARNED 更新必須。
+
+### Follow-up (Unreleased)
+- [ ] PRテンプレートへ Impact Level / 文書分類チェック項目を追加
+- [ ] docs/04-quality/VALIDATION.md にドキュメント構造検証手順を統合
+
+## [v0.3.0] - 2025-09-25
+
 ## [v0.3.0] - 2025-09-25
 ### Added
 - ナレッジ蓄積システム（08-knowledge/フォルダ）の追加
@@ -47,7 +80,8 @@
 - `docs/GETTING_STARTED.md`: AI駆動（ドキュメント基準）開発 Quickstart
 - Quickstart 前提（AI優先・一次情報での検証・時間は目安）
 
-[Unreleased]: https://github.com/feel-flow/ai-spec-driven-development/compare/v0.3.0...HEAD
+[Unreleased]: https://github.com/feel-flow/ai-spec-driven-development/compare/v2.0.0...HEAD
+[v2.0.0]: https://github.com/feel-flow/ai-spec-driven-development/releases/tag/v2.0.0
 [v0.3.0]: https://github.com/feel-flow/ai-spec-driven-development/releases/tag/v0.3.0
 [v0.2.0]: https://github.com/feel-flow/ai-spec-driven-development/releases/tag/v0.2.0
 [v0.1.0]: https://github.com/feel-flow/ai-spec-driven-development/releases/tag/v0.1.0
