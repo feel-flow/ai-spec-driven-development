@@ -268,11 +268,8 @@ function review_comments() {
   info "PR #$pr_number のレビューコメントを取得中..."
 
   echo ""
-  echo -e "${BLUE}========== PR情報 ==========${NC}"
-  gh pr view "$pr_number"
-
   echo ""
-  echo -e "${BLUE}========== レビューコメント ==========${NC}"
+  echo -e "${BLUE}========== PRとレビューコメント ==========${NC}"
   gh pr view "$pr_number" --comments
 
   echo ""
