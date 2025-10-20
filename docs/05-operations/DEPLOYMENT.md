@@ -177,7 +177,7 @@ echo "✅ Issue #${ISSUE_NUM} 完了
 # AIによる次タスク提案
 gh issue list \
   --label "ready" \
-  --sort "priority" \
+  --sort "updated" \
   --limit 5 \
   --json number,title,labels
 
