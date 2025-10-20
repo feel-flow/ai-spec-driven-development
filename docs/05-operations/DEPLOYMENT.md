@@ -145,6 +145,156 @@ gh pr comment ${PR_NUMBER} --body "指摘ありがとうございます。
 🤖 Claude Code"
 ```
 
+#### ステップ4.1: AIレビュースレッドへの返信（重要）
+
+**AIレビューツールからの指摘には、スレッド形式で返信し、再レビューをリクエストします。**
+
+##### 方法1: GitHub GraphQL APIを使用（推奨）
+
+```bash
+# 1. 未解決のレビュースレッドを確認
+gh api graphql -f query='
+query {
+  repository(owner: "OWNER", name: "REPO") {
+    pullRequest(number: PR_NUMBER) {
+      reviewThreads(first: 20) {
+        nodes {
+          id
+          isResolved
+          comments(first: 3) {
+            nodes {
+              author { login }
+              body
+            }
+          }
+        }
+      }
+    }
+  }
+}' --jq '.data.repository.pullRequest.reviewThreads.nodes[] | select(.isResolved == false)'
+
+# 2. スレッドに返信（修正内容を説明）
+cat > /tmp/reply.txt << 'EOF'
+指摘ありがとうございます。
+
+修正しました:
+
+## 変更内容
+- [具体的な修正内容]
+
+変更: [ファイル名:行番号]
+
+/gemini review
+
+🤖 Claude Code
+EOF
+
+# 3. スレッドIDを指定して返信
+THREAD_ID="PRRT_xxxxx"  # 上記のqueryで取得したid
+BODY=$(cat /tmp/reply.txt)
+
+gh api graphql -F body="$BODY" -f query='
+mutation($body: String!) {
+  addPullRequestReviewThreadReply(input: {
+    pullRequestReviewThreadId: "'"$THREAD_ID"'"
+    body: $body
+  }) {
+    comment { id }
+  }
+}'
+```
+
+**AIツール別の再レビューリクエストコマンド**:
+
+| AIツール | コマンド | 説明 |
+|---|---|---|
+| **Gemini Code Assist** | `/gemini review` | 返信の最後に記載 |
+| **GitHub Copilot** | `@githubcopilot review` | 返信の最後に記載 |
+| **その他** | 手動でレビュー依頼 | PRコメントで依頼 |
+
+##### 方法2: 自動化スクリプト使用（より簡単）
+
+```bash
+# scripts/ai-workflow.sh reply-review コマンド使用
+./scripts/ai-workflow.sh reply-review <PR番号> <スレッドID> <返信内容ファイル>
+
+# 例:
+cat > /tmp/my-reply.txt << 'EOF'
+指摘ありがとうございます。
+修正しました: [詳細]
+EOF
+
+./scripts/ai-workflow.sh reply-review 6 "PRRT_kwDOPT5Iqs5elVTu" /tmp/my-reply.txt
+```
+
+##### レビュー対応の完全なサイクル
+
+```bash
+# 1. レビュー指摘を確認
+gh pr view <PR番号> --comments
+
+# 2. 未解決スレッドを取得
+./scripts/ai-workflow.sh list-unresolved <PR番号>
+
+# 3. 修正実装
+# (AIツールで実装)
+
+# 4. コミット＆Push
+git add .
+git commit -m "fix: [レビュー指摘対応]"
+git push
+
+# 5. スレッドに返信（修正完了を報告）
+# 方法1: 手動でGraphQL API使用
+# 方法2: 自動化スクリプト使用（推奨）
+
+# 6. AIによる再レビューを待つ
+# （スレッド返信に /gemini review または @githubcopilot review を含めているため自動実行）
+```
+
+##### 実践例（PR #6での対応）
+
+```bash
+# 1. 未解決スレッドを確認
+gh api graphql -f query='...' | jq '.data.repository.pullRequest.reviewThreads.nodes[] | select(.isResolved == false)'
+
+# 結果: 5つの未解決スレッド発見
+
+# 2. 各スレッドに返信
+for thread_id in "PRRT_kwDOPT5Iqs5elVTu" "PRRT_kwDOPT5Iqs5elZVb" "PRRT_kwDOPT5Iqs5elZVk" "PRRT_kwDOPT5Iqs5elZVp"; do
+  # 修正内容をファイルに記載
+  cat > /tmp/reply_${thread_id}.txt << 'EOF'
+指摘ありがとうございます。
+[修正内容の詳細]
+/gemini review
+🤖 Claude Code
+EOF
+
+  # スレッドに返信
+  BODY=$(cat /tmp/reply_${thread_id}.txt)
+  gh api graphql -F body="$BODY" -f query='
+  mutation($body: String!) {
+    addPullRequestReviewThreadReply(input: {
+      pullRequestReviewThreadId: "'"$thread_id"'"
+      body: $body
+    }) {
+      comment { id }
+    }
+  }'
+done
+
+# 3. 全スレッドに返信完了
+# → Geminiが自動的に再レビューを実行
+# → 修正が承認されればスレッドが解決済みになる
+```
+
+##### 注意事項
+
+- **必ずスレッド形式で返信**: 一般コメントではなく、該当スレッドに返信
+- **再レビューコマンドを忘れずに**: `/gemini review` または `@githubcopilot review`
+- **修正内容を明確に**: 何をどう修正したかを具体的に記載
+- **ファイル名・行番号を含める**: レビュワーが確認しやすくする
+
 #### ステップ5: マージとクリーンアップ
 
 ```bash
