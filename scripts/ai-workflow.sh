@@ -196,7 +196,7 @@ function create_pr() {
   fi
 
   # ブランチ名からIssue番号を抽出
-  local issue_number=$(echo "$current_branch" | grep -oE '^[^/]+/([0-9]+)' | grep -oE '[0-9]+')
+  local issue_number=$(echo "$current_branch" | sed -n 's,^[^/]*/\([0-9]\+\).*$,\1,p')
 
   # ベースブランチを決定
   local base_branch="develop"
