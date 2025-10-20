@@ -26,6 +26,9 @@ AI仕様駆動Git Workflow - 自動化ヘルパースクリプト
   start-hotfix <title> <description>   緊急修正を開始（mainから分岐）
   create-pr                            PRを作成（AI生成の本文テンプレート使用）
   review-comments <pr-number>          PRのレビューコメントを表示（AI読み取り用）
+  list-unresolved <pr-number>          未解決のレビュースレッドを一覧表示
+  reply-review <pr-number> <thread-id> <reply-file> [ai-tool]
+                                       レビュースレッドに返信（ai-tool: gemini|copilot、デフォルト: gemini）
   merge-pr <pr-number>                 PRをマージしてクリーンアップ
   next-task                            次の優先タスクを表示
   status                               現在の作業状況を表示
@@ -34,6 +37,8 @@ AI仕様駆動Git Workflow - 自動化ヘルパースクリプト
   ./ai-workflow.sh start-feature "ユーザー認証" "JWTベースの認証を実装"
   ./ai-workflow.sh create-pr
   ./ai-workflow.sh review-comments 123
+  ./ai-workflow.sh list-unresolved 123
+  ./ai-workflow.sh reply-review 123 "PRRT_xxxxx" /tmp/reply.txt gemini
   ./ai-workflow.sh merge-pr 123
   ./ai-workflow.sh next-task
 
@@ -357,6 +362,139 @@ function show_status() {
   gh pr list --author "@me" --limit 5
 }
 
+# 未解決のレビュースレッドを一覧表示
+function list_unresolved() {
+  local pr_number="$1"
+
+  if [ -z "$pr_number" ]; then
+    error "PR番号を指定してください。"
+  fi
+
+  check_gh_cli
+  check_gh_auth
+
+  info "PR #$pr_number の未解決レビュースレッドを取得中..."
+
+  # リポジトリ情報を取得
+  local repo_info=$(gh repo view --json owner,name)
+  local owner=$(echo "$repo_info" | jq -r '.owner.login')
+  local repo=$(echo "$repo_info" | jq -r '.name')
+
+  # 未解決のスレッドを取得
+  gh api graphql -f query="
+  query {
+    repository(owner: \"$owner\", name: \"$repo\") {
+      pullRequest(number: $pr_number) {
+        reviewThreads(first: 20) {
+          nodes {
+            id
+            isResolved
+            path
+            line
+            comments(first: 3) {
+              nodes {
+                author { login }
+                body
+                createdAt
+              }
+            }
+          }
+        }
+      }
+    }
+  }" --jq '.data.repository.pullRequest.reviewThreads.nodes[] | select(.isResolved == false) | {id: .id, path: .path, line: .line, author: .comments.nodes[0].author.login, preview: .comments.nodes[0].body[0:100], createdAt: .comments.nodes[0].createdAt}'
+
+  echo ""
+  success "未解決スレッドの取得完了"
+}
+
+# レビュースレッドに返信
+function reply_review() {
+  local pr_number="$1"
+  local thread_id="$2"
+  local reply_file="$3"
+  local ai_tool="${4:-gemini}"  # デフォルトはgemini
+
+  if [ -z "$pr_number" ] || [ -z "$thread_id" ] || [ -z "$reply_file" ]; then
+    error "使用方法: reply-review <PR番号> <スレッドID> <返信ファイル> [ai-tool]"
+  fi
+
+  # PR番号の形式チェック
+  if ! [[ "$pr_number" =~ ^[0-9]+$ ]]; then
+    error "PR番号は数値で指定してください: $pr_number"
+  fi
+
+  # スレッドIDの形式チェック (PRRT_ で始まる)
+  if ! [[ "$thread_id" =~ ^PRRT_ ]]; then
+    error "スレッドIDはPRRT_で始まる形式で指定してください: $thread_id"
+  fi
+
+  if [ ! -f "$reply_file" ]; then
+    error "返信ファイルが見つかりません: $reply_file"
+  fi
+
+  check_gh_cli
+  check_gh_auth
+
+  info "PR #$pr_number のスレッド $thread_id に返信中..."
+
+  # 返信内容を読み込み
+  local reply_body=$(cat "$reply_file")
+
+  # AIツール別のコマンドを追加
+  case "$ai_tool" in
+    gemini)
+      reply_body="${reply_body}
+
+/gemini review
+
+🤖 Claude Code"
+      ;;
+    copilot)
+      reply_body="${reply_body}
+
+@githubcopilot review
+
+🤖 Claude Code"
+      ;;
+    *)
+      warning "不明なAIツール: $ai_tool (gemini/copilot を指定してください)"
+      warning "カスタムAIツールを追加する場合は、scripts/ai-workflow.shのreply_review関数を編集してください"
+      info "例: case文に新しいツール名とコマンドを追加"
+      reply_body="${reply_body}"
+      ;;
+  esac
+
+  # GraphQL APIで返信（エラーハンドリング付き）
+  local api_response
+  if ! api_response=$(gh api graphql -F body="$reply_body" -f query='
+  mutation($body: String!) {
+    addPullRequestReviewThreadReply(input: {
+      pullRequestReviewThreadId: "'"$thread_id"'"
+      body: $body
+    }) {
+      comment {
+        id
+        url
+      }
+    }
+  }' --jq '.data.addPullRequestReviewThreadReply.comment | {id: .id, url: .url}' 2>&1); then
+    error "GraphQL API呼び出しに失敗しました: $api_response"
+  fi
+
+  # レスポンスが空でないことを確認
+  if [ -z "$api_response" ] || [ "$api_response" = "null" ]; then
+    error "APIレスポンスが空です。スレッドID ($thread_id) が正しいか確認してください。"
+  fi
+
+  echo "$api_response"
+  success "スレッドへの返信が完了しました"
+
+  if [ "$ai_tool" = "gemini" ] || [ "$ai_tool" = "copilot" ]; then
+    info "AIツール ($ai_tool) による再レビューが自動的に開始されます"
+  fi
+}
+
 # メイン処理
 case "${1:-}" in
   start-feature)
@@ -370,6 +508,12 @@ case "${1:-}" in
     ;;
   review-comments)
     review_comments "$2"
+    ;;
+  list-unresolved)
+    list_unresolved "$2"
+    ;;
+  reply-review)
+    reply_review "$2" "$3" "$4" "$5"
     ;;
   merge-pr)
     merge_pr "$2"
