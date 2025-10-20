@@ -28,8 +28,8 @@ release/*     ← リリース準備ブランチ（developから分岐）
 #### ステップ1: Issue作成とブランチ作成
 
 ```bash
-# GitHub CLIでIssue作成
-gh issue create \
+# GitHub CLIでIssueを作成し、そのURLを取得
+ISSUE_URL=$(gh issue create \
   --title "feat: ユーザー認証機能を実装" \
   --body "## 概要
 - JWTベースの認証実装
@@ -40,10 +40,12 @@ gh issue create \
 - [ ] トークン検証が機能
 - [ ] テストカバレッジ80%以上" \
   --label "feature" \
-  --assignee "@me"
+  --assignee "@me")
 
-# Issue番号を取得してブランチ作成
-ISSUE_NUM=$(gh issue list --limit 1 --json number -q '.[0].number')
+# URLからIssue番号を抽出（複数人が同時にIssueを作成した場合の競合を回避）
+ISSUE_NUM=$(echo "$ISSUE_URL" | grep -oE '[0-9]+$')
+
+# ブランチ作成
 git checkout develop
 git pull origin develop
 git checkout -b "feature/${ISSUE_NUM}-user-auth"
