@@ -419,6 +419,16 @@ function reply_review() {
     error "使用方法: reply-review <PR番号> <スレッドID> <返信ファイル> [ai-tool]"
   fi
 
+  # PR番号の形式チェック
+  if ! [[ "$pr_number" =~ ^[0-9]+$ ]]; then
+    error "PR番号は数値で指定してください: $pr_number"
+  fi
+
+  # スレッドIDの形式チェック (PRRT_ で始まる)
+  if ! [[ "$thread_id" =~ ^PRRT_ ]]; then
+    error "スレッドIDはPRRT_で始まる形式で指定してください: $thread_id"
+  fi
+
   if [ ! -f "$reply_file" ]; then
     error "返信ファイルが見つかりません: $reply_file"
   fi
@@ -449,14 +459,15 @@ function reply_review() {
       ;;
     *)
       warning "不明なAIツール: $ai_tool (gemini/copilot を指定してください)"
-      reply_body="${reply_body}
-
-🤖 Claude Code"
+      warning "カスタムAIツールを追加する場合は、scripts/ai-workflow.shのreply_review関数を編集してください"
+      info "例: case文に新しいツール名とコマンドを追加"
+      reply_body="${reply_body}"
       ;;
   esac
 
-  # GraphQL APIで返信
-  gh api graphql -F body="$reply_body" -f query='
+  # GraphQL APIで返信（エラーハンドリング付き）
+  local api_response
+  if ! api_response=$(gh api graphql -F body="$reply_body" -f query='
   mutation($body: String!) {
     addPullRequestReviewThreadReply(input: {
       pullRequestReviewThreadId: "'"$thread_id"'"
@@ -467,10 +478,21 @@ function reply_review() {
         url
       }
     }
-  }' --jq '.data.addPullRequestReviewThreadReply.comment | {id: .id, url: .url}'
+  }' --jq '.data.addPullRequestReviewThreadReply.comment | {id: .id, url: .url}' 2>&1); then
+    error "GraphQL API呼び出しに失敗しました: $api_response"
+  fi
 
+  # レスポンスが空でないことを確認
+  if [ -z "$api_response" ] || [ "$api_response" = "null" ]; then
+    error "APIレスポンスが空です。スレッドID ($thread_id) が正しいか確認してください。"
+  fi
+
+  echo "$api_response"
   success "スレッドへの返信が完了しました"
-  info "AIツール ($ai_tool) による再レビューが自動的に開始されます"
+
+  if [ "$ai_tool" = "gemini" ] || [ "$ai_tool" = "copilot" ]; then
+    info "AIツール ($ai_tool) による再レビューが自動的に開始されます"
+  fi
 }
 
 # メイン処理

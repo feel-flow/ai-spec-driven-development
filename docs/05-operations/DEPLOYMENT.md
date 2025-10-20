@@ -214,18 +214,68 @@ mutation($body: String!) {
 
 ##### 方法2: 自動化スクリプト使用（より簡単）
 
+**コマンド形式**:
 ```bash
-# scripts/ai-workflow.sh reply-review コマンド使用
-./scripts/ai-workflow.sh reply-review <PR番号> <スレッドID> <返信内容ファイル>
+./scripts/ai-workflow.sh reply-review <PR番号> <スレッドID> <返信ファイル> [ai-tool]
+```
 
-# 例:
+**パラメータ**:
+- `<PR番号>`: 数値のみ（例: `6`）
+- `<スレッドID>`: `PRRT_` で始まるID（例: `PRRT_kwDOPT5Iqs5elVTu`）
+- `<返信ファイル>`: 返信内容を記載したテキストファイルのパス
+- `[ai-tool]`: オプション。`gemini`（デフォルト）または `copilot`
+
+**ステップ1: スレッドIDを取得**
+
+```bash
+# 未解決スレッドの一覧を表示
+./scripts/ai-workflow.sh list-unresolved 8
+
+# 出力例:
+# {
+#   "id": "PRRT_kwDOPT5Iqs5elpv8",
+#   "path": "scripts/ai-workflow.sh",
+#   "line": 470,
+#   "author": "gemini-code-assist",
+#   "preview": "The GraphQL API call in the `reply_review` function lacks error handling..."
+# }
+```
+
+**ステップ2: 返信内容ファイルを作成**
+
+```bash
+# 返信内容をファイルに記載
 cat > /tmp/my-reply.txt << 'EOF'
 指摘ありがとうございます。
-修正しました: [詳細]
-EOF
 
-./scripts/ai-workflow.sh reply-review 6 "PRRT_kwDOPT5Iqs5elVTu" /tmp/my-reply.txt
+## 修正内容
+- GraphQL API呼び出しにエラーハンドリングを追加
+- try-catchでネットワークエラーをキャッチ
+- わかりやすいエラーメッセージを表示
+
+## 変更箇所
+- scripts/ai-workflow.sh:470-483
+
+参照: scripts/ai-workflow.sh:470
+EOF
 ```
+
+**ステップ3: スレッドに返信**
+
+```bash
+# Gemini Code Assistの場合（デフォルト）
+./scripts/ai-workflow.sh reply-review 8 "PRRT_kwDOPT5Iqs5elpv8" /tmp/my-reply.txt
+
+# GitHub Copilotの場合
+./scripts/ai-workflow.sh reply-review 8 "PRRT_kwDOPT5Iqs5elpv8" /tmp/my-reply.txt copilot
+```
+
+スクリプトが自動的に以下を実行します:
+1. 返信内容ファイルを読み込み
+2. AIツール別の再レビューコマンドを追加（`/gemini review` または `@githubcopilot review`）
+3. `🤖 Claude Code` サフィックスを追加
+4. GraphQL APIでスレッドに返信投稿
+5. エラーハンドリング（API失敗時はエラーメッセージ表示）
 
 ##### レビュー対応の完全なサイクル
 
