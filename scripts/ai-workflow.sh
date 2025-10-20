@@ -177,7 +177,7 @@ $description
   git checkout main
   git pull origin main
 
-  local branch_name="hotfix/${issue_number}-$(echo "$title" | sed 's/ /-/g' | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9-]//g')"
+  local branch_name="hotfix/${issue_number}-$(echo "$title" | tr '[:upper:]' '[:lower:]' | sed -e 's/[^a-z0-9]/-/g' -e 's/-\{1,\}/-/g' -e 's/-\|$//g')"
   git checkout -b "$branch_name"
 
   success "ブランチ '$branch_name' を作成しました"
