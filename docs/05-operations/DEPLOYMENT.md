@@ -213,7 +213,7 @@ Closes #<issue>
 Co-Authored-By: Claude <noreply@anthropic.com>
 ```
 
-**type**: feat, fix, docs, style, refactor, test, chore
+**type**: feat, fix, docs, style, refactor, test, chore, hotfix, release
 
 #### ブランチ保護ルール
 ```yaml
