@@ -120,6 +120,20 @@
 5. デプロイ（DEPLOYMENT.md参照）
 6. 開発環境最適化（DEPLOYMENT.md「開発環境の最適化」参照）
 
+## AI仕様駆動Git Workflow
+本プロジェクトでは、Git FlowをベースとしたAI開発ツール最適化ワークフローを採用しています。
+
+**基本フロー**: Issue → Branch → Commit → PR → Review → Merge → Cleanup → Next Task
+
+詳細は [DEPLOYMENT.md](./05-operations/DEPLOYMENT.md#1-ai仕様駆動git-workflow) を参照してください。
+
+**重要なポイント**:
+- すべての作業はIssueから開始
+- ブランチ名: `feature/{issue-number}-{description}`
+- コミットメッセージにドキュメント参照を含める（例: `docs/MASTER.md:29`）
+- AIがPRレビュー指摘を自動読み取り・対応
+- マージ後は自動的にロードマップ更新と次タスク提案
+
 ## AIへのプロンプト補助（貼り付け用）
 以下をプロンプト末尾に追加し、マジックナンバー回避と設定注入を徹底してください。
 
