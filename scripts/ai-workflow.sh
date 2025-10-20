@@ -299,7 +299,7 @@ function merge_pr() {
 
   success "PR #$pr_number をマージしました"
 
-  local base_branch=$(check_develop_branch)
+  local base_branch=$(gh pr view "$pr_number" --json baseRefName -q .baseRefName)
 
   info "${base_branch}ブランチに戻ります..."
   git checkout "$base_branch"
