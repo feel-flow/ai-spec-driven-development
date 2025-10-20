@@ -467,7 +467,7 @@ npx husky init
 npx --no-install commitlint --edit "$1"
 
 # ドキュメント参照チェック
-if ! grep -qE "参照:|参照:" "$1"; then
+if ! grep -iqE "参照:" "$1"; then
   echo "エラー: コミットメッセージにドキュメント参照が含まれていません"
   echo "例: 参照: docs/MASTER.md:29"
   exit 1
