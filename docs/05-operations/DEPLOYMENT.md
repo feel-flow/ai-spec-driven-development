@@ -634,10 +634,51 @@ documentation:
   - 'docs/**'
   - '**/*.md'
 
-ai-generated:
-  - any: ['**/*']
-    all-globs-to-all-files: true
-    # コミットメッセージに「🤖」が含まれる場合
+scripts:
+  - 'scripts/**'
+```
+
+**補足: AI生成コードの識別**
+
+`actions/labeler`はファイルパスベースのラベリングのみサポートしており、コミットメッセージに基づいたラベリングはできません。AI生成コードを識別したい場合は、以下の代替手段があります：
+
+**方法1: PRタイトル/本文ベースのラベリング**
+
+```yaml
+# .github/workflows/ai-label.yml
+name: AI Label
+
+on:
+  pull_request:
+    types: [opened, edited]
+
+jobs:
+  label:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/github-script@v6
+        with:
+          script: |
+            const prBody = context.payload.pull_request.body || '';
+            const prTitle = context.payload.pull_request.title || '';
+
+            // 🤖 絵文字またはClaude Code署名があればai-generatedラベルを追加
+            if (prBody.includes('🤖') || prBody.includes('Claude Code') || prTitle.includes('🤖')) {
+              await github.rest.issues.addLabels({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.payload.pull_request.number,
+                labels: ['ai-generated']
+              });
+            }
+```
+
+**方法2: 手動ラベリング**
+
+AIツールを使用した場合は、PR作成時に明示的に`--label ai-generated`を指定：
+
+```bash
+gh pr create --base develop --title "..." --body "..." --label ai-generated
 ```
 
 ### 1.4 完全無料で実現する推奨構成
