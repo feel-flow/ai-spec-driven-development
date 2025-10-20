@@ -566,7 +566,7 @@ jobs:
               });
             }
 
-  # コミットメッセージ検証
+  # コミットメッセージ検証（各コミットを個別に検証）
   validate-commits:
     if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
@@ -575,17 +575,33 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Validate Commit Messages
-        run: |
-          commits=$(git log --format=%B origin/${{ github.base_ref }}..HEAD)
-          if ! echo "$commits" | grep -qE "(feat|fix|docs|style|refactor|test|chore):"; then
-            echo "エラー: Conventional Commits形式に準拠していないコミットがあります"
-            exit 1
-          fi
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
 
-          if ! echo "$commits" | grep -qE "参照:|参照:"; then
-            echo "警告: ドキュメント参照が含まれていないコミットがあります"
-          fi
+      - name: Install commitlint
+        run: |
+          npm install --save-dev @commitlint/cli @commitlint/config-conventional
+
+      - name: Validate each commit with commitlint
+        uses: wagoid/commitlint-github-action@v5
+        with:
+          configFile: commitlint.config.js
+
+      - name: Check for documentation references (custom rule)
+        run: |
+          # 各コミットメッセージを個別に検証
+          git log --format=%H origin/${{ github.base_ref }}..HEAD | while read commit_hash; do
+            commit_msg=$(git log -1 --format=%B "$commit_hash")
+            commit_subject=$(git log -1 --format=%s "$commit_hash")
+
+            # ドキュメント参照チェック（警告のみ）
+            if ! echo "$commit_msg" | grep -qE "参照:|参照:"; then
+              echo "⚠️  警告: コミット $commit_hash にドキュメント参照が含まれていません"
+              echo "   件名: $commit_subject"
+            fi
+          done
 
   # レビューコメント通知（AIツールに通知）
   notify-review-comments:
