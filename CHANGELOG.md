@@ -3,6 +3,30 @@
 このプロジェクトの変更履歴。フォーマットは Keep a Changelog に準拠し、SemVer でバージョニングします。
 
 ## [Unreleased]
+### Added
+- **Claude Skills統合ガイド**: AI仕様駆動開発を完全自動化する Claude Skills の詳細ガイドを追加
+  - `ai_spec_driven_development.md`: 新セクション「12. Claude Skillsによる実践的活用」
+    - スキルの概要と特徴（モデル起動型、再利用可能性、拡張性）
+    - 5分で完了する自動生成手順
+    - 4つの自動化機能（プロジェクト初期化、新規ドキュメント追加、影響度評価、コミット前検証）
+    - プロジェクトライフサイクル全体での実践例（Week 1-4）
+    - チーム導入のベストプラクティス（スキル共有、標準プロンプト集、トラブルシューティング）
+    - 測定可能な成果（92-90%の時間削減、100%の一貫性向上）
+  - `docs/03-implementation/INTEGRATIONS.md`: AI開発ツール統合セクションを新設
+    - 1.1 Claude Skills統合（インストール、機能、使用例、トラブルシューティング）
+    - 1.2 GitHub Copilot統合（.github/copilot-instructions.md の設定例）
+    - 1.3 Cursor統合（.cursorrules ファイルの設定例）
+  - `docs/GETTING_STARTED.md`: Claude Skillsクイックスタートセクションを追加
+    - 5分でできるインストール手順
+    - 基本的な使用例（プロジェクト初期化、新規ドキュメント追加、コミット前検証）
+    - 詳細ガイドへのリンク
+
+### Changed
+- 既存のセクション「12. まとめ：パラダイムシフトの必要性」をセクション13に変更（Claude Skillsセクション追加に伴う構造調整）
+- 目次を更新し、新セクション12とサブセクション（12.1-12.5）を追加
+
+### Impact
+- Medium Impact: Claude Code ユーザー向けの実践的な自動化ガイドを提供。既存の文書構造には影響なし。
 
 ## [v2.0.0] - 2025-10-16
 ### Added

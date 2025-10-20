@@ -132,5 +132,79 @@ AI（Claude Code / GitHub Copilot）で迷わず実装できる「最小限の�
 
 ---
 
+## Claude Skillsでさらに生産性を向上（推奨）
+
+Claude Code ユーザーは、AI仕様駆動開発専用のスキルを導入することで、ドキュメント管理を自動化できます。
+
+### Claude Skillsとは
+
+Claude Skillsは、特定のワークフローに特化した再利用可能な機能パッケージです。AI仕様駆動開発スキルをインストールすると、Claude Codeが自動的に以下を実行します：
+
+- プロジェクト初期化（フォルダ構造の自動生成）
+- ドキュメント構造の検証と自動補修
+- 新規ドキュメントの適切な配置支援
+- ドキュメント更新時の影響度評価
+- MASTER.md索引の自動更新
+- Frontmatterメタデータの自動挿入
+- コミット前の検証チェックリスト実行
+
+### クイックインストール（5分）
+
+Claude Codeで以下のプロンプトを実行するだけで、スキルが自動生成されます：
+
+```
+Claude Code用のスキルを作成したいです。
+
+【目的】
+AI仕様駆動開発の方法論に基づいて、プロジェクトのドキュメント構造を自動管理するスキルを作成
+
+【参考資料】
+- 公式リポジトリ: https://github.com/feel-flow/ai-spec-driven-development
+- 方法論ドキュメント: https://github.com/feel-flow/ai-spec-driven-development/blob/develop/ai_spec_driven_development.md
+
+【実装してほしい機能】
+1. プロジェクト初期化（フォルダ構造の自動生成）
+2. ドキュメント構造の検証と自動補修
+3. 新規ドキュメントの適切な配置支援
+4. ドキュメント更新時の影響度評価
+5. MASTER.md索引の自動更新
+6. Frontmatterメタデータの自動挿入
+7. 用語集・決定記録の管理
+8. コミット前の検証チェックリスト実行
+
+【スキルが起動する条件】
+- 「AI仕様駆動開発を導入したい」
+- 「ドキュメント構造を検証したい」
+- 「新しいドキュメントを追加したい」
+- 「コミット前にチェックしたい」
+
+お願いします！
+```
+
+### 使用例
+
+スキルインストール後は、以下のような指示だけでAI仕様駆動開発のドキュメント構造が自動生成・管理されます：
+
+```
+# プロジェクト初期化
+「このプロジェクトにAI仕様駆動開発を導入したい」
+
+# 新規ドキュメント追加
+「データベース設計のドキュメントを追加したい」
+
+# コミット前検証
+「コミット前にドキュメントをチェックしたい」
+```
+
+### 詳細ガイド
+
+Claude Skillsの詳細な使い方、トラブルシューティング、ベストプラクティスについては、以下のリソースを参照してください：
+
+- [Claude Skills完全ガイド（日本語）](https://github.com/feel-flow/flow-note-ai/blob/main/CLAUDE_SKILLS_SETUP_GUIDE.md)
+- [Claude Code公式ドキュメント](https://docs.claude.com/en/docs/claude-code)
+- [Skills公式リポジトリ](https://github.com/anthropics/skills)
+
+---
+
 ## このリポジトリでの位置づけ
 本ガイドは `docs/MASTER.md` を起点に、`01-context`/`02-design`/`03-implementation`/`04-quality`/`05-operations`/`06-reference`/`07-project-management` の7構成でAIが迷わない導線を作るための実務補助です。
