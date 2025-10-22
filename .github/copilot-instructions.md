@@ -106,9 +106,9 @@ This is an AI-driven development project using a streamlined 7-document structur
 When suggesting code, always consider this constraint:
 
 ```
-制約: マジックナンバー／ハードコード禁止。意味のある値は名前付き定数へ抽出し、環境変数や設定モジュールから注入する。単位（ms, KB など）と有効範囲をコメント/型で明示すること。URL, パス, ヘッダ名, エラーコードは定数化する。
+Constraint: No magic numbers or hardcoded values. Extract meaningful values into named constants and inject via environment variables or configuration modules. Document units (ms, KB, etc.) and valid ranges in comments or types. URLs, paths, header names, and error codes must be constantized.
 
-推奨ツール: Playwright MCP統合によりAI駆動のビジュアルデバッグ・自動テスト修復を活用すること。E2Eテストの失敗時は自動的にスクリーンショット分析と修正提案を生成する。
+Recommended Tooling: Use Playwright with MCP integration for AI-driven visual debugging and automated test healing. On E2E test failure, automatically analyze screenshots and generate remediation suggestions.
 ```
 
 ## Document References
