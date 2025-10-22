@@ -143,6 +143,101 @@
 推奨ツール: Playwright MCP統合によりAI駆動のビジュアルデバッグ・自動テスト修復を活用すること。E2Eテストの失敗時は自動的にスクリーンショット分析と修正提案を生成する。
 ```
 
+## Spec Kit 運用ガイド（AI Spec Driven 拡張）
+本リポジトリは AI Spec Driven Development を GitHub Spec Kit 風の粒度管理で拡張し、仕様ライフサイクルとLLM利活用を統合する。
+
+### 目的
+- 仕様を小さく明確な単位 (spec) に分割し、変更追跡・レビュー・検索性を高める。
+- Front Matter メタデータでステータス/責任者/リンクを明示し、CI検証を自動化。
+- MCPツール (`spec_lookup`, `spec_search`) を通じて LLM に最小コンテキストを供給。
+
+### 仕様配置
+- ディレクトリ: `docs/specs/`
+- テンプレート: `docs/specs/spec-template.md`
+- サンプル: `docs/specs/authentication.md`
+
+### Front Matter スキーマ（必須フィールド）
+```
+specId: ASDD-DOMAIN-###   # 一意。例: ASDD-AUTH-001
+title: <短く的確>
+owners:                   # 配列（将来GitHubハンドルやチームID）
+  - github: your-handle
+status: draft|review|approved|implementing|done|deprecated
+version: semver
+lastUpdated: YYYY-MM-DD
+tags: [mvp, security, ...]
+links:                    # 任意。Issue/PR/関連doc参照
+  issues: []
+  prs: []
+  docs: []
+summary: >- 1〜2文要約
+riskLevel: low|medium|high
+impact: >- 影響領域要約
+metrics:
+  success:
+    - 指標例: login_success_rate >= 98%
+  guardrails:
+    - 指標例: auth_latency_p95 < 150ms
+```
+
+### ライフサイクル
+| 状態 | 目的 | 代表アクション | 出口条件 |
+|------|------|---------------|----------|
+| draft | 初稿作成 | 草案コミット | レビューワ割当 | 
+| review | 内容検証 | フィードバック反映 | 全必須コメント解消 |
+| approved | 合意済 | 実装Issue紐付 | 実装着手 | 
+| implementing | 実装中 | PRリンク追加 | 全PRマージ | 
+| done | 運用 | メトリクス監視 | 非推奨決定 | 
+| deprecated | 廃止準備 | 代替spec参照 | 削除 or 置換 | 
+
+### 命名規約（specId）
+`ASDD-<DOMAIN>-<連番3桁>` 例: `ASDD-AUTH-001`, `ASDD-OBS-002`
+- DOMAIN: AUTH, USER, OBS(Observability), DATA など領域識別
+- 連番は領域内でインクリメント（欠番許容）
+
+### バリデーション
+- スクリプト: `node scripts/build-spec-index.mjs`
+- 失敗条件: specId欠落 / 重複 / status不正 / title欠落 / version欠落
+- 出力: `dist/spec-index.json`（MCPおよびCI用）
+
+### MCP連携
+| ツール | 目的 | 入力 | 出力 |
+|--------|------|------|------|
+| `spec_lookup` | spec詳細取得 | specId | front matter + 本文 | 
+| `spec_search` | タイトル/タグ簡易検索 | query, limit | specId/score一覧 |
+
+### 開発フロー統合
+1. Issue起票（新仕様 or 変更）
+2. テンプレコピー→ `specId` 割当 → draftコミット
+3. PRでレビュー（reviewステータス）
+4. Merge後 `approved` に更新 & 実装Issue作成
+5. 実装ブランチ / PRリンク (`links.prs`) 追記 → 全マージで `done`
+6. 古い仕様再編時は新spec参照付与後 `deprecated`
+
+### 追跡と自動化（将来拡張）
+- CI: spec-index再生成 → エラーでPR失敗
+- Bot: 未リンク `approved` spec に自動Issue起票
+- 差分ハイライト: 直前バージョン比較で変更要約生成
+
+### ベストプラクティス
+- 1仕様 = 1つの「判断 + 境界 + 目的」単位。過剰分割は避ける。
+- 仕様本文は「Why → What → Constraints → Risks → Metrics」の順で簡潔。
+- 実装詳細が複雑化した場合は派生specを分けて依存リンク明示。
+
+### レビューチェック項目（追加）
+- [ ] specIdユニーク / パターン適合
+- [ ] Goals と Non-Goals 明確
+- [ ] Metrics に成功指標とガードレール両方が定義
+- [ ] リスクに少なくとも1件の緩和策
+- [ ] links.docs / issues / prs の更新整合
+
+### LLM利用時推奨プロンプト追記例
+```
+必要spec: ASDD-AUTH-001 を `spec_lookup` で取得し、未定義領域が他specに依存する場合は spec_search で補集合を提案せよ。
+```
+
+---
+
 ## 関連ドキュメント
 - [GETTING_STARTED.md](./GETTING_STARTED.md) - Quickstart（AI駆動・読み順・プロンプト）
 - [01-context/PROJECT.md](./01-context/PROJECT.md) - ビジョンと要件
