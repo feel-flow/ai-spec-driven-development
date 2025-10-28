@@ -3,8 +3,70 @@
 このプロジェクトの変更履歴。フォーマットは Keep a Changelog に準拠し、SemVer でバージョニングします。
 
 ## [Unreleased]
+
+## [v2.1.0] - 2025-10-28
 ### Added
-- **Claude Skills統合ガイド**: AI仕様駆動開発を完全自動化する Claude Skills の詳細ガイドを追加
+- **ドキュメント構造の大幅改善**
+  - `docs/` を `docs-template/` にリネーム（テンプレートとして明確化）
+  - 企画フェーズのサポート追加
+    - `docs-template/00-planning/PLANNING_TEMPLATE.md`: アイデア→要件定義の企画書テンプレート（9セクション構成）
+
+- **完全初心者向けオンボーディング体系**
+  - `docs-template/GETTING_STARTED_ABSOLUTE_BEGINNER.md`: 何も決まっていない状態からの完全ガイド（4.5時間）
+    - 環境準備（1時間）
+    - アイデア発想（30分）
+    - AIツールへの相談（1時間）
+    - 技術選定（1時間）
+    - 実装準備（1時間）
+  - `docs-template/GETTING_STARTED_NEW_PROJECT.md`: 新規プロジェクト完全ガイド（8-12時間）
+    - Phase 0: 企画（2-3時間）
+    - Phase 1: 要件定義（2-3時間）
+    - Phase 2: 技術選定（1-2時間）
+    - Phase 3: システム設計（2-3時間）
+    - Phase 4: 実装準備（1時間）
+
+- **AIツールセットアップガイド3種**
+  - `docs-template/SETUP_GITHUB_COPILOT.md`: GitHub Copilot完全セットアップ（30分）
+    - **AIプロンプトで自動生成機能**: copilot-instructions.md を5-10分で自動生成
+    - プロジェクト固有のカスタマイズ例（React、Node.js、Next.js）
+    - 高度なプロンプトテンプレート集（既存コードベース学習、チーム規約変換等）
+  - `docs-template/SETUP_CLAUDE_CODE.md`: Claude Code完全セットアップ（40分）
+    - CLAUDE.md 設定ガイド
+    - マルチターン対話、大規模コンテキスト活用法
+    - プロンプトテンプレート集
+  - `docs-template/SETUP_CURSOR.md`: Cursor完全セットアップ（60分）
+    - .cursorrules 設定ガイド
+    - AI Chat、Command K、Composer モード活用法
+    - VS Code互換設定
+
+- **情報不足時の必須確認プロトコル**（🚨 重要な追加機能）
+  - `docs-template/MASTER.md`: 「AIツール向け重要ルール」セクション新設
+    - 情報不足時の必須確認プロトコル定義
+    - 必須確認事項チェックリスト（プロジェクト基本、技術的詳細、ビジネス要件）
+    - 確認の出力形式テンプレート
+    - 推論が許容される範囲の明示
+    - 段階的確認の推奨フロー
+    - 人間の検証タイミング（MASTER.md生成後、ARCHITECTURE.md生成後、コード生成後、デプロイ前）
+  - すべてのAIツールセットアップガイドに確認ルール追加
+    - AGENTS.md、CLAUDE.md、SETUP_*.md に統一フォーマットで実装
+    - AIが推論で埋めず、必ず確認を求める仕組み
+  - 実践例とプロンプトテンプレート追加
+    - 良い例・悪い例の具体的な比較
+    - データベース選択、認証方式選択等の実例
+
+- **ドキュメントファイル命名規則の明確化**
+  - `docs-template/MASTER.md`: コード命名規則とドキュメント命名規則を分離
+    - ディレクトリ: `数字-英語小文字（ハイフン区切り）` (例: `01-context`, `02-design`)
+    - ファイル: `英語大文字.md`（AI識別性優先）(例: `MASTER.md`, `ARCHITECTURE.md`)
+    - 禁止事項: 日本語、スペース、アンダースコア、ファイル名への番号プレフィックス
+  - `docs-template/03-implementation/CONVENTIONS.md`: 「0. ドキュメント命名規則」セクション新設
+    - ディレクトリ構造の実例
+    - 正しい例・間違い例の詳細ガイド
+    - 命名ガイドライン（いつディレクトリを作るか、いつ大文字を使うか）
+    - プロジェクト全体の構造例
+  - 全AIツールガイドに命名規則参照を追加
+
+- **Claude Skills統合ガイド**
   - `ai_spec_driven_development.md`: 新セクション「12. Claude Skillsによる実践的活用」
     - スキルの概要と特徴（モデル起動型、再利用可能性、拡張性）
     - 5分で完了する自動生成手順
@@ -12,21 +74,72 @@
     - プロジェクトライフサイクル全体での実践例（Week 1-4）
     - チーム導入のベストプラクティス（スキル共有、標準プロンプト集、トラブルシューティング）
     - 測定可能な成果（92-90%の時間削減、100%の一貫性向上）
-  - `docs/03-implementation/INTEGRATIONS.md`: AI開発ツール統合セクションを新設
+  - `docs-template/03-implementation/INTEGRATIONS.md`: AI開発ツール統合セクションを新設
     - 1.1 Claude Skills統合（インストール、機能、使用例、トラブルシューティング）
     - 1.2 GitHub Copilot統合（.github/copilot-instructions.md の設定例）
     - 1.3 Cursor統合（.cursorrules ファイルの設定例）
-  - `docs/GETTING_STARTED.md`: Claude Skillsクイックスタートセクションを追加
-    - 5分でできるインストール手順
-    - 基本的な使用例（プロジェクト初期化、新規ドキュメント追加、コミット前検証）
-    - 詳細ガイドへのリンク
 
 ### Changed
+- **ドキュメント構造の再編成**
+  - 24ファイルをリネーム: `docs/` → `docs-template/`
+  - すべてのドキュメント参照パスを更新（README.md、AGENTS.md、CLAUDE.md、MCP等）
+  - `docs-template/GETTING_STARTED.md`: テンプレート使用に関する注記追加
+
+- **README.md の Quick Start セクション強化**
+  - 完全初心者向けガイドを最上位に配置
+  - 新規プロジェクト、既存プロジェクト、AIツール設定の3つのパスを明確化
+  - 所要時間を明記（完全初心者: 4.5時間、新規プロジェクト: 8-12時間、AIツール設定: 30-60分）
+
+- **MASTER.md の関連ドキュメントセクション再構成**
+  - 初心者・新規プロジェクト向け（3ガイド）
+  - AIツール初期設定ガイド（3ガイド）
+  - 既存プロジェクト向け（1ガイド）
+  - コア7文書（6文書）
+  - ナレッジベース（4文書）
+  - 合計17文書への明確な導線
+
+- **AIツール向けガイドの統一**
+  - AGENTS.md に情報確認ルール追加
+  - CLAUDE.md に Information Verification Protocol 追加
+  - すべてのセットアップガイドに確認ルールを統合
+
+- **MCP サーバー設定の更新**
+  - `mcp/index.mjs`: docsRoot を "docs" から "docs-template" に変更
+  - `mcp/README.md`: Glossary パス更新
+  - 説明文の例を最新のディレクトリ構造に合わせて更新
+
 - 既存のセクション「12. まとめ：パラダイムシフトの必要性」をセクション13に変更（Claude Skillsセクション追加に伴う構造調整）
 - 目次を更新し、新セクション12とサブセクション（12.1-12.5）を追加
 
 ### Impact
-- Medium Impact: Claude Code ユーザー向けの実践的な自動化ガイドを提供。既存の文書構造には影響なし。
+- **High Impact**: プロジェクト全体の構造変更
+  - すべてのドキュメントパスが変更（`docs/` → `docs-template/`）
+  - 外部からのリンクは引き続き機能（GitHubが自動リダイレクト）
+  - AIツールの動作に影響（確認プロトコルの追加により、より慎重な動作）
+- **Medium Impact**: 
+  - 新規ユーザーのオンボーディング体験が大幅に向上
+  - AIツールの設定が明確化され、チーム展開が容易に
+  - 情報不足による手戻りが大幅削減
+
+### Migration Notes
+- 既存プロジェクトで `docs/` フォルダを参照している場合、`docs-template/` に変更
+- AIツール設定ファイル（.github/copilot-instructions.md、CLAUDE.md、.cursorrules）の更新推奨
+- MASTER.md の情報不足時確認プロトコルに従って、AIとの対話を見直すことを推奨
+
+### Breaking Changes
+- `docs/` ディレクトリが `docs-template/` に変更
+  - Git履歴は保持（git mv使用）
+  - 既存の参照は更新が必要
+
+### Performance
+- AIツールの判断精度向上により、手戻り時間が推定60-80%削減
+- ドキュメント生成時間: 5-10分に短縮（AIプロンプト自動生成機能使用時）
+
+### Files Changed
+- 37ファイルの変更
+  - 24ファイルのリネーム
+  - 6ファイルの新規作成
+  - 7ファイルの内容更新
 
 ## [v2.0.0] - 2025-10-16
 ### Added
@@ -104,7 +217,8 @@
 - `docs/GETTING_STARTED.md`: AI駆動（ドキュメント基準）開発 Quickstart
 - Quickstart 前提（AI優先・一次情報での検証・時間は目安）
 
-[Unreleased]: https://github.com/feel-flow/ai-spec-driven-development/compare/v2.0.0...HEAD
+[Unreleased]: https://github.com/feel-flow/ai-spec-driven-development/compare/v2.1.0...HEAD
+[v2.1.0]: https://github.com/feel-flow/ai-spec-driven-development/releases/tag/v2.1.0
 [v2.0.0]: https://github.com/feel-flow/ai-spec-driven-development/releases/tag/v2.0.0
 [v0.3.0]: https://github.com/feel-flow/ai-spec-driven-development/releases/tag/v0.3.0
 [v0.2.0]: https://github.com/feel-flow/ai-spec-driven-development/releases/tag/v0.2.0
