@@ -4,7 +4,7 @@
 
 ## 🚨 必須: 作業開始前にMASTER.mdを必ず参照
 
-**このプロジェクトで作業を開始する前に、必ず `docs/MASTER.md` を読み、内容を理解してください。**
+**このプロジェクトで作業を開始する前に、必ず `docs-template/MASTER.md` を読み、内容を理解してください。**
 
 ### なぜMASTER.mdが重要なのか
 
@@ -28,6 +28,88 @@ MASTER.mdには以下の重要な情報が含まれています：
 - パフォーマンス目標を無視した非効率な実装
 - チームのコーディング規約に反するコード
 
+## 🚨 重要: 情報不足時の確認ルール
+
+**すべてのAIエージェントは、情報が不足している場合、推論で埋めずに必ず確認を求めること。**
+
+### 必須確認が必要な情報
+
+以下の情報が不明な場合は、**推論せずに必ず確認**してください：
+
+**プロジェクト基本情報**:
+- プロジェクト名（具体的な名称）
+- ターゲットユーザー（誰のために作るか）
+- 主要機能（何を実現するか）
+- 技術スタック（使用する言語・フレームワーク）
+
+**技術的詳細**:
+- データベース種別（PostgreSQL? MongoDB? MySQL?）
+- 認証方式（JWT? OAuth? Session?）
+- デプロイ環境（AWS? GCP? Azure? Vercel?）
+- API形式（REST? GraphQL? gRPC?）
+
+**ビジネス要件**:
+- パフォーマンス要件（具体的な数値）
+- セキュリティ要件（必須の対策）
+- スケーラビリティ要件（同時接続数等）
+
+### 確認の出力形式（テンプレート）
+
+```markdown
+⚠️ 情報不足により確認が必要です
+
+以下の情報が不足しているため、推論では進められません。
+確認をお願いします：
+
+【必須確認事項】
+1. [項目名]: [何が不明か]
+   - 例: データベース種別
+   - 理由: PostgreSQLとMongoDBで設計が大きく異なるため
+   - 推奨: PostgreSQL（リレーショナルデータの場合）/ MongoDB（ドキュメント指向の場合）
+
+2. [項目名]: [何が不明か]
+   ...
+
+【オプション確認事項（推論で進める場合の前提）】
+1. [項目名]: [推論内容]
+   - 前提: [この前提で進めます]
+   - リスク: [後で変更が必要になる可能性]
+   - 確認推奨: はい/いいえ
+
+【次のステップ】
+上記を確認後、以下のように指示してください：
+「[確認された情報]で進めてください」
+```
+
+### 推論が許容される範囲（明記が必須）
+
+以下は**明示的な指示がない場合のデフォルト値**として使用可（ただし必ず明記すること）：
+
+- ✅ TypeScript strict mode: 常に有効
+- ✅ テストカバレッジ目標: 80%以上
+- ✅ マジックナンバー禁止: 常に適用
+- ✅ エラーハンドリング: Result pattern使用
+- ✅ 命名規則: MASTER.mdの規則に従う
+
+**❌ 推論禁止の例**:
+```
+悪い例:
+「データベースは一般的なので、PostgreSQLで進めます」
+→ ユーザーがMySQLを想定していた場合、全て作り直し
+
+良い例:
+「データベース種別が指定されていません。
+以下から選択してください：
+1. PostgreSQL（推奨: リレーショナル、高機能）
+2. MySQL（推奨: シンプル、広く普及）
+3. MongoDB（推奨: ドキュメント指向、柔軟）
+4. その他（具体的に指定してください）」
+```
+
+詳細は `docs-template/MASTER.md` の「情報不足時の必須確認プロトコル」を参照。
+
+---
+
 ## 各AIエージェント別の設定
 
 ### Claude Code (claude.ai/code)
@@ -36,12 +118,12 @@ MASTER.mdには以下の重要な情報が含まれています：
 
 **必須手順**:
 1. プロジェクト開始時に `CLAUDE.md` を確認
-2. `docs/MASTER.md` を必ず読み込む
+2. `docs-template/MASTER.md` を必ず読み込む
 3. コード生成前にMASTER.mdの内容を参照
 
 **プロンプト例**:
 ```
-このプロジェクトで作業を開始する前に、docs/MASTER.mdの内容を確認し、以下の点を理解してください：
+このプロジェクトで作業を開始する前に、docs-template/MASTER.mdの内容を確認し、以下の点を理解してください：
 - 技術スタック（TypeScript、React、Node.js等）
 - コード生成ルール（型安全性、エラーハンドリング等）
 - 禁止事項（any型、マジックナンバー等）
@@ -84,7 +166,7 @@ interface User {
 # Cursor Rules for AI Spec-Driven Development
 
 ## MANDATORY: Read MASTER.md First
-Before generating any code, you MUST read and understand docs/MASTER.md.
+Before generating any code, you MUST read and understand docs-template/MASTER.md.
 
 ## Key Constraints from MASTER.md
 - TypeScript with strict type safety
@@ -128,7 +210,7 @@ Always reference MASTER.md for project-specific requirements.
 
 **必須手順**:
 1. この `AGENTS.md` ファイルを確認
-2. `docs/MASTER.md` を必ず読み込む
+2. `docs-template/MASTER.md` を必ず読み込む
 3. プロジェクト固有の要件を理解してから作業開始
 
 ## 作業フロー
@@ -136,7 +218,7 @@ Always reference MASTER.md for project-specific requirements.
 ### 1. プロジェクト開始時
 ```
 1. AGENTS.md を確認
-2. docs/MASTER.md を読み込む
+2. docs-template/MASTER.md を読み込む
 3. プロジェクトの技術スタックと要件を理解
 4. 実装優先順位を確認
 5. コーディング規約を理解
@@ -222,9 +304,9 @@ Always reference MASTER.md for project-specific requirements.
 
 1. **MASTER.mdの内容を再確認**
 2. **関連するドキュメントを参照**
-   - `docs/08-knowledge/TROUBLESHOOTING.md`
-   - `docs/08-knowledge/LESSONS_LEARNED.md`
-   - `docs/08-knowledge/BEST_PRACTICES.md`
+   - `docs-template/08-knowledge/TROUBLESHOOTING.md`
+   - `docs-template/08-knowledge/LESSONS_LEARNED.md`
+   - `docs-template/08-knowledge/BEST_PRACTICES.md`
 3. **チームメンバーに相談**
 4. **問題をLESSONS_LEARNED.mdに記録**
 

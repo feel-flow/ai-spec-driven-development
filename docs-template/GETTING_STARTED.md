@@ -207,4 +207,6 @@ Claude Skillsの詳細な使い方、トラブルシューティング、ベス�
 ---
 
 ## このリポジトリでの位置づけ
-本ガイドは `docs/MASTER.md` を起点に、`01-context`/`02-design`/`03-implementation`/`04-quality`/`05-operations`/`06-reference`/`07-project-management` の7構成でAIが迷わない導線を作るための実務補助です。
+本ガイドは `MASTER.md` を起点に、`01-context`/`02-design`/`03-implementation`/`04-quality`/`05-operations`/`06-reference`/`07-project-management` の7構成でAIが迷わない導線を作るための実務補助です。
+
+**注意**: このテンプレートを実際のプロジェクトで使用する際は、`docs-template/` フォルダの内容を `docs/` フォルダにコピーして使用してください。

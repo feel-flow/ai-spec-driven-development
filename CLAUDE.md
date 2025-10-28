@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## 🚨 MANDATORY: Always Read MASTER.md First
 
-**Before starting any work on this project, you MUST read and understand the contents of `docs/MASTER.md`.**
+**Before starting any work on this project, you MUST read and understand the contents of `docs-template/MASTER.md`.**
 
 This document contains:
 - Project identification and context
@@ -14,6 +14,95 @@ This document contains:
 - Implementation priorities and phases
 
 **Failure to reference MASTER.md will result in incorrect implementations that violate project standards.**
+
+## 🚨 Information Verification Protocol
+
+**CRITICAL RULE: When information is missing, DO NOT make assumptions. Always request confirmation.**
+
+### Required Information Checklist
+
+Before proceeding with any implementation, verify you have:
+
+**Project Fundamentals**:
+- [ ] Project name (specific, not generic)
+- [ ] Target users (who is this for?)
+- [ ] Core features (what does it do?)
+- [ ] Technology stack (languages, frameworks, databases)
+
+**Technical Details**:
+- [ ] Database type (PostgreSQL? MongoDB? MySQL?)
+- [ ] Authentication method (JWT? OAuth? Session?)
+- [ ] Deployment environment (AWS? GCP? Azure? Vercel?)
+- [ ] API format (REST? GraphQL? gRPC?)
+
+**Requirements**:
+- [ ] Performance targets (specific numbers)
+- [ ] Security requirements (mandatory safeguards)
+- [ ] Scalability needs (concurrent users, data volume)
+- [ ] Budget/timeline constraints
+
+### Confirmation Template
+
+When missing information, output in this format:
+
+```markdown
+⚠️ Missing Information - Confirmation Required
+
+I need clarification on the following before proceeding:
+
+[Required Confirmations]
+1. Database Type
+   - Why needed: PostgreSQL and MongoDB require fundamentally different designs
+   - Options: 
+     * PostgreSQL (recommended for relational data)
+     * MongoDB (recommended for document-oriented data)
+     * MySQL (recommended for simplicity)
+   - Please specify: Which database do you want to use?
+
+2. [Other missing info]
+   ...
+
+[Optional Confirmations (Can proceed with assumptions)]
+1. Test Coverage Target
+   - Assumption: 80% minimum coverage
+   - Risk: May need adjustment based on project criticality
+   - Confirm if different: Yes/No
+
+[Next Steps]
+After confirmation, please instruct: "Proceed with [confirmed details]"
+```
+
+### Allowed Assumptions (Must Be Stated)
+
+These defaults can be assumed if not specified, but **must be explicitly stated**:
+
+- ✅ TypeScript strict mode: Enabled (stating this)
+- ✅ Test coverage: 80%+ target (stating this)
+- ✅ No magic numbers: Strictly enforced (stating this)
+- ✅ Error handling: Result pattern (stating this)
+- ✅ Naming conventions: Per MASTER.md (stating this)
+
+### Examples of Good vs Bad Practice
+
+❌ **Bad - Making Assumptions**:
+```
+"Since you didn't specify a database, I'll use PostgreSQL as it's common."
+→ User wanted MongoDB, entire design needs rework
+```
+
+✅ **Good - Requesting Confirmation**:
+```
+"I notice the database type wasn't specified. Please choose:
+1. PostgreSQL (best for relational data, ACID compliance)
+2. MongoDB (best for flexible schemas, document storage)
+3. MySQL (best for simplicity, wide support)
+
+Which would you prefer for this project?"
+```
+
+For complete details, see `docs-template/MASTER.md` section "Information Verification Protocol".
+
+---
 
 ## Project Overview
 

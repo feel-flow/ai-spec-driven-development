@@ -1,5 +1,149 @@
 # CONVENTIONS.md - コーディング規約
 
+## 0. ドキュメント命名規則
+
+このプロジェクトでは、AIツールが効率的に理解できるよう、統一されたドキュメント命名規則を採用しています。
+
+### ディレクトリ構造
+```
+docs-template/
+├── 00-planning/              # 数字-英語小文字（ハイフン区切り）
+│   └── PLANNING_TEMPLATE.md  # 英語大文字.md
+├── 01-context/
+│   ├── PROJECT.md
+│   └── CONSTRAINTS.md
+├── 02-design/
+│   ├── ARCHITECTURE.md
+│   ├── DOMAIN.md
+│   ├── DATABASE.md
+│   └── API.md
+├── 03-implementation/
+│   ├── PATTERNS.md
+│   ├── CONVENTIONS.md
+│   └── INTEGRATIONS.md
+└── MASTER.md                  # トップレベルは大文字
+```
+
+### ディレクトリ命名規則
+- **形式**: `数字-英語小文字（ハイフン区切り）`
+- **目的**: AIツールが順序を理解しやすい
+- **例**:
+  ```
+  ✅ 正しい例:
+  - 01-context
+  - 02-design
+  - 03-implementation
+  
+  ❌ 間違い例:
+  - 01_context        （アンダースコア）
+  - 01-Context        （大文字含む）
+  - context           （番号なし）
+  - 1-context         （ゼロパディングなし）
+  ```
+
+### ファイル命名規則
+
+#### メインドキュメント
+- **形式**: `英語大文字.md`
+- **理由**: AIツールが重要文書として優先的に認識
+- **例**:
+  ```
+  ✅ 正しい例:
+  - MASTER.md
+  - ARCHITECTURE.md
+  - TESTING.md
+  - DEPLOYMENT.md
+  
+  ❌ 間違い例:
+  - master.md         （小文字）
+  - Architecture.md   （キャメルケース）
+  - testing_guide.md  （アンダースコア、小文字）
+  - 01-master.md      （番号プレフィックス）
+  ```
+
+#### 特殊ファイル（例外）
+- **標準慣習**: `README.md`（GitHubの標準）
+- **AIツール設定**: 
+  - `CLAUDE.md`（Claude Code用）
+  - `AGENTS.md`（全AIエージェント共通）
+  - `.github/copilot-instructions.md`（GitHub Copilot用）
+  - `.cursorrules`（Cursor用）
+
+### 禁止事項
+```
+❌ 日本語ファイル名
+   - 仕様書.md
+   - アーキテクチャ.md
+
+❌ スペースを含むファイル名
+   - project overview.md
+   - test guide.md
+
+❌ アンダースコア区切り
+   - project_overview.md
+   - test_guide.md
+   → ハイフンを使用: project-overview.md
+
+❌ ファイル名への番号プレフィックス
+   - 01-architecture.md
+   - 02-domain.md
+   → ディレクトリで番号管理: 02-design/ARCHITECTURE.md
+```
+
+### 命名ガイドライン
+
+#### いつディレクトリを作るか
+```
+✅ 作成する場合:
+- 論理的なグループが3つ以上のファイルを持つ
+- 階層的な構造が必要
+- AIツールに明確な順序を示したい
+
+例: 02-design/ に ARCHITECTURE.md, DOMAIN.md, DATABASE.md を配置
+```
+
+#### いつ大文字ファイル名を使うか
+```
+✅ 使用する場合:
+- プロジェクトの中核文書
+- AIツールが頻繁に参照する文書
+- MASTER.md, ARCHITECTURE.md, TESTING.md など
+
+❌ 使用しない場合:
+- ソースコードファイル（TypeScript, JavaScript等）
+- 設定ファイル（package.json, tsconfig.json等）
+```
+
+### 実例: プロジェクト全体の構造
+```
+my-project/
+├── .github/
+│   └── copilot-instructions.md  # ツール固有の命名
+├── .cursorrules                  # ツール固有の命名
+├── docs-template/                # ドキュメントテンプレート
+│   ├── 00-planning/
+│   │   └── PLANNING_TEMPLATE.md
+│   ├── 01-context/
+│   │   ├── PROJECT.md
+│   │   └── CONSTRAINTS.md
+│   ├── 02-design/
+│   │   ├── ARCHITECTURE.md
+│   │   ├── DOMAIN.md
+│   │   └── DATABASE.md
+│   ├── MASTER.md
+│   ├── GETTING_STARTED.md
+│   └── SETUP_GITHUB_COPILOT.md
+├── src/                          # ソースコード（別の命名規則）
+│   ├── domain/
+│   ├── application/
+│   └── infrastructure/
+├── README.md                     # 標準慣習
+├── CLAUDE.md                     # AIツール設定
+└── AGENTS.md                     # AIツール設定
+```
+
+---
+
 ## 1. 一般原則
 
 ### 基本理念

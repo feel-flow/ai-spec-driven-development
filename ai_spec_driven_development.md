@@ -9,14 +9,14 @@ owner: feel-flow
 phase: mvp
 tags: [docs, structure, ai-agent]
 references:
-   - docs/MASTER.md
-   - docs/02-design/ARCHITECTURE.md
+   - docs-template/MASTER.md
+   - docs-template/02-design/ARCHITECTURE.md
 changeImpact: high
 ---
 
 # AI Spec Driven Development ドキュメント運用ガイド
 
-この文書は「AIエージェントが迷わない最小・高精度なドキュメント構造」を保証するための操作仕様書です。`docs/MASTER.md` を上位規約 (Source of Truth) とし、本書はその実務ガイドライン層に位置します。フォルダ生成、ファイル分類、更新、監査をすべて自動化しやすくするための厳密なルールを定義します。
+この文書は「AIエージェントが迷わない最小・高精度なドキュメント構造」を保証するための操作仕様書です。`docs-template/MASTER.md` を上位規約 (Source of Truth) とし、本書はその実務ガイドライン層に位置します。フォルダ生成、ファイル分類、更新、監査をすべて自動化しやすくするための厳密なルールを定義します。
 
 ## 目次
 1. PURPOSE / SCOPE
@@ -55,7 +55,7 @@ AIモデル (Claude Code / GitHub Copilot / Cursor など) が以下を行う際
 <!-- Legacy narrative (v1.x article style) removed in v2.0.0 to keep file focused on operational specification. Full historical content remains in git history if needed. -->
 tags: [tag1, tag2]
 references:
-   - docs/MASTER.md
+   - docs-template/MASTER.md
 changeImpact: low | medium | high
 ---
 ```
@@ -191,8 +191,8 @@ CHANGELOG 記載形式: `docs: <FileName> <summary>`
 ## MUST 命令 (AIエージェント向け抜粋)
 ```
 MUST: 起動直後に下記フォルダ存在を検証し、欠損は即時生成すること:
-docs/01-context docs/02-design docs/03-implementation docs/04-quality 
-docs/05-operations docs/06-reference docs/07-project-management docs/08-knowledge
+docs-template/01-context docs-template/02-design docs-template/03-implementation docs-template/04-quality 
+docs-template/05-operations docs-template/06-reference docs-template/07-project-management docs-template/08-knowledge
 
 MUST: REQUIRED MINIMUM FILE SET 不足時は空テンプレート＋Frontmatterを生成。
 
@@ -290,7 +290,7 @@ MUST: 重複主題検出時は統合提案し再生成を停止する。
 従来の開発プロジェクトでは、以下のような19カテゴリ、60以上の文書を作成することが一般的でした：
 
 ```
-docs/
+docs-template/
 ├── 01-project-foundation/
 │   ├── PROJECT_CHARTER.md                 # プロジェクト憲章
 │   ├── VISION_AND_SCOPE.md                # ビジョンとスコープ
@@ -467,7 +467,7 @@ AI駆動開発では、**初期は最小限の7文書構造**から始め、プ�
 
 #### 初期フェーズ：最小限の7文書構造
 ```
-docs/
+docs-template/
 ├── MASTER.md                    # AI用統合マスタードキュメント（索引・入口）
 ├── 01-context/                  # プロジェクトコンテキスト（初期は最小限）
 │   └── PROJECT.md               # ビジョンと要件の統合
@@ -491,7 +491,7 @@ docs/
 プロジェクトが成長し、チームが拡大するにつれて、以下のような階層構造に拡張することが重要です。これにより、情報の検索性と管理性を保ちながら、AIツールへの適合性も維持できます：
 
 ```
-docs/
+docs-template/
 ├── MASTER.md                    # AI用統合マスタードキュメント
 ├── 01-context/                  # プロジェクトコンテキスト
 │   ├── PROJECT.md              # プロジェクト定義・要件
@@ -2246,7 +2246,7 @@ head -n 20 ~/.claude/skills/ai-spec-driven-development/SKILL.md
 
 **実行内容**:
 1. プロジェクトルートを確認
-2. `docs/` フォルダと8つのサブフォルダを自動生成
+2. `docs-template/` フォルダと8つのサブフォルダを自動生成
    - 01-context/
    - 02-design/
    - 03-implementation/
@@ -2270,7 +2270,7 @@ head -n 20 ~/.claude/skills/ai-spec-driven-development/SKILL.md
 **生成されるフォルダ構造**:
 ```
 your-project/
-├── docs/
+├── docs-template/
 │   ├── MASTER.md                    # プロジェクト索引
 │   ├── 01-context/
 │   │   └── PROJECT.md               # ビジョンと要件
@@ -2312,7 +2312,7 @@ your-project/
    - 独立したドキュメントの必要性を判断
 
 3. 新規ファイル作成
-   - `docs/02-design/DATABASE.md` を作成
+   - `docs-template/02-design/DATABASE.md` を作成
    - Frontmatterを自動挿入
    - テンプレートセクションを生成
 
@@ -2333,8 +2333,8 @@ owner: backend-team
 phase: mvp
 tags: [database, design, sql]
 references:
-   - docs/MASTER.md
-   - docs/02-design/ARCHITECTURE.md
+   - docs-template/MASTER.md
+   - docs-template/02-design/ARCHITECTURE.md
 changeImpact: high
 ---
 ```
@@ -2389,7 +2389,7 @@ ARCHITECTURE.mdのレイヤー構造を3層から4層に変更したい
 
 **実行プロセス**:
 1. **完全性チェック**
-   - docs/ フォルダ存在確認
+   - docs-template/ フォルダ存在確認
    - 8つのサブフォルダ存在確認
    - 必須ファイル存在確認
 
@@ -2436,7 +2436,7 @@ ARCHITECTURE.mdのレイヤー構造を3層から4層に変更したい
 プロンプト: 「このプロジェクトにAI仕様駆動開発を導入したい」
 
 実行結果:
-✓ docs/フォルダ構造を生成
+✓ docs-template/フォルダ構造を生成
 ✓ 必須8文書を生成（Frontmatter付き）
 ✓ MASTER.mdに技術スタック情報を記載
 ✓ PROJECT.mdにプロジェクトビジョンを記載
@@ -2618,7 +2618,7 @@ ln -s ~/.claude/skills/ai-spec-driven-development ./
 | 「AI仕様駆動開発を導入したい」 | 「ドキュメント作って」 | スキル名が含まれている |
 | 「ドキュメント構造を検証したい」 | 「チェックして」 | 「validation」のキーワード |
 | 「MASTER.mdを更新したい」 | 「索引を直したい」 | 「MASTER.md」のキーワード |
-| 「docs/フォルダを初期化したい」 | 「フォルダ作って」 | 「docs folder」のキーワード |
+| 「docs-template/フォルダを初期化したい」 | 「フォルダ作って」 | 「docs folder」のキーワード |
 
 **段階的なアプローチ**
 

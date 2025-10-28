@@ -1,9 +1,127 @@
 # AI駆動開発マスタードキュメント
 
-前提（重要・短文）
+## 前提（重要・短文）
 - ドキュメントはAIが迷わず理解できることを第一基準とする（人間の可読性は副次）。
 - AI生成の推測/補完が混入し得るため、エンジニアは必ず一次情報（ソース/設定/設計資料/実行結果/テスト）で検証し、乖離はSSOTへ即時反映（重複は参照化）。
 - 本ガイドの時間表記は目安。チーム/AIの習熟で短縮される。
+
+## 🚨 AIツール向け重要ルール
+
+### 情報不足時の必須確認プロトコル
+
+AIツールは、ドキュメント生成やコード生成時に**情報が不足している場合、推論で埋めずに必ず確認を求めること**。
+
+#### 必須確認が必要な情報
+
+**プロジェクト基本情報**:
+- [ ] プロジェクト名（具体的な名称）
+- [ ] ターゲットユーザー（誰のために作るか）
+- [ ] 主要機能（何を実現するか）
+- [ ] 技術スタック（使用する言語・フレームワーク）
+
+**技術的詳細**:
+- [ ] データベース種別（PostgreSQL? MongoDB? MySQL?）
+- [ ] 認証方式（JWT? OAuth? Session?）
+- [ ] デプロイ環境（AWS? GCP? Azure? Vercel?）
+- [ ] API形式（REST? GraphQL? gRPC?）
+
+**ビジネス要件**:
+- [ ] パフォーマンス要件（具体的な数値）
+- [ ] セキュリティ要件（必須の対策）
+- [ ] スケーラビリティ要件（同時接続数等）
+- [ ] 予算・期間制約
+
+#### 確認の出力形式
+
+情報不足を検出した場合、以下の形式で出力すること：
+
+```markdown
+⚠️ 情報不足により確認が必要です
+
+以下の情報が不足しているため、推論では進められません。
+確認をお願いします：
+
+【必須確認事項】
+1. [項目名]: [何が不明か]
+   - 例: データベース種別
+   - 理由: PostgreSQLとMongoDBで設計が大きく異なるため
+   - 推奨: PostgreSQL（リレーショナルデータの場合）/ MongoDB（ドキュメント指向の場合）
+
+2. [項目名]: [何が不明か]
+   ...
+
+【オプション確認事項（推論で進める場合の前提）】
+1. [項目名]: [推論内容]
+   - 前提: [この前提で進めます]
+   - リスク: [後で変更が必要になる可能性]
+   - 確認推奨: はい/いいえ
+
+【次のステップ】
+上記を確認後、以下のコマンドで続行してください：
+「[確認された情報]で進めてください」
+```
+
+#### 推論が許容される範囲
+
+以下は**明示的な指示がない場合のデフォルト値**として使用可（ただし明記すること）：
+
+- **TypeScript strict mode**: 常に有効（明記）
+- **テストカバレッジ目標**: 80%以上（明記）
+- **マジックナンバー禁止**: 常に適用（明記）
+- **エラーハンドリング**: Result pattern使用（明記）
+- **命名規則**: MASTER.mdの規則に従う（明記）
+
+**❌ 推論禁止の例**:
+```
+悪い例:
+「データベースは一般的なので、PostgreSQLで進めます」
+→ ユーザーがMySQLを想定していた場合、全て作り直し
+
+良い例:
+「データベース種別が指定されていません。
+以下から選択してください：
+1. PostgreSQL（推奨: リレーショナル、高機能）
+2. MySQL（推奨: シンプル、広く普及）
+3. MongoDB（推奨: ドキュメント指向、柔軟）
+4. その他（具体的に指定してください）」
+```
+
+#### 段階的確認の推奨
+
+大きな決定事項は段階的に確認：
+
+```markdown
+✅ 推奨フロー:
+
+ステップ1: 大枠の確認
+「このプロジェクトは、Webアプリケーションですか？
+それともモバイルアプリですか？API専用ですか？」
+
+↓
+
+ステップ2: 技術スタックの確認
+「Webアプリケーションの場合、
+フロントエンド: React? Vue? Next.js?
+バックエンド: Node.js? Python? Go?」
+
+↓
+
+ステップ3: 詳細仕様の確認
+「Next.js採用の場合、
+- App Router? Pages Router?
+- 認証: NextAuth.js? Auth0? 独自実装?」
+```
+
+#### 人間の検証タイミング
+
+AIが生成したドキュメント・コードは、以下のタイミングで**必ず人間が検証**：
+
+1. **MASTER.md生成後** - プロジェクト全体の方向性確認
+2. **ARCHITECTURE.md生成後** - 技術的決定事項の妥当性確認
+3. **コード生成後** - ビジネスロジックとセキュリティの確認
+4. **デプロイ前** - 本番環境設定の確認
+
+---
 
 ## プロジェクト識別情報
 - **プロジェクト名**: [プロジェクト名を入力]
@@ -61,6 +179,8 @@
 6. **マジックナンバー禁止**: 意味のある数値/文字列の直接埋め込みを禁止。必ず名前付き定数または設定から注入し、単位・範囲を明示（詳細は `PATTERNS.md` を参照）
 
 ### 命名規則
+
+#### コード
 - **変数名**: camelCase（例: userName, isActive）
 - **定数名**: UPPER_SNAKE_CASE（例: MAX_RETRY_COUNT）
 - **型名/インターフェース**: PascalCase（例: UserProfile, ApiResponse）
@@ -68,6 +188,26 @@
   - コンポーネント: PascalCase（例: UserCard.tsx）
   - ユーティリティ: camelCase（例: dateHelpers.ts）
   - 設定ファイル: kebab-case（例: eslint-config.js）
+
+#### ドキュメントファイル
+- **ディレクトリ**: 
+  - 形式: `数字-英語小文字（ハイフン区切り）`
+  - 例: `01-context`, `02-design`, `03-implementation`
+  
+- **ファイル名**:
+  - メインドキュメント: `英語大文字.md`（AI識別性優先）
+  - 例: `MASTER.md`, `ARCHITECTURE.md`, `TESTING.md`
+  
+- **禁止事項**:
+  - ❌ 日本語ファイル名
+  - ❌ スペースを含むファイル名
+  - ❌ アンダースコア区切り（ハイフンを使用）
+  - ❌ ファイル名への番号プレフィックス（ディレクトリのみ使用）
+
+- **例外**:
+  - `README.md`（標準的な慣習）
+  - `CLAUDE.md`, `AGENTS.md`（AIツール向け特殊ファイル）
+  - `.github/copilot-instructions.md`, `.cursorrules`（ツール固有の命名）
 
 ### 禁止事項
 - ❌ any型の使用（やむを得ない場合はコメントで理由を明記）
@@ -239,13 +379,29 @@ metrics:
 ---
 
 ## 関連ドキュメント
-- [GETTING_STARTED.md](./GETTING_STARTED.md) - Quickstart（AI駆動・読み順・プロンプト）
+
+### 初心者・新規プロジェクト向け
+- [GETTING_STARTED_ABSOLUTE_BEGINNER.md](./GETTING_STARTED_ABSOLUTE_BEGINNER.md) - 完全初心者ガイド（何も決まっていない状態から始める、約4.5時間）
+- [GETTING_STARTED_NEW_PROJECT.md](./GETTING_STARTED_NEW_PROJECT.md) - 新規プロジェクト完全ガイド（企画から実装準備まで、8-12時間）
+- [00-planning/PLANNING_TEMPLATE.md](./00-planning/PLANNING_TEMPLATE.md) - プロジェクト企画書テンプレート
+
+### AIツール初期設定ガイド
+- [SETUP_GITHUB_COPILOT.md](./SETUP_GITHUB_COPILOT.md) - GitHub Copilot設定（約30分）
+- [SETUP_CLAUDE_CODE.md](./SETUP_CLAUDE_CODE.md) - Claude Code設定（約40分）
+- [SETUP_CURSOR.md](./SETUP_CURSOR.md) - Cursor設定（約60分）
+
+### 既存プロジェクト向け
+- [GETTING_STARTED.md](./GETTING_STARTED.md) - Quickstart（既存プロジェクトへの導入・AI駆動・読み順・プロンプト）
+
+### コア7文書
 - [01-context/PROJECT.md](./01-context/PROJECT.md) - ビジョンと要件
 - [02-design/ARCHITECTURE.md](./02-design/ARCHITECTURE.md) - システム設計
 - [02-design/DOMAIN.md](./02-design/DOMAIN.md) - ビジネスロジック
 - [03-implementation/PATTERNS.md](./03-implementation/PATTERNS.md) - 実装パターン
 - [04-quality/TESTING.md](./04-quality/TESTING.md) - テスト戦略
 - [05-operations/DEPLOYMENT.md](./05-operations/DEPLOYMENT.md) - デプロイ戦略
+
+### ナレッジベース
 - [08-knowledge/LESSONS_LEARNED.md](./08-knowledge/LESSONS_LEARNED.md) - 開発過程で得た知見・解決策
 - [08-knowledge/TROUBLESHOOTING.md](./08-knowledge/TROUBLESHOOTING.md) - トラブルシューティング集
 - [08-knowledge/BEST_PRACTICES.md](./08-knowledge/BEST_PRACTICES.md) - ベストプラクティス集

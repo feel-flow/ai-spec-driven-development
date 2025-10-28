@@ -102,6 +102,6 @@ The server will expose:
 
 ## Notes
 
-- Glossary is parsed from `docs/06-reference/GLOSSARY.md` if present.
+- Glossary is parsed from `docs-template/06-reference/GLOSSARY.md` if present.
 - Section extraction matches exact level-2 headings (`## Heading`).
 - Search is a basic keyword match with simple scoring.

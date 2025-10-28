@@ -8,9 +8,24 @@ AI開発ツール（Claude Code、GitHub Copilot、Cursor）に最適化され�
 
 ## 🚀 Quick Start
 
+### 🌟 完全初心者の方へ
+**何も決まっていない状態から始める**: [`docs-template/GETTING_STARTED_ABSOLUTE_BEGINNER.md`](./docs-template/GETTING_STARTED_ABSOLUTE_BEGINNER.md)
+- 環境準備からアイデア発想まで完全サポート（所要時間: 約4.5時間）
+- AIツールの初期設定ガイド付き
+
+### 新規プロジェクトを始める場合
+1. **企画から始める**: [`docs-template/GETTING_STARTED_NEW_PROJECT.md`](./docs-template/GETTING_STARTED_NEW_PROJECT.md) - ゼロから完全ガイド（8-12時間）
+2. **企画書を作成**: [`docs-template/00-planning/PLANNING_TEMPLATE.md`](./docs-template/00-planning/PLANNING_TEMPLATE.md) - アイデア→要件定義
+
+### 既存プロジェクトに導入する場合
 1. **理論を学ぶ**: [`ai_spec_driven_development.md`](./ai_spec_driven_development.md) - なぜ7文書構造が最適なのか
-2. **実装を始める**: [`docs/GETTING_STARTED.md`](./docs/GETTING_STARTED.md) - ステップバイステップガイド
-3. **テンプレート活用**: [`docs/`](./docs/) - すぐに使える7文書テンプレート
+2. **実装を始める**: [`docs-template/GETTING_STARTED.md`](./docs-template/GETTING_STARTED.md) - ステップバイステップガイド
+3. **テンプレート活用**: [`docs-template/`](./docs-template/) - すぐに使える7文書テンプレート
+
+### AIツール初期設定ガイド
+- **GitHub Copilot**: [`docs-template/SETUP_GITHUB_COPILOT.md`](./docs-template/SETUP_GITHUB_COPILOT.md) - copilot-instructions.md設定（約30分）
+- **Claude Code**: [`docs-template/SETUP_CLAUDE_CODE.md`](./docs-template/SETUP_CLAUDE_CODE.md) - CLAUDE.md設定（約40分）
+- **Cursor**: [`docs-template/SETUP_CURSOR.md`](./docs-template/SETUP_CURSOR.md) - .cursorrules設定（約60分）
 
 ## 💡 中核概念
 
@@ -30,7 +45,7 @@ AI開発ツール（Claude Code、GitHub Copilot、Cursor）に最適化され�
 
 ### 🚨 重要: 作業開始前に必ずMASTER.mdを参照
 
-すべてのAIエージェントは、このプロジェクトで作業を開始する前に **`docs/MASTER.md`** を必ず読み込んでください。
+すべてのAIエージェントは、このプロジェクトで作業を開始する前に **`docs-template/MASTER.md`** を必ず読み込んでください。
 
 ### エージェント別設定
 

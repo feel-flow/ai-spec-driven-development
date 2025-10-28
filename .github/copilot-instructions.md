@@ -2,7 +2,7 @@
 
 ## 🚨 MANDATORY: Read MASTER.md First
 
-Before generating any code suggestions, you MUST read and understand `docs/MASTER.md`.
+Before generating any code suggestions, you MUST read and understand `docs-template/MASTER.md`.
 
 ## Project Context
 This is an AI-driven development project using a streamlined 7-document structure optimized for AI tools. The project emphasizes "less is more" - fewer, highly-focused documents that AI can effectively parse and understand.
@@ -65,10 +65,10 @@ This is an AI-driven development project using a streamlined 7-document structur
 ## Code Generation Rules
 
 ### Before Suggesting Code
-1. Read `docs/MASTER.md` for project context
-2. Check `docs/03-implementation/PATTERNS.md` for implementation patterns
-3. Verify `docs/02-design/ARCHITECTURE.md` for technical decisions
-4. Review `docs/02-design/DOMAIN.md` for business logic
+1. Read `docs-template/MASTER.md` for project context
+2. Check `docs-template/03-implementation/PATTERNS.md` for implementation patterns
+3. Verify `docs-template/02-design/ARCHITECTURE.md` for technical decisions
+4. Review `docs-template/02-design/DOMAIN.md` for business logic
 
 ### During Code Suggestion
 1. Follow the coding rules from MASTER.md
@@ -112,14 +112,14 @@ Recommended Tooling: Use Playwright with MCP integration for AI-driven visual de
 ```
 
 ## Document References
-- `docs/MASTER.md` - Project overview and rules
-- `docs/01-context/PROJECT.md` - Business requirements
-- `docs/02-design/ARCHITECTURE.md` - Technical architecture
-- `docs/02-design/DOMAIN.md` - Business logic
-- `docs/03-implementation/PATTERNS.md` - Implementation patterns
-- `docs/04-quality/TESTING.md` - Testing strategies
-- `docs/05-operations/DEPLOYMENT.md` - Deployment procedures
-- `docs/08-knowledge/` - Knowledge base and best practices
+- `docs-template/MASTER.md` - Project overview and rules
+- `docs-template/01-context/PROJECT.md` - Business requirements
+- `docs-template/02-design/ARCHITECTURE.md` - Technical architecture
+- `docs-template/02-design/DOMAIN.md` - Business logic
+- `docs-template/03-implementation/PATTERNS.md` - Implementation patterns
+- `docs-template/04-quality/TESTING.md` - Testing strategies
+- `docs-template/05-operations/DEPLOYMENT.md` - Deployment procedures
+- `docs-template/08-knowledge/` - Knowledge base and best practices
 
 ## Code Review Checklist
 - [ ] MASTER.md rules followed
