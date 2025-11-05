@@ -32,14 +32,40 @@ AI開発ツール（Claude Code、GitHub Copilot、Cursor）に最適化され�
 従来の60+文書から**7つの必須文書**への革新的転換：
 
 1. **MASTER.md** - プロジェクト中央管理
-2. **PROJECT.md** - ビジョンと要件
-3. **ARCHITECTURE.md** - システム設計
-4. **DOMAIN.md** - ビジネスロジック
-5. **PATTERNS.md** - 実装パターン
-6. **TESTING.md** - テスト戦略
-7. **DEPLOYMENT.md** - 運用手順
+2. **PROJECT.md** - ビジョンと要件（`01-business/PROJECT.md`）
+3. **ARCHITECTURE.md** - システム設計（`02-design/ARCHITECTURE.md`）
+4. **DOMAIN.md** - ビジネスロジック（`01-business/DOMAIN.md`）
+5. **PATTERNS.md** - 実装パターン（`03-implementation/PATTERNS.md`）
+6. **TESTING.md** - テスト戦略（`07-quality/TESTING.md`）
+7. **DEPLOYMENT.md** - 運用手順（`05-operations/DEPLOYMENT.md`）
 
 詳細な説明と実装例は[完全ガイド](./ai_spec_driven_development.md#2-ai駆動開発に最適化されたドキュメント構造)を参照。
+
+### 📁 ドキュメント構造（番号付きフォルダ）
+
+**重要**: AIツールは以下の番号付きフォルダ構造を使用してください。
+
+```
+docs/
+├── MASTER.md                           # 中央管理文書（必須）
+├── 01-business/
+│   ├── PROJECT.md                      # ビジョンと要件
+│   └── DOMAIN.md                       # ビジネスロジック
+├── 02-design/
+│   └── ARCHITECTURE.md                 # システム設計
+├── 03-implementation/
+│   └── PATTERNS.md                     # 実装パターン
+├── 05-operations/
+│   └── DEPLOYMENT.md                   # 運用手順
+└── 07-quality/
+    └── TESTING.md                      # テスト戦略
+```
+
+**なぜ番号付きフォルダか**:
+- カテゴリの明確化（ビジネス、設計、実装、運用、品質）
+- 文書間の依存関係が視覚的に理解しやすい
+- AIツールが適切な文書を素早く見つけられる
+- スケーラビリティ（各カテゴリ内で詳細文書を追加可能）
 
 ## 🤖 AIエージェント向けガイド
 

@@ -19,6 +19,30 @@ AI（Claude Code / GitHub Copilot）で迷わず実装できる「最小限の�
 ---
 
 ## まずやることチェックリスト（共通 15分）
+
+### 📁 番号付きフォルダ構造を使用
+**重要**: AIツールは以下の番号付きフォルダ構造を使用してください。
+
+```
+docs/
+├── MASTER.md                           # 中央管理文書
+├── 01-business/
+│   ├── PROJECT.md                      # ビジョンと要件
+│   └── DOMAIN.md                       # ビジネスロジック
+├── 02-design/
+│   └── ARCHITECTURE.md                 # システム設計
+├── 03-implementation/
+│   └── PATTERNS.md                     # 実装パターン
+├── 05-operations/
+│   └── DEPLOYMENT.md                   # 運用手順
+├── 06-reference/
+│   ├── GLOSSARY.md                     # 用語集
+│   └── DECISIONS.md                    # 設計判断記録
+└── 07-quality/
+    └── TESTING.md                      # テスト戦略
+```
+
+### チェックリスト
 - [ ] docs/MASTER.md を開き、以下4点を最新化
   - [ ] プロジェクト識別（名前/バージョン/最終更新日/使用AIツール）
   - [ ] 技術スタック要約（FE/BE/DB/Infra）
@@ -35,9 +59,9 @@ AI（Claude Code / GitHub Copilot）で迷わず実装できる「最小限の�
 ## 新規で始める（~60分）
 1) 最小ドキュメント3点だけを埋める（30分）
 - docs/MASTER.md… 上記4点＋「読ませる順序」を明記
-- docs/01-context/PROJECT.md… Why/Who/What/Success＋MVPの受け入れ基準
+- docs/01-business/PROJECT.md… Why/Who/What/Success＋MVPの受け入れ基準
 - docs/02-design/ARCHITECTURE.md… レイヤ構成/依存方向/データフロー/例外方針/テスト層割合
-（余力があれば docs/02-design/DOMAIN.md にユビキタス言語と主要エンティティを箇条書き）
+（余力があれば docs/01-business/DOMAIN.md にユビキタス言語と主要エンティティを箇条書き）
 
 2) 最初の1機能を要件化（15分）
 - PROJECT.md にユーザーストーリー1件＋受け入れ基準（Given/When/Then）
@@ -66,10 +90,10 @@ AI（Claude Code / GitHub Copilot）で迷わず実装できる「最小限の�
 
 ## AIに読ませる順序と粒度（トークン最適化）
 1) MASTER.md（必須）
-2) 01-context/PROJECT.md（機能のWhy/受け入れ基準）
+2) 01-business/PROJECT.md（機能のWhy/受け入れ基準）
 3) 02-design/ARCHITECTURE.md（層/依存/エラー/データフロー）
-4) 02-design/DOMAIN.md（必要時のみ：用語/ルール/主要エンティティ）
-5) 04-quality/TESTING.md（書き方/層の割合/命名）
+4) 01-business/DOMAIN.md（必要時のみ：用語/ルール/主要エンティティ）
+5) 07-quality/TESTING.md（書き方/層の割合/命名）
 6) 05-operations/DEPLOYMENT.md（必要時のみ：CI/CDや設定）
 7) 06-reference/[GLOSSARY/DECISIONS]（曖昧さ解消）
 
@@ -86,12 +110,12 @@ AI（Claude Code / GitHub Copilot）で迷わず実装できる「最小限の�
 目的: リポジトリのAI駆動ルールに従い、<機能名> を実装する。
 参照順序（この順で読み、他は見ない）:
 - docs/MASTER.md
-- docs/01-context/PROJECT.md
+- docs/01-business/PROJECT.md
 - docs/02-design/ARCHITECTURE.md
-- （必要時）docs/02-design/DOMAIN.md
+- （必要時）docs/01-business/DOMAIN.md
 
-要件: PROJECT.md の受け入れ基準を満たすこと。テストは TESTING.md のパターン・命名に従い同時生成。
-制約: マジックナンバー/ハードコード禁止（定数or設定から注入）。型安全/エラーパターンは PATTERNS.md に準拠。
+要件: PROJECT.md の受け入れ基準を満たすこと。テストは 07-quality/TESTING.md のパターン・命名に従い同時生成。
+制約: マジックナンバー/ハードコード禁止（定数or設定から注入）。型安全/エラーパターンは 03-implementation/PATTERNS.md に準拠。
 出力: 変更ファイル一覧→実装→テスト→要点サマリ。疑義は実装前に質問。
 ```
 
