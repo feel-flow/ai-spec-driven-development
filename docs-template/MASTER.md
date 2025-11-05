@@ -263,7 +263,7 @@ AIが生成したドキュメント・コードは、以下のタイミングで
 ## AI仕様駆動Git Workflow
 本プロジェクトでは、Git FlowをベースとしたAI開発ツール最適化ワークフローを採用しています。
 
-**基本フロー**: Issue → Branch → Commit → PR → Review → Merge → Cleanup → Next Task
+**基本フロー**: Issue → Branch → Commit → **Self-Review** → PR → Review → Merge → **Knowledge** → Cleanup → Next Task
 
 詳細は [DEPLOYMENT.md](./05-operations/DEPLOYMENT.md#1-ai仕様駆動git-workflow) を参照してください。
 
@@ -271,8 +271,10 @@ AIが生成したドキュメント・コードは、以下のタイミングで
 - すべての作業はIssueから開始
 - ブランチ名: `feature/{issue-number}-{description}`
 - コミットメッセージにドキュメント参照を含める（例: `docs/MASTER.md:29`）
+- **【重要】PR作成前にセルフレビューを実施** - AIツールを活用してコーディング規約・仕様整合性・テスト充実度を事前確認
 - AIがPRレビュー指摘を自動読み取り・対応
-- マージ後は自動的にロードマップ更新と次タスク提案
+- **【重要】マージ後にナレッジを体系化** - 得られた知見をGitHub Discussionsに分類・記録し、チーム資産として蓄積
+- ロードマップ更新と次タスク提案
 
 ## AIへのプロンプト補助（貼り付け用）
 以下をプロンプト末尾に追加し、マジックナンバー回避と設定注入を徹底してください。
