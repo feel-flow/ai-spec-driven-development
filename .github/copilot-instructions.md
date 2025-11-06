@@ -121,6 +121,60 @@ Recommended Tooling: Use Playwright with MCP integration for AI-driven visual de
 - `docs-template/05-operations/DEPLOYMENT.md` - Deployment procedures
 - `docs-template/08-knowledge/` - Knowledge base and best practices
 
+## GitHub Copilot for Pull Requests Behavior Control
+
+### PR Comment Policy
+When reviewing pull requests, GitHub Copilot MUST follow these rules:
+
+1. **Single Comment per Review Session**
+   - Provide ONE comprehensive review comment per PR update
+   - Consolidate all feedback into a single structured comment
+   - DO NOT post multiple separate comments for different issues
+
+2. **Triggering Conditions**
+   - Comment ONLY on the following PR events:
+     - Initial PR creation (`opened`)
+     - New commits pushed (`synchronize`)
+   - DO NOT comment on:
+     - PR reopening (`reopened`)
+     - PR closing (`closed`)
+     - Draft PR state changes
+
+3. **Comment Structure**
+   When commenting, use this structure:
+   ```markdown
+   ## Review Summary
+   [Overall assessment]
+
+   ## Critical Issues
+   - [Issue 1]
+   - [Issue 2]
+
+   ## Suggestions
+   - [Suggestion 1]
+   - [Suggestion 2]
+
+   ## Checklist
+   - [ ] MASTER.md rules followed
+   - [ ] No magic numbers
+   - [ ] Type safety ensured
+   ```
+
+4. **Avoid Redundant Comments**
+   - Check if a similar comment already exists before posting
+   - Update existing comments instead of creating new ones when possible
+   - Group related issues together
+
+5. **Rate Limiting**
+   - Maximum 1 review comment per PR event
+   - Wait for human response before providing follow-up suggestions
+   - Respect the "review requested" flag
+
+### Workflow Integration
+- Align with `.github/workflows/release-drafter.yml` triggers
+- Do not interfere with automated release note generation
+- Focus on code quality, not administrative tasks
+
 ## Code Review Checklist
 - [ ] MASTER.md rules followed
 - [ ] No magic numbers/hardcoded values
