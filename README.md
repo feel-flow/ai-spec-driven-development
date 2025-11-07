@@ -2,9 +2,13 @@
 
 AI開発ツール（Claude Code、GitHub Copilot、Cursor）に最適化された7文書構造によるドキュメント戦略。
 
-## 📚 完全ガイド
+## 📚 主要ドキュメント
 
-**→ [`ai_spec_driven_development.md`](./ai_spec_driven_development.md) - 理論と実践の包括的解説**
+このリポジトリの主要なドキュメントは以下の通りです。
+
+- **[インデックス](./ai_spec_driven_development.md)**: すべてのドキュメントへの入り口。
+- **[AI Spec Driven Development 概念と実践](./docs/AI_SPEC_DRIVEN_DEVELOPMENT.md)**: この開発アプローチの背景にある思想、具体的な実践方法を解説。
+- **[運用ガイド (AIエージェント向け)](./docs/OPERATIONAL_GUIDE.md)**: AIエージェントが開発プロセスで参照すべき操作仕様書。
 
 ## 🚀 Quick Start
 
@@ -18,7 +22,7 @@ AI開発ツール（Claude Code、GitHub Copilot、Cursor）に最適化され�
 2. **企画書を作成**: [`docs-template/00-planning/PLANNING_TEMPLATE.md`](./docs-template/00-planning/PLANNING_TEMPLATE.md) - アイデア→要件定義
 
 ### 既存プロジェクトに導入する場合
-1. **理論を学ぶ**: [`ai_spec_driven_development.md`](./ai_spec_driven_development.md) - なぜ7文書構造が最適なのか
+1. **理論を学ぶ**: [`docs/AI_SPEC_DRIVEN_DEVELOPMENT.md`](./docs/AI_SPEC_DRIVEN_DEVELOPMENT.md) - なぜ7文書構造が最適なのか
 2. **実装を始める**: [`docs-template/GETTING_STARTED.md`](./docs-template/GETTING_STARTED.md) - ステップバイステップガイド
 3. **テンプレート活用**: [`docs-template/`](./docs-template/) - すぐに使える7文書テンプレート
 
@@ -39,7 +43,7 @@ AI開発ツール（Claude Code、GitHub Copilot、Cursor）に最適化され�
 6. **TESTING.md** - テスト戦略（`07-quality/TESTING.md`）
 7. **DEPLOYMENT.md** - 運用手順（`05-operations/DEPLOYMENT.md`）
 
-詳細な説明と実装例は[完全ガイド](./ai_spec_driven_development.md#2-ai駆動開発に最適化されたドキュメント構造)を参照。
+詳細な説明と実装例は[AI Spec Driven Development 概念と実践](./docs/AI_SPEC_DRIVEN_DEVELOPMENT.md)を参照。
 
 ### 📁 ドキュメント構造（番号付きフォルダ）
 
