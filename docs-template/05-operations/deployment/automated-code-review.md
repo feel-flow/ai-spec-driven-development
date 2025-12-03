@@ -224,7 +224,7 @@ fi
 # 自動生成ファイルはスキップ
 STAGED_FILES=$(git diff --cached --name-only)
 # 除外対象でないファイルリストを取得
-NON_GENERATED_FILES=$(echo "$STAGED_FILES" | grep -vE '^(package-lock\.json|yarn\.lock|.*\.generated\..*)$')
+NON_GENERATED_FILES=$(echo "$STAGED_FILES" | grep -vE '^(package-lock\.json|yarn\.lock|pnpm-lock.yaml|.*\.generated\..*)$')
 
 # 除外対象でないファイルがなければスキップ
 if [ -z "$NON_GENERATED_FILES" ]; then
