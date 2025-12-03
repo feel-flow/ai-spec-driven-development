@@ -40,7 +40,6 @@ BOLD='\033[1m'
 
 # Configuration
 NO_NPM=false
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 # ============================================================================
 # Functions
@@ -501,8 +500,7 @@ setup_npm_scripts() {
     if command -v jq > /dev/null 2>&1; then
         jq '.scripts = (.scripts // {}) + {
             "prepare": "husky",
-            "code-review": "scripts/claude-review.sh",
-            "review": "scripts/claude-review.sh"
+            "code-review": "scripts/claude-review.sh"
         } | .devDependencies = (.devDependencies // {}) + {
             "husky": "^9.1.7"
         }' "$project_root/package.json" > "$project_root/package.json.tmp" \
@@ -521,7 +519,7 @@ setup_npm_scripts() {
     if command -v npm > /dev/null 2>&1; then
         echo ""
         echo -e "${BLUE}  Installing husky...${NC}"
-        (cd "$project_root" && npm install --save-dev husky@^9.1.7 2>/dev/null) || {
+        (cd "$project_root" && npm install --save-dev husky@^9.1.7) || {
             print_warning "npm install 失敗。手動で実行: npm install"
         }
     fi
