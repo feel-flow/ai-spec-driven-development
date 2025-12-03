@@ -156,6 +156,21 @@ npm run test
 npm audit --audit-level=moderate
 ```
 
+**Claude Code + Husky 自動レビュー（推奨）**:
+
+コミット時に自動でAIレビューを実行するシステムを導入できます。
+詳細は [自動コードレビュー](./automated-code-review.md) を参照してください。
+
+```bash
+# セットアップ（初回のみ）
+bash scripts/setup-automated-review.sh
+
+# 以降、git commit 時に自動でレビューが実行されます
+git commit -m "feat: 新機能を追加"
+# → Claude Code が自動でレビュー
+# → Critical な問題があればコミットをブロック
+```
+
 **ベストプラクティス**:
 - セルフレビューは15-30分程度で完了させる
 - 指摘事項は即座に修正

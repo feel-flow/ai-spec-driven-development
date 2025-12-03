@@ -1,6 +1,6 @@
 # セルフレビュー（PR作成前）
 
-> **Parent**: [DEPLOYMENT.md](../DEPLOYMENT.md) | **Workflow Step**: 2.5
+> **Parent**: [DEPLOYMENT.md](../DEPLOYMENT.md) | **Workflow Step**: 2.5 | **Related**: [自動コードレビュー](./automated-code-review.md)
 
 ## 目的
 
@@ -132,6 +132,22 @@ AIがレビュー結果を返したら、指摘事項があればその場で修
 ### Git Hooksによる自動チェック
 
 pre-push hookで自動実行（`.husky/pre-push`）することも可能です。
+
+### Claude Code + Husky による自動レビュー（推奨）
+
+コミット時に自動でAIレビューを実行するシステムを導入できます。
+詳細は **[自動コードレビュー](./automated-code-review.md)** を参照してください。
+
+**セットアップ**:
+```bash
+bash scripts/setup-automated-review.sh
+```
+
+**特徴**:
+- `git commit` 時に自動でClaude Codeがレビュー
+- Critical な問題があればコミットをブロック
+- `/code-review` で手動レビューも可能
+- 緊急時は `--no-verify` でスキップ可能
 
 ---
 
