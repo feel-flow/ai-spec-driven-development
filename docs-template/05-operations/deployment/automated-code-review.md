@@ -223,7 +223,11 @@ fi
 ```bash
 # 自動生成ファイルはスキップ
 STAGED_FILES=$(git diff --cached --name-only)
-if echo "$STAGED_FILES" | grep -qE "^(package-lock\.json|yarn\.lock|.*\.generated\..*)$"; then
+# 除外対象でないファイルリストを取得
+NON_GENERATED_FILES=$(echo "$STAGED_FILES" | grep -vE '^(package-lock\.json|yarn\.lock|.*\.generated\..*)$')
+
+# 除外対象でないファイルがなければスキップ
+if [ -z "$NON_GENERATED_FILES" ]; then
     echo "Only auto-generated files staged - skipping review"
     exit 0
 fi
