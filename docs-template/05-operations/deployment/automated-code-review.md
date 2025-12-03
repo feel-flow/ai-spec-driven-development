@@ -47,8 +47,14 @@ Claude Code と Husky を組み合わせた自動コードレビューシステ�
 プロジェクトルートで以下を実行:
 
 ```bash
-# スクリプトをダウンロードして実行
-curl -sL https://raw.githubusercontent.com/OWNER/REPO/main/scripts/setup-automated-review.sh | bash
+# スクリプトをダウンロード
+curl -sLO https://raw.githubusercontent.com/OWNER/REPO/main/scripts/setup-automated-review.sh
+
+# スクリプトの内容を確認（推奨）
+less setup-automated-review.sh
+
+# 確認後、実行
+bash setup-automated-review.sh
 
 # または、リポジトリにスクリプトがある場合
 bash scripts/setup-automated-review.sh
@@ -200,12 +206,12 @@ None found
 
 ```bash
 # 厳格モード: Important Issues でもブロック
-if grep -qi "REJECTED\|Important Issues" "$REVIEW_RESULT"; then
+if grep -qEi "REJECTED|Important Issues" "$REVIEW_RESULT"; then
     exit 1
 fi
 
 # 緩和モード: Critical Issues のみブロック
-if grep -qi "REJECTED" "$REVIEW_RESULT" && grep -qi "Critical Issues" "$REVIEW_RESULT"; then
+if grep -qEi "REJECTED" "$REVIEW_RESULT" && grep -qEi "Critical Issues" "$REVIEW_RESULT"; then
     exit 1
 fi
 ```

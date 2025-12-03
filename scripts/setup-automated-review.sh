@@ -182,8 +182,8 @@ BOLD='\033[1m'
 
 # Configuration
 PROJECT_ROOT="$(git rev-parse --show-toplevel)"
-REVIEW_RESULT="/tmp/claude-review-$$.md"
-DIFF_FILE="/tmp/claude-diff-$$.diff"
+REVIEW_RESULT=$(mktemp)
+DIFF_FILE=$(mktemp)
 
 # Cleanup function
 cleanup() {
