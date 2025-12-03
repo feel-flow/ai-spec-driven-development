@@ -387,8 +387,3 @@ UX      ├────┼────┼────┼────┤  [  ]
 - [アジャイルサムライ](https://www.amazon.co.jp/dp/4274068560) - Jonathan Rasmusson著（インセプションデッキの原典）
 - [Agile Inception Deck](https://agilewarrior.wordpress.com/2010/11/06/the-agile-inception-deck/) - オリジナル解説（英語）
 
----
-
-**作成日**: [YYYY-MM-DD]
-**最終更新**: [YYYY-MM-DD]
-**作成者**: [名前]
