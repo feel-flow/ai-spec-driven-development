@@ -234,8 +234,11 @@ echo ""
 echo -e "${BLUE}Running Claude Code review...${NC}"
 echo ""
 
-# Create review prompt
-REVIEW_PROMPT="You are a code reviewer. Review the following git diff for a pre-commit check.
+# Run Claude review by piping the prompt directly
+# This avoids shell variable length limits for large diffs
+{
+    cat << 'PROMPT_HEAD'
+You are a code reviewer. Review the following git diff for a pre-commit check.
 
 ## Review Criteria
 
@@ -261,34 +264,35 @@ REVIEW_PROMPT="You are a code reviewer. Review the following git diff for a pre-
 
 Provide your review in this format:
 
-\`\`\`markdown
+```markdown
 ## Review Summary
 **Files reviewed**: [count]
 **Total changes**: +[additions] / -[deletions]
 
 ## Critical Issues
-[List each critical issue with file:line reference, or \"None found\"]
+[List each critical issue with file:line reference, or "None found"]
 
 ## Important Issues
-[List each important issue, or \"None found\"]
+[List each important issue, or "None found"]
 
 ## Suggestions
-[List suggestions for improvement, or \"Code looks good\"]
+[List suggestions for improvement, or "Code looks good"]
 
 ## Verdict: APPROVED / REJECTED
 **Reason**: [Brief explanation]
-\`\`\`
+```
 
 ## Diff to Review
 
-\`\`\`diff
-$(cat "$DIFF_FILE")
-\`\`\`
+```diff
+PROMPT_HEAD
+    cat "$DIFF_FILE"
+    cat << 'PROMPT_TAIL'
+```
 
-Provide your review now:"
-
-# Run Claude review
-echo "$REVIEW_PROMPT" | claude --print > "$REVIEW_RESULT" 2>&1 || {
+Provide your review now:
+PROMPT_TAIL
+} | claude --print > "$REVIEW_RESULT" 2>&1 || {
     echo -e "${RED}Error: Claude Code review failed${NC}"
     cat "$REVIEW_RESULT" 2>/dev/null || true
     exit 1
