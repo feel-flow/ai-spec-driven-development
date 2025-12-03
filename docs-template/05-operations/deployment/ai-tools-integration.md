@@ -104,7 +104,7 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 
 **type**: feat, fix, docs, style, refactor, test, chore, hotfix, release
 
-**詳細な設定方法**: [SETUP_CLAUDE_CODE.md](./SETUP_CLAUDE_CODE.md)
+**詳細な設定方法**: [SETUP_CLAUDE_CODE.md](../../SETUP_CLAUDE_CODE.md)
 
 ---
 
@@ -137,7 +137,7 @@ GitHub Copilotは直接的なGitワークフロー自動化機能は限定的で
 }
 ```
 
-**詳細な設定方法**: [SETUP_GITHUB_COPILOT.md](./SETUP_GITHUB_COPILOT.md)
+**詳細な設定方法**: [SETUP_GITHUB_COPILOT.md](../../SETUP_GITHUB_COPILOT.md)
 
 ---
 
@@ -173,7 +173,7 @@ Cursorは `.cursorrules` ファイルでプロジェクト固有のルールを�
 - ドキュメント参照のないコミット
 ```
 
-**詳細な設定方法**: [SETUP_CURSOR.md](./SETUP_CURSOR.md)
+**詳細な設定方法**: [SETUP_CURSOR.md](../../SETUP_CURSOR.md)
 
 ---
 
@@ -414,7 +414,7 @@ branches:
 ## 関連ドキュメント
 
 - [DEPLOYMENT.md](../DEPLOYMENT.md) - デプロイメント戦略全体
-- [SETUP_CLAUDE_CODE.md](./SETUP_CLAUDE_CODE.md) - Claude Code詳細設定
-- [SETUP_GITHUB_COPILOT.md](./SETUP_GITHUB_COPILOT.md) - GitHub Copilot詳細設定
-- [SETUP_CURSOR.md](./SETUP_CURSOR.md) - Cursor詳細設定
+- [SETUP_CLAUDE_CODE.md](../../SETUP_CLAUDE_CODE.md) - Claude Code詳細設定
+- [SETUP_GITHUB_COPILOT.md](../../SETUP_GITHUB_COPILOT.md) - GitHub Copilot詳細設定
+- [SETUP_CURSOR.md](../../SETUP_CURSOR.md) - Cursor詳細設定
 - [../MASTER.md](../../MASTER.md) - プロジェクトマスター仕様

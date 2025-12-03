@@ -221,5 +221,4 @@ aws cloudwatch get-metric-statistics \
 ## 参照
 
 - [DEPLOYMENT.md](../DEPLOYMENT.md) - デプロイメント全体の詳細
-- [security.md](./security.md) - セキュリティ設定
 - [infrastructure.md](./infrastructure.md) - インフラ構成
