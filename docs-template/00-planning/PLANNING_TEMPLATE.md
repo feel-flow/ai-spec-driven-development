@@ -10,6 +10,13 @@
 3. AIツール（Claude Code、GitHub Copilot等）と対話しながら詳細化
 4. 完成したら `PROJECT.md` と `MASTER.md` に情報を転記
 
+### 関連ドキュメント
+
+プロジェクトの特性に応じて、以下のテンプレートも活用してください：
+
+- [INCEPTION_DECK_TEMPLATE.md](./INCEPTION_DECK_TEMPLATE.md) - アジャイル形式の10の質問でプロジェクトの方向性を明確化
+- [USECASE_TEMPLATE.md](./USECASE_TEMPLATE.md) - 機能要件をアクター視点で詳細整理
+
 ---
 
 ## 1. プロジェクトの発想・アイデア
