@@ -366,5 +366,5 @@ aws route53 change-resource-record-sets \
 ## 関連ドキュメント
 
 - [DEPLOYMENT.md](../DEPLOYMENT.md) - デプロイメント戦略全体
-- [CI/CD パイプライン](./cicd.md) - 継続的インテグレーション/デリバリー
+- [CI/CD パイプライン](./ci-cd.md) - 継続的インテグレーション/デリバリー
 - [モニタリング](./monitoring.md) - 監視とアラート詳細
