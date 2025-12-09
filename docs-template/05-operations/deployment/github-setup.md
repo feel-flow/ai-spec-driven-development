@@ -202,7 +202,54 @@ gh auth login
 gh label delete "feature" --yes  # → enhancement を使用
 gh label delete "fix" --yes      # → bug を使用
 gh label delete "docs" --yes     # → documentation を使用
-gh label delete "chore" --yes    # → enhancement または適切なラベルを使用
+gh label delete "chore" --yes    # → 下記の指針を参照
+```
+
+#### `chore` ラベル廃止に伴う運用指針
+
+`chore` ラベルを廃止したことで、以下のような保守タスクの扱いについて明確な指針が必要です。
+
+**`chore` タスクの分類と推奨ラベル**:
+
+| タスクの種類 | 推奨ラベル | バージョン影響 | リリースノート掲載 | 理由 |
+|------------|-----------|--------------|------------------|------|
+| **依存関係の更新**（セキュリティ修正なし） | ラベルなし | patch | 掲載しない | ユーザーに影響なし |
+| **依存関係の更新**（セキュリティ修正あり） | `bug` | patch | 🛠 Fixes に掲載 | セキュリティ改善として重要 |
+| **ビルドプロセス改善** | ラベルなし | patch | 掲載しない | 内部改善のみ |
+| **リファクタリング**（機能変更なし） | ラベルなし | patch | 掲載しない | 内部品質向上 |
+| **リファクタリング**（パフォーマンス改善あり） | `enhancement` | minor | 🚀 Features に掲載 | ユーザーメリットあり |
+| **CI/CDパイプライン改善** | ラベルなし | patch | 掲載しない | 開発効率化のみ |
+| **開発ツール追加** | ラベルなし | patch | 掲載しない | 開発者向け |
+
+**運用ルール**:
+
+1. **ユーザーに影響がない保守タスク** → ラベルなしでマージ
+   - Release Drafterは自動的に`patch`バージョンとして扱う
+   - リリースノートには掲載されない（`default: patch`設定による）
+
+2. **ユーザーにメリットがある保守タスク** → 適切なラベルを付与
+   - セキュリティ修正 → `bug` ラベル（Fixesセクションに掲載）
+   - パフォーマンス改善 → `enhancement` ラベル（Featuresセクションに掲載）
+
+3. **バージョニングの注意点**
+   - `enhancement` ラベルはマイナーバージョンアップを引き起こします
+   - 依存関係更新のような定型的な保守タスクには`enhancement`を使用しないでください
+   - ユーザーに明確なメリットがある場合のみ`enhancement`を使用
+
+**例**:
+
+```bash
+# ❌ 避けるべき（マイナーバージョンアップになる）
+gh pr create --title "chore: Update dependencies" --label "enhancement"
+
+# ✅ 推奨（patchバージョンアップ、リリースノート非掲載）
+gh pr create --title "chore: Update dependencies"
+
+# ✅ 推奨（セキュリティ修正の場合）
+gh pr create --title "chore: Update dependencies (security fix)" --label "bug"
+
+# ✅ 推奨（パフォーマンス改善の場合）
+gh pr create --title "perf: Optimize build process" --label "enhancement"
 ```
 
 ### Release Drafterが動作しない

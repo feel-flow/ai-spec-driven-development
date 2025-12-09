@@ -41,7 +41,7 @@ create_label() {
   local description="$2"
   local color="$3"
 
-  if gh label list --json name --jq '.[].name' | grep -q "^${name}$"; then
+  if [[ -v "EXISTING_LABELS_MAP[$name]" ]]; then
     print_warning "ラベル '${name}' は既に存在します（スキップ）"
   else
     gh label create "$name" --description "$description" --color "$color"
@@ -57,6 +57,15 @@ echo ""
 
 check_gh_cli
 check_gh_auth
+
+# 既存ラベルを一度だけ取得（パフォーマンス最適化）
+print_info "既存のラベルを取得中..."
+declare -A EXISTING_LABELS_MAP
+while IFS= read -r label; do
+  EXISTING_LABELS_MAP["$label"]=1
+done < <(gh label list --json name --jq '.[].name')
+print_success "既存ラベル取得完了（${#EXISTING_LABELS_MAP[@]}個）"
+echo ""
 
 print_info "GitHubラベルを設定します..."
 echo ""
