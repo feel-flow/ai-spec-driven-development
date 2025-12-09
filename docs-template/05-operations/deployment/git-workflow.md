@@ -44,7 +44,7 @@ ISSUE_URL=$(gh issue create \
 ## 受入基準
 - [ ] [基準1]
 - [ ] [基準2]" \
-  --label "feature" \
+  --label "enhancement" \
   --assignee "@me")
 
 # Issue番号を抽出
@@ -247,7 +247,7 @@ gh pr create \
 Closes #${ISSUE_NUM}
 
 🤖 Generated with [Claude Code](https://claude.com/claude-code)" \
-  --label "feature" \
+  --label "enhancement" \
   --reviewer "team-lead"
 ```
 

@@ -4,7 +4,28 @@
 
 ## [Unreleased]
 
+## [v2.2.0] - 2025-12-09
 ### Added
+- **GitHubラベル体系の標準化**（2025-12-09）
+  - **標準準拠のラベル構成**
+    - GitHubデフォルトラベルを最大限活用（`bug`, `enhancement`, `documentation`など）
+    - 必要最小限のカスタムラベルのみ追加（`major`, `minor`, `patch`, `hotfix`, `urgent`）
+    - 重複ラベル（`feature`, `fix`, `docs`, `chore`）を削除し、標準ラベルに統合
+    - **効果**: セットアップ不要、GitHub標準に準拠、学習コスト削減、ツール連携の向上
+  - **自動セットアップスクリプト**
+    - `scripts/setup-github-labels.sh`: 必要なカスタムラベルを一括作成
+    - 既存ラベルはスキップ（エラーなし）
+    - インタラクティブな確認プロンプト
+  - **包括的なドキュメント**
+    - `docs-template/05-operations/deployment/github-setup.md`: GitHub初期設定ガイド（新規）
+    - ラベルの使い分け、Release Drafterの設定、ワークフロースクリプトの使用方法を詳説
+    - トラブルシューティングセクションを含む
+  - **既存ファイルの更新**
+    - `.github/release-drafter.yml`: 標準ラベルに対応（`enhancement`, `bug`, `documentation`使用）
+    - `scripts/ai-workflow.sh`: `feature` → `enhancement` に更新
+    - `docs-template/05-operations/deployment/git-workflow.md`: ラベル参照を標準化
+    - `docs-template/05-operations/DEPLOYMENT.md`: 目次に `github-setup.md` を追加
+
 - **ドキュメント構造の明確化**（2025-11-05）
   - **番号付きフォルダ構造の文書化**
     - README.mdに7文書のフォルダパス表記を追加（例: `01-business/PROJECT.md`）

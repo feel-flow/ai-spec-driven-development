@@ -6,6 +6,7 @@
 
 | ドキュメント | 内容 | 推奨読み順 |
 |------------|------|----------|
+| [github-setup.md](./deployment/github-setup.md) | GitHub初期設定（ラベル・Release Drafter） | ⭐⭐⭐⭐⭐ 0th |
 | [git-workflow.md](./deployment/git-workflow.md) | AI駆動Git Workflow全体 | ⭐⭐⭐⭐⭐ 1st |
 | [self-review.md](./deployment/self-review.md) | セルフレビュー詳細（PR作成前） | ⭐⭐⭐⭐ 2nd |
 | [automated-code-review.md](./deployment/automated-code-review.md) | 自動コードレビュー（Claude Code + Husky） | ⭐⭐⭐⭐ - |

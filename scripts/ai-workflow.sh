@@ -125,7 +125,7 @@ $description
 - docs/MASTER.md
 - docs/PATTERNS.md
 - docs/TESTING.md" \
-    --label "feature" \
+    --label "enhancement" \
     --assignee "@me")
 
   local issue_number=$(echo "$issue_url" | grep -oE '[0-9]+$')
