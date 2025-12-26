@@ -28,12 +28,18 @@ Issue → Branch → Commit → Self-Review → PR → Review → Merge → Know
 
 ## コアサイクル（9ステップ）
 
-```
-┌─────────────────────────────────────────────────────────────────────┐
-│  Issue → Branch → Commit → Self-Review → PR → Review → Merge       │
-│                                                    ↓                │
-│                              Cleanup ← Knowledge ←─┘                │
-└─────────────────────────────────────────────────────────────────────┘
+```mermaid
+graph LR
+    subgraph "コアサイクル"
+        A[1. Issue] --> B[2. Branch]
+        B --> C[3. Commit]
+        C --> D[4. Self-Review]
+        D --> E[5. PR]
+        E --> F[6. Review]
+        F --> G[7. Merge]
+        G --> H[8. Knowledge]
+        H --> I[9. Cleanup]
+    end
 ```
 
 ### 各ステップの概要
@@ -118,8 +124,8 @@ git commit -m "feat: ユーザー認証機能を実装
 - ログイン/ログアウトAPIを実装
 
 参照:
-- docs/MASTER.md:29 (認証方式)
-- docs/PATTERNS.md:145 (エラーハンドリング)
+- docs-template/MASTER.md:29 (認証方式)
+- docs-template/03-implementation/PATTERNS.md:145 (エラーハンドリング)
 
 Closes #123"
 ```
@@ -143,9 +149,9 @@ Closes #123"
 ```
 「以下の観点で、今回のコミット内容をレビューしてください：
 
-1. コーディング規約（docs/MASTER.md、docs/PATTERNS.md）
-2. 仕様との整合性（docs/PROJECT.md、docs/ARCHITECTURE.md）
-3. テスト充実度（docs/TESTING.md）
+1. コーディング規約（docs-template/MASTER.md、docs-template/03-implementation/PATTERNS.md）
+2. 仕様との整合性（docs-template/01-context/PROJECT.md、docs-template/02-design/ARCHITECTURE.md、docs-template/02-design/DOMAIN.md）
+3. テスト充実度（docs-template/04-quality/TESTING.md）
 4. パフォーマンスとセキュリティ
 5. ドキュメント更新の必要性
 
