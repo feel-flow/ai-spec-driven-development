@@ -2,6 +2,8 @@
 
 AI開発ツール（Claude Code、GitHub Copilot、Cursor）に最適化されたGit Flowベースのワークフローです。
 
+> **このドキュメントについて**: 本ドキュメントはワークフロー全体の概要と流れを説明するハブドキュメントです。各ステップの詳細な手順やテンプレートは[関連ドキュメント](#関連ドキュメント)を参照してください。
+
 ## なぜAI駆動Git Workflowか
 
 従来のGit Workflowに **セルフレビュー（PR作成前）** と **ナレッジ体系化（マージ後）** を組み込むことで、AIツールの力を最大限に活用します。
@@ -126,8 +128,8 @@ git commit -m "feat: ユーザー認証機能を実装
 - ログイン/ログアウトAPIを実装
 
 参照:
-- docs-template/MASTER.md:29 (認証方式)
-- docs-template/03-implementation/PATTERNS.md:145 (エラーハンドリング)
+- docs/MASTER.md:29 (認証方式)
+- docs/03-implementation/PATTERNS.md:145 (エラーハンドリング)
 
 Closes #123"
 ```
@@ -151,9 +153,9 @@ Closes #123"
 ```
 「以下の観点で、今回のコミット内容をレビューしてください：
 
-1. コーディング規約（docs-template/MASTER.md、docs-template/03-implementation/PATTERNS.md）
-2. 仕様との整合性（docs-template/01-context/PROJECT.md、docs-template/02-design/ARCHITECTURE.md、docs-template/02-design/DOMAIN.md）
-3. テスト充実度（docs-template/04-quality/TESTING.md）
+1. コーディング規約（docs/MASTER.md、docs/03-implementation/PATTERNS.md）
+2. 仕様との整合性（docs/01-context/PROJECT.md、docs/02-design/ARCHITECTURE.md、docs/02-design/DOMAIN.md）
+3. テスト充実度（docs/04-quality/TESTING.md）
 4. パフォーマンスとセキュリティ
 5. ドキュメント更新の必要性
 
@@ -278,7 +280,7 @@ git pull origin develop
 git fetch --prune
 ```
 
-**注**: ステップ7で `gh pr merge --delete-branch` を使用した場合、ローカルのfeatureブランチも自動で削除されるため `git branch -D` は通常不要です。もしブランチが残っている場合は `git branch -D feature/123-user-auth` で手動削除してください。
+**注**: ステップ7で `gh pr merge --delete-branch` を使用するとリモートブランチが削除されます。ローカルブランチは、チェックアウトしていない場合に限り削除されます。多くの場合、フィーチャーブランチ上で作業しているため、マージ後に `git branch -D feature/123-user-auth` で手動削除が必要です。
 
 ---
 
