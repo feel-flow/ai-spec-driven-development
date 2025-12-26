@@ -142,7 +142,7 @@ Closes #123"
 |------|-------------|
 | 1. コーディング規約 | マジックナンバー、型安全性、命名規則 |
 | 2. 仕様との整合性 | PROJECT.md、ARCHITECTURE.md、DOMAIN.mdとの整合 |
-| 3. テスト充実度 | カバレッジ80%+、エッジケース、エラーハンドリング |
+| 3. テスト充実度 | カバレッジ80%以上、エッジケース、エラーハンドリング |
 | 4. パフォーマンス・セキュリティ | N+1問題、入力サニタイズ、認証・認可 |
 | 5. ドキュメント更新 | README、API仕様書の更新要否 |
 
@@ -268,13 +268,17 @@ gh discussion create \
 
 ### ステップ9: Cleanup
 
+PRのマージ後、ローカル環境を同期します。
+
 ```bash
 git checkout develop
 git pull origin develop
-git branch -D "feature/123-user-auth"
-# リモートで削除済みの追跡ブランチをローカルから削除
+
+# リモートで削除済みの追跡ブランチをローカルから一括削除
 git fetch --prune
 ```
+
+**注**: ステップ7で `gh pr merge --delete-branch` を使用した場合、ローカルのfeatureブランチも自動で削除されるため `git branch -D` は通常不要です。もしブランチが残っている場合は `git branch -D feature/123-user-auth` で手動削除してください。
 
 ---
 
