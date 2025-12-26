@@ -128,8 +128,8 @@ git commit -m "feat: ユーザー認証機能を実装
 - ログイン/ログアウトAPIを実装
 
 参照:
-- docs-template/MASTER.md:29 (認証方式)
-- docs-template/03-implementation/PATTERNS.md:145 (エラーハンドリング)
+- docs-template/MASTER.md#技術スタック (認証方式)
+- docs-template/03-implementation/PATTERNS.md#3-エラーハンドリング (エラーハンドリング)
 
 Closes #123"
 ```
@@ -227,9 +227,9 @@ Closes #123"
 ### ステップ7: Merge
 
 ```bash
-# developブランチに切り替えてからマージ（ローカルブランチも自動削除）
+# developブランチに切り替えてからマージ
 git checkout develop
-gh pr merge --squash --delete-branch
+gh pr merge <PR番号> --squash --delete-branch
 ```
 
 **注**: `feature`ブランチにはSquash mergeが適していますが、`release`や`hotfix`ブランチを`main`にマージする際は、コミット履歴を保持するために通常のmerge (`--merge`) を検討してください。
@@ -280,7 +280,7 @@ git pull origin develop
 git fetch --prune
 ```
 
-**注**: ステップ7で `develop` ブランチに切り替えてからマージしたため、リモートとローカルのフィーチャーブランチは自動的に削除されています。`git fetch --prune` は、他の開発者がマージして削除したブランチなど、リモートで削除済みの追跡ブランチをローカルから一括で削除するために役立ちます。
+**注**: ステップ7で `gh pr merge --delete-branch` を実行したため、リモートのフィーチャーブランチは自動的に削除されています。ローカルのフィーチャーブランチは、マージ前に `develop` へ切り替えているため、手動で `git branch -d feature/123-user-auth` を実行するか、`gh` コマンドのインタラクティブなプロンプトに従って削除する必要があります。`git fetch --prune` は、他の開発者がマージして削除したブランチなど、リモートで削除済みの追跡ブランチをローカルから一括で削除するために役立ちます。
 
 ---
 
