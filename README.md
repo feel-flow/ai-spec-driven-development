@@ -8,6 +8,7 @@ AI開発ツール（Claude Code、GitHub Copilot、Cursor）に最適化され�
 
 - **[インデックス](./ai_spec_driven_development.md)**: すべてのドキュメントへの入り口。
 - **[AI Spec Driven Development 概念と実践](./docs/AI_SPEC_DRIVEN_DEVELOPMENT.md)**: この開発アプローチの背景にある思想、具体的な実践方法を解説。
+- **[AI駆動 Git Workflow](./docs/AI_GIT_WORKFLOW.md)**: AIツールに最適化されたGit Flowベースのワークフロー。セルフレビューとナレッジ体系化を組み込んだ9ステップ。
 - **[運用ガイド (AIエージェント向け)](./docs/OPERATIONAL_GUIDE.md)**: AIエージェントが開発プロセスで参照すべき操作仕様書。
 
 ## 🚀 Quick Start
