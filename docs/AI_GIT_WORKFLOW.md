@@ -70,6 +70,8 @@ hotfix/*      ← 緊急修正（mainから分岐）
 release/*     ← リリース準備（developから分岐）
 ```
 
+**注**: この図は主なコードの流れを示しています。`release`ブランチや`hotfix`ブランチは`main`と`develop`の両方にマージされるなど、実際のフローはより複雑になる場合があります。
+
 ### ブランチ命名規則
 
 | タイプ | パターン | 例 |
@@ -268,6 +270,8 @@ gh discussion create \
 git checkout develop
 git pull origin develop
 git branch -d "feature/123-user-auth"
+# リモートで削除済みの追跡ブランチをローカルから削除
+git fetch --prune
 ```
 
 ---
