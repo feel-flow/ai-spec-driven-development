@@ -229,6 +229,8 @@ Closes #123"
 gh pr merge --squash --delete-branch
 ```
 
+**注**: `feature`ブランチにはSquash mergeが適していますが、`release`や`hotfix`ブランチを`main`にマージする際は、コミット履歴を保持するために通常のmerge (`--merge`) を検討してください。
+
 ### ステップ8: Knowledge（ナレッジ体系化）
 
 **目的**: 開発で得た知見をチーム資産として蓄積
@@ -269,7 +271,7 @@ gh discussion create \
 ```bash
 git checkout develop
 git pull origin develop
-git branch -d "feature/123-user-auth"
+git branch -D "feature/123-user-auth"
 # リモートで削除済みの追跡ブランチをローカルから削除
 git fetch --prune
 ```
