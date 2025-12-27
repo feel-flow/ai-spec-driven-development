@@ -5,6 +5,22 @@
 ## [Unreleased]
 
 ### Added
+- **開発準備ガイド（DEVELOPMENT_PREPARATION.md）の追加**（2025-12-27）
+  - `docs-template/06-reference/DEVELOPMENT_PREPARATION.md` を新規作成
+    - 5つのPhaseで構成された体系的な開発準備プロセスを定義
+      - Phase 1: Issue-First Development（要件をIssueで定義）
+      - Phase 2: Document-Driven Design（技術をドキュメントで確定）
+      - Phase 3: MECE検証（漏れなくダブりなく検証）
+      - Phase 4: AI Spec-Driven Development（仕様をドキュメントで駆動）
+      - Phase 5: Git Workflow（コードを管理）
+    - 対象読者とステークホルダーの定義テンプレート
+    - Issue作成のベストプラクティス（構成要素、ラベル、依存関係）
+    - MECE検証チェックリスト（5つの視点: 機能・データフロー・ライフサイクル・関係者・非機能）
+    - 開発準備完了チェックリスト
+    - アンチパターン集
+  - `docs-template/MASTER.md` に「開発プロセスガイド」セクションを追加
+  - **効果**: 新規プロジェクト開始時に「何を決める必要があるか」を体系的に把握可能。FFIDプロジェクトで実践したベストプラクティスを汎用テンプレート化
+
 - **AI駆動 Git Workflow ドキュメントの追加**（2025-12-27）
   - `docs/AI_GIT_WORKFLOW.md` を新規作成
     - AI開発ツールに最適化されたGit Flowベースのワークフロー解説
