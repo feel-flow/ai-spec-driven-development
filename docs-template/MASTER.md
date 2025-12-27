@@ -409,6 +409,9 @@ metrics:
 - [08-knowledge/BEST_PRACTICES.md](./08-knowledge/BEST_PRACTICES.md) - ベストプラクティス集
 - [08-knowledge/FAQ.md](./08-knowledge/FAQ.md) - よくある質問と回答
 
+### 開発プロセスガイド
+- [06-reference/DEVELOPMENT_PREPARATION.md](./06-reference/DEVELOPMENT_PREPARATION.md) - 開発準備ガイド（5 Phases: Issue-First → Document-Driven → MECE検証 → AI Spec-Driven → Git Workflow）
+
 ## ドキュメント構造ガイド（AIツール向け）
 
 ### 大規模ドキュメントの階層化
