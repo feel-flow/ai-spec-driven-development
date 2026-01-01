@@ -234,11 +234,18 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - name: Check MASTER.md updated
         run: |
-          if ! git diff --name-only origin/main | grep -q "docs/MASTER.md"; then
-            echo "Warning: docs/ was changed but MASTER.md was not updated"
-            echo "Please update MASTER.md if new sections were added"
+          # docs/配下が変更されている場合、MASTER.mdも変更されているか確認
+          DOCS_CHANGED=$(git diff --name-only origin/${{ github.base_ref }} | grep '^docs/' | wc -l)
+          MASTER_CHANGED=$(git diff --name-only origin/${{ github.base_ref }} | grep '^docs/MASTER.md' | wc -l)
+
+          if [ "$DOCS_CHANGED" -gt 0 ] && [ "$MASTER_CHANGED" -eq 0 ]; then
+            echo "::error::docs/ was changed but MASTER.md was not updated"
+            echo "Please update MASTER.md to reflect the changes"
+            exit 1
           fi
 ```
 
