@@ -39,7 +39,18 @@ AGENTS.mdは「AIエージェント向けのREADME」として設計されてい
 
 ### Claude Codeの注意点
 
-Claude CodeはAGENTS.md標準に **対応していません**。`CLAUDE.md`のみを読み込みます。
+Claude CodeはAGENTS.md標準に **ネイティブ対応していません**。`CLAUDE.md`のみを読み込みます。
+
+**ワークアラウンド**: `CLAUDE.md`内でAGENTS.mdを参照するよう記述すれば、間接的に読み込ませることは可能です。
+
+```markdown
+# CLAUDE.md
+
+このリポジトリのルールは AGENTS.md に記載されています。
+実装前に必ず AGENTS.md を読んでください。
+```
+
+**Agent Skills**: AnthropicはAGENTS.mdの代わりに独自の「Agent Skills」システムを開発しています。`SKILL.md`ファイルを使用し、Claude.ai、Claude Code、Claude Agent SDKで利用可能です。
 
 複数のAIツールを併用する場合は、`CLAUDE.md`と`AGENTS.md`の両方を用意することを推奨します。
 
