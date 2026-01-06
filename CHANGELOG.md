@@ -5,6 +5,34 @@
 ## [Unreleased]
 
 ### Added
+- **Issue起点のドキュメント管理戦略を書籍・テンプレートに追加**（2026-01-06）
+  - **核心的な考え方**: `Issue = AIへのコンテキスト選択`
+    - すべてのタスクで全7文書を読む必要はない
+    - Issueの「参照ドキュメント」セクションで、AIに読ませる文書を選択
+  - **書籍への追加**
+    - `books/.../part3_practice/07_daily-workflow.md`: 「Issue = AIへのコンテキスト選択」セクション追加
+      - タスク種別ごとの推奨参照文書一覧（新機能/バグ/リファクタ/インフラ/ドキュメント）
+      - 関連Issueの参照方法
+      - スコープ外の明示方法
+      - 章末チェックリストに3項目追加
+    - `books/.../part5_organization/14_roadmap-knowledge.md`: 「ドキュメント増加の管理戦略」セクション追加
+      - 成長フェーズ（Phase 1〜3）の定義
+      - ファイルサイズ制限と分割トリガー
+      - アーカイブ戦略（基準・手順）
+      - 月次参照チェックリスト
+      - リンク切れチェックの自動化（GitHub Actions例）
+      - 章末チェックリストに3項目追加
+  - **テンプレートの追加・更新**
+    - `docs-template/.github/ISSUE_TEMPLATE/` に5種類のテンプレートを追加
+      - feature.md（新機能追加）
+      - bug.md（バグ修正）
+      - refactor.md（リファクタリング）
+      - infra.md（インフラ変更）
+      - docs.md（ドキュメント更新）
+    - `docs-template/MASTER.md`: 「月次ドキュメント参照チェック」セクション追加
+    - `docs-template/archive/.gitkeep`: アーカイブディレクトリ作成
+  - **効果**: Issue作成時に必要な文書だけを選択し、AIのコンテキスト効率を向上。ドキュメント増加を管理し、陳腐化を防止
+
 - **技術選定・バージョン管理・ADRの重要性を書籍・テンプレートに追加**（2026-01-06）
   - **書籍への追加**
     - `books/ai-spec-driven-development-90percent/part1_why-ai-fails/02_ai-weakness.md`: 「技術バージョン：もう一つの未記述要件」セクションを追加
