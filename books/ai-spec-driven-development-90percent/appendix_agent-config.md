@@ -1,6 +1,6 @@
 # 付録：AIエージェント設定ファイル一覧
 
-> **注意**: この情報は2025年1月時点のものです。各ツールの仕様は頻繁に更新されるため、最新情報は公式ドキュメントを確認してください。
+> **注意**: この情報は2026年1月6日時点の調査結果です。AIコーディングツールの仕様は頻繁に更新されるため、最新情報は各ツールの公式ドキュメントを確認してください。
 
 ---
 
@@ -32,6 +32,8 @@ AGENTS.mdは「AIエージェント向けのREADME」として設計されてい
 | Cursor | `AGENTS.md`, `.cursor/rules/*.mdc` | ✅ |
 | Windsurf | `AGENTS.md`, Cascade Rules | ✅ |
 | Gemini CLI | `AGENTS.md` | ✅ |
+| Google Antigravity | `~/.gemini/GEMINI.md`, `AGENTS.md` | ✅ |
+| Kiro (AWS) | `.kiro/steering/*.md`, `AGENTS.md` | ✅ |
 | Cline | `.clinerules` | - |
 | Factory/Droid | `AGENTS.md`, `.factory/droids/*.md` | ✅ |
 
@@ -40,6 +42,27 @@ AGENTS.mdは「AIエージェント向けのREADME」として設計されてい
 Claude CodeはAGENTS.md標準に **対応していません**。`CLAUDE.md`のみを読み込みます。
 
 複数のAIツールを併用する場合は、`CLAUDE.md`と`AGENTS.md`の両方を用意することを推奨します。
+
+### Google Antigravityの特徴
+
+Google Antigravity（2025年11月リリース）は、Googleが提供するエージェント型開発プラットフォームです。
+
+- **グローバル設定**: `~/.gemini/GEMINI.md` に個人の設定を記述
+- **AGENTS.md対応**: リポジトリルートのAGENTS.mdも読み込み可能
+- **アーティファクト機能**: Google Docsスタイルのコメントでエージェントにフィードバック可能
+
+詳細: [Google Antigravity 公式ドキュメント](https://antigravity.google/docs/home)
+
+### Kiro（AWS）の特徴
+
+Kiro（2025年7月リリース）は、AWSが提供する仕様駆動開発に特化したエージェント型IDEです。
+
+- **Steeringファイル**: `.kiro/steering/*.md` でプロジェクト固有のルールを定義
+- **AGENTS.md対応**: AGENTS.mdも読み込み可能（ただし inclusion modes は非対応）
+- **Spec駆動**: `requirements.md`, `design.md`, `tasks.md` による仕様管理
+- **Foundation files**: `product.md`, `tech.md`, `structure.md` でプロジェクトコンテキストを提供
+
+詳細: [Kiro 公式ドキュメント](https://kiro.dev/docs/steering/)
 
 ---
 
@@ -130,7 +153,16 @@ monorepo/
 
 ## 参考リンク
 
+### AGENTS.md関連
+
 - [AGENTS.md 公式サイト](https://agents.md)
 - [GitHub agentsmd/agents.md](https://github.com/agentsmd/agents.md)
 - [OpenAI Codex AGENTS.mdガイド](https://developers.openai.com/codex/guides/agents-md/)
 - [InfoQ: AGENTS.md Emerges as Open Standard](https://www.infoq.com/news/2025/08/agents-md/)
+
+### 各ツールの公式ドキュメント
+
+- [Google Antigravity](https://antigravity.google/docs/home)
+- [Kiro (AWS)](https://kiro.dev/docs/)
+- [Cursor Rules](https://docs.cursor.com/)
+- [GitHub Copilot Instructions](https://docs.github.com/en/copilot)
