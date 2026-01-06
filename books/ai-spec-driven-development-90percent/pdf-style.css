@@ -1,0 +1,102 @@
+/* PDF スタイル設定 */
+
+/* 基本フォント */
+body {
+  font-family: "Hiragino Kaku Gothic ProN", "Hiragino Sans", "Meiryo", sans-serif;
+  font-size: 11pt;
+  line-height: 1.8;
+}
+
+/* 見出し */
+h1 {
+  page-break-before: always;
+  font-size: 24pt;
+  margin-top: 0;
+  padding-top: 40px;
+}
+
+/* 最初のh1はページブレークしない */
+h1:first-of-type {
+  page-break-before: avoid;
+}
+
+h2 {
+  font-size: 18pt;
+  margin-top: 30px;
+  page-break-after: avoid;
+}
+
+h3 {
+  font-size: 14pt;
+  margin-top: 20px;
+  page-break-after: avoid;
+}
+
+/* コードブロック */
+pre {
+  background-color: #f5f5f5;
+  padding: 12px;
+  border-radius: 4px;
+  font-size: 10pt;
+  overflow-x: auto;
+  page-break-inside: avoid;
+}
+
+code {
+  font-family: "SF Mono", "Monaco", "Menlo", monospace;
+  background-color: #f0f0f0;
+  padding: 2px 4px;
+  border-radius: 3px;
+  font-size: 10pt;
+}
+
+/* テーブル */
+table {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 15px 0;
+  page-break-inside: avoid;
+}
+
+th, td {
+  border: 1px solid #ddd;
+  padding: 8px 12px;
+  text-align: left;
+}
+
+th {
+  background-color: #f5f5f5;
+  font-weight: bold;
+}
+
+/* 画像 */
+img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+  margin: 20px auto;
+  page-break-inside: avoid;
+}
+
+/* 水平線（章区切り） */
+hr {
+  page-break-after: always;
+  border: none;
+  margin: 0;
+  padding: 0;
+  height: 0;
+}
+
+/* リスト */
+ul, ol {
+  page-break-inside: avoid;
+}
+
+/* 引用 */
+blockquote {
+  border-left: 4px solid #ddd;
+  padding-left: 16px;
+  margin-left: 0;
+  color: #555;
+  page-break-inside: avoid;
+}
