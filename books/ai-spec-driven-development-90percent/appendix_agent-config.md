@@ -16,16 +16,16 @@ AGENTS.mdは「AIエージェント向けのREADME」として設計されてい
 
 ### 公式リソース
 
-- 公式サイト: https://agents.md
-- GitHub: https://github.com/agentsmd/agents.md
-- OpenAI Codexガイド: https://developers.openai.com/codex/guides/agents-md/
+- 公式サイト: <https://agents.md>
+- GitHub: <https://github.com/agentsmd/agents.md>
+- OpenAI Codexガイド: <https://developers.openai.com/codex/guides/agents-md/>
 
 ---
 
 ## ツール別設定ファイル一覧
 
 | ツール | 設定ファイル | AGENTS.md対応 |
-|--------|-------------|:-------------:|
+| ------ | ----------- | :-----------: |
 | Claude Code | `CLAUDE.md` | ❌ |
 | GitHub Copilot | `.github/copilot-instructions.md`, `AGENTS.md` | ✅ |
 | OpenAI Codex | `AGENTS.md`, `SKILL.md` | ✅ |
@@ -171,9 +171,17 @@ monorepo/
 - [OpenAI Codex AGENTS.mdガイド](https://developers.openai.com/codex/guides/agents-md/)
 - [InfoQ: AGENTS.md Emerges as Open Standard](https://www.infoq.com/news/2025/08/agents-md/)
 
-### 各ツールの公式ドキュメント
+### 各ツールの公式リリース・ドキュメント
 
-- [Google Antigravity](https://antigravity.google/docs/home)
-- [Kiro (AWS)](https://kiro.dev/docs/)
-- [Cursor Rules](https://docs.cursor.com/)
-- [GitHub Copilot Instructions](https://docs.github.com/en/copilot)
+| ツール | 公式リリース | ドキュメント |
+| ------ | ----------- | ----------- |
+| Claude Code | [Claude 3.7 Sonnet and Claude Code](https://www.anthropic.com/news/claude-3-7-sonnet) | [Claude Code Docs](https://code.claude.com/docs/) |
+| GitHub Copilot | [Coding Agent for GitHub Copilot](https://github.com/newsroom/press-releases/coding-agent-for-github-copilot) | [GitHub Copilot Docs](https://docs.github.com/en/copilot) |
+| OpenAI Codex | [Codex is now generally available](https://openai.com/index/codex-now-generally-available/) | [Codex Changelog](https://developers.openai.com/codex/changelog/) |
+| Cursor | [Cursor 2.0](https://cursor.com/blog/2-0) | [Cursor Docs](https://docs.cursor.com/) |
+| Windsurf | [Windsurf Launch](https://windsurf.com/blog/windsurf-launch) | [Windsurf Changelog](https://windsurf.com/changelog) |
+| Gemini CLI | [Introducing Gemini CLI](https://blog.google/technology/developers/introducing-gemini-cli-open-source-ai-agent/) | [Gemini CLI Docs](https://geminicli.com/docs/) |
+| Google Antigravity | [Build with Google Antigravity](https://developers.googleblog.com/build-with-google-antigravity-our-new-agentic-development-platform/) | [Antigravity Docs](https://antigravity.google/docs/home) |
+| Kiro (AWS) | [Kiro Launch](https://kiro.dev/blog/introducing-kiro-cli/) | [Kiro Docs](https://kiro.dev/docs/) |
+| Cline | [GitHub cline/cline](https://github.com/cline/cline) | [Cline Docs](https://docs.cline.bot/) |
+| Factory/Droid | [Factory is GA](https://factory.ai/news/factory-is-ga) | [Factory Docs](https://factory.ai/) |
