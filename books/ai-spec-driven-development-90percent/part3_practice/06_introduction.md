@@ -12,17 +12,42 @@
 
 ### ステップ1：ディレクトリ構造の作成
 
-まず、docsディレクトリを作成します。
+まず、番号付きディレクトリ構造を作成します。番号付けにより、ファイルが増えても整理しやすくなります。
 
 ```bash
-mkdir -p docs
+# ディレクトリ構造を作成
+mkdir -p docs/{00-planning,01-context,02-design,03-implementation,04-quality,05-operations,06-reference,07-project-management,08-knowledge}
+
+# 7文書を作成
 touch docs/MASTER.md
-touch docs/PROJECT.md
-touch docs/ARCHITECTURE.md
-touch docs/DOMAIN.md
-touch docs/PATTERNS.md
-touch docs/TESTING.md
-touch docs/DEPLOYMENT.md
+touch docs/01-context/PROJECT.md
+touch docs/02-design/ARCHITECTURE.md
+touch docs/02-design/DOMAIN.md
+touch docs/03-implementation/PATTERNS.md
+touch docs/04-quality/TESTING.md
+touch docs/05-operations/DEPLOYMENT.md
+```
+
+作成される構造：
+
+```text
+docs/
+├── MASTER.md                      # 索引・ナビゲーション
+├── 00-planning/                   # 企画段階の文書
+├── 01-context/
+│   └── PROJECT.md                 # ビジョン・要件
+├── 02-design/
+│   ├── ARCHITECTURE.md            # システム設計
+│   └── DOMAIN.md                  # ビジネスロジック
+├── 03-implementation/
+│   └── PATTERNS.md                # 実装パターン
+├── 04-quality/
+│   └── TESTING.md                 # テスト戦略
+├── 05-operations/
+│   └── DEPLOYMENT.md              # 運用手順
+├── 06-reference/                  # API仕様・外部参照
+├── 07-project-management/         # 進捗・チケット管理
+└── 08-knowledge/                  # ナレッジ・ADR
 ```
 
 ### ステップ2：MASTER.mdを最初に書く
@@ -52,12 +77,12 @@ updated: 2024-01-01
 ## 文書索引
 | 文書 | 状態 | 説明 |
 |------|------|------|
-| [PROJECT.md](./PROJECT.md) | draft | ビジョン・要件 |
-| [ARCHITECTURE.md](./ARCHITECTURE.md) | draft | システム設計 |
-| [DOMAIN.md](./DOMAIN.md) | draft | ビジネスロジック |
-| [PATTERNS.md](./PATTERNS.md) | draft | 実装パターン |
-| [TESTING.md](./TESTING.md) | draft | テスト戦略 |
-| [DEPLOYMENT.md](./DEPLOYMENT.md) | draft | 運用手順 |
+| [PROJECT.md](./01-context/PROJECT.md) | draft | ビジョン・要件 |
+| [ARCHITECTURE.md](./02-design/ARCHITECTURE.md) | draft | システム設計 |
+| [DOMAIN.md](./02-design/DOMAIN.md) | draft | ビジネスロジック |
+| [PATTERNS.md](./03-implementation/PATTERNS.md) | draft | 実装パターン |
+| [TESTING.md](./04-quality/TESTING.md) | draft | テスト戦略 |
+| [DEPLOYMENT.md](./05-operations/DEPLOYMENT.md) | draft | 運用手順 |
 
 ## ディレクトリ構造
 ```text
@@ -281,7 +306,7 @@ API → Service → Repository → Database
 
 ### 新規プロジェクトの場合
 
-- [ ] docsディレクトリと7つのファイルを作成した
+- [ ] 番号付きディレクトリ構造（00〜08）と7つの文書を作成した
 - [ ] MASTER.mdに概要と文書索引を書いた
 - [ ] PROJECT.mdにビジョンとMVP機能を書いた
 - [ ] 他の文書は見出しだけでも作成した
