@@ -247,7 +247,7 @@ DEPLOYMENT.md（222行 - 索引）
 
 ### アーカイブ戦略
 
-古くなった文書は**archive/**ディレクトリに移動します。
+古くなった文書は**archive/** ディレクトリに移動します。
 
 ```text
 docs/
@@ -317,7 +317,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Link Checker
-        uses: lycheeverse/lychee-action@v1
+        uses: lycheeverse/lychee-action@v2
         with:
           args: --verbose --no-progress 'docs/**/*.md'
           fail: true
