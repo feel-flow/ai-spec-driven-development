@@ -90,12 +90,12 @@ MASTER.mdは**AIが最初に読む文書**です。
 ## 文書索引
 | 文書 | 説明 | 更新日 |
 |------|------|--------|
-| [PROJECT.md](./PROJECT.md) | ビジョン・要件 | 2024-01-01 |
-| [ARCHITECTURE.md](./ARCHITECTURE.md) | システム設計 | 2024-01-01 |
-| [DOMAIN.md](./DOMAIN.md) | ビジネスロジック | 2024-01-01 |
-| [PATTERNS.md](./PATTERNS.md) | 実装パターン | 2024-01-01 |
-| [TESTING.md](./TESTING.md) | テスト戦略 | 2024-01-01 |
-| [DEPLOYMENT.md](./DEPLOYMENT.md) | 運用手順 | 2024-01-01 |
+| [PROJECT.md](./PROJECT.md) | ビジョン・要件 | 2026-01-01 |
+| [ARCHITECTURE.md](./ARCHITECTURE.md) | システム設計 | 2026-01-01 |
+| [DOMAIN.md](./DOMAIN.md) | ビジネスロジック | 2026-01-01 |
+| [PATTERNS.md](./PATTERNS.md) | 実装パターン | 2026-01-01 |
+| [TESTING.md](./TESTING.md) | テスト戦略 | 2026-01-01 |
+| [DEPLOYMENT.md](./DEPLOYMENT.md) | 運用手順 | 2026-01-01 |
 
 ## ディレクトリ構造
 ```text

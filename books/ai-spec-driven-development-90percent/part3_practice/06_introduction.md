@@ -60,8 +60,8 @@ title: MASTER.md
 version: 0.1.0
 status: draft
 owner: "@your-name"
-created: 2024-01-01
-updated: 2024-01-01
+created: 2026-01-01
+updated: 2026-01-01
 ---
 
 # プロジェクト名
@@ -100,8 +100,8 @@ title: PROJECT.md
 version: 0.1.0
 status: draft
 owner: "@your-name"
-created: 2024-01-01
-updated: 2024-01-01
+created: 2026-01-01
+updated: 2026-01-01
 ---
 
 # PROJECT.md
@@ -136,8 +136,8 @@ title: ARCHITECTURE.md
 version: 0.1.0
 status: draft
 owner: "@your-name"
-created: 2024-01-01
-updated: 2024-01-01
+created: 2026-01-01
+updated: 2026-01-01
 ---
 
 # ARCHITECTURE.md

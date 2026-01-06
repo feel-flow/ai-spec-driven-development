@@ -226,7 +226,7 @@ jobs:
 
 ```bash
 # いつ、誰が、何を変えたか
-git log --oneline --author="name" --since="2024-01-01"
+git log --oneline --author="name" --since="2026-01-01"
 
 # 特定のファイルの変更履歴
 git log --follow -p -- path/to/file
