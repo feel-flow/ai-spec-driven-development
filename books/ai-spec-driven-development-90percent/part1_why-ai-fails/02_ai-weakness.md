@@ -307,7 +307,7 @@ POST /api/v1/users
   "id": "uuid",
   "email": "user@example.com",
   "username": "johndoe",
-  "createdAt": "2024-01-01T00:00:00Z"
+  "createdAt": "2026-01-01T00:00:00Z"
 }
 ```
 

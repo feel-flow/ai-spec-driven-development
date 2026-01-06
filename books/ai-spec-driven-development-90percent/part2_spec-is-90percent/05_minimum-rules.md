@@ -30,7 +30,7 @@ title: ARCHITECTURE.md
 version: 1.2.0
 status: approved
 owner: "@tech-lead"
-created: 2024-01-01
+created: 2026-01-01
 updated: 2024-03-15
 reviewers:
   - "@senior-dev"
@@ -50,7 +50,7 @@ reviewers:
 | version | セマンティックバージョン | 1.2.0 |
 | status | 文書の状態 | draft / review / approved |
 | owner | 責任者 | @username |
-| created | 作成日 | 2024-01-01 |
+| created | 作成日 | 2026-01-01 |
 | updated | 最終更新日 | 2024-03-15 |
 
 ### オプションフィールド
