@@ -5,6 +5,35 @@
 ## [Unreleased]
 
 ### Added
+- **技術選定・バージョン管理・ADRの重要性を書籍・テンプレートに追加**（2026-01-06）
+  - **書籍への追加**
+    - `books/ai-spec-driven-development-90percent/part1_why-ai-fails/02_ai-weakness.md`: 「技術バージョン：もう一つの未記述要件」セクションを追加
+      - AIのカットオフ（学習データの締め切り日）問題の解説
+      - バージョンを明記しないとAIが古い書き方をするリスク
+      - Next.js Pages Router vs App Router、React 18 vs 19の具体例
+      - 技術スタックにバージョンを明記する解決策
+      - ADR（Architecture Decision Record）の重要性の導入
+      - 章末チェックリストに3項目追加
+    - `books/ai-spec-driven-development-90percent/part2_spec-is-90percent/04_seven-documents.md`: ARCHITECTURE.mdセクションを大幅拡充
+      - 技術スタックのバージョン明記の重要性（良い例/悪い例）
+      - ADRの重要性と効果
+      - ADRテンプレート（AI向け最適化版）：バージョン選定理由・AIカットオフ対策・非推奨API回避・AIへの指示セクション追加
+      - ADR記述例：Next.js 15.0.xの選定（完全な実例）
+      - ADRの管理方法（3つの選択肢と推奨）
+      - 章末チェックリストに3項目追加
+  - **テンプレートの更新**
+    - `docs-template/MASTER.md`: 技術スタックセクションを拡充
+      - バージョン付き概要テーブル追加（カテゴリ/技術/バージョン/AIへの注意点）
+      - 「AIへの補足（カットオフ対策）」セクション追加
+      - ARCHITECTURE.mdへのADR参照リンク追加
+    - `docs-template/02-design/ARCHITECTURE.md`: ADRセクションを新設
+      - 技術選定一覧テーブル（ADR番号列追加）
+      - バージョン管理方針
+      - ADR一覧テーブル
+      - ADRテンプレート（AI向け最適化版）
+      - ADR記述例（PostgreSQL 16.x）
+  - **効果**: AIが技術バージョンを正しく理解し、非推奨APIを避けた最新の書き方でコードを生成できるようになる。ADRにより技術選定の背景をAIも人間も理解可能に
+
 - **開発準備ガイド（DEVELOPMENT_PREPARATION.md）の追加**（2025-12-27）
   - `docs-template/06-reference/DEVELOPMENT_PREPARATION.md` を新規作成
     - 5つのPhaseで構成された体系的な開発準備プロセスを定義

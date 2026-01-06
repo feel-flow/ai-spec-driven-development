@@ -124,6 +124,137 @@ async function registerUser(email: string, password: string) {
 
 ---
 
+## 技術バージョン：もう一つの「未記述要件」
+
+### AIの学習データには締め切りがある
+
+LLMにはもう一つ、見落とされがちな弱点があります。
+
+それは**学習データのカットオフ（知識の締め切り日）**です。
+
+LLMは特定の日付までのデータで学習されています。
+
+- Claude Sonnet 4：2025年3月頃
+- Claude Sonnet 4.5：2025年7月頃（信頼性が高いのは2025年1月まで）
+- GPT-4o：2024年6月頃
+- GPT-5：2024年10月頃
+- Gemini 2.5 Pro：2025年1月末頃
+
+つまり、**カットオフ以降にリリースされた技術については、古い情報しか持っていない**可能性があります。
+
+### バージョンを書かないとどうなるか
+
+```
+指示：「Next.jsでApp Routerを使ってAPIルートを作って」
+
+AIが推測すること：
+- Next.jsのバージョンは？（13.4？14.0？15.0？）
+- 各バージョンでAPIルートの書き方が微妙に違う
+- App Routerはいつから安定版？
+```
+
+バージョンを明記しなければ、AIは「学習時点で一般的だったバージョン」を想定します。
+
+結果として：
+
+- **非推奨APIを使ったコードが生成される**
+- **新しいバージョンでは動かない書き方が提案される**
+- **セキュリティパッチが適用される前の脆弱な実装パターンが使われる**
+
+### 実際に起きる問題
+
+Next.jsを例に見てみましょう。
+
+```typescript
+// AIが書いたコード（Next.js 13.x想定）
+// pages/api/users.ts ← Pages Routerの書き方
+export default function handler(req, res) {
+  res.status(200).json({ users: [] });
+}
+```
+
+```typescript
+// 実際のプロジェクト（Next.js 15.x）では
+// app/api/users/route.ts ← App Routerの書き方
+export async function GET() {
+  return Response.json({ users: [] });
+}
+```
+
+ディレクトリ構造も、エクスポート形式も、レスポンスの返し方も、まったく異なります。
+
+AIが古い書き方で実装すると、プロジェクトの構成と合わず、すべて書き直しになります。
+
+### Reactでも同様の問題
+
+```typescript
+// AIが書いたコード（React 18想定）
+// クライアントコンポーネントとして全体を実装
+'use client';
+import { useState, useEffect } from 'react';
+
+export default function UserList() {
+  const [users, setUsers] = useState([]);
+
+  useEffect(() => {
+    fetch('/api/users').then(r => r.json()).then(setUsers);
+  }, []);
+
+  return <ul>{users.map(u => <li key={u.id}>{u.name}</li>)}</ul>;
+}
+```
+
+```typescript
+// React 19 + Next.js 15では
+// Server Componentとしてシンプルに実装
+export default async function UserList() {
+  const users = await fetch('/api/users').then(r => r.json());
+  return <ul>{users.map(u => <li key={u.id}>{u.name}</li>)}</ul>;
+}
+```
+
+Server Componentsを知らないAIは、不要な`'use client'`を付け、`useEffect`で無理やりデータを取得します。
+
+### 解決策：技術スタックにバージョンを明記する
+
+MASTER.mdやARCHITECTURE.mdで、**使用する技術とバージョンを明示**します。
+
+```markdown
+## 技術スタック
+
+| 技術 | バージョン | AIへの注意点 |
+|------|-----------|-------------|
+| Next.js | 16.1.x | App Router使用（Pages Router禁止） |
+| React | 19.2.x | Server Componentsがデフォルト |
+| TypeScript | 5.9.x | strict mode有効 |
+| PostgreSQL | 17.x | - |
+| Prisma | 6.x | - |
+```
+
+この情報があれば、AIは：
+
+- 「Next.js 16ではApp Routerでこう書く」と正しく実装
+- 「React 19.2のServer Componentsを活用した設計」を提案
+- 「TypeScript 5.9の新機能を使用可能」と判断
+
+**バージョンを書くことは、AIへの「追加の仕様」**なのです。
+
+### なぜADRが必要か
+
+さらに重要なのは、**なぜその技術・バージョンを選んだのか**を記録することです。
+
+これを**ADR（Architecture Decision Record）**と呼びます。
+
+ADRがあると：
+
+- **AIが技術選定の背景を理解**し、一貫した設計提案ができる
+- **後から参加したメンバー**が「なぜこの技術？」を理解できる
+- **将来の変更時**に「当時の判断根拠」を参照できる
+
+ADRの詳細な書き方は、第4章のARCHITECTURE.mdセクションで解説します。
+
+---
+
 ## 解法：仮定を排除して、仕様を"書いてから"渡す
 
 ### 「仮定させない」という発想
@@ -248,6 +379,9 @@ POST /api/v1/users
 - [ ] 最近AIに出した指示を振り返り、「推測が必要だった箇所」を特定する
 - [ ] 次にAIに指示を出すとき、What/How/Where/Constraint/Format/Testを意識する
 - [ ] Issueテンプレートを作成し、「受け入れ基準」「技術的制約」「スコープ外」の項目を入れる
+- [ ] プロジェクトで使用している主要技術のバージョンを確認する
+- [ ] AIが未学習の可能性がある新しい技術を特定する
+- [ ] 技術バージョンをMASTER.mdまたはARCHITECTURE.mdに明記する
 
 ---
 
