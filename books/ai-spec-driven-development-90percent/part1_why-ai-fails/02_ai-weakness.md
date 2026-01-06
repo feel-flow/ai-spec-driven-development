@@ -134,9 +134,11 @@ LLMにはもう一つ、見落とされがちな弱点があります。
 
 LLMは特定の日付までのデータで学習されています。
 
-- Claude 3.5 Sonnet：2024年4月頃
-- GPT-4 Turbo：2023年12月頃
-- Gemini Pro：2023年後半
+- Claude Sonnet 4：2025年3月頃
+- Claude Sonnet 4.5：2025年7月頃（信頼性が高いのは2025年1月まで）
+- GPT-4o：2024年6月頃
+- GPT-5：2024年10月頃
+- Gemini 2.5 Pro：2025年1月末頃
 
 つまり、**カットオフ以降にリリースされた技術については、古い情報しか持っていない**可能性があります。
 
@@ -222,18 +224,18 @@ MASTER.mdやARCHITECTURE.mdで、**使用する技術とバージョンを明示
 
 | 技術 | バージョン | AIへの注意点 |
 |------|-----------|-------------|
-| Next.js | 15.0.x | App Router使用（Pages Router禁止） |
-| React | 19.0.x | Server Componentsがデフォルト |
-| TypeScript | 5.6.x | strict mode有効 |
-| PostgreSQL | 16.x | - |
+| Next.js | 16.1.x | App Router使用（Pages Router禁止） |
+| React | 19.2.x | Server Componentsがデフォルト |
+| TypeScript | 5.9.x | strict mode有効 |
+| PostgreSQL | 17.x | - |
 | Prisma | 6.x | - |
 ```
 
 この情報があれば、AIは：
 
-- 「Next.js 15ではApp Routerでこう書く」と正しく実装
-- 「React 19のServer Componentsを活用した設計」を提案
-- 「TypeScript 5.6の新機能を使用可能」と判断
+- 「Next.js 16ではApp Routerでこう書く」と正しく実装
+- 「React 19.2のServer Componentsを活用した設計」を提案
+- 「TypeScript 5.9の新機能を使用可能」と判断
 
 **バージョンを書くことは、AIへの「追加の仕様」**なのです。
 

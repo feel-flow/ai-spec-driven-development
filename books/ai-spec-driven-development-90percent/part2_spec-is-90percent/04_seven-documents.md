@@ -197,9 +197,9 @@ PROJECT.mdがあると、AIは：
 ## 技術スタック
 | レイヤー | 技術 | バージョン | AIへの注意点 |
 |---------|------|-----------|-------------|
-| Frontend | Next.js | 15.0.x | App Router使用（Pages Router禁止） |
+| Frontend | Next.js | 16.1.x | App Router使用（Pages Router禁止） |
 | Runtime | Node.js | 22.x LTS | ES2024構文使用可 |
-| Database | PostgreSQL | 16.x | JSON、全文検索対応 |
+| Database | PostgreSQL | 17.x | JSON、全文検索対応 |
 | ORM | Prisma | 6.x | 型安全、マイグレーション |
 
 → AIはバージョン固有の書き方を選択できる
@@ -219,10 +219,10 @@ PROJECT.mdがあると、AIは：
 ## 技術スタック
 | レイヤー | 技術 | バージョン | 選定理由 | ADR |
 |---------|------|-----------|---------|-----|
-| Frontend | Next.js | 15.0.x | App Router、RSC対応 | ADR-003 |
-| State | Zustand | 4.x | 軽量、TypeScript親和性 | - |
+| Frontend | Next.js | 16.1.x | App Router、RSC対応 | ADR-003 |
+| State | Zustand | 5.x | 軽量、TypeScript親和性 | - |
 | Backend | Hono | 4.x | 軽量、型安全 | ADR-004 |
-| Database | PostgreSQL | 16.x | リレーショナル、ACID | ADR-002 |
+| Database | PostgreSQL | 17.x | リレーショナル、ACID | ADR-002 |
 | ORM | Prisma | 6.x | 型生成、マイグレーション | - |
 | Cache | Redis | 7.x | セッション、キャッシュ | - |
 
@@ -297,12 +297,12 @@ ADRがあると：
 - 公式ドキュメント: [URL]
 ```
 
-### ADR記述例：Next.js 15の選定
+### ADR記述例：Next.js 16の選定
 
 具体的な記述例を見てみましょう。
 
 ```markdown
-## ADR-003: Next.js 15.0.xの採用
+## ADR-003: Next.js 16.1.xの採用
 
 ### ステータス
 承認済み
@@ -312,29 +312,29 @@ SPAからSSR対応のフルスタックフレームワークへ移行が必要�
 SEO対応、初期表示速度の改善、サーバーコンポーネントの活用が目的。
 
 ### 決定
-Next.js 15.0.x（App Router）を採用する。
+Next.js 16.1.x（App Router）を採用する。
 
 ### バージョン選定理由
-- **なぜ15.0.xか**: Turbopackの安定版、React 19公式対応
-- **AIカットオフ対策**: 2024年10月リリースのため、一部AIは未学習の可能性。
+- **なぜ16.1.xか**: Turbopackファイルシステムキャッシュが安定版、開発起動時間が10〜14倍高速化
+- **AIカットオフ対策**: 2025年10月リリースのため、一部AIは未学習の可能性。
   `app/`ディレクトリ構造とRoute Handlers形式を仕様に明記すること。
 - **非推奨API回避**:
   - ❌ `pages/api/*.ts`（Pages Router形式）は使用禁止
   - ❌ `getServerSideProps`は使用禁止
   - ✅ `app/api/*/route.ts`形式を使用
-- **サポート期間**: Next.js 15はメジャーバージョン、長期サポート対象
+- **サポート期間**: Next.js 16はメジャーバージョン、長期サポート対象
 
 ### 代替技術との比較
 | 技術 | 採用/却下 | 理由 |
 |------|----------|------|
-| Next.js 14 | 却下 | Turbopackが不安定、React 18依存 |
+| Next.js 15 | 却下 | Turbopackキャッシュが不安定 |
 | Remix | 却下 | エコシステム、Vercelとの親和性 |
 | SvelteKit | 却下 | チームの学習コスト |
 
 ### 影響
 - **ポジティブ**:
   - Server Componentsによるバンドルサイズ削減
-  - Turbopackによる開発体験向上
+  - Turbopackキャッシュによる開発体験の大幅向上
 - **ネガティブ**:
   - 一部のnpmパッケージがRSC非対応
   - AIが古いPages Router形式を提案する可能性（仕様明記で回避）
@@ -348,7 +348,7 @@ Next.jsのコード生成時は以下を遵守：
 
 ### 関連
 - 公式ドキュメント: https://nextjs.org/docs
-- 移行ガイド: https://nextjs.org/docs/app/building-your-application/upgrading
+- 移行ガイド: https://nextjs.org/docs/app/guides/upgrading
 ```
 
 ### ADRの管理方法

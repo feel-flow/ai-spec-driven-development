@@ -158,8 +158,8 @@ AIが生成したドキュメント・コードは、以下のタイミングで
 - [技術名 x.x]: [リリース日]。[注意点、非推奨APIなど]
 
 **例**:
-- Next.js 15: 2024年10月リリース。App Router形式を使用（Pages Router禁止）
-- React 19: 2024年12月リリース。Server Componentsがデフォルト（`"use client"`は明示時のみ）
+- Next.js 16: 2025年10月リリース。App Router形式を使用（Pages Router禁止）
+- React 19.2: Server Componentsがデフォルト（`"use client"`は明示時のみ）
 
 ### 詳細
 
