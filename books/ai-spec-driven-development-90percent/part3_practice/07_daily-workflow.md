@@ -252,16 +252,19 @@ Issue #42 を実装してください。
 3. 影響を受ける既存ファイルの変更点
 ```
 
-### Claude Codeを使う場合
+### AIコーディングツールを使う場合
 
-Claude Codeでは、Issueの内容をそのまま渡せます。
+Claude Code、GitHub Copilot、Cursorなど、いずれのツールでもIssueの内容をそのまま渡せます。
 
 ```bash
-# GitHubのIssueを直接参照
+# Claude Codeの例
 claude "Issue #42 を実装して。docs/配下の仕様に従って。"
+
+# GitHub Copilot（チャット）の例
+# @workspace Issue #42 を実装して。docs/配下の仕様に従って。
 ```
 
-7文書がリポジトリにあれば、Claude Codeは自動的に参照します。
+7文書がリポジトリにあれば、AIツールは自動的に参照します。
 
 ---
 
