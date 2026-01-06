@@ -62,8 +62,6 @@ Google Antigravity（2025年11月リリース）は、Googleが提供するエ�
 - **AGENTS.md対応**: リポジトリルートのAGENTS.mdも読み込み可能
 - **アーティファクト機能**: Google Docsスタイルのコメントでエージェントにフィードバック可能
 
-詳細: [Google Antigravity 公式ドキュメント](https://antigravity.google/docs/home)
-
 ### Kiro（AWS）の特徴
 
 Kiro（2025年7月リリース）は、AWSが提供する仕様駆動開発に特化したエージェント型IDEです。
@@ -72,8 +70,6 @@ Kiro（2025年7月リリース）は、AWSが提供する仕様駆動開発に�
 - **AGENTS.md対応**: AGENTS.mdも読み込み可能（ただし inclusion modes は非対応）
 - **Spec駆動**: `requirements.md`, `design.md`, `tasks.md` による仕様管理
 - **Foundation files**: `product.md`, `tech.md`, `structure.md` でプロジェクトコンテキストを提供
-
-詳細: [Kiro 公式ドキュメント](https://kiro.dev/docs/steering/)
 
 ---
 
