@@ -134,3 +134,14 @@
 - 次にやること
 
 → [99_afterword.md](./99_afterword.md)
+
+---
+
+## 付録
+
+### 付録：AIエージェント設定ファイル一覧
+- AGENTS.mdとは（オープンスタンダード）
+- ツール別設定ファイル（Claude Code, GitHub Copilot, Cursor等）
+- 7文書との連携テンプレート
+
+→ [appendix_agent-config.md](./appendix_agent-config.md)
