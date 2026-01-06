@@ -9,7 +9,7 @@
 **AGENTS.md** は、AIコーディングエージェント向けのオープンスタンダードです。
 
 - **Linux Foundation傘下のAgentic AI Foundation** が管理
-- **20,000以上のリポジトリ** で採用（2025年時点）
+- **60,000以上のリポジトリ** で採用（2026年1月時点）
 - GitHub Copilot, Cursor, OpenAI Codex等の主要ツールが対応
 
 AGENTS.mdは「AIエージェント向けのREADME」として設計されています。README.mdが人間向けの説明であるのに対し、AGENTS.mdはAIが効率的にコードを理解・生成するための指示を記述します。
@@ -50,7 +50,7 @@ Claude CodeはAGENTS.md標準に **ネイティブ対応していません**。`
 実装前に必ず AGENTS.md を読んでください。
 ```
 
-**Agent Skills**: AnthropicはAGENTS.mdの代わりに独自の「Agent Skills」システムを開発しています。`SKILL.md`ファイルを使用し、Claude.ai、Claude Code、Claude Agent SDKで利用可能です。
+**Agent Skills**: Anthropicは独自の「Agent Skills」システムを開発しています。`SKILL.md`ファイルを使用し、Claude.ai、Claude Code、Claude Agent SDKで利用可能です。AGENTS.mdがエージェントの要件・設計・セキュリティ等を定義するのに対し、Agent Skills/SKILL.mdはClaudeが実行時に動的に読み込むスキルモジュールです。両者は補完関係にあり、併用することで効果を発揮します。
 
 複数のAIツールを併用する場合は、`CLAUDE.md`と`AGENTS.md`の両方を用意することを推奨します。
 
