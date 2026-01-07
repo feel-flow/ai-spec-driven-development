@@ -4,88 +4,47 @@
 
 ## 概要
 
-Devinの全タスクにおいて、PR作成前に自動で複数の専門エージェントによるレビューを実行し、問題が見つかった場合は自動修復を行うシステムです。
+Devinの全タスクにおいて、PR作成前に自動で5つの観点からコードレビューを実行し、問題が見つかった場合は自動修復を行うシステムです。
+
+**重要**: このシステムはDevinのネイティブAI機能を使用します。外部API（OpenAI、Anthropic等）は不要です。
 
 ### 特徴
 
-- **5つの専門エージェント**: Security, Performance, Testing, Documentation, Business Logic
-- **並列実行**: 全エージェントが同時にレビューを実行（高速化）
-- **自動修復ループ**: 問題が見つかった場合、自動修復を試み、再レビューを繰り返す
-- **LLM駆動**: OpenAI GPT-4o または Anthropic Claude 3.5 Sonnet を使用
+- **5つのレビュー観点**: Security, Performance, Testing, Documentation, Business Logic
+- **Devin内蔵AI使用**: 外部APIキー不要
+- **自動修復ループ**: 問題が見つかった場合、自動修復を試み、再レビューを繰り返す（最大5回）
+- **全タスク適用**: Devinの全タスクでPR作成前に自動実行
 
 ---
 
-## セットアップ
+## Devin向け必須ワークフロー
 
-### 1. 必要な環境変数
+### PR作成前の自動レビュー手順
 
-```bash
-# OpenAI APIキー（推奨）
-export OPENAI_API_KEY="sk-..."
+**Devinは以下の手順をPR作成前に必ず実行すること:**
 
-# または Anthropic APIキー（フォールバック）
-export ANTHROPIC_API_KEY="sk-ant-..."
+```
+1. 変更ファイルを特定（git diff --name-only）
+2. 5つの観点で各ファイルをレビュー
+3. 問題があれば自動修復
+4. 再レビュー（最大5回繰り返し）
+5. 全パスしたらPR作成
+6. レビュー結果をPR本文に含める
 ```
 
-### 2. 依存パッケージのインストール
+### 変更ファイルの特定
 
 ```bash
-pip install openai anthropic
-```
+# ステージングされたファイルを確認
+git diff --cached --name-only --diff-filter=ACMR
 
-### 3. スクリプトの配置
-
-ai-spec-driven-developmentリポジトリから以下のファイルをコピー：
-
-```bash
-# スクリプトをプロジェクトにコピー
-cp scripts/devin-pre-pr-review.py your-project/scripts/
-cp scripts/devin-pre-pr-review.sh your-project/scripts/
-
-# 実行権限を付与
-chmod +x your-project/scripts/devin-pre-pr-review.sh
+# 未ステージングの変更ファイルを確認
+git diff --name-only --diff-filter=ACMR
 ```
 
 ---
 
-## 使用方法
-
-### 基本的な使用
-
-```bash
-# Git変更ファイルを自動検出してレビュー
-./scripts/devin-pre-pr-review.sh
-
-# 自動修復を有効にしてレビュー
-./scripts/devin-pre-pr-review.sh --auto-fix
-
-# 最大反復回数を指定（デフォルト: 5）
-./scripts/devin-pre-pr-review.sh --auto-fix --max-iterations 10
-
-# 特定のファイルをレビュー
-./scripts/devin-pre-pr-review.sh --files src/main.py src/utils.py
-```
-
-### Devinワークフローへの統合
-
-**PR作成前に必ず実行**:
-
-```bash
-# 1. コード変更を完了
-git add .
-
-# 2. Pre-PRレビューを実行（自動修復あり）
-./scripts/devin-pre-pr-review.sh --auto-fix
-
-# 3. レビューがパスしたらPR作成
-git commit -m "feat: implement feature X"
-git push origin feature/xxx
-gh pr create --title "feat: implement feature X" --body "..."
-```
-
----
-
-## 5つの専門エージェント
+## 5つのレビュー観点
 
 ### 1. Security Agent
 
@@ -150,55 +109,73 @@ gh pr create --title "feat: implement feature X" --body "..."
 
 ---
 
-## 出力例
+## レビュー実行例
 
+### 各観点のチェック例
+
+**Security観点**:
+```python
+# NG: SQLインジェクションリスク
+query = f"SELECT * FROM users WHERE id = {user_id}"
+
+# OK: パラメータ化クエリ
+query = "SELECT * FROM users WHERE id = %s"
+cursor.execute(query, (user_id,))
 ```
-==========================================
-Devin Pre-PR Review System
-==========================================
-Using LLM: openai
-Files to review: ['src/main.py', 'src/utils.py']
 
---- Iteration 1/5 ---
+**Performance観点**:
+```python
+# NG: N+1クエリ
+for user in users:
+    orders = db.query(Order).filter(Order.user_id == user.id).all()
 
-============================================================
-Review Results for: src/main.py
-============================================================
-Total Issues: 3
-Fixed Issues: 0
-Time Elapsed: 12.34s
-Status: NEEDS ATTENTION
+# OK: Eager Loading
+users = db.query(User).options(joinedload(User.orders)).all()
+```
 
---- SECURITY ---
-  [HIGH] SQL Injection Risk
-    Line: 45
-    String interpolation in SQL query detected.
-    Recommendation: Use parameterized queries instead.
-    Auto-fix: Available
+**Testing観点**:
+```python
+# NG: エッジケース未テスト
+def test_divide():
+    assert divide(10, 2) == 5
 
---- BUSINESS_LOGIC ---
-  [MEDIUM] Magic Number Detected
-    Line: 23
-    Hardcoded value '3600' found.
-    Recommendation: Extract to named constant with unit comment.
-    Auto-fix: Available
+# OK: エッジケースを含む
+def test_divide():
+    assert divide(10, 2) == 5
+    assert divide(0, 5) == 0
+    with pytest.raises(ZeroDivisionError):
+        divide(10, 0)
+```
 
-Applied 2 fixes. Re-reviewing...
+**Documentation観点**:
+```python
+# NG: docstring/型ヒントなし
+def process(data):
+    return data * 2
 
---- Iteration 2/5 ---
-All checks passed!
+# OK: docstring/型ヒントあり
+def process(data: int) -> int:
+    """データを2倍にして返す。
+    
+    Args:
+        data: 処理対象の整数値
+        
+    Returns:
+        入力値の2倍
+    """
+    return data * 2
+```
 
-============================================================
-SUMMARY
-============================================================
-Files Reviewed: 2
-Total Issues: 3
-Total Fixed: 2
-Overall Status: PASSED
+**Business Logic観点**:
+```python
+# NG: マジックナンバー
+if user.age > 18:
+    allow_access()
 
-==========================================
-Review PASSED - Ready to create PR
-==========================================
+# OK: 名前付き定数
+MINIMUM_AGE_FOR_ACCESS = 18
+if user.age > MINIMUM_AGE_FOR_ACCESS:
+    allow_access()
 ```
 
 ---
@@ -207,13 +184,29 @@ Review PASSED - Ready to create PR
 
 ### 修復ループ
 
+Devinは以下のループを実行:
+
 ```
-1. 全エージェントが並列でレビュー実行
-2. CRITICAL/HIGH の問題があるか確認
-3. 自動修復可能な問題を収集
-4. 修復を適用
-5. 再レビュー（最大N回繰り返し）
-6. 全パスまたは最大回数到達で終了
+iteration = 0
+max_iterations = 5
+
+while iteration < max_iterations:
+    # 1. 各ファイルを5観点でレビュー
+    issues = review_all_files_from_5_perspectives()
+    
+    # 2. 問題がなければ終了
+    if len(issues) == 0:
+        print("全レビュー観点をパス")
+        break
+    
+    # 3. 問題があれば修復
+    for issue in issues:
+        apply_fix(issue)
+    
+    iteration += 1
+
+# 4. PR作成
+create_pr_with_review_results()
 ```
 
 ### 修復可能な問題の例
@@ -225,6 +218,7 @@ Review PASSED - Ready to create PR
 | 弱いハッシュ | 可能 | MD5 → bcrypt |
 | 未使用import | 可能 | 削除 |
 | docstring不足 | 可能 | 自動生成 |
+| 型ヒント不足 | 可能 | 自動追加 |
 
 ---
 
@@ -238,57 +232,49 @@ Devinの全タスクで以下のワークフローを適用：
 1. Issue確認 → Branch作成
 2. コード実装
 3. Lint/Type Check実行
-4. **Pre-PR Review実行** ← ここで本システムを使用
-5. レビューパスまで自動修復
-6. PR作成
-7. CI待機
-8. マージ
+4. **5観点レビュー実行** ← Devin内蔵AIで実行
+5. 問題があれば自動修復
+6. 再レビュー（最大5回繰り返し）
+7. 全パスしたらPR作成
+8. レビュー結果をPR本文に含める
+9. CI待機
+10. マージ
 ```
 
-### Devinへの指示例
+### PR本文に含めるレビュー結果テンプレート
 
-```
-PR作成前に必ず以下のコマンドを実行してください：
+```markdown
+## セルフレビュー結果
 
-./scripts/devin-pre-pr-review.sh --auto-fix
+### 実施日時
+{date}
 
-このコマンドは5つの専門エージェント（Security, Performance, Testing, 
-Documentation, Business Logic）による並列レビューを実行し、
-問題が見つかった場合は自動修復を試みます。
+### レビュー観点
 
-レビューがパスするまでPRを作成しないでください。
+| 観点 | 結果 | 検出数 | 修正数 |
+|------|------|--------|--------|
+| Security | PASS | 0 | 0 |
+| Performance | PASS | 0 | 0 |
+| Testing | PASS | 0 | 0 |
+| Documentation | PASS | 1 | 1 |
+| Business Logic | PASS | 2 | 2 |
+
+### 修正内容
+- docstring追加: src/utils.py:45
+- マジックナンバー定数化: src/auth.py:23, src/config.py:12
+
+### 結論
+全レビュー観点をパス。PR作成準備完了。
 ```
 
 ---
 
-## トラブルシューティング
+## 注意事項
 
-### APIキーエラー
-
-```
-Error: No LLM API key found.
-```
-
-**解決策**: `OPENAI_API_KEY` または `ANTHROPIC_API_KEY` を設定
-
-### パッケージ不足
-
-```
-Warning: Some packages may be missing: openai or anthropic
-```
-
-**解決策**: `pip install openai anthropic`
-
-### タイムアウト
-
-大きなファイルや多数のファイルをレビューする場合、タイムアウトが発生する可能性があります。
-
-**解決策**: ファイルを分割してレビュー
-
-```bash
-./scripts/devin-pre-pr-review.sh --files src/module1.py
-./scripts/devin-pre-pr-review.sh --files src/module2.py
-```
+- このシステムはDevinのネイティブAI機能を使用します
+- 外部API（OpenAI、Anthropic等）は不要です
+- Devinが自身のAI能力でコードを分析し、問題を検出・修復します
+- 最大5回の修復ループ後も問題が残る場合は、ユーザーに報告してください
 
 ---
 
