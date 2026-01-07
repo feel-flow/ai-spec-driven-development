@@ -9,6 +9,7 @@
 | [github-setup.md](./deployment/github-setup.md) | GitHub初期設定（ラベル・Release Drafter） | ⭐⭐⭐⭐⭐ 0th |
 | [git-workflow.md](./deployment/git-workflow.md) | AI駆動Git Workflow全体 | ⭐⭐⭐⭐⭐ 1st |
 | [self-review.md](./deployment/self-review.md) | セルフレビュー詳細（PR作成前） | ⭐⭐⭐⭐ 2nd |
+| [devin-pre-pr-review.md](./deployment/devin-pre-pr-review.md) | Devin Pre-PRレビューシステム（5エージェント並列） | ⭐⭐⭐⭐ 2.5th |
 | [automated-code-review.md](./deployment/automated-code-review.md) | 自動コードレビュー（Claude Code + Husky） | ⭐⭐⭐⭐ - |
 | [knowledge-management.md](./deployment/knowledge-management.md) | ナレッジ体系化（マージ後） | ⭐⭐⭐⭐ 3rd |
 | [ai-tools-integration.md](./deployment/ai-tools-integration.md) | AIツール統合設定 | ⭐⭐⭐ - |
