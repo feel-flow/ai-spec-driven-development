@@ -439,7 +439,9 @@ metrics:
 - [08-knowledge/FAQ.md](./08-knowledge/FAQ.md) - よくある質問と回答
 
 ### 開発プロセスガイド
+
 - [06-reference/DEVELOPMENT_PREPARATION.md](./06-reference/DEVELOPMENT_PREPARATION.md) - 開発準備ガイド（5 Phases: Issue-First → Document-Driven → MECE検証 → AI Spec-Driven → Git Workflow）
+- [06-reference/COPILOT-AGENTS.md](./06-reference/COPILOT-AGENTS.md) - GitHub Copilot Agents設定リファレンス（6種のレビューエージェントテンプレート）
 
 ## ドキュメント構造ガイド（AIツール向け）
 
