@@ -5456,9 +5456,10 @@ GitHub Copilotのカスタムエージェントは**Premium Requests**を消費�
 | Claude Haiku 4.5 | 0.33倍 |
 | Claude Sonnet 4 / 4.5 | 1倍 |
 | Claude Opus 4.5 | 3倍 |
-| Claude Opus 4.1 | 10倍 |
 
 コストを抑えたい場合は、GPT-4oを使用することで無料でエージェントを実行できます。
+
+> **注**: Premium Requestsの詳細な料金体系は[GitHub Docs](https://docs.github.com/en/copilot/concepts/billing/copilot-requests)を参照してください。
 
 ---
 
