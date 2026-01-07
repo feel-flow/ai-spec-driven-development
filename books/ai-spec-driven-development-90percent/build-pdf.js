@@ -24,21 +24,23 @@ const files = [
   'part3_practice/09_change-impact.md',
   'part4_faq/10_engineer-role.md',
   'part4_faq/11_quality-security.md',
-  'part4_faq/12_tool-implementation.md',
+  'part4_faq/12_claude-code-skills.md',
+  'part4_faq/12a_copilot-agents.md',
   'part5_organization/13_team-standardization.md',
   'part5_organization/14_roadmap-knowledge.md',
   '99_afterword.md',
   'appendix_agent-config.md'
 ];
 
-// 章番号を抽出するパターン
-const chapterPattern = /^# 第(\d+)章/;
+// 章番号を抽出するパターン（12aのような形式にも対応）
+const chapterPattern = /^# 第(\d+[a-z]?)章/;
 const partPattern = /^# 第\d+部/;
 const sectionPattern = /^## /;
 const subsectionPattern = /^### /;
 const subsubsectionPattern = /^#### /;
 
-let currentChapter = 0;
+let currentChapter = '0';
+let currentChapterNum = 0;
 let currentSection = 0;
 let currentSubsection = 0;
 let currentSubsubsection = 0;
@@ -54,7 +56,8 @@ function processLine(line) {
   // 章タイトル
   const chapterMatch = line.match(chapterPattern);
   if (chapterMatch) {
-    currentChapter = parseInt(chapterMatch[1]);
+    currentChapter = chapterMatch[1]; // '12' or '12a'
+    currentChapterNum = parseInt(chapterMatch[1]); // 数値部分のみ（カウント用）
     currentSection = 0;
     currentSubsection = 0;
     currentSubsubsection = 0;
@@ -119,4 +122,4 @@ for (const file of files) {
 const outputPath = path.join(baseDir, 'combined-numbered.md');
 fs.writeFileSync(outputPath, combined);
 console.log(`Generated: ${outputPath}`);
-console.log(`Total chapters processed: ${currentChapter}`);
+console.log(`Total chapters processed: ${currentChapterNum}`);
