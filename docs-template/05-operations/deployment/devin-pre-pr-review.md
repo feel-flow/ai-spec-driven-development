@@ -1,6 +1,6 @@
 # Devin Pre-PR Review System
 
-> **Parent**: [DEPLOYMENT.md](../DEPLOYMENT.md) | **Workflow Step**: 4 (Self-Review) | **Related**: [セルフレビュー](./self-review.md)
+> **Parent**: [DEPLOYMENT.md](../DEPLOYMENT.md) | **Workflow Step**: 2.5 (Self-Review) | **Related**: [セルフレビュー](./self-review.md)
 
 ## 概要
 
@@ -189,6 +189,7 @@ Devinは以下のループを実行:
 ```
 iteration = 0
 max_iterations = 5
+issues = []
 
 while iteration < max_iterations:
     # 1. 各ファイルを5観点でレビュー
@@ -205,8 +206,12 @@ while iteration < max_iterations:
     
     iteration += 1
 
-# 4. PR作成
-create_pr_with_review_results()
+# 4. 最終確認とPR作成
+if len(issues) == 0:
+    create_pr_with_review_results()
+else:
+    print("最大反復回数に達しましたが、問題が残っています")
+    report_remaining_issues_to_user(issues)
 ```
 
 ### 修復可能な問題の例
