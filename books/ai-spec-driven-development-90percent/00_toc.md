@@ -104,12 +104,21 @@
 
 → [part4_faq/11_quality-security.md](./part4_faq/11_quality-security.md)
 
-### 第12章　ツール実装：Claude Code / Skillsで"仕様駆動"を自動化する
-- Skillsの考え方
-- スキルが起動する条件
-- できること
+### 第12章　ツール実装（前編）：Claude Code Skillsで"仕様駆動"を自動化する
 
-→ [part4_faq/12_tool-implementation.md](./part4_faq/12_tool-implementation.md)
+- Claude Code Skillsの考え方と設計方法
+- 仕様駆動を支援するスキル例（5種）
+- pr-review-toolkit（公式プラグイン）
+
+→ [part4_faq/12_claude-code-skills.md](./part4_faq/12_claude-code-skills.md)
+
+### 第12a章　ツール実装（後編）：GitHub Copilot Agentsで"仕様駆動"を自動化する
+
+- GitHub Copilot Agentsの仕組みと4つのタイプ
+- 仕様駆動開発向けエージェント（6種のテンプレート）
+- Claude Code vs GitHub Copilot 比較
+
+→ [part4_faq/12a_copilot-agents.md](./part4_faq/12a_copilot-agents.md)
 
 ---
 
