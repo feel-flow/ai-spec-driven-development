@@ -247,7 +247,7 @@ MASTER.mdやARCHITECTURE.mdで、**使用する技術とバージョンを明示
 | Prisma | 6.x | - |
 ```
 
-この情報があれば、AIは：
+この情報があれば、AIは次のように動作します。
 
 - 「Next.js 16ではApp Routerでこう書く」と正しく実装
 - 「React 19.2のServer Componentsを活用した設計」を提案
@@ -257,11 +257,11 @@ MASTER.mdやARCHITECTURE.mdで、**使用する技術とバージョンを明示
 
 ### なぜADRが必要か
 
-さらに重要なのは、** なぜその技術・バージョンを選んだのか** を記録することです。
+さらに重要なのは、**なぜその技術・バージョンを選んだのか** を記録することです。
 
 これを**ADR（Architecture Decision Record）** と呼びます。
 
-ADRがあると：
+ADRがあると、AIは次のように動作します。
 
 - **AIが技術選定の背景を理解**し、一貫した設計提案ができる
 - **後から参加したメンバー** が「なぜこの技術？」を理解できる
@@ -299,7 +299,7 @@ AIに「勝手に仮定するな」と言っても無駄です。情報がなけ
 
 先ほどのユーザー登録APIを、仕様として書き直してみましょう。
 
-```markdown
+`````markdown
 ## ユーザー登録API
 
 ### エンドポイント
@@ -354,7 +354,7 @@ POST /api/v1/users
 - バリデーション: src/validators/user.ts の validateUserInput を使用
 - エラーレスポンス: src/errors/http.ts の形式に従う
 - 監査ログ: src/services/audit.ts の AuditService を使用
-```
+`````
 
 この仕様をAIに渡せば、**推測の余地がほとんどなくなります**。
 

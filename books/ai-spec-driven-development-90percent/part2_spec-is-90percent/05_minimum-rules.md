@@ -51,7 +51,7 @@ reviewers:
 | status | 文書の状態 | draft / review / approved |
 | owner | 責任者 | @username |
 | created | 作成日 | 2026-01-01 |
-| updated | 最終更新日 | 2024-03-15 |
+| updated | 最終更新日 | 2026-01-05 |
 
 ### オプションフィールド
 

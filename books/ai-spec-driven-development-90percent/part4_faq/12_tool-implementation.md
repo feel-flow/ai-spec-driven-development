@@ -1,5 +1,7 @@
 # 第12章　ツール実装：Claude Code / Skillsで"仕様駆動"を自動化する
 
+> **Note**: この章で紹介する「Skills」は、**Claude Code固有の機能**です。GitHub CopilotやCursorなど他のAIコーディングツールには、同等の機能が存在しない場合があります。Claude Code以外のツールを使用している場合は、各ツールの拡張機能やカスタマイズ方法を確認してください。
+
 ## この章で学ぶこと
 
 - Claude CodeのSkillsの考え方と活用法
