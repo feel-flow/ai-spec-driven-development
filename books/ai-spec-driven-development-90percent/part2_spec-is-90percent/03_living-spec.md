@@ -1,8 +1,6 @@
-# 第2部　結論：AIに任せる開発は「仕様」が9割
-
 ![第2部：仕様が9割](../images/part2-spec-is-90percent.jpeg)
 
-本書の核心です。AIが迷わず動くために必要な「7文書構成」を提示します。MASTER.md を中心に、PROJECT / ARCHITECTURE / DOMAIN / PATTERNS / TESTING / DEPLOYMENT の役割と連携を解説。仕様を「生きた成果物」として運用する方法を学びます。
+**［第2部］** 本書の核心です。AIが迷わず動くために必要な「7文書構成」を提示します。MASTER.md を中心に、PROJECT / ARCHITECTURE / DOMAIN / PATTERNS / TESTING / DEPLOYMENT の役割と連携を解説。仕様を「生きた成果物」として運用する方法を学びます。
 
 ---
 
