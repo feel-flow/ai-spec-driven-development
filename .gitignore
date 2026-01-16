@@ -22,3 +22,7 @@ coverage/
 
 # Claude Code
 .claude/settings.local.json
+
+# Generated books (EPUB/PDF)
+books/**/*.epub
+books/**/AIエージェント開発は仕様が9割*.pdf
