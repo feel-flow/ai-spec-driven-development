@@ -44,9 +44,11 @@ module.exports = {
 
   /**
    * EPUB用のファイルリストを取得
-   * @returns {string[]} 00_toc.md を除外したファイルリスト
+   * @returns {string[]} _metadata.md と 00_toc.md を除外したファイルリスト
    */
   getEpubFiles() {
-    return this.files.filter(file => file !== '00_toc.md');
+    return this.files.filter(file =>
+      file !== '00_toc.md' && file !== '_metadata.md'
+    );
   }
 };
