@@ -100,6 +100,12 @@ The server will expose:
   - Use `search` tool to find relevant design docs.
   - Use `extract_section` to pull a specific `##` section from a markdown file.
 
+### OpenAI Codex
+
+- Codex VS Code拡張でもMCPサーバーを利用できます
+- 設定方法の詳細は [Codex MCP連携ガイド](../docs/CODEX_MCP_GUIDE.md) を参照してください
+- Codexの設定は `~/.codex/config.toml` で管理されます
+
 ## Notes
 
 - Glossary is parsed from `docs-template/06-reference/GLOSSARY.md` if present.
