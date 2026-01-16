@@ -68,6 +68,11 @@ node build-epub.js
 
 生成されるファイル: `AIエージェント開発は仕様が9割_v0.1.0.epub`
 
+**対応プラットフォーム:**
+- ✅ Amazon Kindle (KDP)
+- ✅ Apple Books
+- ✅ その他EPUB 3.0対応リーダー
+
 ### PDF生成
 
 ```bash
@@ -115,11 +120,45 @@ brew install epubcheck
 epubcheck "AIエージェント開発は仕様が9割_v0.1.0.epub"
 ```
 
+## 📱 Apple Books対応
+
+### 追加されたメタデータ
+
+- **Publisher**: Futoshi Okazaki
+- **ISBN**: 空文字列（出版時に実際のISBNに置き換え）
+
+### ISBN設定方法
+
+[book-config.js](book-config.js) の `isbn` フィールドを更新:
+
+```javascript
+metadata: {
+  // ... 他のフィールド ...
+  isbn: '978-1234567890' // 実際のISBN-13
+}
+```
+
+### Apple Books Connect での配信
+
+1. [Apple Books Connect](https://books.apple.com/) にアカウント登録
+2. EPUBファイルをアップロード
+3. 価格・地域設定
+4. 審査提出
+
+### Kindle vs Apple Books の違い
+
+| 項目 | Kindle (KDP) | Apple Books |
+|------|--------------|-------------|
+| フォーマット | EPUB 3.0 ✅ | EPUB 3.0 ✅ |
+| カバー画像 | 必須 | 必須 |
+| ISBN | 任意（KDPが発行可） | 推奨 |
+| 審査 | あり（緩め） | あり（厳しめ） |
+
 ## 📝 設定のカスタマイズ
 
 ### メタデータの変更
 
-[book-config.js](book-config.js:21-31) を編集:
+[book-config.js](book-config.js:34-45) を編集:
 
 ```javascript
 metadata: {

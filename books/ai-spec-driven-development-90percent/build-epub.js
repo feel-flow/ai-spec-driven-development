@@ -92,6 +92,16 @@ function runPandoc(files, hasCoverImage) {
       '--resource-path=.:images'
     ];
 
+    // Publisher情報を追加
+    if (bookConfig.metadata.publisher) {
+      args.push('--metadata', `publisher=${bookConfig.metadata.publisher}`);
+    }
+
+    // ISBN情報を追加（ISBNがある場合のみ）
+    if (bookConfig.metadata.isbn && bookConfig.metadata.isbn.trim() !== '') {
+      args.push('--metadata', `identifier=ISBN:${bookConfig.metadata.isbn}`);
+    }
+
     // カバー画像がある場合のみ追加
     if (hasCoverImage) {
       args.push('--epub-cover-image=' + bookConfig.metadata.coverImage);
