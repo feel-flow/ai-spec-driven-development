@@ -224,6 +224,15 @@ metadata: {
 | **バージョン** | 0.1.0 |
 | **構成** | 5部14章 + 付録 |
 
+## 🛒 出版リンク
+
+本書は以下のプラットフォームで購入できます：
+
+| プラットフォーム | リンク |
+|-----------------|--------|
+| **Amazon Kindle** | [Kindleストアで見る](https://www.amazon.co.jp/dp/B0GHHVX1NY) |
+| **Apple Books** | [Apple Booksで見る](http://books.apple.com/us/book/id6757913579) |
+
 ## 🤝 貢献
 
 Issue #24: EPUB生成スクリプトの作成
