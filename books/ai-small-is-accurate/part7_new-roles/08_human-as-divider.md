@@ -663,13 +663,30 @@ AIと協働する新しい働き方を、一緒に作っていきましょう。
 
 ### 図8-3：分ける力の重要性
 
-```
-スタイル: ピラミッド図
-内容:
-頂点: 分ける力（最重要）
-中段: 設計力、検証力、本質理解力
-下段: 実行スキル（AI時代は相対的価値が下がる）
+**用途**: インフォグラフィック（本文中）
+**配置**: 「変わる仕事のスキルセット」セクション内
 
-注釈: 「AI時代のスキルセット」
-配色: グラデーション（上から下へ、重要度を表現）
+**プロンプト(日本語)**:
+AI時代のスキル重要度を示すピラミッド図。頂点に「分ける力」（最も重要、輝く黄金色）、中段に「設計力」「検証力」「本質理解力」（重要、明るい青色）、下段に「実行スキル」（従来重要だった、薄い灰色で相対的価値低下を表現）。各層にアイコンとラベルを配置。ピラミッド全体は透明感のあるグラデーションで上から下へ重要度を視覚化。右側に注釈「AI時代のスキルセット」。モダンでプロフェッショナルなインフォグラフィックスタイル。
+
+**プロンプト(英語・画像生成AI用)**:
+
+```text
+Professional pyramid infographic showing skill importance in AI era.
+TOP TIER (peak): "Division Skills" (most critical) in bright golden
+glow with star icon. MIDDLE TIER: Three skills - "Design", "Verification",
+"Essence Understanding" in bright tech-blue with relevant icons.
+BOTTOM TIER: "Execution Skills" (traditional importance, now declining
+relative value) in light gray tone. Transparent gradient flowing from
+top to bottom representing importance hierarchy. Side annotation:
+"AI Era Skillset". Clean modern infographic style, Japanese minimalist
+aesthetic, tech-blue and gold color scheme with gray base.
+--ar 3:2 --style infographic --v 6
 ```
+
+**スタイル指定**:
+
+- アスペクト比: 3:2
+- スタイル: インフォグラフィック、階層構造
+- カラー: ゴールド（頂点）+ テックブルー（中段）+ グレー（下段）
+- トーン: 分析的、示唆的、プロフェッショナル
