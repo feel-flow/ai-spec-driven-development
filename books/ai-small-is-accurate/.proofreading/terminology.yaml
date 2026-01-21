@@ -8,6 +8,7 @@ generated_at: "2026-01-21T00:00:00Z"
 source_files:
   - books/ai-small-is-accurate/00_preface.md
   - books/ai-small-is-accurate/part1_why-ai-fails/01_the-seventy-percent-problem.md
+  - books/ai-small-is-accurate/part2_context-limit/02_lost-in-the-middle.md
 
 # ===================================
 # コア概念（本書固有）
