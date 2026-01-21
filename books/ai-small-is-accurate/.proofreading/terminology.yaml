@@ -9,6 +9,8 @@ source_files:
   - books/ai-small-is-accurate/00_preface.md
   - books/ai-small-is-accurate/part1_why-ai-fails/01_the-seventy-percent-problem.md
   - books/ai-small-is-accurate/part2_context-limit/02_lost-in-the-middle.md
+  - books/ai-small-is-accurate/part3_precision/03_scope-convergence.md
+  - books/ai-small-is-accurate/part3_precision/04_two-stage-ai.md
 
 # ===================================
 # コア概念（本書固有）
@@ -41,16 +43,27 @@ core_concepts:
   - standard: "スコープ収束パターン"
     variants:
       - "Scope Convergence Pattern"
-    frequency: 3
+    frequency: 35
     first_appearance: "00_preface.md:106"
-    description: "分けて→渡して→収束させるパターン"
+    main_chapter: "part3_precision/03_scope-convergence.md"
+    description: "大きなゴールを小さなマイルストーンに分解し、70%→90%→98%と段階的に収束させるパターン"
+    rules:
+      - "一度に1つだけ求める"
+      - "成功を確認してから次へ"
+      - "各ステップを検証可能にする"
 
   - standard: "二段階AI活用"
     variants:
       - "2段階AI活用"
-    frequency: 3
+      - "Two-Stage AI"
+    frequency: 30
     first_appearance: "00_preface.md:72"
-    description: "AIに直接結果を出させるのではなく、ツール/コードを作らせる手法"
+    main_chapter: "part3_precision/04_two-stage-ai.md"
+    description: "AIに直接結果を出させるのではなく、検証ツール（チェックリスト/テストコード/評価基準）を作らせ、人間が検証する手法"
+    patterns:
+      - "チェックリスト生成パターン"
+      - "テストコード生成パターン"
+      - "評価基準生成パターン"
 
   - standard: "精度モード"
     variants: []
