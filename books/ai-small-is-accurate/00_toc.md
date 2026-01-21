@@ -16,12 +16,20 @@
 
 ## 第1部　なぜAIは期待通りに動かないのか？
 
-### 第1章　70%問題──「全部やって」が生む微妙さ
+### 第1章　70%問題──「全部やって」が生む微妙さ（前編）
 - ChatGPTでも、Claudeでも、画像生成でも同じ現象
 - みんなが経験してる「なんか微妙」問題
 - 大きなお願いほど曖昧になる理由
 
 → [part1_why-ai-fails/01_the-seventy-percent-problem.md](./part1_why-ai-fails/01_the-seventy-percent-problem.md)
+
+### 第1章　70%問題（後編）──隠れたコストと解決策の糸口
+
+- 70%の完成度で止まることによる隠れたコスト
+- AIとの付き合い方を変える必要性
+- コンテキスト縮小戦略への導入
+
+→ [part1_why-ai-fails/01b_hidden-costs-and-solutions.md](./part1_why-ai-fails/01b_hidden-costs-and-solutions.md)
 
 ---
 
