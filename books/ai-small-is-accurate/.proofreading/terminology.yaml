@@ -1,0 +1,275 @@
+# terminology.yaml
+# 自動生成: /extract-terms コマンド
+# 最終更新: 2026-01-21
+# 対象書籍: 「なぜAIは期待通りに動かないのか」
+
+version: "1.0"
+generated_at: "2026-01-21T00:00:00Z"
+source_files:
+  - books/ai-small-is-accurate/00_preface.md
+  - books/ai-small-is-accurate/part1_why-ai-fails/01_the-seventy-percent-problem.md
+
+# ===================================
+# コア概念（本書固有）
+# ===================================
+core_concepts:
+  - standard: "70%問題"
+    variants:
+      - "70%の完成度"
+      - "七割問題"
+    frequency: 25
+    first_appearance: "part1_why-ai-fails/01_the-seventy-percent-problem.md:1"
+    description: "AIに大きなタスクを丸投げすると、約70%の完成度で止まってしまう現象"
+
+  - standard: "Lost in the Middle"
+    variants:
+      - "Lost in the Middle問題"
+      - "ロスト・イン・ザ・ミドル"
+    frequency: 8
+    first_appearance: "part1_why-ai-fails/01_the-seventy-percent-problem.md:230"
+    description: "LLMが長い入力の中間部分を忘れやすい問題（Stanford 2023論文）"
+    reference: "arXiv:2307.03172"
+
+  - standard: "コンテキスト縮小戦略"
+    variants:
+      - "Context Reduction Strategy"
+    frequency: 5
+    first_appearance: "part1_why-ai-fails/01_the-seventy-percent-problem.md:681"
+    description: "大きなお願いを小さく分けてAIに渡す戦略"
+
+  - standard: "スコープ収束パターン"
+    variants:
+      - "Scope Convergence Pattern"
+    frequency: 3
+    first_appearance: "00_preface.md:106"
+    description: "分けて→渡して→収束させるパターン"
+
+  - standard: "二段階AI活用"
+    variants:
+      - "2段階AI活用"
+    frequency: 3
+    first_appearance: "00_preface.md:72"
+    description: "AIに直接結果を出させるのではなく、ツール/コードを作らせる手法"
+
+  - standard: "精度モード"
+    variants: []
+    frequency: 2
+    first_appearance: "00_preface.md:82"
+    description: "明確で具体的な指示でAIに実行させるモード"
+
+  - standard: "推論モード"
+    variants: []
+    frequency: 2
+    first_appearance: "00_preface.md:88"
+    description: "余白を残した指示でAIに考えさせるモード"
+
+# ===================================
+# 技術用語
+# ===================================
+technical_terms:
+  - standard: "コンテキスト"
+    variants:
+      - "コンテクスト"
+      - "context"
+    frequency: 17
+    note: "長音符ありの「コンテキスト」を標準とする"
+
+  - standard: "大規模言語モデル"
+    short_form: "LLM"
+    variants:
+      - "Large Language Model"
+    frequency: 8
+    requires_initial_explanation: true
+    note: "初出時は「LLM（大規模言語モデル）」と記載"
+
+  - standard: "プルリクエスト"
+    short_form: "PR"
+    variants:
+      - "Pull Request"
+      - "プルリク"
+    frequency: 3
+    requires_initial_explanation: true
+
+  - standard: "トークン"
+    variants:
+      - "token"
+    frequency: 5
+    description: "LLMが処理するテキストの単位"
+
+  - standard: "プロンプト"
+    variants:
+      - "prompt"
+    frequency: 12
+    description: "AIへの入力・指示"
+
+  - standard: "API"
+    full_form: "Application Programming Interface"
+    frequency: 5
+    requires_initial_explanation: false
+
+  - standard: "JWT"
+    full_form: "JSON Web Token"
+    frequency: 2
+    requires_initial_explanation: true
+
+# ===================================
+# 製品・サービス名
+# ===================================
+product_names:
+  - standard: "ChatGPT"
+    variants:
+      - "chatGPT"
+      - "Chat GPT"
+      - "chatgpt"
+    frequency: 11
+    case_sensitive: true
+    company: "OpenAI"
+
+  - standard: "Claude"
+    variants:
+      - "claude"
+    frequency: 9
+    case_sensitive: true
+    company: "Anthropic"
+
+  - standard: "Claude Code"
+    variants:
+      - "claude code"
+      - "ClaudeCode"
+    frequency: 2
+    case_sensitive: true
+    official_url: "https://claude.ai/code"
+
+  - standard: "Midjourney"
+    variants:
+      - "midjourney"
+      - "MidJourney"
+    frequency: 2
+    case_sensitive: true
+
+  - standard: "GitHub"
+    variants:
+      - "Github"
+      - "github"
+    frequency: 2
+    case_sensitive: true
+
+  - standard: "VSCode"
+    variants:
+      - "VS Code"
+      - "vscode"
+      - "Visual Studio Code"
+    frequency: 3
+    case_sensitive: true
+
+  - standard: "OpenAI"
+    variants:
+      - "openai"
+    frequency: 3
+    case_sensitive: true
+
+  - standard: "Anthropic"
+    variants:
+      - "anthropic"
+    frequency: 2
+    case_sensitive: true
+
+  - standard: "Google"
+    variants:
+      - "google"
+    frequency: 3
+    case_sensitive: true
+
+# ===================================
+# 長音符の統一
+# ===================================
+katakana_standards:
+  - standard: "ユーザー"
+    variant: "ユーザ"
+    rule: "長音符あり"
+    frequency: 10
+
+  - standard: "サーバー"
+    variant: "サーバ"
+    rule: "長音符あり"
+
+  - standard: "ブラウザー"
+    variant: "ブラウザ"
+    rule: "長音符あり"
+
+  - standard: "エンジニア"
+    note: "長音符なしが標準"
+    frequency: 7
+
+  - standard: "プロジェクト"
+    note: "長音符なしが標準"
+    frequency: 10
+
+  - standard: "レビュー"
+    variant: "レビュ"
+    rule: "長音符あり"
+    frequency: 8
+
+  - standard: "アーキテクチャ"
+    note: "長音符なしが標準"
+
+  - standard: "フレームワーク"
+    note: "長音符なしが標準"
+
+# ===================================
+# 略語一覧
+# ===================================
+abbreviations:
+  - abbreviation: "AI"
+    full_form: "人工知能（Artificial Intelligence）"
+    requires_explanation: false
+    note: "一般的に認知されているため説明不要"
+    frequency: 87
+
+  - abbreviation: "LLM"
+    full_form: "大規模言語モデル（Large Language Model）"
+    requires_explanation: true
+
+  - abbreviation: "PR"
+    full_form: "プルリクエスト（Pull Request）"
+    requires_explanation: true
+
+  - abbreviation: "API"
+    full_form: "Application Programming Interface"
+    requires_explanation: false
+
+  - abbreviation: "JWT"
+    full_form: "JSON Web Token"
+    requires_explanation: true
+
+  - abbreviation: "E2E"
+    full_form: "End to End"
+    requires_explanation: true
+
+  - abbreviation: "CRUD"
+    full_form: "Create, Read, Update, Delete"
+    requires_explanation: true
+
+  - abbreviation: "SaaS"
+    full_form: "Software as a Service"
+    requires_explanation: true
+
+  - abbreviation: "CAGR"
+    full_form: "Compound Annual Growth Rate（年平均成長率）"
+    requires_explanation: true
+
+# ===================================
+# 表記揺れ検出ルール
+# ===================================
+variation_rules:
+  - pattern: "コンテキスト|コンテクスト"
+    standard: "コンテキスト"
+    note: "「コンテキスト」に統一"
+
+  - pattern: "ユーザー|ユーザ"
+    standard: "ユーザー"
+    note: "長音符ありに統一"
+
+  - pattern: "70%|70％|七割"
+    standard: "70%"
+    note: "半角パーセントに統一"
