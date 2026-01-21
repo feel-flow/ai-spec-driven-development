@@ -12,6 +12,7 @@ source_files:
   - books/ai-small-is-accurate/part2_context-limit/02_lost-in-the-middle.md
   - books/ai-small-is-accurate/part3_precision/03_scope-convergence.md
   - books/ai-small-is-accurate/part3_precision/04_two-stage-ai.md
+  - books/ai-small-is-accurate/part4_inference/05_leave-room-for-thinking.md
 
 # ===================================
 # コア概念（本書固有）
@@ -67,16 +68,38 @@ core_concepts:
       - "評価基準生成パターン"
 
   - standard: "精度モード"
-    variants: []
-    frequency: 2
+    variants:
+      - "Precision Mode"
+    frequency: 15
     first_appearance: "00_preface.md:82"
+    main_chapter: "part4_inference/05_leave-room-for-thinking.md"
     description: "明確で具体的な指示でAIに実行させるモード"
+    characteristics:
+      - "詳細な指示を与える"
+      - "AIは言われた通りに実行"
+      - "実行結果の精度が高い"
+      - "推論の余地が少ない"
 
   - standard: "推論モード"
-    variants: []
-    frequency: 2
+    variants:
+      - "Inference Mode"
+    frequency: 15
     first_appearance: "00_preface.md:88"
+    main_chapter: "part4_inference/05_leave-room-for-thinking.md"
     description: "余白を残した指示でAIに考えさせるモード"
+    characteristics:
+      - "曖昧さを残す"
+      - "AIに提案を求める"
+      - "「〜と思うけど、どう思う？」パターン"
+      - "壁打ち相手として活用"
+
+  - standard: "壁打ち"
+    variants:
+      - "ブレインストーミング"
+      - "アイデア出し"
+    frequency: 10
+    first_appearance: "part4_inference/05_leave-room-for-thinking.md:350"
+    description: "AIを思考パートナーとして活用し、アイデアを発展させる対話手法"
 
 # ===================================
 # 技術用語
