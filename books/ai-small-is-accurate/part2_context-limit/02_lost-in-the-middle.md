@@ -100,7 +100,7 @@ AIの要約には、この情報が**まったく含まれていませんでし�
 
 > **Lost in the Middle: How Language Models Use Long Contexts**
 >
-> Nelson F. Liu et al.
+> Nelson F. Liu ら
 > Stanford University, UC Berkeley, Samaya AI
 > 2023年
 
@@ -559,7 +559,7 @@ Lost in the Middleの観点で見直してみましょう。
 
 「ユーザー認証システムを実装してください。
  ログイン、ログアウト、パスワードリセット、    ← 冒頭
- セッション管理、JWT認証、
+ セッション管理、JWT（JSON Web Token）認証、
  ロールベースのアクセス制御、                   ← 中間
  二要素認証、監査ログ、
  アカウントロックアウト、                       ← 中間
