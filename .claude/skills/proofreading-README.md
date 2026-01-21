@@ -52,8 +52,8 @@
 ## ファイル構成
 
 ```text
-.claude/skills/proofreading/
-├── README.md              # このファイル
+.claude/skills/
+├── proofreading-README.md # このファイル
 ├── proofread.md           # メインコーディネーター
 ├── proofread-japanese.md  # 日本語校正ルール
 ├── proofread-structure.md # 章構造検証ルール
@@ -124,5 +124,5 @@ terms:
 
 ## 関連ドキュメント
 
-- [CLAUDE.md](../../../CLAUDE.md) - プロジェクト全体のAI向けガイドライン
-- [books/](../../../books/) - 校正対象の書籍ディレクトリ
+- [CLAUDE.md](../../CLAUDE.md) - プロジェクト全体のAI向けガイドライン
+- [books/](../../books/) - 校正対象の書籍ディレクトリ
