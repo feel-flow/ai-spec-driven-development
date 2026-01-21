@@ -27,7 +27,7 @@ triggers:
 
 ### 基本的な使い方
 
-```
+```text
 /proofread [ファイルパス]
 ```
 
