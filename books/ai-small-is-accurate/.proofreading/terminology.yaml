@@ -104,6 +104,27 @@ core_concepts:
     first_appearance: "part4_inference/05_leave-room-for-thinking.md:350"
     description: "AIを思考パートナーとして活用し、アイデアを発展させる対話手法"
 
+  - standard: "ファイル分割"
+    variants:
+      - "ファイルの分割"
+      - "分割"
+    frequency: 20
+    first_appearance: "part6_vscode/07_practical-tips.md:1"
+    main_chapter: "part6_vscode/07_practical-tips.md"
+    description: "AIのコンテキストを設計するために、コードや文書を適切なサイズのファイルに分ける技術"
+    guidelines:
+      - "1ファイル500行以下を目安"
+      - "1ファイル = 1責務"
+      - "関連情報は近くに配置"
+
+  - standard: "単一責任原則"
+    variants:
+      - "Single Responsibility Principle"
+      - "SRP"
+    frequency: 3
+    first_appearance: "part6_vscode/07_practical-tips.md:90"
+    description: "1つのファイルやモジュールは1つの責務だけを持つべきという設計原則"
+
 # ===================================
 # 技術用語
 # ===================================
@@ -177,9 +198,25 @@ product_names:
     variants:
       - "claude code"
       - "ClaudeCode"
-    frequency: 2
+    frequency: 10
     case_sensitive: true
     official_url: "https://claude.ai/code"
+    main_chapter: "part6_vscode/07_practical-tips.md"
+
+  - standard: "GitHub Copilot"
+    variants:
+      - "Copilot"
+      - "copilot"
+    frequency: 2
+    case_sensitive: true
+    company: "GitHub/Microsoft"
+
+  - standard: "Cursor"
+    variants:
+      - "cursor"
+    frequency: 2
+    case_sensitive: true
+    description: "AIを統合したコードエディタ"
 
   - standard: "Midjourney"
     variants:
