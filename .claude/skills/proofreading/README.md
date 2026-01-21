@@ -41,12 +41,17 @@
 | --- | --- | --- |
 | メイン校正 | `/proofread` | 全観点の統合校正 |
 | 用語抽出 | `/extract-terms` | 本文から用語集を生成 |
+| 日本語校正 | - | 誤字脱字、文法、読みやすさ |
 | 構造検証 | `/proofread-structure` | 章構造のみを検証 |
+| 用語統一 | - | 表記揺れ、略語、固有名詞 |
+| Markdown検証 | - | コードブロック、リンク、テーブル |
 | ファクトチェック | `/proofread-facts` | 事実確認のみを実行 |
+
+**注**: `-` のスキルは `/proofread` から内部的に呼び出されるサブスキルです。`focus:` オプションで個別実行も可能です（例: `/proofread file.md focus:japanese`）。
 
 ## ファイル構成
 
-```
+```text
 .claude/skills/proofreading/
 ├── README.md              # このファイル
 ├── proofread.md           # メインコーディネーター
@@ -56,7 +61,7 @@
 ├── proofread-markdown.md  # Markdown検証ルール
 ├── proofread-facts.md     # ファクトチェックルール
 ├── extract-terms.md       # 用語抽出スキル
-└── terminology.yaml       # 自動生成される用語集
+└── terminology.yaml       # /extract-terms 実行後に生成
 ```
 
 ## 出力形式

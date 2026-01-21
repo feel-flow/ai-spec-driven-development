@@ -65,7 +65,7 @@ triggers:
 
 ### ステップ1：ファイル収集
 
-```
+```text
 対象: books/**/*.md
 除外: 00_toc.md, _metadata.md, images/
 ```
@@ -112,7 +112,7 @@ term_analysis:
 # 最終更新: YYYY-MM-DD HH:MM:SS
 
 version: "1.0"
-generated_at: "2024-01-15T10:00:00Z"
+generated_at: "YYYY-MM-DDTHH:MM:SSZ"  # 実行時に自動設定
 source_files:
   - books/ai-spec-driven-development-90percent/
   - books/ai-small-is-accurate/

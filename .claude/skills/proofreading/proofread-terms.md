@@ -57,7 +57,7 @@ terms:
 
 略語は初出時にフルスペルで説明が必要です。
 
-```
+```text
 🔴 悪い例：
 「PRを作成してください。」（初出で説明なし）
 
@@ -138,7 +138,7 @@ JIS規格に基づく原則：
 
 #### 単位との組み合わせ
 
-```
+```text
 ✅ 良い例：
 - 200行
 - 5000字
@@ -211,7 +211,7 @@ JIS規格に基づく原則：
 ```yaml
 # .claude/skills/proofreading/terminology.yaml
 version: "1.0"
-generated_at: "2024-01-15T10:00:00Z"
+generated_at: "YYYY-MM-DDTHH:MM:SSZ"  # 実行時に自動設定
 source_files:
   - books/ai-spec-driven-development-90percent/
   - books/ai-small-is-accurate/
