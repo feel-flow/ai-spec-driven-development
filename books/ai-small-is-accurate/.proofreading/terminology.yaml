@@ -8,6 +8,7 @@ generated_at: "2026-01-21T00:00:00Z"
 source_files:
   - books/ai-small-is-accurate/00_preface.md
   - books/ai-small-is-accurate/part1_why-ai-fails/01_the-seventy-percent-problem.md
+  - books/ai-small-is-accurate/part1_why-ai-fails/01b_hidden-costs-and-solutions.md
   - books/ai-small-is-accurate/part2_context-limit/02_lost-in-the-middle.md
   - books/ai-small-is-accurate/part3_precision/03_scope-convergence.md
   - books/ai-small-is-accurate/part3_precision/04_two-stage-ai.md
