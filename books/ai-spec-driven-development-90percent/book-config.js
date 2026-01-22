@@ -16,6 +16,7 @@ module.exports = {
     'part2_spec-is-90percent/03_living-spec.md',
     'part2_spec-is-90percent/04_seven-documents.md',
     'part2_spec-is-90percent/05_minimum-rules.md',
+    // Part 2と3の間の茶話コーナー（意図的にルート直下に配置）
     'part2-3_break_corner.md',
     'part3_practice/06_introduction.md',
     'part3_practice/07_daily-workflow.md',
