@@ -64,6 +64,7 @@
 - どちらが正しいか分からなくなる
 
 ⭕ **解決策**：
+
 ```markdown
 ## ARCHITECTURE.md（What: 何を使うか）
 - 認証方式: JWT (HS256)

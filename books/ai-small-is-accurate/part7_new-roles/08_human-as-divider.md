@@ -673,15 +673,15 @@ AI時代のスキル重要度を示すピラミッド図。頂点に「分ける
 
 ```text
 Professional pyramid infographic showing skill importance in AI era.
-TOP TIER (peak): "Division Skills" (most critical) in bright golden
+TOP TIER (peak): "Decomposition Skills" (most critical) in bright golden
 glow with star icon. MIDDLE TIER: Three skills - "Design", "Verification",
-"Essence Understanding" in bright tech-blue with relevant icons.
+"Essential Understanding" in bright tech-blue with relevant icons.
 BOTTOM TIER: "Execution Skills" (traditional importance, now declining
 relative value) in light gray tone. Transparent gradient flowing from
 top to bottom representing importance hierarchy. Side annotation:
 "AI Era Skillset". Clean modern infographic style, Japanese minimalist
 aesthetic, tech-blue and gold color scheme with gray base.
---ar 3:2 --style infographic --v 6
+--ar 3:2 --v 6.0
 ```
 
 **スタイル指定**:

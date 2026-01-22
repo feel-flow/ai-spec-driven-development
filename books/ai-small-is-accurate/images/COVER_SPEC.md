@@ -34,14 +34,14 @@ lighter text. Minimalist professional style with Japanese aesthetic
 of negative space (ma). Author name "岡崎 太" subtly placed.
 Tech-blue primary color with white and light blue accents. Modern,
 clean, sophisticated book cover design.
---ar 3:4 --style professional --v 6
+--ar 3:4 --v 6.0
 ```
 
 ### スタイル指定
 
 - **アスペクト比**: 3:4（書籍表紙標準）
 - **スタイル**: ミニマル、プロフェッショナル、日本的
-- **カラー**: テックブルー（主色）+ 白 + 淡いオレンジ（アクセント）
+- **カラー**: テックブルー（主色）+ 白 + 淡いブルー（アクセント）
 - **トーン**: 洗練された、示唆的、余白の美学
 - **タイポグラフィ**: エレガントな日本語明朝体（タイトル）、ゴシック体（サブタイトル）
 
@@ -76,7 +76,7 @@ Deep blue gradient background. Title "なぜAIは期待通りに動かないの�
 and subtitle "小さく、でも余白を残して" placement same as Design 1.
 More conceptual, abstract approach. Professional modern aesthetic.
 Tech-blue dominant with white typography. Author name "岡崎 太" subtle.
---ar 3:4 --style conceptual --v 6
+--ar 3:4 --v 6.0
 ```
 
 ### スタイル指定
@@ -104,12 +104,12 @@ Tech-blue dominant with white typography. Author name "岡崎 太" subtle.
 Ultra-minimalist book cover design. Almost entirely clean white space.
 TOP CENTER: Title "なぜAIは期待通りに動かないのか" in large, bold
 Japanese serif font, deep tech-blue. CENTER: Small contrasting numbers
-"70%" (faded) vs "98%" (vibrant) showing key concept. BOTTOM: Subtitle
+"70%" (in light gray, faded) vs "98%" (in vibrant tech-blue) showing key concept. BOTTOM: Subtitle
 "小さく、でも余白を残して" in smaller elegant text. Maximum use of
 negative space (ma) in Japanese design tradition. Minimal visual elements
 for maximum impact. Author name "岡崎 太" subtle at bottom. Sophisticated,
 elegant, clean.
---ar 3:4 --style minimal --v 6
+--ar 3:4 --v 6.0
 ```
 
 ### スタイル指定
@@ -150,10 +150,13 @@ elegant, clean.
 
 ## 使用方法
 
-1. 各デザイン案の英語プロンプトをMidjourney v6またはDALL-E 3に入力
+1. 各デザイン案の英語プロンプトをMidjourney v6に入力
+   - DALL-E 3を使用する場合は、Midjourney固有のパラメータ（`--ar`、`--v`）を削除してください
 2. 生成された画像を確認し、要件を満たしているか検証
+   - **注意**: AI生成ツールは日本語テキストを正確にレンダリングできない場合があります
+   - 必要に応じて、Photoshop/Illustratorなどで手動でタイポグラフィを追加してください
 3. 必要に応じてプロンプトを微調整（パラメータ変更など）
-4. 最終画像を指定ディレクトリに配置
+4. 最終画像を指定ディレクトリに配置（`book-config.js`からの相対パスは `images/`）
 5. `book-config.js`の`coverImage: 'images/cover.jpg'`参照を確認
 
 ---

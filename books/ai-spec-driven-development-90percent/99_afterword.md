@@ -146,7 +146,8 @@ AIコーディングツールは、入力が曖昧なら曖昧な出力を返し
 
 - **X（@zamuraiai）**: 最新のTipsと実践レポート
 - **GitHub**: 7文書テンプレートの最新版
-  - [AI仕様駆動開発 公式リポジトリ](https://github.com/feel-flow/ai-spec-driven-development)
+  - AI仕様駆動開発 公式リポジトリ（公開準備中）
+  - ※公開時はX（@zamuraiai）でお知らせします
 
 ### 更新が必要なサイン
 
