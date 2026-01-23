@@ -252,7 +252,7 @@ AIに大きなタスクを渡すと、こうなります:
 2023年、スタンフォード大学のNelson F. Liuらの研究チームが、
 LLM（大規模言語モデル）の驚くべき特性を発見しました。
 
-論文「Lost in the Middle: How Language Models Use Long Contexts」[^1]で報告されたのが、**「Lost in the Middle」** 問題です。
+論文「Lost in the Middle: How Language Models Use Long Contexts」[^1]で報告されたのが、「**Lost in the Middle**」問題です。
 
 > **重要な発見**
 >
@@ -268,7 +268,7 @@ LLM（大規模言語モデル）の驚くべき特性を発見しました。
 
 実は、AIには**もう1つの弱点**があります。2025年に発見された「Lost at the Beginning of Reasoning（推論の最初で迷子になる）」問題です。これは「熟考型AI」（推論モデル）に特有の弱点で、第2b章で詳しく解説します。
 
-どちらの弱点も、**「小さく分ける」**ことで解決できます。
+どちらの弱点も、「**小さく分ける**」ことで解決できます。
 
 ---
 
