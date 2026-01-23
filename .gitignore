@@ -26,3 +26,7 @@ coverage/
 # Generated books (EPUB/PDF)
 books/**/*.epub
 books/**/AIエージェント開発は仕様が9割*.pdf
+
+# Vivliostyle (PDF build tool)
+books/**/.vivliostyle/
+books/**/output/
