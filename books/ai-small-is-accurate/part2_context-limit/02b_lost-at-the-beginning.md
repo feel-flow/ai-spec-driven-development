@@ -33,6 +33,8 @@
 ### 2024年以降、熟考型が主流に
 
 2024年を境に、**熟考型AI**（推論モデル）が急速に普及しました。
+OpenAIのo1（2024年9月）、DeepSeek-R1（2025年1月）などが登場し、
+「考える」AIが当たり前になりつつあります。
 
 もしあなたがChatGPTやClaudeを使っていて、
 回答前に「考え中...」と表示されたり、
@@ -278,7 +280,7 @@ After:  小さな問題 × 3回 → 短い思考 → 各回で修正可能
 
 **AI侍**: 「ふむ、AIには2つの弱点があることがわかったであろう」
 
-**DJ町娘**: 「はい！即答型は『中間忘れ』、熟考型は『最初依存』ですね。でも、どっちを使ってるか分からないときはどうすれば...？」
+**DJ町娘**: 「はい！即答型は「中間忘れ」、熟考型は「最初依存」ですね。でも、どっちを使ってるか分からないときはどうすれば...？」
 
 **AI侍**: 「心配は無用。**両方に効く解決策**があるからだ」
 
@@ -333,7 +335,10 @@ After:  小さな問題 × 3回 → 短い思考 → 各回で修正可能
 
 本章で紹介した研究:
 
-> **Lost at the Beginning of Reasoning: How Language Models Lose Track of Early Information in Long CoT**
+> **Lost at the Beginning of Reasoning**
+>
+> Baohao Liao, Xinyi Chen, Sara Rajaee, Yuhui Xu,
+> Christian Herold, Anders Søgaard, Maarten de Rijke, Christof Monz
 >
 > arXiv:2506.22058 (2025)
 >
