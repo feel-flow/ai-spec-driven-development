@@ -10,6 +10,7 @@ source_files:
   - books/ai-small-is-accurate/part1_why-ai-fails/01_the-seventy-percent-problem.md
   - books/ai-small-is-accurate/part1_why-ai-fails/01b_hidden-costs-and-solutions.md
   - books/ai-small-is-accurate/part2_context-limit/02_lost-in-the-middle.md
+  - books/ai-small-is-accurate/part2_context-limit/02b_lost-at-the-beginning.md
   - books/ai-small-is-accurate/part3_precision/03_scope-convergence.md
   - books/ai-small-is-accurate/part3_precision/04_two-stage-ai.md
   - books/ai-small-is-accurate/part4_inference/05_leave-room-for-thinking.md
@@ -34,10 +35,39 @@ core_concepts:
     variants:
       - "Lost in the Middle問題"
       - "ロスト・イン・ザ・ミドル"
+      - "中間忘却"
     frequency: 8
     first_appearance: "part1_why-ai-fails/01_the-seventy-percent-problem.md:230"
-    description: "LLMが長い入力の中間部分を忘れやすい問題（Stanford 2023論文）"
+    main_chapter: "part2_context-limit/02_lost-in-the-middle.md"
+    description: "即答型AIが長い入力の中間部分を忘れやすい問題（Stanford 2023論文）"
     reference: "arXiv:2307.03172"
+
+  - standard: "Lost at the Beginning of Reasoning"
+    variants:
+      - "Lost at the Beginning"
+      - "ロスト・アット・ザ・ビギニング"
+      - "最初依存"
+    frequency: 5
+    first_appearance: "part2_context-limit/02b_lost-at-the-beginning.md:1"
+    main_chapter: "part2_context-limit/02b_lost-at-the-beginning.md"
+    description: "熟考型AI（推論モデル）が最初の推論ステップに引きずられやすい問題（2025年論文）"
+    reference: "arXiv:2506.22058"
+
+  - standard: "即答型AI"
+    variants:
+      - "非推論モデル"
+      - "即答型"
+    frequency: 3
+    first_appearance: "part2_context-limit/02b_lost-at-the-beginning.md:20"
+    description: "質問を受けたらすぐに回答するタイプのAI（GPT-4、Claude通常モードなど）"
+
+  - standard: "熟考型AI"
+    variants:
+      - "推論モデル"
+      - "熟考型"
+    frequency: 3
+    first_appearance: "part2_context-limit/02b_lost-at-the-beginning.md:20"
+    description: "回答前に「考える時間」を取るタイプのAI（o1、o3、Claude Extended Thinking、DeepSeek-R1など）"
 
   - standard: "コンテキスト縮小戦略"
     variants:

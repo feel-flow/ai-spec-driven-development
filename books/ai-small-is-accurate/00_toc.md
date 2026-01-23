@@ -43,6 +43,13 @@
 
 → [part2_context-limit/02_lost-in-the-middle.md](./part2_context-limit/02_lost-in-the-middle.md)
 
+### 第2b章　Lost at the Beginning──最初で迷子になるAI
+- 2種類のAI：即答型と熟考型
+- 熟考型の弱点：推論の最初で迷子になる
+- 両方に効く解決策：「小さく分ける」
+
+→ [part2_context-limit/02b_lost-at-the-beginning.md](./part2_context-limit/02b_lost-at-the-beginning.md)
+
 ---
 
 ## 第3部　細かく指示する──精度を上げる
