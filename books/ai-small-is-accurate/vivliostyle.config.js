@@ -3,7 +3,10 @@ module.exports = {
   author: '岡崎 太',
   language: 'ja',
   size: 'A5',
-  theme: '@vivliostyle/theme-techbook',
+  theme: [
+    '@vivliostyle/theme-techbook',
+    'styles/custom.css'
+  ],
   entry: [
     '00_preface.md',
     '00_toc.md',

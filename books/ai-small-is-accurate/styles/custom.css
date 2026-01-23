@@ -1,0 +1,73 @@
+/**
+ * AI侍道場コーナー用カスタムスタイル
+ *
+ * 使用方法:
+ * <div class="ai-samurai-dojo">
+ * ## 🥷 AI侍道場 - [章テーマ]
+ * ...
+ * </div>
+ */
+
+/* コラム全体の枠 */
+.ai-samurai-dojo {
+  border: 2px solid #2c3e50;
+  border-radius: 8px;
+  padding: 1.5em 2em;
+  margin: 2.5em 0;
+  background: linear-gradient(to bottom, #fafafa 0%, #ffffff 100%);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+  page-break-inside: avoid;
+}
+
+/* コラムタイトル */
+.ai-samurai-dojo > h2:first-of-type {
+  margin-top: 0;
+  padding-bottom: 0.5em;
+  border-bottom: 2px solid #2c3e50;
+  color: #2c3e50;
+}
+
+/* 秘伝書セクション */
+.ai-samurai-dojo h3 {
+  margin-top: 1.5em;
+  color: #34495e;
+}
+
+/* 対話形式のスタイル */
+.ai-samurai-dojo p:has(> strong:first-child) {
+  margin-left: 0;
+}
+
+/* キャラクター名を強調 */
+.ai-samurai-dojo p > strong:first-child {
+  color: #2c3e50;
+}
+
+/* キャラクター画像 */
+.ai-samurai-dojo img {
+  display: block;
+  max-width: 300px;
+  margin: 1em auto;
+}
+
+/* 番号付きリスト */
+.ai-samurai-dojo ol {
+  margin-left: 1.5em;
+}
+
+.ai-samurai-dojo li {
+  margin-bottom: 0.5em;
+}
+
+/* コードブロック内のスタイル調整 */
+.ai-samurai-dojo pre {
+  background-color: #f0f0f0;
+  border-radius: 4px;
+}
+
+/* 印刷時の改ページ制御 */
+@media print {
+  .ai-samurai-dojo {
+    break-inside: avoid;
+  }
+}
