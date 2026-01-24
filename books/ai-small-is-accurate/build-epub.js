@@ -89,7 +89,7 @@ function runPandoc(files, hasCoverImage) {
       '--toc-depth=3',
       '--split-level=1',
       '--css=epub-style.css',
-      '--resource-path=.:images'
+      '--resource-path=.:images:part1_why-ai-fails:part2_context-limit:part3_precision:part4_inference:part5_failures:part6_vscode:part7_new-roles'
     ];
 
     // Publisher情報を追加
