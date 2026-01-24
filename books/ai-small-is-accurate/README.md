@@ -206,7 +206,7 @@ metadata: {
 
 ```
 エラー: 以下のファイルが見つかりません:
-  - part1_why-ai-fails/01_the-seventy-percent-problem.md
+  - part1_why-ai-fails/01-1_the-seventy-percent-problem.md
 ```
 
 → Markdownファイルが正しい場所にあるか確認
