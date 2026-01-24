@@ -118,6 +118,7 @@ tr:nth-child(even) {
 
 /* 画像 */
 img {
+  width: 100%;       /* 常に横幅100%で表示 */
   max-width: 100%;
   height: auto;
   display: block;
