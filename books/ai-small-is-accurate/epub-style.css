@@ -148,12 +148,29 @@ li {
 /* 引用 */
 blockquote {
   border-left: 4px solid #ddd;
-  padding-left: 1em;
-  margin: 1em 0;
+  padding: 1em 1em 1em 1.2em;  /* 上右下左に余白 */
+  margin: 1.5em 0;  /* 外側マージンも広げる */
   color: #555;
-  font-style: italic;
+  /* font-style: italic を削除（日本語は読みにくい） */
+  background-color: #fafafa;  /* 薄い背景色で区別 */
+  line-height: 2;  /* 行間を広げる */
   page-break-inside: avoid;
   break-inside: avoid;
+}
+
+/* 引用内の段落 */
+blockquote p {
+  margin: 0.6em 0;
+}
+
+/* 引用内のリスト */
+blockquote ul,
+blockquote ol {
+  margin: 0.8em 0;
+}
+
+blockquote li {
+  margin: 0.4em 0;
 }
 
 /* 段落 */
@@ -208,6 +225,56 @@ em, i {
   }
 
   blockquote {
+    background-color: #252525;
     color: #aaa;
+  }
+}
+
+/* 目次（nav.xhtml）のスタイル */
+nav#toc ol.toc {
+  list-style-type: none;  /* トップレベルの番号を消す */
+  padding-left: 0;
+}
+
+nav#toc ol.toc > li > ol.toc {
+  list-style-type: decimal;  /* サブレベルは番号付き */
+  padding-left: 1.5em;
+}
+
+/* ===== 脚注のカスタマイズ ===== */
+
+/* 脚注参照リンク（本文内） */
+a.footnote-ref {
+  vertical-align: super;
+  font-size: 0.8em;
+  text-decoration: none;
+}
+
+/* 括弧でカスタマイズ: (*1) の形式 */
+a.footnote-ref::before {
+  content: "(*";
+}
+
+a.footnote-ref::after {
+  content: ")";
+}
+
+/* 脚注セクション全体 */
+section.footnotes {
+  border-top: 2px solid #ddd;
+  padding-top: 1em;
+  margin-top: 2em;
+  font-size: 0.9em;
+}
+
+section.footnotes li {
+  margin: 0.5em 0;
+  line-height: 1.6;
+}
+
+/* ダークモード対応 */
+@media (prefers-color-scheme: dark) {
+  section.footnotes {
+    border-top-color: #555;
   }
 }

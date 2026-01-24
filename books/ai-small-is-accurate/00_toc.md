@@ -10,7 +10,7 @@
 - 本書のアプローチ：コンテキスト縮小戦略
 - 精度と推論のバランス
 
-→ [00_preface.md](./00_preface.md)
+→ [はじめに](#はじめに)
 
 ---
 
@@ -21,7 +21,7 @@
 - みんなが経験してる「なんか微妙」問題
 - 大きなお願いほど曖昧になる理由
 
-→ [part1_why-ai-fails/01-1_the-seventy-percent-problem.md](./part1_why-ai-fails/01-1_the-seventy-percent-problem.md)
+→ [第1-1章](#第1-1章-70問題全部やってが生む微妙さ)
 
 ### 第1-2章　70%問題──隠れたコストと解決策の糸口
 
@@ -29,7 +29,7 @@
 - AIとの付き合い方を変える必要性
 - コンテキスト縮小戦略への導入
 
-→ [part1_why-ai-fails/01-2_hidden-costs-and-solutions.md](./part1_why-ai-fails/01-2_hidden-costs-and-solutions.md)
+→ [第1-2章](#第1-2章-70問題隠れたコストと解決策の糸口)
 
 ---
 
@@ -41,14 +41,14 @@
 - コンテキストが長いほど、中間は忘れやすい
 - 小さく分ける＝中間がない＝全部覚える
 
-→ [part2_context-limit/02-1_lost-in-the-middle.md](./part2_context-limit/02-1_lost-in-the-middle.md)
+→ [第2-1章](#第2-1章-lost-in-the-middle中間を忘れるai)
 
 ### 第2-2章　Lost at the Beginning──最初で迷子になるAI
 - 2種類のAI：即答型と熟考型
 - 熟考型の弱点：推論の最初で迷子になる
 - 両方に効く解決策：「小さく分ける」
 
-→ [part2_context-limit/02-2_lost-at-the-beginning.md](./part2_context-limit/02-2_lost-at-the-beginning.md)
+→ [第2-2章](#第2-2章-lost-at-the-beginning最初で迷子になるai)
 
 ---
 
@@ -59,14 +59,14 @@
 - 3つの基本ルール
 - 分野別の分け方ガイド
 
-→ [part3_precision/03-1_scope-convergence.md](./part3_precision/03-1_scope-convergence.md)
+→ [第3-1章](#第3-1章-スコープ収束パターン小さく分けて精度を上げる)
 
 ### 第3-2章　二段階AI活用──検証可能な形で出力させる
 - AIに直接やらせる vs ツールを作らせる
 - チェックリスト/テストコード/評価基準生成
 - 5分野での実践例
 
-→ [part3_precision/03-2_two-stage-ai.md](./part3_precision/03-2_two-stage-ai.md)
+→ [第3-2章](#第3-2章-二段階ai活用検証可能な形で出力させる)
 
 ---
 
@@ -78,7 +78,7 @@
 - 実行させたい時は具体的に、考えさせたい時は曖昧に
 - 壁打ち相手としてのAI活用
 
-→ [part4_inference/04-1_leave-room-for-thinking.md](./part4_inference/04-1_leave-room-for-thinking.md)
+→ [第4-1章](#第4-1章-余白を残す推論の力を借りる)
 
 ---
 
@@ -90,7 +90,7 @@
 - パターン3：AIに直接判断させる → 検証可能な形で出力させる
 - パターン4：修正を一度に全部頼む → 1つずつ確認しながら
 
-→ [part5_failures/05-1_before-after-patterns.md](./part5_failures/05-1_before-after-patterns.md)
+→ [第5-1章](#第5-1章-beforeafter失敗パターンと解決策)
 
 ---
 
@@ -101,7 +101,7 @@
 - どう分けるか、どう渡すか
 - この本の壁打ち例（メタな紹介）
 
-→ [part6_vscode/06-1_practical-tips.md](./part6_vscode/06-1_practical-tips.md)
+→ [第6-1章](#第6-1章-ファイル分割の技術aiが見える範囲を設計する)
 
 ---
 
@@ -112,12 +112,12 @@
 - 組み合わせで大きな成果を出す
 - 姉妹編「AIエージェント開発は仕様が9割」への橋渡し
 
-→ [part7_new-roles/07-1_human-as-divider.md](./part7_new-roles/07-1_human-as-divider.md)
+→ [第7-1章](#第7-1章-人間の仕事は分けることになる)
 
 ---
 
-## おわりに
+## あとがき
 - 小さく、でも余白を残して
 - 次にやること
 
-→ [99_afterword.md](./99_afterword.md)
+→ [あとがき](#あとがき)

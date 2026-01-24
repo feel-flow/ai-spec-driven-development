@@ -3,7 +3,7 @@
  * EPUB生成スクリプト
  * - Pandocを使用してMarkdownファイルをEPUB形式に変換
  * - メタデータの埋め込み
- * - 00_toc.mdを目次ページとして使用
+ * - Pandocの--tocオプションで自動目次を生成
  * - カバー画像の設定
  */
 
@@ -86,6 +86,8 @@ function runPandoc(files, hasCoverImage) {
       '--metadata', `lang=${bookConfig.metadata.language}`,
       '--metadata', `date=${bookConfig.metadata.date}`,
       '--split-level=1',
+      '--toc',
+      '--toc-depth=2',
       '--css=epub-style.css',
       '--resource-path=.:images:part1_why-ai-fails:part2_context-limit:part3_precision:part4_inference:part5_failures:part6_vscode:part7_new-roles'
     ];
