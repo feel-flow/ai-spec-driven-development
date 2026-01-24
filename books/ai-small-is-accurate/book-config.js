@@ -12,12 +12,15 @@ module.exports = {
     '00_preface.md',
     '00_toc.md', // PDF生成では使用、EPUB生成では除外
     'part1_why-ai-fails/01_the-seventy-percent-problem.md',
+    'part1_why-ai-fails/01b_hidden-costs-and-solutions.md',
     'part2_context-limit/02_lost-in-the-middle.md',
-    'part3_precision/03_divide-and-conquer.md',
-    'part4_inference/04_leave-room-for-thinking.md',
-    'part5_failures/05_before-after-patterns.md',
-    'part6_vscode/06_practical-tips.md',
-    'part7_new-roles/07_human-as-divider.md',
+    'part2_context-limit/02b_lost-at-the-beginning.md',
+    'part3_precision/03_scope-convergence.md',
+    'part3_precision/04_two-stage-ai.md',
+    'part4_inference/05_leave-room-for-thinking.md',
+    'part5_failures/06_before-after-patterns.md',
+    'part6_vscode/07_practical-tips.md',
+    'part7_new-roles/08_human-as-divider.md',
     '99_afterword.md'
   ],
 
