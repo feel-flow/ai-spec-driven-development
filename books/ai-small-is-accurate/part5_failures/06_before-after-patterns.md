@@ -729,39 +729,3 @@ Step 3: 確認してから次へ
 
 VSCodeを使った実践的なファイル分割の技術、
 AIに効果的に渡すためのコツを学びましょう。
-
----
-
-## 画像生成プロンプト
-
-### 画像1: 章扉絵「Before/After」
-
-**日本語での説明**:
-左右に分かれた図。左側は「Before」で、大きな混乱した状態。右側は「After」で、整理された成功状態。矢印が左から右へ向かい、変化を示す。
-
-```text
-Conceptual illustration of "Before and After" transformation.
-LEFT side: "Before" - chaotic, confused state with messy elements,
-scattered papers, error symbols.
-RIGHT side: "After" - organized, successful state with clean structure,
-checkmarks, satisfied expression.
-Arrow pointing from left to right showing transformation.
-Split design, contrasting colors (red-gray vs blue-green).
---ar 16:9 --style clean --v 6
-```
-
-### 画像2: 4つのパターン一覧
-
-**日本語での説明**:
-4つのパターンをカード形式で並べた図。各カードにはパターン名と簡単なアイコンが入っている。
-
-```text
-Infographic showing four failure patterns and solutions.
-Four cards arranged in grid:
-1. "All at once → Divide" with splitting icon
-2. "Vague → Specific" with magnifying glass icon
-3. "Direct → Verifiable" with checklist icon
-4. "Batch fix → One by one" with step arrows icon
-Clean card layout, consistent color scheme.
---ar 3:2 --style infographic --v 6
-```

@@ -388,36 +388,3 @@ After:  小さな問題 × 3回 → 短い思考 → 各回で修正可能
 > arXiv:2307.03172 (2023)
 >
 > [https://arxiv.org/abs/2307.03172](https://arxiv.org/abs/2307.03172)
-
----
-
-## 画像生成プロンプト
-
-### 画像1: 2種類のAI（即答型と熟考型）
-
-**日本語での説明**:
-左右対比の図。左側は「即答型」（質問→即回答の直線矢印）、右側は「熟考型」（質問→思考の雲→回答の曲線矢印）。シンプルでわかりやすいアイコン風のイラスト。
-
-```text
-Side-by-side comparison of two AI types.
-LEFT: "Instant Type" - Simple arrow from question to answer, labeled "Instant Response".
-RIGHT: "Deliberate Type" - Arrow from question through thought bubble/cloud to answer, labeled "Think → Response".
-Clean icon style, tech-blue and warm orange colors, Japanese labels.
---ar 16:9 --style minimalist --v 6
-```
-
-### 画像2: 2つの弱点比較図
-
-**日本語での説明**:
-上下対比の図。上段：即答型の弱点「入力の中間が暗くなる」（U字曲線のイメージ）。下段：熟考型の弱点「最初の思考が全体を支配」（ドミノ倒しのイメージ）。両方の下に「解決策：小さく分ける」を示す。
-
-```text
-Two-part comparison diagram showing AI weaknesses.
-TOP: "Instant Type Weakness" - Long input stream with faded middle section,
-U-curve visualization showing low attention in middle.
-BOTTOM: "Deliberate Type Weakness" - Chain of thought blocks where first block
-is highlighted and subsequent blocks follow its direction (domino effect).
-FOOTER: "Solution for Both: Split into Smaller Parts" with icon.
-Clean infographic style, consistent color scheme.
---ar 9:16 --style infographic --v 6
-```

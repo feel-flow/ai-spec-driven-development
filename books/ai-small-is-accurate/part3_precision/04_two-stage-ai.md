@@ -80,6 +80,8 @@ AIの「判断」は、**必ずしも正しくありません**。
 AIに直接結果を出させるのではなく、
 **AIに「ツール」を作らせて、そのツールで検証する**手法です。
 
+![二段階AI活用の概念図：AIがツールを生成し、人間がそれを使って検証するフロー](./04_two_stage_ai.png)
+
 ```text
 【二段階AI活用の流れ】
 
@@ -113,6 +115,8 @@ AIに直接結果を出させるのではなく、
 
 ### 従来のアプローチとの比較
 
+![従来のアプローチ vs 二段階AI活用の比較図](./04_traditional_vs_two_stage.png)
+
 ```text
 【従来のアプローチ】
 
@@ -135,6 +139,8 @@ AIに直接結果を出させるのではなく、
 ## 3つのパターン
 
 二段階AI活用には、主に3つのパターンがあります。
+
+![二段階AI活用の3つのパターン：チェックリスト生成、テストコード生成、評価基準生成](./04_three_patterns.png)
 
 ---
 
@@ -724,50 +730,3 @@ AIの推論力を引き出すテクニックを学びます。
 「精度」と「推論」。
 この**2つのバランス**を取れる人が、
 AIを本当に使いこなせる人です。
-
----
-
-## 画像生成プロンプト
-
-### 画像1: 章扉絵「二段階AI活用」
-
-**日本語での説明**:
-2段階のプロセスを示す図。ステップ1でAIがツール（歯車やチェックリスト）を生成し、ステップ2で人間がそのツールを使って検証している。「AI → ツール → 人間が検証」の流れを視覚化。
-
-```text
-Conceptual illustration of "Two-Stage AI Utilization".
-Step 1: AI generates tools (gears, checklists, code symbols).
-Step 2: Human uses the tools to verify results.
-Shows the flow: AI → Tools → Human verification.
-Clean tech style, blue and green gradient.
---ar 16:9 --style minimalist --v 6
-```
-
-### 画像2: 従来 vs 二段階AI活用の比較
-
-**日本語での説明**:
-左右対比の図。左側：AIから結果が直接出力され、人間は「信じるしかない」状態。右側：AIからツールが出力され、人間がツールを使って検証し、判断している状態。
-
-```text
-Side-by-side comparison illustration.
-LEFT: AI outputs "judgment" directly to human,
-human has "trust only" expression, uncertain.
-RIGHT: AI outputs "tools" (checklist, test code),
-human uses tools to verify, confident expression.
-Modern infographic style, contrast colors.
---ar 16:9 --style clean --v 6
-```
-
-### 画像3: 3つのパターン
-
-**日本語での説明**:
-3つのパターンを示すインフォグラフィック。パターン1「チェックリスト生成」、パターン2「テストコード生成」、パターン3「評価基準生成」。各パターンにアイコンと簡単な説明。
-
-```text
-Infographic showing three patterns of Two-Stage AI.
-Pattern 1: "Checklist Generation" with checklist icon.
-Pattern 2: "Test Code Generation" with code brackets icon.
-Pattern 3: "Evaluation Criteria" with rating stars icon.
-Clean card layout, tech-blue color scheme.
---ar 3:2 --style infographic --v 6
-```
