@@ -12,8 +12,8 @@ const bookConfig = require('./book-config');
 // ファイル順序をbook-config.jsから取得
 const files = bookConfig.files;
 
-// 章番号を抽出するパターン（12aのような形式にも対応）
-const chapterPattern = /^# 第(\d+[a-z]?)章/;
+// 章番号を抽出するパターン（1-1のような部-章形式に対応）
+const chapterPattern = /^# 第(\d+-\d+)章/;
 const partPattern = /^# 第\d+部/;
 const sectionPattern = /^## /;
 const subsectionPattern = /^### /;
