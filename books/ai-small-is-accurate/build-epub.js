@@ -196,7 +196,7 @@ async function main() {
     console.log('');
 
     // 4. Pandoc実行
-    console.log('[4/5] Pandocでのe変換実行中...');
+    console.log('[4/5] PandocでのEPUB変換実行中...');
     console.log(`  - タイトル: ${bookConfig.metadata.title}`);
     console.log(`  - 著者: ${bookConfig.metadata.author}`);
     console.log(`  - バージョン: ${bookConfig.metadata.version}`);

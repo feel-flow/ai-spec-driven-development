@@ -78,24 +78,41 @@ function processLine(line) {
 }
 
 function processFile(filePath) {
-  const content = fs.readFileSync(filePath, 'utf-8');
-  const lines = content.split('\n');
-  const processedLines = lines.map(processLine);
-  return processedLines.join('\n');
+  try {
+    const content = fs.readFileSync(filePath, 'utf-8');
+    const lines = content.split('\n');
+    const processedLines = lines.map(processLine);
+    return processedLines.join('\n');
+  } catch (error) {
+    console.error(`Error reading file ${filePath}: ${error.message}`);
+    throw error;
+  }
 }
 
 // メイン処理
 const baseDir = __dirname;
 let combined = '';
+const missingFiles = [];
 
 for (const file of files) {
   const filePath = path.join(baseDir, file);
   if (fs.existsSync(filePath)) {
-    const processed = processFile(filePath);
-    combined += processed + '\n\n';
+    try {
+      const processed = processFile(filePath);
+      combined += processed + '\n\n';
+    } catch (error) {
+      console.error(`Failed to process file: ${filePath}`);
+      process.exit(1);
+    }
   } else {
-    console.error(`File not found: ${filePath}`);
+    missingFiles.push(filePath);
   }
+}
+
+// ファイル未検出エラー処理
+if (missingFiles.length > 0) {
+  console.error(`\nMissing files:\n${missingFiles.map(f => `  - ${f}`).join('\n')}`);
+  process.exit(1);
 }
 
 // 出力

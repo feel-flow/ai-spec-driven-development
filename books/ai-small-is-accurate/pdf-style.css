@@ -34,7 +34,7 @@ h3 {
   page-break-after: avoid;
 }
 
-/* コードブロック - ダーク背景・等幅フォント */
+/* コードブロック - ライト背景・等幅フォント */
 pre {
   font-family: "SF Mono", "Monaco", "Menlo", "Courier New", monospace;
   background-color: #f5f5f5;
