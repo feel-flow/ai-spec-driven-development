@@ -61,6 +61,8 @@ AIには、2つの使い方があります。
 両方を使い分けることで、
 AIを**本当に使いこなせる**ようになります。
 
+![精度モードと推論モードの対比図。左側は明確な指示で正確な出力、右側は余白のある問いかけで複数のアイデアが出る。](./05_two_modes_comparison.png)
+
 ---
 
 ## 細かすぎると推論の邪魔をする
@@ -172,6 +174,8 @@ AIは「従う」ことに集中し、
 「**どう思う？**」と聞いている
 
 この違いが、AIの推論モードを引き出します。
+
+![細かすぎる指示と余白のある問いかけの比較図。上部はAIが窮屈そうに作業、下部はAIが自由に考えてアイデアを出している。](./05_leave_room_comparison.png)
 
 ---
 
@@ -438,6 +442,8 @@ Whyを直接伝えることができます。
 相談していました。
 
 今は、AIがその役割を担えます。
+
+![人間とAIが対話しながらブレインストーミングしている図。人間のアイデアをAIが整理して選択肢として返している。](./05_brainstorming_partner.png)
 
 ---
 
@@ -721,51 +727,3 @@ AIを本当に使いこなすためのカギです。
 
 こうした失敗パターンと、
 Before/After形式での解決策を学びましょう。
-
----
-
-## 画像生成プロンプト
-
-### 画像1: 章扉絵「精度モードと推論モード」
-
-**日本語での説明**:
-左右に分かれた図。左側は「精度モード」で、明確な指示が矢印でAIに向かい、正確な出力が出てくる。右側は「推論モード」で、曖昧な問いかけがAIに向かい、複数のアイデアや提案が出てくる。
-
-```text
-Conceptual illustration of "Two Modes of AI Usage".
-LEFT: "Precision Mode" - clear arrows pointing to AI,
-single precise output emerges.
-RIGHT: "Inference Mode" - wavy thoughtful lines to AI,
-multiple ideas and suggestions branching out.
-Split design, clean minimalist style, blue and purple gradient.
---ar 16:9 --style minimalist --v 6
-```
-
-### 画像2: 余白を残す表現
-
-**日本語での説明**:
-対比の図。上部は「細かすぎる指示」で、AIが窮屈そうに作業している。下部は「余白のある問いかけ」で、AIが自由に考え、電球（アイデア）を複数出している。
-
-```text
-Comparison illustration of instruction styles.
-TOP: Dense detailed instructions, AI robot working in cramped space,
-single output, constrained feeling.
-BOTTOM: Open question with space, AI robot thinking freely,
-multiple lightbulb ideas emerging.
-Before/after comparison style, modern flat design.
---ar 16:9 --style clean --v 6
-```
-
-### 画像3: 壁打ち相手としてのAI
-
-**日本語での説明**:
-人間とAIが対話している図。人間が考えを話し、AIが整理された選択肢や視点を返している。思考が整理されていくプロセスを視覚化。
-
-```text
-Illustration of AI as brainstorming partner.
-Human figure talking with thought bubbles,
-AI robot responding with organized cards showing options,
-thought process being clarified visually.
-Collaborative feeling, warm tech colors.
---ar 3:2 --style modern --v 6
-```
