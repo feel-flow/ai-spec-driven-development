@@ -1,36 +1,5 @@
 # 第1章　70%問題──「全部やって」が生む微妙さ（前編）
 
-<!--
-### 画像1：章扉絵「70%問題」
-
-**用途**: 扉絵（章の冒頭）
-**配置**: 章タイトル直後
-
-**プロンプト（日本語）**:
-スプリットスクリーン形式のコンセプトイラスト。左側：ラップトップでAIインターフェースを使う興奮した表情の人物、親指を立てている、輝くAI画面。右側：同じ人物が画面を見て困惑し、やや不満げな表情、「ほぼ完璧だけど何か違う」という仕事を見ている。目立つプログレスバーが70%で表示。モダンでプロフェッショナルなスタイル、クリーンでミニマルな美学、テックブルーの配色にオレンジのアクセント。日本的なデザイン感覚 - すっきりとしてエレガント。ソフトな照明、デジタルアートスタイル。
-
-**プロンプト（英語・画像生成AI用）**:
-
-```text
-A conceptual split-screen illustration showing the "70% problem" in AI
-assistance. LEFT SIDE: Enthusiastic person at laptop with glowing AI
-interface, excited expression, giving thumbs up. RIGHT SIDE: Same person
-looking puzzled and slightly frustrated at screen showing work that's
-"almost but not quite right". Prominent progress bar showing 70%
-completion. Modern professional style, clean minimalist aesthetic,
-tech-blue color scheme with hints of orange for contrast. Japanese
-design sensibility - uncluttered, elegant. Soft lighting, digital art
-style. --ar 16:9 --style professional --v 6
-```
-
-**スタイル指定**:
-
-- アスペクト比: 16:9
-- スタイル: ミニマル、プロフェッショナル
-- カラー: テックブルー + オレンジアクセント
-- トーン: 共感的、ユーモラス
--->
-
 ## この章で学ぶこと
 
 - AIに大きなタスクを丸投げすると、なぜ70%程度の完成度で止まってしまうのかを理解する
