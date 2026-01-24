@@ -3,7 +3,7 @@
  * EPUB生成スクリプト
  * - Pandocを使用してMarkdownファイルをEPUB形式に変換
  * - メタデータの埋め込み
- * - 目次の自動生成
+ * - 00_toc.mdを目次ページとして使用
  * - カバー画像の設定
  */
 
@@ -85,17 +85,10 @@ function runPandoc(files, hasCoverImage) {
       '--metadata', `author=${bookConfig.metadata.author}`,
       '--metadata', `lang=${bookConfig.metadata.language}`,
       '--metadata', `date=${bookConfig.metadata.date}`,
-      '--toc',
-      '--toc-depth=3',
       '--split-level=1',
       '--css=epub-style.css',
       '--resource-path=.:images:part1_why-ai-fails:part2_context-limit:part3_precision:part4_inference:part5_failures:part6_vscode:part7_new-roles'
     ];
-
-    // Publisher情報を追加
-    if (bookConfig.metadata.publisher) {
-      args.push('--metadata', `publisher=${bookConfig.metadata.publisher}`);
-    }
 
     // ISBN情報を追加（ISBNがある場合のみ）
     if (bookConfig.metadata.isbn && bookConfig.metadata.isbn.trim() !== '') {
@@ -180,7 +173,7 @@ async function main() {
     console.log('✓ Pandocが見つかりました');
     console.log('');
 
-    // 2. EPUB用のファイルリストを取得 (00_toc.md除外)
+    // 2. EPUB用のファイルリストを取得
     const epubFiles = bookConfig.getEpubFiles();
     console.log(`[2/5] ファイルの存在確認... (${epubFiles.length}ファイル)`);
     checkFilesExist(epubFiles);
