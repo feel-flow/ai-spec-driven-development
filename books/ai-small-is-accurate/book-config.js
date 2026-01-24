@@ -6,20 +6,26 @@
 
 module.exports = {
   // ファイル順序
-  // 注: 00_toc.md はEPUB生成時に除外 (Pandocの自動目次生成を使用)
   files: [
     '_metadata.md',
     '00_preface.md',
-    '00_toc.md', // PDF生成では使用、EPUB生成では除外
+    '00_toc.md',
+    'part1_why-ai-fails/_part.md',
     'part1_why-ai-fails/01-1_the-seventy-percent-problem.md',
     'part1_why-ai-fails/01-2_hidden-costs-and-solutions.md',
+    'part2_context-limit/_part.md',
     'part2_context-limit/02-1_lost-in-the-middle.md',
     'part2_context-limit/02-2_lost-at-the-beginning.md',
+    'part3_precision/_part.md',
     'part3_precision/03-1_scope-convergence.md',
     'part3_precision/03-2_two-stage-ai.md',
+    'part4_inference/_part.md',
     'part4_inference/04-1_leave-room-for-thinking.md',
+    'part5_failures/_part.md',
     'part5_failures/05-1_before-after-patterns.md',
+    'part6_vscode/_part.md',
     'part6_vscode/06-1_practical-tips.md',
+    'part7_new-roles/_part.md',
     'part7_new-roles/07-1_human-as-divider.md',
     '99_afterword.md'
   ],
@@ -41,10 +47,9 @@ module.exports = {
   /**
    * EPUB用のファイルリストを取得
    * @returns {string[]} _metadata.md と 00_toc.md を除外したファイルリスト
+   * 注: 00_toc.md は Pandoc の --toc オプションで自動生成されるため除外
    */
   getEpubFiles() {
-    return this.files.filter(file =>
-      file !== '00_toc.md' && file !== '_metadata.md'
-    );
+    return this.files.filter(file => file !== '_metadata.md' && file !== '00_toc.md');
   }
 };
