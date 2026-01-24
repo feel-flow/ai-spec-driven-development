@@ -13,6 +13,7 @@ module.exports = {
     'part1_why-ai-fails/01_the-seventy-percent-problem.md',
     'part1_why-ai-fails/01b_hidden-costs-and-solutions.md',
     'part2_context-limit/02_lost-in-the-middle.md',
+    'part2_context-limit/02b_lost-at-the-beginning.md',
     'part3_precision/03_scope-convergence.md',
     'part3_precision/04_two-stage-ai.md',
     'part4_inference/05_leave-room-for-thinking.md',

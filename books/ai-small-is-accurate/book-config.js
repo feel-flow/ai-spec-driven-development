@@ -26,8 +26,8 @@ module.exports = {
 
   // メタデータ
   metadata: {
-    title: 'なぜAIは期待通りに動かないのか',
-    subtitle: '小さく、でも余白を残して',
+    title: 'なぜあの人のAIは優秀なのか',
+    subtitle: '「分割と余白」で変わるAIと協働術',
     author: 'Futoshi Okazaki',
     language: 'ja',
     version: '0.1.0',
