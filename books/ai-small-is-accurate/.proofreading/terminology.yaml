@@ -7,16 +7,16 @@ version: "1.0"
 generated_at: "2026-01-21T00:00:00Z"
 source_files:
   - books/ai-small-is-accurate/00_preface.md
-  - books/ai-small-is-accurate/part1_why-ai-fails/01_the-seventy-percent-problem.md
-  - books/ai-small-is-accurate/part1_why-ai-fails/01b_hidden-costs-and-solutions.md
-  - books/ai-small-is-accurate/part2_context-limit/02_lost-in-the-middle.md
-  - books/ai-small-is-accurate/part2_context-limit/02b_lost-at-the-beginning.md
-  - books/ai-small-is-accurate/part3_precision/03_scope-convergence.md
-  - books/ai-small-is-accurate/part3_precision/04_two-stage-ai.md
-  - books/ai-small-is-accurate/part4_inference/05_leave-room-for-thinking.md
-  - books/ai-small-is-accurate/part5_failures/06_before-after-patterns.md
-  - books/ai-small-is-accurate/part6_vscode/07_practical-tips.md
-  - books/ai-small-is-accurate/part7_new-roles/08_human-as-divider.md
+  - books/ai-small-is-accurate/part1_why-ai-fails/01-1_the-seventy-percent-problem.md
+  - books/ai-small-is-accurate/part1_why-ai-fails/01-2_hidden-costs-and-solutions.md
+  - books/ai-small-is-accurate/part2_context-limit/02-1_lost-in-the-middle.md
+  - books/ai-small-is-accurate/part2_context-limit/02-2_lost-at-the-beginning.md
+  - books/ai-small-is-accurate/part3_precision/03-1_scope-convergence.md
+  - books/ai-small-is-accurate/part3_precision/03-2_two-stage-ai.md
+  - books/ai-small-is-accurate/part4_inference/04-1_leave-room-for-thinking.md
+  - books/ai-small-is-accurate/part5_failures/05-1_before-after-patterns.md
+  - books/ai-small-is-accurate/part6_vscode/06-1_practical-tips.md
+  - books/ai-small-is-accurate/part7_new-roles/07-1_human-as-divider.md
   - books/ai-small-is-accurate/99_afterword.md
 
 # ===================================
@@ -28,7 +28,7 @@ core_concepts:
       - "70%の完成度"
       - "七割問題"
     frequency: 25
-    first_appearance: "part1_why-ai-fails/01_the-seventy-percent-problem.md:1"
+    first_appearance: "part1_why-ai-fails/01-1_the-seventy-percent-problem.md:1"
     description: "AIに大きなタスクを丸投げすると、約70%の完成度で止まってしまう現象"
 
   - standard: "Lost in the Middle"
@@ -37,8 +37,8 @@ core_concepts:
       - "ロスト・イン・ザ・ミドル"
       - "中間忘却"
     frequency: 8
-    first_appearance: "part1_why-ai-fails/01_the-seventy-percent-problem.md:230"
-    main_chapter: "part2_context-limit/02_lost-in-the-middle.md"
+    first_appearance: "part1_why-ai-fails/01-1_the-seventy-percent-problem.md:230"
+    main_chapter: "part2_context-limit/02-1_lost-in-the-middle.md"
     description: "即答型AIが長い入力の中間部分を忘れやすい問題（Stanford 2023論文）"
     reference: "arXiv:2307.03172"
 
@@ -48,8 +48,8 @@ core_concepts:
       - "ロスト・アット・ザ・ビギニング"
       - "最初依存"
     frequency: 5
-    first_appearance: "part2_context-limit/02b_lost-at-the-beginning.md:1"
-    main_chapter: "part2_context-limit/02b_lost-at-the-beginning.md"
+    first_appearance: "part2_context-limit/02-2_lost-at-the-beginning.md:1"
+    main_chapter: "part2_context-limit/02-2_lost-at-the-beginning.md"
     description: "熟考型AI（推論モデル）が最初の推論ステップに引きずられやすい問題（2025年論文）"
     reference: "arXiv:2506.22058"
 
@@ -58,7 +58,7 @@ core_concepts:
       - "非推論モデル"
       - "即答型"
     frequency: 3
-    first_appearance: "part2_context-limit/02b_lost-at-the-beginning.md:20"
+    first_appearance: "part2_context-limit/02-2_lost-at-the-beginning.md:20"
     description: "質問を受けたらすぐに回答するタイプのAI（GPT-4、Claude通常モードなど）"
 
   - standard: "熟考型AI"
@@ -66,14 +66,14 @@ core_concepts:
       - "推論モデル"
       - "熟考型"
     frequency: 3
-    first_appearance: "part2_context-limit/02b_lost-at-the-beginning.md:20"
+    first_appearance: "part2_context-limit/02-2_lost-at-the-beginning.md:20"
     description: "回答前に「考える時間」を取るタイプのAI（o1、o3、Claude Extended Thinking、DeepSeek-R1など）"
 
   - standard: "コンテキスト縮小戦略"
     variants:
       - "Context Reduction Strategy"
     frequency: 5
-    first_appearance: "part1_why-ai-fails/01_the-seventy-percent-problem.md:681"
+    first_appearance: "part1_why-ai-fails/01-1_the-seventy-percent-problem.md:681"
     description: "大きなお願いを小さく分けてAIに渡す戦略"
 
   - standard: "スコープ収束パターン"
@@ -81,7 +81,7 @@ core_concepts:
       - "Scope Convergence Pattern"
     frequency: 35
     first_appearance: "00_preface.md:106"
-    main_chapter: "part3_precision/03_scope-convergence.md"
+    main_chapter: "part3_precision/03-1_scope-convergence.md"
     description: "大きなゴールを小さなマイルストーンに分解し、70%→90%→98%と段階的に収束させるパターン"
     rules:
       - "一度に1つだけ求める"
@@ -94,7 +94,7 @@ core_concepts:
       - "Two-Stage AI"
     frequency: 30
     first_appearance: "00_preface.md:72"
-    main_chapter: "part3_precision/04_two-stage-ai.md"
+    main_chapter: "part3_precision/03-2_two-stage-ai.md"
     description: "AIに直接結果を出させるのではなく、検証ツール（チェックリスト/テストコード/評価基準）を作らせ、人間が検証する手法"
     patterns:
       - "チェックリスト生成パターン"
@@ -106,7 +106,7 @@ core_concepts:
       - "Precision Mode"
     frequency: 15
     first_appearance: "00_preface.md:82"
-    main_chapter: "part4_inference/05_leave-room-for-thinking.md"
+    main_chapter: "part4_inference/04-1_leave-room-for-thinking.md"
     description: "明確で具体的な指示でAIに実行させるモード"
     characteristics:
       - "詳細な指示を与える"
@@ -119,7 +119,7 @@ core_concepts:
       - "Inference Mode"
     frequency: 15
     first_appearance: "00_preface.md:88"
-    main_chapter: "part4_inference/05_leave-room-for-thinking.md"
+    main_chapter: "part4_inference/04-1_leave-room-for-thinking.md"
     description: "余白を残した指示でAIに考えさせるモード"
     characteristics:
       - "曖昧さを残す"
@@ -132,7 +132,7 @@ core_concepts:
       - "ブレインストーミング"
       - "アイデア出し"
     frequency: 10
-    first_appearance: "part4_inference/05_leave-room-for-thinking.md:350"
+    first_appearance: "part4_inference/04-1_leave-room-for-thinking.md:350"
     description: "AIを思考パートナーとして活用し、アイデアを発展させる対話手法"
 
   - standard: "ファイル分割"
@@ -140,8 +140,8 @@ core_concepts:
       - "ファイルの分割"
       - "分割"
     frequency: 20
-    first_appearance: "part6_vscode/07_practical-tips.md:1"
-    main_chapter: "part6_vscode/07_practical-tips.md"
+    first_appearance: "part6_vscode/06-1_practical-tips.md:1"
+    main_chapter: "part6_vscode/06-1_practical-tips.md"
     description: "AIのコンテキストを設計するために、コードや文書を適切なサイズのファイルに分ける技術"
     guidelines:
       - "1ファイル500行以下を目安"
@@ -153,7 +153,7 @@ core_concepts:
       - "Single Responsibility Principle"
       - "SRP"
     frequency: 3
-    first_appearance: "part6_vscode/07_practical-tips.md:90"
+    first_appearance: "part6_vscode/06-1_practical-tips.md:90"
     description: "1つのファイルやモジュールは1つの責務だけを持つべきという設計原則"
 
 # ===================================
@@ -232,7 +232,7 @@ product_names:
     frequency: 10
     case_sensitive: true
     official_url: "https://claude.ai/code"
-    main_chapter: "part6_vscode/07_practical-tips.md"
+    main_chapter: "part6_vscode/06-1_practical-tips.md"
 
   - standard: "GitHub Copilot"
     variants:

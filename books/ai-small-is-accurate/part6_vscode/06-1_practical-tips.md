@@ -1,4 +1,4 @@
-# 第7章　ファイル分割の技術──AIが見える範囲を設計する
+# 第6-1章　ファイル分割の技術──AIが見える範囲を設計する
 
 ## この章で学ぶこと
 
@@ -17,7 +17,7 @@
 
 答えは**ファイル分割**です。
 
-AIツールにとって、「見える範囲」とはファイルです。1つの大きなファイルに全てを詰め込めば、AIは大量のコンテキストを処理しなければなりません。第2章・第2b章で学んだAIの弱点（中間忘却・最初の推論依存）が発生し、精度が下がってしまいます。
+AIツールにとって、「見える範囲」とはファイルです。1つの大きなファイルに全てを詰め込めば、AIは大量のコンテキストを処理しなければなりません。第2-1章・第2-2章で学んだAIの弱点（中間忘却・最初の推論依存）が発生し、精度が下がってしまいます。
 
 逆に、適切なサイズにファイルを分割すれば、AIは必要な情報だけを見て、正確に作業できます。
 
@@ -502,7 +502,7 @@ core_concepts:
 
 ### 校正プロセス
 
-本書の校正は、二段階AI活用パターン（第4章）を実践しています。
+本書の校正は、二段階AI活用パターン（第3-2章）を実践しています。
 
 ```markdown
 【第一段階：AIにチェックリストを作らせる】
@@ -535,26 +535,27 @@ books/ai-small-is-accurate/
 ├── 00_toc.md                     (目次: 〜100行)
 ├── 00_preface.md                 (まえがき: 〜200行)
 ├── part1_why-ai-fails/
-│   ├── 01_the-seventy-percent-problem.md (〜800行)
-│   └── 01b_hidden-costs-and-solutions.md (〜500行)
+│   ├── 01-1_the-seventy-percent-problem.md (〜800行)
+│   └── 01-2_hidden-costs-and-solutions.md  (〜500行)
 ├── part2_context-limit/
-│   └── 02_lost-in-the-middle.md  (〜700行)
+│   ├── 02-1_lost-in-the-middle.md   (〜700行)
+│   └── 02-2_lost-at-the-beginning.md (〜450行)
 ├── part3_precision/
-│   ├── 03_scope-convergence.md   (〜750行)
-│   └── 04_two-stage-ai.md        (〜700行)
+│   ├── 03-1_scope-convergence.md    (〜750行)
+│   └── 03-2_two-stage-ai.md         (〜700行)
 ├── part4_inference/
-│   └── 05_leave-room-for-thinking.md (〜650行)
+│   └── 04-1_leave-room-for-thinking.md (〜650行)
 ├── part5_failures/
-│   └── 06_before-after-patterns.md (〜750行)
+│   └── 05-1_before-after-patterns.md (〜750行)
 ├── part6_vscode/
-│   └── 07_practical-tips.md      (この章: 〜750行)
+│   └── 06-1_practical-tips.md       (この章: 〜750行)
 └── part7_new-roles/
-    └── 08_human-as-divider.md    (〜500行)
+    └── 07-1_human-as-divider.md     (〜500行)
 ```
 
 **分割のポイント**：
 - 各章は500〜800行に収める
-- 長くなった第1章は01と01bに分割
+- 長くなった第1章は01-1と01-2に分割
 - 部（Part）ごとにディレクトリを分ける
 - AIに「この章を校正して」と渡しやすいサイズ
 
@@ -651,4 +652,4 @@ books/ai-small-is-accurate/
 
 これまで学んできた「コンテキスト縮小戦略」は、単なるテクニックではありません。AIと人間がどう協働するかという、**新しい働き方**への入り口なのです。
 
-→ 第8章「人間の仕事は『分けること』になる」へ
+→ 第7-1章「人間の仕事は『分けること』になる」へ
