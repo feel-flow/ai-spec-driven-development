@@ -86,10 +86,9 @@ Gemini CLIの出力をそのまま表示します。必要に応じて以下を�
 ```bash
 # インストール確認
 which gemini
-
-# インストールされていない場合（例）
-npm install -g @google/gemini-cli
 ```
+
+インストールされていない場合は、[Gemini CLI公式リポジトリ](https://github.com/google-gemini/gemini-cli)を参照してください。
 
 ### 認証エラー
 

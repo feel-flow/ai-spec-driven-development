@@ -64,10 +64,9 @@ Codex CLIの出力をそのまま表示します。必要に応じて以下を�
 ```bash
 # インストール確認
 which codex
-
-# インストールされていない場合
-npm install -g @openai/codex
 ```
+
+インストールされていない場合は、[OpenAI Codex CLI公式リポジトリ](https://github.com/openai/codex)を参照してください。
 
 ### 認証エラー
 
