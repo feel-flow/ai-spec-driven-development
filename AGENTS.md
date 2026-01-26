@@ -181,14 +181,42 @@ MASTER.mdには以下の重要な情報が含まれています：
 
 ### GitHub Copilot
 
-**設定ファイル**: `.github/copilot-instructions.md` または `AGENTS.md`
+**設定ファイル**: `.github/copilot-instructions.md` または `AGENTS.md`  
+**校正スキル**: `.github/copilot/skills/*.md`
 
 **必須手順**:
 1. リポジトリのルートに `AGENTS.md` を配置
 2. コード補完前にMASTER.mdの内容を確認
 3. コメントでMASTER.mdの参照を明記
 
-**コメント例**:
+**校正スキル（Book Writing Workflow 用）**:
+
+スコープを分割した 5 つの校正スキルを `.github/copilot/skills` に配置：
+
+| スキル | 対象 | 説明 |
+|--------|------|------|
+| [`proofread-japanese.md`](.github/copilot/skills/proofread-japanese.md) | 日本語表現 | 誤字脱字、文法、読みやすさ |
+| [`proofread-terms.md`](.github/copilot/skills/proofread-terms.md) | 用語統一 | 表記揺れ、用語の一貫性 |
+| [`proofread-facts.md`](.github/copilot/skills/proofread-facts.md) | ファクトチェック | 統計データ、出典、技術的正確性 |
+| [`proofread-structure.md`](.github/copilot/skills/proofread-structure.md) | 文書構造 | 見出しレベル、必須セクション |
+| [`proofread-markdown.md`](.github/copilot/skills/proofread-markdown.md) | Markdown 記法 | リスト、強調、コードブロック、テーブル |
+
+**スキル実行方法**:
+
+PR コメントで自動実行（PR 作成時）：
+```
+PR #XXX が作成されると、5 つのスキルが自動実行され、
+各スキルが独立した PR コメントを投稿
+```
+
+または手動実行：
+```markdown
+@github-copilot /proofread-japanese
+@github-copilot /proofread-terms
+@github-copilot /proofread-facts
+```
+
+**コメント例（コード補完時）**:
 ```typescript
 // MASTER.md参照: TypeScript、型安全性必須、マジックナンバー禁止
 // Phase 1 MVP機能: ユーザー認証システム
@@ -198,6 +226,8 @@ interface User {
   email: string;
 }
 ```
+
+**詳細**: [`.github/copilot/skills/README.md`](.github/copilot/skills/README.md) を参照
 
 ### Cursor
 
@@ -366,7 +396,182 @@ Always reference MASTER.md for project-specific requirements.
 
 ---
 
-## 📝 校正レビュー指示（Proofread Review Instructions）
+## � Book Writing Git Workflow
+
+本の執筆タスクは、以下のGit Workflowに従って作業を行うこと。
+
+### Workflow Overview
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│  1. Issue作成 → 2. ブランチ作成 → 3. プラン作成                   │
+│       ↓                                                          │
+│  4. 実装 → 5. 自己レビュー → 6. PR作成                           │
+│       ↓                                                          │
+│  7. レビュー（/proofread自動実行）                                │
+│       ↓                                                          │
+│  8. 指摘対応 → 9. 再レビュー（ループ）                            │
+│       ↓                                                          │
+│  10. マージ可能 → ユーザー確認 → 11. マージ → 12. クリーンナップ   │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+### Step-by-Step Process
+
+#### 1. Issue作成
+- タスクの内容を明確にしたIssueをGitHubに作成
+- 適切なラベルを付与
+
+#### 2. ブランチ作成
+- Issue番号を含むブランチ名で作成
+- 命名規則: `feature/#<issue番号>-<簡潔な説明>`
+- 例: `feature/#42-add-chapter3-section`
+
+#### 3. プラン作成
+- 複雑なタスクの場合は `EnterPlanMode` でプランを作成
+- ユーザー承認を得てから実装開始
+
+#### 4. 実装
+- 執筆・編集作業を実施
+- 小さな単位でコミット
+
+#### 5. 自己レビュー（Pre-commit）
+- コミット前に内容を確認
+- 明らかなミスを修正
+
+#### 6. PR作成
+- `/commit-push-pr` または個別コマンドでPR作成
+- **※ PR作成後、hookにより自動的に校正レビューが促される**
+
+#### 7. レビュー（文章校正）
+- `/proofread` スキルを実行
+- 日本語・構造・用語・Markdown・ファクトチェックを実施
+
+#### 8. 指摘対応
+- レビュー結果に基づき修正を実施
+- 対応可能な指摘はすべて対応
+
+#### 9. 再レビュー
+- 修正完了後、再度 `/proofread` を実行
+- 問題がなくなるまで 8-9 を繰り返す
+
+#### 10. マージ確認
+- すべての指摘に対応完了後、**必ずユーザーに確認を取る**
+- 「マージしてよろしいですか？」と確認
+
+#### 11. マージ
+- ユーザー承認後にPRをマージ
+
+#### 12. クリーンナップ
+- `/clean_gone` でマージ済みブランチを削除
+- developブランチに戻る
+
+### Available Commands
+
+| ステップ | 使用するスキル/コマンド |
+|---------|----------------------|
+| コミット | `/commit` |
+| コミット→PR一括 | `/commit-push-pr` |
+| 文章校正（総合） | `/proofread` |
+| 構造チェック | `/proofread-structure` |
+| ファクトチェック | `/proofread-facts` |
+| 用語抽出 | `/extract-terms` |
+| ブランチクリーンナップ | `/clean_gone` |
+
+### Important Rules
+
+1. **PRマージ前には必ずユーザー確認を取ること**
+2. **レビュー指摘は可能な限りすべて対応すること**
+3. **ブランチはマージ後に必ずクリーンナップすること**
+4. **大きな変更は複数のPRに分割すること**
+
+---
+
+## 🎨 書籍「ai-small-is-accurate」挿絵ルール
+
+### キャラクター使用ルール
+
+本書籍の挿絵・図解には、以下の2キャラクターを使用すること。
+
+**公式キャラクターデザイン**: `books/ai-small-is-accurate/images/characters.png` を参照
+
+#### AI侍（あいさむらい）
+- **役割**: 知識を授ける師匠キャラ
+- **外見**:
+  - ひげを生やした中年男性
+  - グレー/ダークグレーの着物
+  - 腰に刀を差している
+  - 自信満々でニッコリした笑顔
+  - ちびキャラ（2〜3頭身）スタイル
+- **セリフ調**: 「〜である」「〜なのだ」「わしは〜」など武士言葉
+
+#### DJ町娘（でぃーじぇーまちむすめ）
+- **役割**: 読者代理、学ぶ側のキャラ
+- **外見**:
+  - 若い女性
+  - オレンジ/金色の着物（花柄）
+  - 白いヘッドフォン着用
+  - かわいらしい笑顔、明るい表情
+  - ちびキャラ（2〜3頭身）スタイル
+- **セリフ調**: 「〜ですか？」「なるほど！」「〜ですね✨」など明るく素直
+
+### 挿絵作成ガイドライン
+
+#### キャラクター付き挿絵（シーン・比喩の説明）
+1. **比喩やシーンの説明**: AI侍とDJ町娘を登場させる
+2. **概念説明**: AI侍が解説、DJ町娘が質問や驚きのリアクション
+3. **スタイル**: 公式デザインに準拠したちびキャラスタイル
+4. **配色**: テックブルー背景 ＋ キャラクターの暖色
+
+#### 図解・チャート（データ・グラフ）
+1. **キャラクターは使わない**: シンプルなインフォグラフィック
+2. **棒グラフ、折れ線、フローチャート等**: クリーンでプロフェッショナルなスタイル
+3. **配色**: グリーン→ブルー→イエロー→オレンジ（良→悪のグラデーション）
+4. **日本語ラベル**: タイトル、軸、注釈は日本語で
+
+### 画像生成プロンプトの例
+
+```text
+Educational illustration with two chibi-style Japanese characters.
+
+AI侍: Bearded middle-aged samurai in dark gray kimono with katana at waist,
+confident smile, 2-3 head proportion chibi style.
+
+DJ町娘: Young girl in orange/gold floral kimono with white headphones,
+cheerful expression, 2-3 head proportion chibi style.
+
+[場面の説明]
+
+Style: Cute chibi anime style matching the reference design,
+tech-blue background, warm character colors.
+```
+
+### 重要
+
+**画像生成時は必ず以下の手順を踏むこと：**
+
+1. **参照画像を渡して生成**: `books/ai-small-is-accurate/images/characters.png` をGemini APIに参照画像として渡す
+2. **本文への差し込み**: 生成後、Markdownファイルに `![alt](./画像名.png)` で画像参照を追加
+3. **コメントのプロンプトは削除**: 画像生成用コメント（`<!-- -->`）は実際の画像に置き換える
+
+### 画像生成コード例
+
+```python
+import google.generativeai as genai
+
+# 公式キャラクター画像を参照として渡す
+character_image = genai.upload_file("books/ai-small-is-accurate/images/characters.png")
+
+prompt = """Using the exact character designs from the reference image, create...
+[場面の説明]
+"""
+
+response = model.generate_content([prompt, character_image])
+```
+
+---
+
+## �📝 校正レビュー指示（Proofread Review Instructions）
 
 本プロジェクトの書籍（日本語技術書）をレビューする際は、以下の観点でチェックしてください。
 
