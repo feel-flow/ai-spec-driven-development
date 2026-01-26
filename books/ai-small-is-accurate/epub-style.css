@@ -279,3 +279,31 @@ section.footnotes li {
     border-top-color: #555;
   }
 }
+
+/* コラムボックス */
+.column-box {
+  background-color: #f0f4f8;
+  padding: 20px;
+  border-radius: 8px;
+  border-left: 4px solid #1E3A5F;
+  margin: 20px 0;
+  page-break-inside: avoid;
+  break-inside: avoid;
+}
+
+.column-box h2 {
+  margin-top: 0;
+  color: #1E3A5F;
+}
+
+/* ダークモード対応 */
+@media (prefers-color-scheme: dark) {
+  .column-box {
+    background-color: #1a2332;
+    border-left-color: #5a8fc4;
+  }
+  
+  .column-box h2 {
+    color: #5a8fc4;
+  }
+}
