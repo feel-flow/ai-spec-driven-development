@@ -529,6 +529,4 @@ SaaS（Software as a Service）プロダクトに新しいユーザー管理機�
 
 ---
 
----
-
 [^1]: Liu, Nelson F., et al. "Lost in the Middle: How Language Models Use Long Contexts." arXiv:2307.03172, 2023. [arXiv](https://arxiv.org/abs/2307.03172)
