@@ -89,7 +89,13 @@ function runPandoc(files, hasCoverImage) {
       '--toc',
       '--toc-depth=2',
       '--css=epub-style.css',
-      '--resource-path=.:images:part1_why-ai-fails:part2_context-limit:part3_precision:part4_inference:part5_failures:part6_vscode:part7_new-roles'
+      '--resource-path=.:images:' +
+        'part1_why-ai-fails:part1_why-ai-fails/images:' +
+        'part2_context-limit:part2_context-limit/images:' +
+        'part3_precision:part3_precision/images:' +
+        'part4_inference:part4_inference/images:' +
+        'part5_vscode:part5_vscode/images:' +
+        'part6_new-roles:part6_new-roles/images'
     ];
 
     // ISBN情報を追加（ISBNがある場合のみ）

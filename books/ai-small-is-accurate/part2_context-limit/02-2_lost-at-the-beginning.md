@@ -1,4 +1,4 @@
-# 第2-2章　Lost at the Beginning──最初で迷子になるAI
+# 2-2　Lost at the Beginning──最初で迷子になるAI
 
 ## 2種類のAI：即答型と熟考型
 
@@ -267,7 +267,7 @@ After:  小さな問題 × 3回 → 短い思考 → 各回で修正可能
 
 「Why」を伝えると、AIは最初の推論を**正しい方向**に開始しやすくなります。
 
-詳しくは[第4-1章「余白を残す──推論を引き出す」](../part4_inference/04-1_leave-room-for-thinking.md)で解説します。
+詳しくは[4-1「余白を残す──推論を引き出す」](../part4_inference/04-1_leave-room-for-thinking.md)で解説します。
 
 ---
 
