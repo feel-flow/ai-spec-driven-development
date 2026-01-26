@@ -112,17 +112,7 @@ PR コメントで以下のように指示：
 | facts | 事実 | 小（ファクトのみ） | PR 作成時 |
 | structure | 構造 | 小（セクション要件のみ） | PR 作成時 |
 | markdown | 記法 | 小（Markdown のみ） | PR 作成時 |
-| generate-illustration | 画像 | 小（コード生成のみ） | 随時（手動）
-## 📊 スキル分類表
-
-| スキル | 対象 | スコープ粒度 | 実行タイミング |
-|--------|------|-------------|--------------|
-| japanese | 日本語 | 小（表現のみ） | PR 作成時 |
-| terms | 用語 | 小（統一のみ） | PR 作成時 |
-| generate-illustration | generate-illustration | 同じ粒度 |
-| facts | 事実 | 小（ファクトのみ） | PR 作成時 |
-| structure | 構造 | 小（セクション要件のみ） | PR 作成時 |
-| markdown | 記法 | 小（Markdown のみ） | PR 作成時 |
+| generate-illustration | 画像 | 小（コード生成のみ） | 随時（手動） |
 
 ---
 
