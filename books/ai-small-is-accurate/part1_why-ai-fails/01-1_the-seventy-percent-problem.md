@@ -513,6 +513,8 @@ SaaS（Software as a Service）プロダクトに新しいユーザー管理機�
 
 ---
 
+<div class="column-box">
+
 ## 📌 コラム：プロンプトは映画だ！
 
 ![映画構成とAI](./images/column_01-1_movie.png)
@@ -537,5 +539,9 @@ SaaS（Software as a Service）プロダクトに新しいユーザー管理機�
 **DJ町娘**：「AIも人間と同じ記憶パターンなんですね！」
 
 **AI侍**：「さよう。だから**プロンプトは映画のように構成せよ**。これが70%を超える秘訣じゃ🎭」
+
+</div>
+
+---
 
 [^1]: Liu, Nelson F., et al. "Lost in the Middle: How Language Models Use Long Contexts." arXiv:2307.03172, 2023. [arXiv](https://arxiv.org/abs/2307.03172)
