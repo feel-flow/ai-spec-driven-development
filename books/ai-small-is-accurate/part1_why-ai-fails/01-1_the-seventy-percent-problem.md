@@ -513,37 +513,6 @@ SaaS（Software as a Service）プロダクトに新しいユーザー管理機�
 
 ---
 
-## 📌 コラム
-
-<!-- 
-画像生成プロンプト（2コマ漫画）:
-
-Create a 2-panel manga-style educational illustration with chibi characters.
-
-Reference: books/ai-small-is-accurate/images/characters.png
-- AI Samurai: Bearded middle-aged man, dark gray kimono, katana
-- DJ Machimusume: Young girl, orange/gold kimono, white headphones
-
-Panel 1 (Left): "70% Problem"
-- DJ Machimusume looking frustrated at laptop
-- Large "70%" text in red
-- Simple speech bubble: "なんか微妙…"
-- Minimal background
-
-Panel 2 (Right): "Lost in the Middle"
-- Simple illustration: flashlight beam in dark room
-- Center is blurred, edges are clear
-- AI Samurai (small figure) pointing: "中間が見えない"
-- Clean, minimal infographic style
-
-Style:
-- Cute chibi anime (2-3 heads tall)
-- Tech-blue background (#1E3A5F)
-- Clear panel border
-- 2:1 aspect ratio
-- Minimal elements, focus on clarity
--->
-
 ## 📌 コラム：プロンプトは映画だ！
 
 ![映画構成とAI](./images/column_01-1_movie.png)
@@ -568,7 +537,5 @@ Style:
 **DJ町娘**：「AIも人間と同じ記憶パターンなんですね！」
 
 **AI侍**：「さよう。だから**プロンプトは映画のように構成せよ**。これが70%を超える秘訣じゃ🎭」
-
----
 
 [^1]: Liu, Nelson F., et al. "Lost in the Middle: How Language Models Use Long Contexts." arXiv:2307.03172, 2023. [arXiv](https://arxiv.org/abs/2307.03172)
