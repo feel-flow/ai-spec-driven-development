@@ -17,9 +17,9 @@ module.exports = {
     'part3_precision/03-1_scope-convergence.md',
     'part3_precision/03-2_two-stage-ai.md',
     'part4_inference/04-1_leave-room-for-thinking.md',
-    'part5_failures/05-1_before-after-patterns.md',
-    'part6_vscode/06-1_practical-tips.md',
-    'part7_new-roles/07-1_human-as-divider.md',
+    'part5_vscode/05-1_practical-tips.md',
+    'part6_new-roles/06-1_human-as-divider.md',
+    'appendix_quick-reference.md',
     '99_afterword.md'
   ],
   output: [
