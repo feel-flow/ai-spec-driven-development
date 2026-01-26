@@ -513,19 +513,38 @@ SaaS（Software as a Service）プロダクトに新しいユーザー管理機�
 
 ---
 
-## 📌 この章のまとめ（AI侍 & DJ町娘コラム）
+## 📌 コラム
 
-【DJ町娘】「この章のポイント、3つですね🎧」
+<!-- 
+画像生成プロンプト（2コマ漫画）:
 
-1. **「全部やって」は最悪のお願い** - AIに大きなタスクを丸投げすると、汎用化・表面化・推測増加で70%止まり
-2. **Lost in the Middle問題** - 長い入力の中間部分を忘れる（もう1つの弱点は第2-2章で！）
-3. **隠れたコスト** - AI生成30分 + 手直し2時間 = 最初から手動より遅い
+Create a 2-panel manga-style educational illustration with chibi characters.
 
-【AI侍】「その通り。そして次章では、この70%問題が引き起こす**4つの隠れたコスト**（時間・認知・機会・チーム）と、解決策の糸口**『コンテキスト縮小戦略』**を掘り下げる」
+Reference: books/ai-small-is-accurate/images/characters.png
+- AI Samurai: Bearded middle-aged man, dark gray kimono, katana
+- DJ Machimusume: Young girl, orange/gold kimono, white headphones
 
-【DJ町娘】「了解です！後編も頑張ります🎧」
+Panel 1 (Left): "70% Problem"
+- DJ Machimusume looking frustrated at laptop
+- Large "70%" text in red
+- Simple speech bubble: "なんか微妙…"
+- Minimal background
 
-→ [第1-2章：隠れたコストと解決策の糸口](01-2_hidden-costs-and-solutions.md)
+Panel 2 (Right): "Lost in the Middle"
+- Simple illustration: flashlight beam in dark room
+- Center is blurred, edges are clear
+- AI Samurai (small figure) pointing: "中間が見えない"
+- Clean, minimal infographic style
+
+Style:
+- Cute chibi anime (2-3 heads tall)
+- Tech-blue background (#1E3A5F)
+- Clear panel border
+- 2:1 aspect ratio
+- Minimal elements, focus on clarity
+-->
+
+![70%問題の2コマ解説](./images/column_01-1_two-panel.png)
 
 ---
 
