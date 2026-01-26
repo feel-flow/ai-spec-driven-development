@@ -54,8 +54,9 @@ import os
 # APIキーの設定（環境変数）
 genai.configure(api_key=os.environ.get('GEMINI_API_KEY'))
 
-# モデル選択（プレビュー版推奨）
-model = genai.GenerativeModel('gemini-1.5-pro')
+# モデル選択（画像生成対応モデル）
+# 注意: Gemini 2.0以降は画像生成非対応。Imagen 3を使用すること
+model = genai.GenerativeModel('imagen-3.0-generate-001')
 
 # 参照画像のパス（リポジトリルートからの相対パス）
 ref_image_path = "books/ai-small-is-accurate/images/characters.png"
