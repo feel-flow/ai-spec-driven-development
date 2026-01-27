@@ -17,7 +17,7 @@
 
 ## パターン選択フローチャート
 
-![AI依頼のためのパターン選択フローチャート](./images/appendix_pattern_selection_flowchart.png)
+![パターン選択フローチャート](./images/appendix_pattern_selection_flowchart.png)
 
 ---
 

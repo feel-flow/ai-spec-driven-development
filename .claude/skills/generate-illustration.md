@@ -2,6 +2,8 @@
 name: generate-illustration
 description: 本書「ai-small-is-accurate」専用のイラスト生成スキル。キャラクター参照画像を自動で渡し、一貫したスタイルの画像を生成する。
 triggers:
+  - "nanobanana"
+  - "/nanobanana"
   - "イラスト生成"
   - "画像を作成"
   - "図解を生成"
@@ -10,11 +12,12 @@ allowed-tools:
   - Bash(python3:*)
 ---
 
-# イラスト生成スキル（/generate-illustration）
+# イラスト生成スキル（/nanobanana）
 
 ## 概要
 
 本書「ai-small-is-accurate」専用のイラスト生成スキルです。
+別名: `/generate-illustration`、`nanobanana`
 キャラクター参照画像（`characters.png`）を自動的にGemini APIに渡し、
 一貫したスタイルのイラストを生成します。
 
