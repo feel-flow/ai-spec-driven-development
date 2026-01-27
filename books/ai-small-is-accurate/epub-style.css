@@ -143,12 +143,30 @@ tr:nth-child(even) {
 }
 
 /* 画像 */
+/* 図（figure）要素 - Pandocが画像を囲む */
+figure {
+  width: 100% !important;
+  max-width: 100% !important;
+  margin: 1.5em 0 !important;   /* 左右の余白を0に */
+  padding: 0 !important;
+  page-break-inside: avoid;
+  break-inside: avoid;
+}
+
+figure figcaption {
+  text-align: center;
+  font-size: 0.85em;
+  color: #666;
+  margin-top: 0.5em;
+}
+
 img {
-  width: 100%;       /* 常に横幅100%で表示 */
-  max-width: 100%;
-  height: auto;
+  width: 100% !important;       /* 常に横幅100%で表示 - Kindle対応 */
+  max-width: 100% !important;
+  height: auto !important;
   display: block;
-  margin: 1.5em auto;
+  margin: 0 !important;         /* 余白はfigureで管理 */
+  padding: 0 !important;
   page-break-inside: avoid;
   break-inside: avoid;
 }
@@ -311,26 +329,40 @@ section.footnotes li {
 .column-box {
   background-color: #f0f4f8;
   padding: 20px;
+  padding-left: 0 !important;   /* 左余白を0に（画像用） */
+  padding-right: 0 !important;  /* 右余白を0に（画像用） */
   border-radius: 8px;
-  border-left: 4px solid #1E3A5F;
+  /* border-left を削除（引用っぽく見えるため） */
   margin: 20px 0;
   page-break-inside: avoid;
   break-inside: avoid;
 }
 
-.column-box h2 {
+.column-box h2,
+.column-box h3 {
   margin-top: 0;
+  padding: 0 20px;  /* 見出しには左右パディング */
   color: #1E3A5F;
+}
+
+.column-box p {
+  padding: 0 20px;  /* 本文には左右パディング */
+}
+
+.column-box img {
+  width: 100% !important;
+  margin: 0 !important;
+  padding: 0 !important;
 }
 
 /* ダークモード対応 */
 @media (prefers-color-scheme: dark) {
   .column-box {
     background-color: #1a2332;
-    border-left-color: #5a8fc4;
   }
 
-  .column-box h2 {
+  .column-box h2,
+  .column-box h3 {
     color: #5a8fc4;
   }
 }

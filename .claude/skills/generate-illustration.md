@@ -6,6 +6,8 @@ triggers:
   - "画像を作成"
   - "図解を生成"
   - "/generate-illustration"
+allowed-tools:
+  - Bash(python3:*)
 ---
 
 # イラスト生成スキル（/generate-illustration）
@@ -15,6 +17,21 @@ triggers:
 本書「ai-small-is-accurate」専用のイラスト生成スキルです。
 キャラクター参照画像（`characters.png`）を自動的にGemini APIに渡し、
 一貫したスタイルのイラストを生成します。
+
+## 実行コマンド
+
+```bash
+# キャラクター付きイラスト（参照画像を自動で渡す）
+python3 .claude/scripts/generate_illustration.py character "<プロンプト>" -o <出力パス>
+
+# 図解・インフォグラフィック（参照画像なし）
+python3 .claude/scripts/generate_illustration.py diagram "<プロンプト>" -o <出力パス>
+```
+
+## 依存関係
+
+- `google-genai` パッケージ
+- 環境変数 `GEMINI_API_KEY`
 
 ## キャラクター
 
@@ -127,7 +144,7 @@ triggers:
 ### キャラクター付きイラスト
 
 ```python
-import google.generativeai as genai
+from google import genai
 import os
 
 genai.configure(api_key=os.environ.get('GEMINI_API_KEY'))
@@ -163,7 +180,7 @@ if hasattr(response, 'candidates') and response.candidates:
 ### 図解
 
 ```python
-import google.generativeai as genai
+from google import genai
 import os
 
 genai.configure(api_key=os.environ.get('GEMINI_API_KEY'))
