@@ -128,15 +128,24 @@ AIは「従う」ことに集中し、
 
 ### 余白を残す表現パターン
 
-```text
-【余白を残す表現】
+**【余白を残す表現】**
 
-❌ 細かすぎ:
+<div class="comparison-box">
+<div class="comparison-before">
+
+**細かすぎ**
+
 「青色のボタンを、角丸8pxで、フォントサイズ16pxで作って」
 
-✅ 余白あり:
+</div>
+<div class="comparison-after">
+
+**余白あり**
+
 「CTAボタンを作りたいんだけど、どんなデザインがいいかな？」
-```
+
+</div>
+</div>
 
 ```text
 【より具体的なパターン】
@@ -275,34 +284,55 @@ AI: 「レート制限の設計について、いくつか提案します。
 「〜と思うんだけど」を使わなくても、
 Whyを直接伝えることができます。
 
-```text
-【Before: What のみ】
+<div class="comparison-box">
+<div class="comparison-before">
+
+**Before: What のみ**
+
 「キャッシュ機能を追加して」
 
-【After: What + Why】
-「キャッシュ機能を追加して。
- 理由：APIのレスポンスが遅くて、
- ユーザーから苦情が来てるから」
+</div>
+<div class="comparison-after">
+
+**After: What + Why**
+
+「キャッシュ機能を追加して。理由：APIのレスポンスが遅くて、ユーザーから苦情が来てるから」
+
+</div>
+</div>
+
+<div class="comparison-result">
 
 → AIは「ユーザー体験の改善」が目的と理解
 → キャッシュだけでなく、他の高速化案も提案できる
-```
 
-```text
-【コードレビューでのWhy】
+</div>
 
-❌ What のみ:
+**【コードレビューでのWhy】**
+
+<div class="comparison-box">
+<div class="comparison-before">
+
+**What のみ**
+
 「このコードをレビューして」
 
-✅ What + Why:
-「このコードをレビューして。
- 特に気になってるのは、
- エラーハンドリングが適切かどうか。
- 本番で予期せぬエラーが出て困った経験があるから」
+</div>
+<div class="comparison-after">
+
+**What + Why**
+
+「このコードをレビューして。特に気になってるのは、エラーハンドリングが適切かどうか。本番で予期せぬエラーが出て困った経験があるから」
+
+</div>
+</div>
+
+<div class="comparison-result">
 
 → AIは「エラーハンドリング」に重点を置いてレビュー
 → 過去の問題を防ぐ視点でフィードバック
-```
+
+</div>
 
 **ポイント**:
 - 「〜と思う」は、自然にWhyを伝える表現

@@ -1,16 +1,32 @@
 /* EPUB スタイル設定 */
 /* pdf-style.css をベースに EPUB リーダー向けに最適化 */
 
-/* 基本フォント - EPUB リーダーのシステムフォントを尊重 */
+/* ===== 基本フォント設定 ===== */
+/* 本文: Noto Serif JP（明朝体）- 長文の読みやすさ重視 */
 body {
-  font-family: serif;
+  font-family:
+    "Noto Serif JP",              /* 第一候補: Google Noto 明朝 */
+    "Hiragino Mincho ProN",       /* macOS/iOS */
+    "Yu Mincho",                  /* Windows */
+    serif;                        /* 最終フォールバック */
   font-size: 1em;
+  font-weight: 400;
   line-height: 1.8;
   margin: 0;
   padding: 0;
 }
 
-/* 見出し */
+/* ===== 見出し ===== */
+/* 見出し: Noto Sans JP（ゴシック体）- 視認性重視 */
+h1, h2, h3, h4, h5, h6 {
+  font-family:
+    "Noto Sans JP",               /* 第一候補: Google Noto ゴシック */
+    "Hiragino Kaku Gothic ProN",  /* macOS/iOS */
+    "Yu Gothic",                  /* Windows */
+    sans-serif;                   /* 最終フォールバック */
+  font-weight: 700;  /* 見出しは太字 */
+}
+
 h1 {
   font-size: 1.8em;
   margin-top: 2em;
@@ -53,9 +69,14 @@ h4 {
   break-after: avoid;
 }
 
-/* コードブロック - モノスペースフォント */
+/* ===== コードブロック - 等幅フォント ===== */
 pre {
-  font-family: monospace;
+  font-family:
+    "Noto Sans Mono",
+    "Source Code Pro",
+    "Menlo",
+    "Monaco",
+    monospace;
   background-color: #f5f5f5;
   color: #333;
   padding: 0.8em;
@@ -80,7 +101,12 @@ pre code {
 
 /* インラインコード */
 code {
-  font-family: monospace;
+  font-family:
+    "Noto Sans Mono",
+    "Source Code Pro",
+    "Menlo",
+    "Monaco",
+    monospace;
   background-color: #e8e8e8;
   padding: 0.1em 0.3em;
   border-radius: 3px;
@@ -152,9 +178,10 @@ blockquote {
   padding: 1em 1em 1em 1.2em;  /* 上右下左に余白 */
   margin: 1.5em 0;  /* 外側マージンも広げる */
   color: #555;
+  font-size: 0.85em;  /* 本文より小さく - 補足的な内容として表現 */
   /* font-style: italic を削除（日本語は読みにくい） */
   background-color: #fafafa;  /* 薄い背景色で区別 */
-  line-height: 2;  /* 行間を広げる */
+  line-height: 1.8;  /* 小さいフォントに合わせて行間調整 */
   page-break-inside: avoid;
   break-inside: avoid;
 }
@@ -302,8 +329,63 @@ section.footnotes li {
     background-color: #1a2332;
     border-left-color: #5a8fc4;
   }
-  
+
   .column-box h2 {
     color: #5a8fc4;
+  }
+}
+
+/* ===== 比較ボックス（Before/After） ===== */
+.comparison-box {
+  margin: 1.5em 0;
+  page-break-inside: avoid;
+  break-inside: avoid;
+}
+
+.comparison-before {
+  background-color: #fff5f5;
+  border-left: 4px solid #c53030;
+  padding: 1em;
+  margin-bottom: 0.5em;
+}
+
+.comparison-before strong {
+  color: #c53030;
+}
+
+.comparison-after {
+  background-color: #f0fff4;
+  border-left: 4px solid #276749;
+  padding: 1em;
+}
+
+.comparison-after strong {
+  color: #276749;
+}
+
+.comparison-result {
+  margin-top: 0.8em;
+  padding-left: 1em;
+  color: #555;
+}
+
+/* 比較ボックス ダークモード対応 */
+@media (prefers-color-scheme: dark) {
+  .comparison-before {
+    background-color: #2d1f1f;
+    border-left-color: #fc8181;
+  }
+  .comparison-before strong {
+    color: #fc8181;
+  }
+  .comparison-after {
+    background-color: #1f2d1f;
+    border-left-color: #68d391;
+  }
+  .comparison-after strong {
+    color: #68d391;
+  }
+  .comparison-result {
+    color: #aaa;
   }
 }
