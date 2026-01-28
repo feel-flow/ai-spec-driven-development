@@ -569,7 +569,7 @@ GitHub Copilotのカスタムエージェントは**Premium Requests**を消費�
 
 Skills を使うと、新メンバーもベテランと同じ方法でタスクを実行できます。
 
-### 現時点での制限
+### 現時点での制限（2026年1月時点）
 
 - リポジトリ単位での作成のみ（Organization/Enterprise単位は今後対応予定）
 - Copilot有料プラン（Individual/Business/Enterprise）が必要
