@@ -366,3 +366,57 @@ prompt = """Using the exact character designs from the reference image, create..
 
 response = model.generate_content([prompt, character_image])
 ```
+
+---
+
+## 📦 書籍「ai-small-is-accurate」ビルドコマンド
+
+### ディレクトリ構造
+
+```
+books/ai-small-is-accurate/
+├── images/                    # ルート画像（表紙、キャラクター等）
+├── part1_why-ai-fails/
+│   └── images/                # Part1の画像
+├── part2_context-limit/
+│   └── images/                # Part2の画像
+├── ...（各パート同様）
+├── book-config.js             # メタデータ・ファイル順序の定義
+├── build-pdf.js               # Markdown結合＋章番号付与
+├── build-epub.js              # EPUB生成スクリプト
+└── generate-pdf.js            # PDF生成スクリプト（推奨）
+```
+
+### ビルドコマンド
+
+| 出力形式 | コマンド | 説明 |
+|---------|---------|------|
+| EPUB | `node build-epub.js` | Pandocを使用してEPUB3形式で出力 |
+| PDF | `node generate-pdf.js` | Pandoc + weasyprintでPDF出力 |
+
+### 依存ツール
+
+```bash
+# Pandoc（必須）
+brew install pandoc
+
+# weasyprint（PDF生成に必要）
+pip install weasyprint
+```
+
+### PDF生成の技術的な注意点
+
+**画像パスの問題と解決策:**
+
+- 各パートの画像は `partX_xxx/images/` に格納されている
+- Markdownでは `./images/xxx.png` という相対パスで参照
+- **EPUB**: Pandocの`--resource-path`オプションで複数ディレクトリを検索可能
+- **PDF**: weasyprintはHTMLから直接画像を読むため、`--resource-path`が効かない
+
+**`generate-pdf.js` の動作:**
+1. `build-pdf.js`を実行してMarkdownを結合
+2. 各パートの画像を**一時的に**ルートの`images/`にコピー
+3. Pandoc + weasyprintでPDF生成
+4. 一時コピーした画像を**自動クリーンアップ**
+
+これにより、画像のディレクトリ構造を維持しながらPDF生成が可能。
