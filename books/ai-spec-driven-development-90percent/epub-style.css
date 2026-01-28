@@ -183,6 +183,17 @@ em, i {
   font-style: italic;
 }
 
+/* 目次（nav.xhtml）のスタイル */
+nav#toc ol.toc {
+  list-style-type: none;  /* トップレベルの番号を消す */
+  padding-left: 0;
+}
+
+nav#toc ol.toc > li > ol.toc {
+  list-style-type: decimal;  /* サブレベルは番号付き */
+  padding-left: 1.5em;
+}
+
 /* ダークモード対応 (一部EPUBリーダーでサポート) */
 @media (prefers-color-scheme: dark) {
   body {

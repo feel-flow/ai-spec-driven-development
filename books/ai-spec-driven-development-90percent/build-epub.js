@@ -86,7 +86,7 @@ function runPandoc(files, hasCoverImage) {
       '--metadata', `lang=${bookConfig.metadata.language}`,
       '--metadata', `date=${bookConfig.metadata.date}`,
       '--toc',
-      '--toc-depth=3',
+      '--toc-depth=2',
       '--split-level=1',
       '--css=epub-style.css',
       '--resource-path=.:images'
