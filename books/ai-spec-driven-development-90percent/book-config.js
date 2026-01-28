@@ -34,8 +34,8 @@ module.exports = {
 
   // メタデータ
   metadata: {
-    title: 'AIエージェント開発は仕様が9割',
-    subtitle: 'Vibe Codingで失敗しないための設計図',
+    title: 'AI仕様駆動開発',
+    subtitle: 'AIエージェント開発の新常識',
     author: 'Futoshi Okazaki',
     language: 'ja',
     version: '1.2.0',
