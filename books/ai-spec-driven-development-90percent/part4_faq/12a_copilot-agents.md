@@ -547,3 +547,33 @@ GitHub Copilotのカスタムエージェントは**Premium Requests**を消費�
 これを**PRを出す前の儀式**にせよ。習慣化すれば、品質は自然と上がる。
 
 ---
+
+## 参考: GitHub Copilot Skills
+
+2025年12月、GitHubは**Copilot Agent Skills**を発表しました。本章で紹介したAgentsとは別の機能です。
+
+### Agents vs Skills の違い
+
+| 観点 | Agents | Skills |
+|------|--------|--------|
+| 保存場所 | `.github/agents/*.agent.md` | `.github/skills/[skill-name]/SKILLS.md` |
+| 目的 | 「何を見るか」「どう判断するか」を定義 | 「特定タスクをどう実行するか」を定義 |
+| 呼び出し | `@エージェント名` で明示的に呼び出し | 関連するプロンプトで**自動的に**ロード |
+| 比喩 | 専門家（レビュアー、テスター等） | チームのプレイブック・手順書 |
+
+### Skills でできること
+
+- **コードレビュー標準**: チーム固有のレビュー観点を定義
+- **テストパターン**: 「このプロジェクトではこう書く」を明文化
+- **ドキュメント作成**: テンプレートに沿った一貫した記述
+
+Skills を使うと、新メンバーもベテランと同じ方法でタスクを実行できます。
+
+### 現時点での制限（2026年1月時点）
+
+- リポジトリ単位での作成のみ（Organization/Enterprise単位は今後対応予定）
+- Copilot有料プラン（Individual/Business/Enterprise）が必要
+
+詳細は[GitHub公式ドキュメント](https://docs.github.com/en/copilot)を参照してください。
+
+---
