@@ -19,9 +19,9 @@ const bookConfig = require('./book-config');
 
 // === 設定 ===
 const CONFIG = {
-  // 判型（トリムサイズ）- 5.5 x 8.5 インチ
-  trimWidth: 5.5,      // インチ
-  trimHeight: 8.5,     // インチ
+  // 判型（トリムサイズ）- 5.83 x 8.27 インチ（A5）
+  trimWidth: 5.83,     // インチ
+  trimHeight: 8.27,    // インチ
 
   // 裁ち落とし
   bleed: 0.125,        // インチ（各辺）
@@ -230,6 +230,18 @@ function createBackCoverImage(size, tempDir) {
     '-pointsize', '18',
     '-gravity', 'south',
     '-annotate', '+0+150', '姉妹編「AIエージェント開発は仕様が9割」も好評発売中',
+    backPath
+  ]);
+
+  // バーコード領域（KDP必須: 裏表紙右下に2" x 1.2"の白い領域）
+  // 位置: 右下から裁ち落とし分だけ内側
+  const barcodeWidth = inchToPixel(2);
+  const barcodeHeight = inchToPixel(1.2);
+  const barcodeMargin = inchToPixel(0.25); // 端からのマージン
+  runMagick([
+    backPath,
+    '-fill', 'white',
+    '-draw', `rectangle ${size.backWidthPx - barcodeWidth - barcodeMargin},${size.totalHeightPx - barcodeHeight - barcodeMargin} ${size.backWidthPx - barcodeMargin},${size.totalHeightPx - barcodeMargin}`,
     backPath
   ]);
 
