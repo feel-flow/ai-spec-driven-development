@@ -34,13 +34,13 @@ module.exports = {
 
   // メタデータ
   metadata: {
-    title: 'AIエージェント開発は仕様が9割',
-    subtitle: 'Vibe Codingで失敗しないための設計図',
+    title: 'AI仕様駆動開発',
+    subtitle: 'AIエージェント開発の新常識',
     author: 'Futoshi Okazaki',
     language: 'ja',
-    version: '1.0.0',
-    date: '2026-01-01',
-    coverImage: 'images/cover.jpg',
+    version: '1.2.0',
+    date: '2026-01-29',
+    coverImage: 'images/cover_kindle.jpg',
     description: 'AIコーディングツール（Claude Code, GitHub Copilot, Cursor等）を活用したいエンジニア向けの実践ガイド。AI仕様駆動開発の考え方と7文書構成を導入して、AIに安心して開発を任せられるようになる。',
     publisher: 'Futoshi Okazaki',
     isbn: '' // 出版時に実際のISBNに置き換え
