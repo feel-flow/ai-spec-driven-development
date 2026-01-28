@@ -1,0 +1,332 @@
+# terminology.yaml
+# 自動生成: /extract-terms コマンド
+# 対象書籍: AIエージェント開発は仕様が9割
+# 最終更新: 2026-01-28
+
+version: "1.0"
+generated_at: "2026-01-28T00:00:00Z"
+source_files:
+  - books/ai-spec-driven-development-90percent/
+
+# ===================================
+# コア概念
+# ===================================
+core_concepts:
+  - standard: "AI仕様駆動開発"
+    variants:
+      - "仕様駆動開発"
+      - "Spec-driven development"
+    description: "AIとの協働において仕様を中心に据えた開発手法"
+
+  - standard: "7文書構成"
+    variants:
+      - "7つの文書"
+      - "7文書"
+    description: "AIが効率的に参照できる最小構成の文書セット"
+
+  - standard: "vibe coding"
+    variants:
+      - "バイブコーディング"
+    description: "「いい感じに作って」という曖昧な指示でのAI開発アプローチ"
+
+  - standard: "影響度評価"
+    variants:
+      - "changeImpact"
+      - "change impact"
+    description: "変更の影響範囲をLOW/MEDIUM/HIGHで分類する評価手法"
+
+# ===================================
+# 7文書
+# ===================================
+seven_documents:
+  - standard: "MASTER.md"
+    description: "プロジェクト索引、AIが最初に読む文書"
+
+  - standard: "PROJECT.md"
+    description: "ビジョン・要件を定義（What/Why）"
+
+  - standard: "ARCHITECTURE.md"
+    description: "システム設計・技術スタック（How）"
+
+  - standard: "DOMAIN.md"
+    description: "ビジネスロジック・ドメインモデル"
+
+  - standard: "PATTERNS.md"
+    description: "実装パターン・コーディング規約"
+
+  - standard: "TESTING.md"
+    description: "テスト戦略・品質基準"
+
+  - standard: "DEPLOYMENT.md"
+    description: "運用手順・デプロイフロー"
+
+# ===================================
+# 技術用語
+# ===================================
+technical_terms:
+  - standard: "コンテキスト"
+    variants:
+      - "コンテクスト"
+      - "context"
+    note: "長音符ありの「コンテキスト」を標準とする"
+
+  - standard: "プルリクエスト"
+    short_form: "PR"
+    variants:
+      - "Pull Request"
+      - "プルリク"
+    requires_initial_explanation: true
+
+  - standard: "大規模言語モデル"
+    short_form: "LLM"
+    variants:
+      - "Large Language Model"
+    requires_initial_explanation: true
+
+  - standard: "Frontmatter"
+    variants:
+      - "フロントマター"
+    description: "Markdownファイル先頭のYAML形式メタデータ"
+
+  - standard: "ADR"
+    full_form: "Architecture Decision Record"
+    variants:
+      - "意思決定記録"
+      - "アーキテクチャ決定記録"
+    requires_initial_explanation: true
+
+  - standard: "セマンティックバージョニング"
+    short_form: "SemVer"
+    variants:
+      - "Semantic Versioning"
+    description: "メジャー.マイナー.パッチ形式のバージョン管理"
+
+  - standard: "リポジトリ"
+    variants:
+      - "リポジトリー"
+      - "レポジトリ"
+    note: "長音符なしの「リポジトリ」を標準とする"
+
+# ===================================
+# 製品・サービス名
+# ===================================
+product_names:
+  - standard: "Claude Code"
+    variants:
+      - "claude code"
+      - "ClaudeCode"
+    case_sensitive: true
+
+  - standard: "GitHub Copilot"
+    variants:
+      - "Github Copilot"
+      - "copilot"
+      - "Copilot"
+    case_sensitive: true
+
+  - standard: "ChatGPT"
+    variants:
+      - "chatGPT"
+      - "Chat GPT"
+      - "chatgpt"
+    case_sensitive: true
+
+  - standard: "GitHub"
+    variants:
+      - "Github"
+      - "github"
+    case_sensitive: true
+
+  - standard: "Next.js"
+    variants:
+      - "NextJS"
+      - "Nextjs"
+      - "next.js"
+    case_sensitive: true
+
+  - standard: "TypeScript"
+    variants:
+      - "Typescript"
+      - "typescript"
+    case_sensitive: true
+
+  - standard: "PostgreSQL"
+    variants:
+      - "Postgres"
+      - "postgres"
+      - "PostgreSql"
+    case_sensitive: true
+
+  - standard: "Prisma"
+    variants:
+      - "prisma"
+    case_sensitive: true
+
+  - standard: "Redis"
+    variants:
+      - "redis"
+    case_sensitive: true
+
+  - standard: "Cursor"
+    variants:
+      - "cursor"
+    case_sensitive: true
+
+  - standard: "Anthropic"
+    variants:
+      - "anthropic"
+    case_sensitive: true
+
+  - standard: "OpenAI"
+    variants:
+      - "openai"
+      - "Open AI"
+    case_sensitive: true
+
+# ===================================
+# 長音符の統一
+# ===================================
+katakana_standards:
+  - standard: "ユーザー"
+    variant: "ユーザ"
+    rule: "長音符あり"
+
+  - standard: "サーバー"
+    variant: "サーバ"
+    rule: "長音符あり"
+
+  - standard: "レビュワー"
+    variant: "レビュアー"
+    rule: "「レビュワー」を標準とする"
+
+  - standard: "エンジニア"
+    note: "長音符なしが標準"
+
+  - standard: "コンテナ"
+    variant: "コンテナー"
+    rule: "長音符なし"
+
+  - standard: "パラメータ"
+    variant: "パラメーター"
+    rule: "長音符なし"
+
+  - standard: "フォルダ"
+    variant: "フォルダー"
+    rule: "長音符なし（ただし「ディレクトリ」推奨）"
+
+  - standard: "ディレクトリ"
+    variant: "ディレクトリー"
+    rule: "長音符なし"
+
+# ===================================
+# 略語一覧
+# ===================================
+abbreviations:
+  - abbreviation: "PR"
+    full_form: "プルリクエスト（Pull Request）"
+    requires_explanation: true
+
+  - abbreviation: "LLM"
+    full_form: "大規模言語モデル（Large Language Model）"
+    requires_explanation: true
+
+  - abbreviation: "AI"
+    full_form: "人工知能（Artificial Intelligence）"
+    requires_explanation: false
+
+  - abbreviation: "API"
+    full_form: "Application Programming Interface"
+    requires_explanation: false
+
+  - abbreviation: "JWT"
+    full_form: "JSON Web Token"
+    requires_explanation: true
+
+  - abbreviation: "ADR"
+    full_form: "Architecture Decision Record"
+    requires_explanation: true
+
+  - abbreviation: "CRUD"
+    full_form: "Create, Read, Update, Delete"
+    requires_explanation: true
+
+  - abbreviation: "CI/CD"
+    full_form: "Continuous Integration / Continuous Delivery"
+    requires_explanation: true
+
+  - abbreviation: "MVP"
+    full_form: "Minimum Viable Product"
+    requires_explanation: true
+
+  - abbreviation: "SLA"
+    full_form: "Service Level Agreement"
+    requires_explanation: true
+
+  - abbreviation: "ORM"
+    full_form: "Object-Relational Mapping"
+    requires_explanation: true
+
+  - abbreviation: "SSR"
+    full_form: "Server-Side Rendering"
+    requires_explanation: true
+
+  - abbreviation: "RSC"
+    full_form: "React Server Components"
+    requires_explanation: true
+
+  - abbreviation: "SPA"
+    full_form: "Single Page Application"
+    requires_explanation: true
+
+  - abbreviation: "MFA"
+    full_form: "Multi-Factor Authentication"
+    requires_explanation: true
+
+# ===================================
+# 本書固有の用語
+# ===================================
+book_specific_terms:
+  - standard: "仕様OS"
+    description: "7文書構成をOSに例えた表現。AIが動作するための基盤"
+
+  - standard: "生きた仕様"
+    variants:
+      - "Living Spec"
+    description: "変更されるたびに更新される、陳腐化しない仕様"
+
+  - standard: "死んだ仕様"
+    description: "書かれた瞬間に古くなり、誰も参照しなくなった仕様"
+
+  - standard: "暗黙知"
+    variants:
+      - "tacit knowledge"
+    description: "明文化されていないチーム内のルールや慣習"
+
+  - standard: "明示知"
+    variants:
+      - "explicit knowledge"
+    description: "文書化された、誰でも参照可能な知識"
+
+  - standard: "推測の連鎖"
+    description: "AIが一つの推測から次の推測を重ねていく状態"
+
+  - standard: "コンテキストウィンドウ"
+    variants:
+      - "context window"
+    description: "LLMが一度に処理できる入力トークンの上限"
+
+  - standard: "カットオフ"
+    variants:
+      - "学習データのカットオフ"
+      - "knowledge cutoff"
+    description: "LLMの学習データの締め切り日"
+
+# ===================================
+# キャラクター名
+# ===================================
+characters:
+  - standard: "AI侍"
+    description: "知識を授ける師匠キャラクター"
+
+  - standard: "DJ町娘"
+    description: "読者代理、学ぶ側のキャラクター"

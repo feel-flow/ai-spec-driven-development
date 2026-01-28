@@ -550,7 +550,7 @@ GitHub Copilotのカスタムエージェントは**Premium Requests**を消費�
 
 ## 参考: GitHub Copilot Skills
 
-2025年12月、GitHubは**Copilot Agent Skills**を発表しました。本章で紹介したAgentsとは別の機能です。
+2025年12月、GitHubは**Copilot Skills**を発表しました。本章で紹介したAgentsとは別の機能です。
 
 ### Agents vs Skills の違い
 
