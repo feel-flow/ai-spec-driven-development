@@ -38,7 +38,7 @@ module.exports = {
     subtitle: 'Vibe Codingで失敗しないための設計図',
     author: 'Futoshi Okazaki',
     language: 'ja',
-    version: '0.1.0',
+    version: '1.0.0',
     date: '2026-01-01',
     coverImage: 'images/cover.jpg',
     description: 'AIコーディングツール（Claude Code, GitHub Copilot, Cursor等）を活用したいエンジニア向けの実践ガイド。AI仕様駆動開発の考え方と7文書構成を導入して、AIに安心して開発を任せられるようになる。',
