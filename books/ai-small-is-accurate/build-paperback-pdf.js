@@ -45,11 +45,12 @@ const partDirs = [
 function createPaperbackCss() {
   // KDPペーパーバック用設定
   // トリムサイズ: 5.83 x 8.27 インチ（148 x 210 mm = A5）
-  // マージン: 外側 0.5インチ、内側（ノド）0.75インチ
+  // KDP要件: 内側0.5インチ、外側0.25インチ以上（151-300ページ）
+  // 安全マージンを追加: 内側0.875インチ、外側0.625インチ
   const css = `
 @page {
   size: 5.83in 8.27in;
-  margin: 0.5in 0.5in 0.5in 0.75in; /* 上 右 下 左（ノド側広め） */
+  margin: 0.625in 0.625in 0.625in 0.875in; /* 上 右 下 左（ノド側広め） */
 
   @bottom-center {
     content: counter(page);
@@ -140,9 +141,11 @@ pre {
   color: #e2e8f0;
   padding: 1em;
   margin: 1em 0;
-  overflow-x: auto;
   border-radius: 4px;
   page-break-inside: avoid;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
 }
 
 code {
@@ -157,7 +160,7 @@ pre code {
 }
 
 img {
-  max-width: 100%;
+  max-width: 85%;
   height: auto;
   display: block;
   margin: 1em auto;
@@ -165,17 +168,20 @@ img {
 }
 
 table {
-  width: 100%;
+  max-width: 100%;
   border-collapse: collapse;
   margin: 1em 0;
-  font-size: 10pt;
+  font-size: 9pt;
   page-break-inside: avoid;
+  table-layout: fixed;
 }
 
 th, td {
   border: 1px solid #cbd5e0;
-  padding: 0.5em;
+  padding: 0.4em;
   text-align: left;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
 }
 
 th {
@@ -226,6 +232,57 @@ em {
 /* ページ区切り */
 .page-break {
   page-break-before: always;
+}
+
+/* コラムボックス */
+.column-box {
+  background-color: #f7fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 4px;
+  padding: 1em;
+  margin: 1em 0;
+  page-break-inside: avoid;
+}
+
+/* 比較ボックス */
+.comparison-box {
+  margin: 1em 0;
+  page-break-inside: avoid;
+}
+
+.comparison-before,
+.comparison-after {
+  padding: 0.8em;
+  margin: 0.5em 0;
+  border-radius: 4px;
+}
+
+.comparison-before {
+  background-color: #fff5f5;
+  border-left: 4px solid #e53e3e;
+}
+
+.comparison-after {
+  background-color: #f0fff4;
+  border-left: 4px solid #38a169;
+}
+
+.comparison-result {
+  background-color: #ebf8ff;
+  border-left: 4px solid #3182ce;
+  padding: 0.8em;
+  margin: 0.5em 0;
+  border-radius: 4px;
+}
+
+/* 道場コーナー */
+.dojo-corner {
+  background-color: #fffaf0;
+  border: 2px solid #ED8936;
+  border-radius: 8px;
+  padding: 1em;
+  margin: 1.5em 0;
+  page-break-inside: avoid;
 }
 `;
 
@@ -400,7 +457,7 @@ async function main() {
   console.log('');
   console.log('設定:');
   console.log('  トリムサイズ: 5.83 x 8.27 インチ（A5）');
-  console.log('  マージン: 外側 0.5インチ、内側（ノド）0.75インチ');
+  console.log('  マージン: 上下外 0.625インチ、内側（ノド）0.875インチ');
   console.log('');
 
   let copiedFiles = [];
