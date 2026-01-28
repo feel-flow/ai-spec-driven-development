@@ -44,11 +44,11 @@ const partDirs = [
  */
 function createPaperbackCss() {
   // KDPペーパーバック用設定
-  // トリムサイズ: 5.5 x 8.5 インチ（139.7 x 215.9 mm）
+  // トリムサイズ: 5.83 x 8.27 インチ（148 x 210 mm = A5）
   // マージン: 外側 0.5インチ、内側（ノド）0.75インチ
   const css = `
 @page {
-  size: 5.5in 8.5in;
+  size: 5.83in 8.27in;
   margin: 0.5in 0.5in 0.5in 0.75in; /* 上 右 下 左（ノド側広め） */
 
   @bottom-center {
@@ -399,7 +399,7 @@ async function main() {
   console.log('='.repeat(60));
   console.log('');
   console.log('設定:');
-  console.log('  トリムサイズ: 5.5 x 8.5 インチ');
+  console.log('  トリムサイズ: 5.83 x 8.27 インチ（A5）');
   console.log('  マージン: 外側 0.5インチ、内側（ノド）0.75インチ');
   console.log('');
 
