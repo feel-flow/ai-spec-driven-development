@@ -28,6 +28,7 @@ books/**/.claude/
 # Generated books (EPUB/PDF)
 books/**/*.epub
 books/**/*.pdf
+!books/**/images/cover_paperback.pdf
 
 # Vivliostyle (PDF build tool)
 books/**/.vivliostyle/
