@@ -26,6 +26,9 @@ const CONFIG = {
   // 裁ち落とし
   bleed: 0.125,        // インチ（各辺）
 
+  // セーフゾーン（KDP必須：トリムエッジからの最小距離）
+  safeZone: 0.374,     // インチ（9.5mm）— テキストはこの内側に配置
+
   // 解像度
   dpi: 300,
 
@@ -117,6 +120,8 @@ function calculateCoverSize(pageCount) {
     frontWidthPx: inchToPixel(frontWidth + CONFIG.bleed),
     backWidthPx: inchToPixel(backWidth + CONFIG.bleed),
     bleedPx: inchToPixel(CONFIG.bleed),
+    // セーフゾーン: ファイル端からテキストまでの最小距離 = bleed + safeZone
+    safeMarginPx: inchToPixel(CONFIG.bleed + CONFIG.safeZone),
   };
 }
 
@@ -169,6 +174,7 @@ function createSpineImage(size, tempDir) {
  */
 function createBackCoverImage(size, tempDir) {
   const backPath = path.join(tempDir, 'back.png');
+  const safeMargin = size.safeMarginPx; // ≈150px（bleed + safeZone）
 
   // ベース画像を作成
   runMagick([
@@ -177,14 +183,14 @@ function createBackCoverImage(size, tempDir) {
     backPath
   ]);
 
-  // キャッチコピー（上部）
+  // キャッチコピー（上部）— セーフゾーン内に収める
   runMagick([
     backPath,
     '-fill', CONFIG.accentColor,
     '-font', CONFIG.fontFamilyBold,
     '-pointsize', '36',
     '-gravity', 'north',
-    '-annotate', '+0+200', 'AIを使う全ての人に贈る「思想編」',
+    '-annotate', `+0+${safeMargin + 80}`, 'AIを使う全ての人に贈る「思想編」',
     backPath
   ]);
 
@@ -210,7 +216,7 @@ function createBackCoverImage(size, tempDir) {
     backPath
   ]);
 
-  // 特徴（下部）
+  // 特徴（下部）— バーコードと干渉しないよう位置調整
   const features = '✓ ChatGPT / Claude / Gemini 対応\n✓ コピペで使えるプロンプト例付き\n✓ 初心者でもすぐ実践できる';
   runMagick([
     backPath,
@@ -218,30 +224,31 @@ function createBackCoverImage(size, tempDir) {
     '-font', CONFIG.fontFamilyLight,
     '-pointsize', '22',
     '-gravity', 'south',
-    '-annotate', '+0+300', features,
+    '-annotate', `+0+${safeMargin + 250}`, features,
     backPath
   ]);
 
-  // 姉妹編の紹介（最下部）
+  // 姉妹編の紹介
   runMagick([
     backPath,
     '-fill', '#888888',
     '-font', CONFIG.fontFamilyLight,
     '-pointsize', '18',
     '-gravity', 'south',
-    '-annotate', '+0+150', '姉妹編「AIエージェント開発は仕様が9割」も好評発売中',
+    '-annotate', `+0+${safeMargin + 150}`, '姉妹編「AIエージェント開発は仕様が9割」も好評発売中',
     backPath
   ]);
 
-  // バーコード領域（KDP必須: 裏表紙右下に2" x 1.2"の白い領域）
-  // 位置: 右下から裁ち落とし分だけ内側
+  // バーコード領域（KDP必須: 裏表紙左下に2" x 1.2"の白い領域）
+  // 見開きで裏表紙は左側なので、外端 = 左端。セーフゾーンを確保。
   const barcodeWidth = inchToPixel(2);
   const barcodeHeight = inchToPixel(1.2);
-  const barcodeMargin = inchToPixel(0.25); // 端からのマージン
+  const barcodeX = safeMargin;
+  const barcodeY = size.totalHeightPx - barcodeHeight - safeMargin;
   runMagick([
     backPath,
     '-fill', 'white',
-    '-draw', `rectangle ${size.backWidthPx - barcodeWidth - barcodeMargin},${size.totalHeightPx - barcodeHeight - barcodeMargin} ${size.backWidthPx - barcodeMargin},${size.totalHeightPx - barcodeMargin}`,
+    '-draw', `rectangle ${barcodeX},${barcodeY} ${barcodeX + barcodeWidth},${barcodeY + barcodeHeight}`,
     backPath
   ]);
 
@@ -310,7 +317,7 @@ function main() {
   console.log('');
 
   // ページ数を取得
-  const pageCount = parseInt(process.argv[2]) || 125;
+  const pageCount = parseInt(process.argv[2]) || 368;
   console.log(`ページ数: ${pageCount}`);
 
   // ImageMagick確認
@@ -326,6 +333,7 @@ function main() {
   console.log('表紙サイズ:');
   console.log(`  全体: ${size.totalWidthPx} x ${size.totalHeightPx} px`);
   console.log(`  背幅: ${size.spineWidthPx} px (${size.spineWidth.toFixed(3)} インチ)`);
+  console.log(`  セーフマージン: ${size.safeMarginPx} px (bleed ${CONFIG.bleed}" + safeZone ${CONFIG.safeZone}")`);
   console.log('');
 
   // 一時ディレクトリ
