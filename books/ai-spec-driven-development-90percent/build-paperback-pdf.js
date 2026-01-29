@@ -292,6 +292,12 @@ function combineMarkdownFiles() {
     content = content.replace(/\.\.\/images\//g, 'images/');
     content = content.replace(/\.\/images\//g, 'images/');
 
+    // ペーパーバック用リンク変換（印刷版ではURLクリック不可）
+    // ページ内リンク: [テキスト](#anchor) → テキスト
+    content = content.replace(/\[([^\]]+)\]\(#[^)]+\)/g, '$1');
+    // 外部リンク: [テキスト](https://...) → テキスト（URL）
+    content = content.replace(/\[([^\]]+)\]\((https?:\/\/[^)]+)\)/g, '$1（$2）');
+
     combined += content + '\n\n';
   }
 
