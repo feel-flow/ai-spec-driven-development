@@ -554,43 +554,26 @@ TDDの「テストファースト」とAI仕様駆動開発の「仕様ファー
 
 ## ステップ3：AIにタスクを渡す
 
-### プロンプトの構造
+「Issue #42を実装して」——これだけで十分です。
 
-```markdown
-## タスク
-Issue #42 を実装してください。
+なぜなら、ステップ1でIssueに必要な情報をすべて書いたからです。
 
-## コンテキスト
-- Issue: [IssueのURL or 内容をコピー]
-- 関連文書:
-  - docs/ARCHITECTURE.md
-  - docs/DOMAIN.md
-  - docs/PATTERNS.md
+- **受け入れ基準** → 何を作るか
+- **技術的制約** → どう作るか
+- **スコープ外** → 何を作らないか
+- **参照ドキュメント** → どの仕様に従うか
 
-## 制約
-- 既存の認証サービス（src/services/auth/）を拡張する形で実装
-- 新規ファイルは src/services/auth/login.ts に作成
-- テストは src/services/auth/__tests__/login.test.ts に作成
-
-## 出力
-1. 実装コード
-2. テストコード
-3. 影響を受ける既存ファイルの変更点
-```
-
-### AIコーディングツールを使う場合
-
-Claude Code、GitHub Copilot、Cursorなど、いずれのツールでもIssueの内容をそのまま渡せます。
+AIコーディングツール（Claude Code、GitHub Copilot、Cursorなど）はリポジトリにアクセスできるので、Issueのリンク先ドキュメントも自動的に読みます。7文書がリポジトリにあれば、追加の説明は不要です。
 
 ```bash
 # Claude Codeの例
-claude "Issue #42 を実装して。docs/配下の仕様に従って。"
+claude "Issue #42 を実装して"
 
 # GitHub Copilot（チャット）の例
-# @workspace Issue #42 を実装して。docs/配下の仕様に従って。
+# @workspace Issue #42 を実装して
 ```
 
-7文書がリポジトリにあれば、AIツールは自動的に参照します。
+長いプロンプトを書く必要はありません。Issueが仕様書であり、プロンプトはその「起動スイッチ」にすぎないのです。
 
 ---
 
