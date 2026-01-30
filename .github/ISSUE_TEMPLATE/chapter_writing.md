@@ -27,6 +27,13 @@ labels: 'book, writing'
 - 章の概要・主なトピック
 - 読者に伝えたいメッセージ
 
+## 参照ファイル
+
+このIssueの作業に必要なプロジェクト内のファイルを記載してください。
+
+- （例: `books/ai-small-is-accurate/book-config.js`）
+- （例: `books/ai-small-is-accurate/part3_precision/03-1_scope-convergence.md`）
+
 ## 受け入れ条件
 
 - [ ] 章の本文が完成している
