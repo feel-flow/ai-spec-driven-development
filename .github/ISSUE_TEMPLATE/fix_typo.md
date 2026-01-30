@@ -33,6 +33,12 @@ labels: 'bug, book'
 
 正しい記述を記載してください。
 
+## 参照ファイル
+
+修正時に確認が必要な関連ファイルを記載してください。
+
+- （例: `books/ai-small-is-accurate/terminology.yaml`）
+
 ## 受け入れ条件
 
 - [ ] 修正が反映されている
