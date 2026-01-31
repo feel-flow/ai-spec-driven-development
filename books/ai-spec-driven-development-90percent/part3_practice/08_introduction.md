@@ -4,7 +4,7 @@
 
 ---
 
-# 第6章　導入手順：既存プロジェクト／新規プロジェクト
+# 第8章　導入手順：既存プロジェクト／新規プロジェクト
 
 ## この章で学ぶこと
 
@@ -411,7 +411,7 @@ API → Service → Repository → Database
 
 ## 🥷 AI侍道場 - 最初の一歩を踏み出す勇気
 
-![AI侍道場：最初の一歩を踏み出す勇気](../images/ch06-ai-samurai-dojo.png)
+![AI侍道場：最初の一歩を踏み出す勇気](../images/ch08-ai-samurai-dojo.png)
 
 ---
 

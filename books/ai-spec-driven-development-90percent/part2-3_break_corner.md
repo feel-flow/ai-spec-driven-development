@@ -149,6 +149,6 @@
 
 ---
 
-**👉 次章：[第6章 導入手順](./part3_practice/06_introduction.md)**
+**👉 次章：[第8章 導入手順](./part3_practice/08_introduction.md)**
 
 ---

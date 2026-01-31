@@ -1,4 +1,4 @@
-# 第12a章　ツール実装（後編）：GitHub Copilot Agentsで"仕様駆動"を自動化する
+# 第11章　ツール実装（後編）：GitHub Copilot Agentsで"仕様駆動"を自動化する
 
 ## この章で学ぶこと
 
@@ -11,7 +11,7 @@
 
 ## 読者へのメッセージ
 
-前章（第12章）では**Claude Code Skills**を取り上げました。本章では**GitHub Copilot Agents**を解説します。
+前章（第10章）では**Claude Code Skills**を取り上げました。本章では**GitHub Copilot Agents**を解説します。
 
 > **Note**: GitHub Copilotには、Claude Codeのpr-review-toolkitのような**公式プラグインが提供されていません**。同等の機能を実現するには、本章で紹介するエージェントテンプレートを自分でリポジトリに追加する必要があります。
 
@@ -491,7 +491,7 @@ GitHub Copilotのカスタムエージェントは**Premium Requests**を消費�
 
 ## 🥷 AI侍道場 - エージェントの使い分け
 
-![AI侍道場：エージェントの使い分け](../images/ch12a-ai-samurai-dojo.png)
+![AI侍道場：エージェントの使い分け](../images/ch11-ai-samurai-dojo.png)
 
 ---
 
