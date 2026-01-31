@@ -235,7 +235,7 @@ function createBackCoverImage(size, tempDir) {
     '-font', CONFIG.fontFamilyLight,
     '-pointsize', '18',
     '-gravity', 'south',
-    '-annotate', `+0+${safeMargin + 150}`, '姉妹編「AIエージェント開発は仕様が9割」も好評発売中',
+    '-annotate', `+0+${safeMargin + 150}`, '姉妹編「AI仕様駆動開発」も好評発売中',
     backPath
   ]);
 

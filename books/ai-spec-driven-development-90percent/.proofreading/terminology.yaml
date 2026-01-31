@@ -1,6 +1,6 @@
 # terminology.yaml
 # 自動生成: /extract-terms コマンド
-# 対象書籍: AIエージェント開発は仕様が9割
+# 対象書籍: AI仕様駆動開発
 # 最終更新: 2026-01-28
 
 version: "1.0"

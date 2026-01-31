@@ -23,7 +23,7 @@ const sampleConfig = require('./sample-config');
 
 const baseDir = __dirname;
 const imagesDir = path.join(baseDir, 'images');
-const baseFileName = `AIエージェント開発は仕様が9割_v${sampleConfig.metadata.version}_sample`;
+const baseFileName = `AI仕様駆動開発_v${sampleConfig.metadata.version}_sample`;
 const epubOutputPath = path.join(baseDir, `${baseFileName}.epub`);
 const pdfOutputPath = path.join(baseDir, `${baseFileName}.pdf`);
 const combinedMdPath = path.join(baseDir, 'combined-sample.md');
