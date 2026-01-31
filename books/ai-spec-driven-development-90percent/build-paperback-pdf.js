@@ -292,6 +292,10 @@ function combineMarkdownFiles() {
     content = content.replace(/\.\.\/images\//g, 'images/');
     content = content.replace(/\.\/images\//g, 'images/');
 
+    // Pandoc属性構文を除去（weasyprintでは解釈されずそのまま表示されるため）
+    // 例: # はじめに {.unnumbered} → # はじめに
+    content = content.replace(/\s*\{\.unnumbered\}/g, '');
+
     // ペーパーバック用リンク変換（印刷版ではURLクリック不可）
     // ページ内リンク: [テキスト](#anchor) → テキスト
     content = content.replace(/\[([^\]]+)\]\(#[^)]+\)/g, '$1');
