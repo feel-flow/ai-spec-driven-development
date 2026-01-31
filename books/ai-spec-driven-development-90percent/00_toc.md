@@ -90,66 +90,75 @@
 
 → [part3_practice/08_introduction.md](./part3_practice/08_introduction.md)
 
-### 第9章　日々の開発フロー：AIに"タスク"を渡す前にやること
+### 第9章　プロトタイピング：仕様を書く前に"動くもの"で確かめる
+
+- PoCと本実装の違い——何を検証し、何を捨てるか
+- AIで素早くプロトタイプを作るアプローチ
+- PoCから仕様に落とすタイミングと方法
+- 失敗したPoCの正しい扱い方
+
+→ [part3_practice/09_prototyping.md](./part3_practice/09_prototyping.md)
+
+### 第10章　日々の開発フロー：AIに"タスク"を渡す前にやること
 
 - 仕様の粒度：受け入れ基準が書けているか
 - 設計の粒度：アーキテクチャ制約が明示されているか
 - テストの粒度：テストが仕様を代替していないか
 
-→ [part3_practice/09_daily-workflow.md](./part3_practice/09_daily-workflow.md)
+→ [part3_practice/10_daily-workflow.md](./part3_practice/10_daily-workflow.md)
 
-### 第10章　ツール実装（前編）：Claude Code Skillsで"仕様駆動"を自動化する
+### 第11章　ツール実装（前編）：Claude Code Skillsで"仕様駆動"を自動化する
 
 - Claude Code Skillsの考え方と設計方法
 - 仕様駆動を支援するスキル例（5種）
 - pr-review-toolkit（公式プラグイン）
 
-→ [part3_practice/10_claude-code-skills.md](./part3_practice/10_claude-code-skills.md)
+→ [part3_practice/11_claude-code-skills.md](./part3_practice/11_claude-code-skills.md)
 
-### 第11章　ツール実装（後編）：GitHub Copilot Agentsで"仕様駆動"を自動化する
+### 第12章　ツール実装（後編）：GitHub Copilot Agentsで"仕様駆動"を自動化する
 
 - GitHub Copilot Agentsの仕組みと4つのタイプ
 - 仕様駆動開発向けエージェント（6種のテンプレート）
 - Claude Code vs GitHub Copilot 比較
 
-→ [part3_practice/11_copilot-agents.md](./part3_practice/11_copilot-agents.md)
+→ [part3_practice/12_copilot-agents.md](./part3_practice/12_copilot-agents.md)
 
 ---
 
 ## 第4部　現場で揉めるポイントへの回答
 
-### 第12章　「それ、結局エンジニアが全部書くのでは？」への答え
+### 第13章　「それ、結局エンジニアが全部書くのでは？」への答え
 
 - 役割分担の再設計
 - "書く"ではなく"編集する"に寄せる
 
-→ [part4_faq/12_engineer-role.md](./part4_faq/12_engineer-role.md)
+→ [part4_faq/13_engineer-role.md](./part4_faq/13_engineer-role.md)
 
-### 第13章　品質・セキュリティ・責任の所在
+### 第14章　品質・セキュリティ・責任の所在
 
 - 「AIが書いたコード」の責任
 - テスト戦略を先に固める意味
 - 監査可能性
 
-→ [part4_faq/13_quality-security.md](./part4_faq/13_quality-security.md)
+→ [part4_faq/14_quality-security.md](./part4_faq/14_quality-security.md)
 
 ---
 
 ## 第5部　組織に展開する
 
-### 第14章　チーム標準化：レビューの中心を「コード」から「仕様」へ
+### 第15章　チーム標準化：レビューの中心を「コード」から「仕様」へ
 
 - 仕様レビュー→タスク→実装レビューの順番
 - 「MASTERが更新されていないPRは受け付けない」ルール
 
-→ [part5_organization/14_team-standardization.md](./part5_organization/14_team-standardization.md)
+→ [part5_organization/15_team-standardization.md](./part5_organization/15_team-standardization.md)
 
-### 第15章　ロードマップとナレッジ蓄積
+### 第16章　ロードマップとナレッジ蓄積
 
 - 成長フェーズで増やす文書
 - "知見"をAIに食わせられる形で残す
 
-→ [part5_organization/15_roadmap-knowledge.md](./part5_organization/15_roadmap-knowledge.md)
+→ [part5_organization/16_roadmap-knowledge.md](./part5_organization/16_roadmap-knowledge.md)
 
 ---
 
