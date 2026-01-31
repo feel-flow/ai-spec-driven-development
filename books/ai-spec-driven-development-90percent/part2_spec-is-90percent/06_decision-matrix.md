@@ -1,4 +1,4 @@
-# 第8章　文書追加の意思決定（Decision Matrix）
+# 第6章　文書追加の意思決定（Decision Matrix）
 
 ## この章で学ぶこと
 
