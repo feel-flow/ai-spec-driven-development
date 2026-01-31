@@ -1,10 +1,10 @@
-# AIエージェント開発は仕様が9割
+# AI仕様駆動開発
 
 Kindle出版用のMarkdownソースとビルドスクリプト
 
 ## 📚 概要
 
-このディレクトリには、書籍「AIエージェント開発は仕様が9割」のMarkdownソースファイルと、EPUB/PDF生成スクリプトが含まれています。
+このディレクトリには、書籍「AI仕様駆動開発」のMarkdownソースファイルと、EPUB/PDF生成スクリプトが含まれています。
 
 ## 🛠️ 前提条件
 
@@ -66,7 +66,7 @@ cd books/ai-spec-driven-development-90percent
 node build-epub.js
 ```
 
-生成されるファイル: `AIエージェント開発は仕様が9割_v0.1.0.epub`
+生成されるファイル: `AI仕様駆動開発_v1.3.0.epub`
 
 **対応プラットフォーム:**
 - ✅ Amazon Kindle (KDP)
@@ -88,7 +88,7 @@ node build-pdf.js
 
 ```bash
 # macOS
-open -a "Kindle Previewer" "AIエージェント開発は仕様が9割_v0.1.0.epub"
+open -a "Kindle Previewer" "AI仕様駆動開発_v1.3.0.epub"
 ```
 
 確認項目:
@@ -102,7 +102,7 @@ open -a "Kindle Previewer" "AIエージェント開発は仕様が9割_v0.1.0.ep
 
 ```bash
 # Calibreでファイルを開く
-calibre "AIエージェント開発は仕様が9割_v0.1.0.epub"
+calibre "AI仕様駆動開発_v1.3.0.epub"
 ```
 
 確認項目:
@@ -117,7 +117,7 @@ calibre "AIエージェント開発は仕様が9割_v0.1.0.epub"
 brew install epubcheck
 
 # 検証実行
-epubcheck "AIエージェント開発は仕様が9割_v0.1.0.epub"
+epubcheck "AI仕様駆動開発_v1.3.0.epub"
 ```
 
 ## 📱 Apple Books対応
@@ -162,8 +162,8 @@ metadata: {
 
 ```javascript
 metadata: {
-  title: 'AIエージェント開発は仕様が9割',
-  subtitle: 'Vibe Codingで失敗しないための設計図',
+  title: 'AI仕様駆動開発',
+  subtitle: 'AIエージェント開発の新常識',
   author: 'Futoshi Okazaki',
   language: 'ja',
   version: '0.1.0',  // バージョンを変更
@@ -218,8 +218,8 @@ metadata: {
 
 | 項目 | 内容 |
 |------|------|
-| **タイトル** | AIエージェント開発は仕様が9割 |
-| **サブタイトル** | Vibe Codingで失敗しないための設計図 |
+| **タイトル** | AI仕様駆動開発 |
+| **サブタイトル** | AIエージェント開発の新常識 |
 | **著者** | Futoshi Okazaki |
 | **バージョン** | 0.1.0 |
 | **構成** | 5部14章 + 付録 |
