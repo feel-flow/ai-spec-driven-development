@@ -42,7 +42,7 @@
 
 ## 変更の3分類
 
-![変更影響度評価](../images/ch09-change-impact.jpeg)
+![変更影響度評価](../images/ch07-change-impact.jpeg)
 
 すべての変更を以下の3つに分類します。
 
@@ -354,7 +354,7 @@ HIGH変更は一気にデプロイしません。
 
 ## 🥷 AI侍道場 - 変更を恐れない設計
 
-![AI侍道場：変更を恐れない設計](../images/ch09-ai-samurai-dojo.png)
+![AI侍道場：変更を恐れない設計](../images/ch07-ai-samurai-dojo.png)
 
 ---
 

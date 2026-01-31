@@ -143,7 +143,7 @@ TESTING.mdでテスト戦略を明示することで、これらの問題を防�
 
 ### ガードレールの3層構造
 
-![ガードレールの3層構造](../images/ch11-guardrail-structure.jpeg)
+![ガードレールの3層構造](../images/ch13-guardrail-structure.jpeg)
 
 AIの品質を担保するために、3層のガードレールを設けます。
 
@@ -343,7 +343,7 @@ AIが書いたか人間が書いたかより、**適切なプロセスを経た�
 
 ## 🥷 AI侍道場 - 品質は文化である
 
-![AI侍道場：品質は文化である](../images/ch11-ai-samurai-dojo.png)
+![AI侍道場：品質は文化である](../images/ch13-ai-samurai-dojo.png)
 
 ---
 

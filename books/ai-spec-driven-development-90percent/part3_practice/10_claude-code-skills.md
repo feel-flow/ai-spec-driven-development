@@ -620,7 +620,7 @@ description: >
 
 ## 🥷 AI侍道場 - ツールは手段、目的は価値
 
-![AI侍道場：ツールは手段、目的は価値](../images/ch12-ai-samurai-dojo.png)
+![AI侍道場：ツールは手段、目的は価値](../images/ch10-ai-samurai-dojo.png)
 
 ---
 

@@ -33,7 +33,7 @@ AIは、Issue・ブランチ・PRの連携を追跡できます。「以前のIs
 
 ## Issueベースの開発フロー全体像
 
-![AI開発フロー](../images/ch07-daily-workflow.jpeg)
+![AI開発フロー](../images/ch09-daily-workflow.jpeg)
 
 ### フローの概要
 
@@ -725,7 +725,7 @@ PR作成 → レビュー → 修正 → 再レビュー。このサイクルは
 
 ## 🥷 AI侍道場 - Issueは芸術である
 
-![AI侍道場：Issueは芸術である](../images/ch07-ai-samurai-dojo.png)
+![AI侍道場：Issueは芸術である](../images/ch09-ai-samurai-dojo.png)
 
 ---
 

@@ -411,7 +411,7 @@ API → Service → Repository → Database
 
 ## 🥷 AI侍道場 - 最初の一歩を踏み出す勇気
 
-![AI侍道場：最初の一歩を踏み出す勇気](../images/ch06-ai-samurai-dojo.png)
+![AI侍道場：最初の一歩を踏み出す勇気](../images/ch08-ai-samurai-dojo.png)
 
 ---
 

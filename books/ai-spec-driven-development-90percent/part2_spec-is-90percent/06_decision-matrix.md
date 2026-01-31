@@ -36,7 +36,7 @@
 
 ### 判断フローチャート
 
-![文書判断フローチャート](../images/ch08-decision-flowchart.png)
+![文書判断フローチャート](../images/ch06-decision-flowchart.png)
 
 
 ### フローチャートで決まらないとき
@@ -340,7 +340,7 @@ jobs:
 
 ## 🥷 AI侍道場 - Decision Matrixの活用術
 
-![AI侍道場：Decision Matrixの活用術](../images/ch08-ai-samurai-dojo.png)
+![AI侍道場：Decision Matrixの活用術](../images/ch06-ai-samurai-dojo.png)
 
 ---
 

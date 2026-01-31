@@ -318,7 +318,7 @@ MASTER.mdの更新がPRの通過条件になっていても、「更新しまし
 
 ## 🥷 AI侍道場 - チームで統一する技術
 
-![AI侍道場：チームで統一する技術](../images/ch13-ai-samurai-dojo.png)
+![AI侍道場：チームで統一する技術](../images/ch14-ai-samurai-dojo.png)
 
 ---
 

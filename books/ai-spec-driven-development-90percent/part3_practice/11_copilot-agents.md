@@ -491,7 +491,7 @@ GitHub Copilotのカスタムエージェントは**Premium Requests**を消費�
 
 ## 🥷 AI侍道場 - エージェントの使い分け
 
-![AI侍道場：エージェントの使い分け](../images/ch12a-ai-samurai-dojo.png)
+![AI侍道場：エージェントの使い分け](../images/ch11-ai-samurai-dojo.png)
 
 ---
 
