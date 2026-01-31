@@ -55,6 +55,20 @@
 
 → [part2_spec-is-90percent/05_minimum-rules.md](./part2_spec-is-90percent/05_minimum-rules.md)
 
+### 第8章　文書追加の意思決定（Decision Matrix）
+- 「PROJECT？DOMAIN？ARCHITECTURE？」の判断
+- 例：DB設計、認証、権限、監査ログ、SLO
+- MASTER.mdの索引更新を必須タスクに
+
+→ [part2_spec-is-90percent/08_decision-matrix.md](./part2_spec-is-90percent/08_decision-matrix.md)
+
+### 第9章　変更に強い運用：影響度評価で手戻りを消す
+- 変更の種類：文言修正／概念追加／概念再定義
+- HIGH変更のチェックリスト
+- 仕様変更→AI再実装を"安全に繰り返す"設計
+
+→ [part2_spec-is-90percent/09_change-impact.md](./part2_spec-is-90percent/09_change-impact.md)
+
 ---
 
 ## 第3部　実践：AI仕様駆動開発のワークフロー
@@ -73,19 +87,21 @@
 
 → [part3_practice/07_daily-workflow.md](./part3_practice/07_daily-workflow.md)
 
-### 第8章　文書追加の意思決定（Decision Matrix）
-- 「PROJECT？DOMAIN？ARCHITECTURE？」の判断
-- 例：DB設計、認証、権限、監査ログ、SLO
-- MASTER.mdの索引更新を必須タスクに
+### 第12章　ツール実装（前編）：Claude Code Skillsで"仕様駆動"を自動化する
 
-→ [part3_practice/08_decision-matrix.md](./part3_practice/08_decision-matrix.md)
+- Claude Code Skillsの考え方と設計方法
+- 仕様駆動を支援するスキル例（5種）
+- pr-review-toolkit（公式プラグイン）
 
-### 第9章　変更に強い運用：影響度評価で手戻りを消す
-- 変更の種類：文言修正／概念追加／概念再定義
-- HIGH変更のチェックリスト
-- 仕様変更→AI再実装を"安全に繰り返す"設計
+→ [part3_practice/12_claude-code-skills.md](./part3_practice/12_claude-code-skills.md)
 
-→ [part3_practice/09_change-impact.md](./part3_practice/09_change-impact.md)
+### 第12a章　ツール実装（後編）：GitHub Copilot Agentsで"仕様駆動"を自動化する
+
+- GitHub Copilot Agentsの仕組みと4つのタイプ
+- 仕様駆動開発向けエージェント（6種のテンプレート）
+- Claude Code vs GitHub Copilot 比較
+
+→ [part3_practice/12a_copilot-agents.md](./part3_practice/12a_copilot-agents.md)
 
 ---
 
@@ -103,22 +119,6 @@
 - 監査可能性
 
 → [part4_faq/11_quality-security.md](./part4_faq/11_quality-security.md)
-
-### 第12章　ツール実装（前編）：Claude Code Skillsで"仕様駆動"を自動化する
-
-- Claude Code Skillsの考え方と設計方法
-- 仕様駆動を支援するスキル例（5種）
-- pr-review-toolkit（公式プラグイン）
-
-→ [part4_faq/12_claude-code-skills.md](./part4_faq/12_claude-code-skills.md)
-
-### 第12a章　ツール実装（後編）：GitHub Copilot Agentsで"仕様駆動"を自動化する
-
-- GitHub Copilot Agentsの仕組みと4つのタイプ
-- 仕様駆動開発向けエージェント（6種のテンプレート）
-- Claude Code vs GitHub Copilot 比較
-
-→ [part4_faq/12a_copilot-agents.md](./part4_faq/12a_copilot-agents.md)
 
 ---
 
