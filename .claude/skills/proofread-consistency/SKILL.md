@@ -1,9 +1,6 @@
 ---
 name: proofread-consistency
 description: 章間の矛盾・用語の定義の一貫性を検証する校閲スキル
-triggers:
-  - "整合性チェックして"
-  - "/proofread-consistency"
 ---
 
 # 整合性校閲スキル

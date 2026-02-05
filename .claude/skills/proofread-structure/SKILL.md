@@ -1,9 +1,6 @@
 ---
 name: proofread-structure
 description: 章のフォーマット・構造が規定に準拠しているかチェックするスキル
-triggers:
-  - "構造チェックして"
-  - "/proofread-structure"
 ---
 
 # 章構造検証スキル
