@@ -4,7 +4,7 @@ subtitle: 「分割と余白」で変わるAIと協働術
 author: Futoshi Okazaki
 publisher: Futoshi Okazaki
 language: ja
-date: 2026-01-18
+date: 2026-02-05
 version: 0.1.0
 description: AIを使う全ての人向けの思想編。ChatGPT、Claude、画像生成AIなど、あらゆるAIツールで「なんか微妙」になる原因と解決策を解説。コンテキスト縮小戦略とスコープ収束パターンで、AIの精度を意図的に設計する方法を学ぶ。
 isbn: ""

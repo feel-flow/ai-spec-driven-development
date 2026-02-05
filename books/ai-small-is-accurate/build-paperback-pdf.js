@@ -70,7 +70,7 @@ body {
   font-size: 10pt;
   line-height: 1.8;
   color: #333;
-  text-align: justify;
+  text-align: left;
   orphans: 2;
   widows: 2;
 }
@@ -128,10 +128,17 @@ ol + p {
 
 blockquote {
   margin: 1em 0;
-  padding: 0.8em 1em;
+  padding: 0.5em 1em;
   background-color: #f7fafc;
   border-left: 4px solid #ED8936;
-  font-size: 10pt;
+  font-size: 9pt;
+  text-align: left;
+  line-height: 1.4;
+}
+
+blockquote p {
+  margin: 0.3em 0;
+  text-indent: 0;
 }
 
 pre, code {
@@ -149,6 +156,11 @@ pre {
   white-space: pre-wrap;
   word-wrap: break-word;
   overflow-wrap: break-word;
+}
+
+/* コードブロック内のシンタックスハイライトを無効化（見やすさ優先） */
+pre * {
+  color: #e2e8f0 !important;
 }
 
 code {
@@ -317,9 +329,32 @@ em {
   background-color: #fffaf0;
   border: 2px solid #ED8936;
   border-radius: 8px;
-  padding: 1em;
-  margin: 1.5em 0;
+  padding: 0.5em 1em 1em 1em;
+  margin: 1em 0;
   page-break-inside: avoid;
+  line-height: 1.5;
+}
+
+.dojo-corner h2 {
+  margin-top: 0.2em;
+  margin-bottom: 0.3em;
+}
+
+.dojo-corner h3 {
+  margin-top: 0.5em;
+  margin-bottom: 0.2em;
+}
+
+.dojo-corner p {
+  margin: 0.3em 0;
+}
+
+.dojo-corner ul {
+  margin: 0.3em 0;
+}
+
+.dojo-corner li {
+  margin: 0.1em 0;
 }
 
 /* 目次（Table of Contents） */
