@@ -1,9 +1,6 @@
 ---
 name: proofread-logic
 description: 論理の一貫性・矛盾検出を行う校閲スキル
-triggers:
-  - "論理チェックして"
-  - "/proofread-logic"
 ---
 
 # 論理校閲スキル

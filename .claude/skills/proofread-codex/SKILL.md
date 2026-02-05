@@ -1,10 +1,6 @@
 ---
 name: proofread-codex
 description: OpenAI Codex CLIを使用したPR差分の校正レビュー
-triggers:
-  - "/proofread codex"
-  - "codexでレビューして"
-  - "codexで校正して"
 ---
 
 # Codex CLI校正スキル

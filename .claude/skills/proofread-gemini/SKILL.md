@@ -1,10 +1,6 @@
 ---
 name: proofread-gemini
 description: Google Gemini CLIを使用したPR差分の校正レビュー
-triggers:
-  - "/proofread gemini"
-  - "geminiでレビューして"
-  - "geminiで校正して"
 ---
 
 # Gemini CLI校正スキル

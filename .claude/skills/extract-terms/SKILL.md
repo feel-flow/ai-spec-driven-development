@@ -1,10 +1,6 @@
 ---
 name: extract-terms
 description: 既存の書籍本文から用語を自動抽出し、terminology.yamlを生成するスキル
-triggers:
-  - "用語を抽出して"
-  - "用語集を作成して"
-  - "/extract-terms"
 ---
 
 # 用語抽出スキル（/extract-terms）

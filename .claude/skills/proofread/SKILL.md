@@ -1,11 +1,6 @@
 ---
 name: proofread
 description: 日本語技術書の総合校正スキル。章単位または書籍全体の校正を実行し、重要度別にレポートを出力する。
-triggers:
-  - "校正して"
-  - "proofreadして"
-  - "この章をチェックして"
-  - "/proofread"
 ---
 
 # 校正スキル（/proofread）

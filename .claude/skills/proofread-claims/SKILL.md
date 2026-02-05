@@ -1,9 +1,6 @@
 ---
 name: proofread-claims
 description: 根拠のない主張・過度な断言を検出する校閲スキル
-triggers:
-  - "主張チェックして"
-  - "/proofread-claims"
 ---
 
 # 主張校閲スキル

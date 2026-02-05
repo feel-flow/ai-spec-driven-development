@@ -1,10 +1,6 @@
 ---
 name: proofread-depth
 description: 章の「内容の深さ・充実度」をチェックする本書専用スキル。具体例、ケーススタディ、図解、理論的根拠、章間一貫性を評価する。
-triggers:
-  - "内容充実度チェック"
-  - "深さチェック"
-  - "/proofread-depth"
 ---
 
 # 内容充実度検証スキル（/proofread-depth）

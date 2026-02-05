@@ -1,9 +1,6 @@
 ---
 name: proofread-facts
 description: 研究論文、統計データ、技術的主張のファクトチェックを行うスキル（厳密モード）
-triggers:
-  - "ファクトチェックして"
-  - "/proofread-facts"
 ---
 
 # ファクトチェックスキル
