@@ -206,7 +206,7 @@ AIは、正しく使えば強力なパートナーになります。
 
 <div class="ai-samurai-dojo">
 
-## 🥷 AI侍道場 - 本書の案内人
+## AI侍道場 - 本書の案内人
 
 ![AI侍とDJ町娘の4コマ漫画](./images/manga_4panel_intro.png)
 

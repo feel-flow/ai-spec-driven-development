@@ -67,7 +67,7 @@ function createPaperbackCss() {
 
 body {
   font-family: "Hiragino Kaku Gothic ProN", "Hiragino Sans", "Yu Gothic", "Meiryo", sans-serif;
-  font-size: 11pt;
+  font-size: 10pt;
   line-height: 1.8;
   color: #333;
   text-align: justify;
@@ -76,7 +76,7 @@ body {
 }
 
 h1 {
-  font-size: 20pt;
+  font-size: 18pt;
   font-weight: bold;
   margin-top: 2em;
   margin-bottom: 1em;
@@ -84,6 +84,7 @@ h1 {
   page-break-after: avoid;
   border-bottom: 2px solid #ED8936;
   padding-bottom: 0.3em;
+  text-align: left;
 }
 
 h1:first-of-type {
@@ -91,20 +92,22 @@ h1:first-of-type {
 }
 
 h2 {
-  font-size: 16pt;
+  font-size: 14pt;
   font-weight: bold;
   margin-top: 1.5em;
   margin-bottom: 0.8em;
   page-break-after: avoid;
   color: #1a365d;
+  text-align: left;
 }
 
 h3 {
-  font-size: 13pt;
+  font-size: 12pt;
   font-weight: bold;
   margin-top: 1.2em;
   margin-bottom: 0.6em;
   page-break-after: avoid;
+  text-align: left;
 }
 
 p {
@@ -160,11 +163,14 @@ pre code {
 }
 
 img {
-  max-width: 85%;
+  max-width: 100%;
+  max-height: 90vh;
+  width: auto;
   height: auto;
   display: block;
-  margin: 1em auto;
+  margin: 0.5em auto;
   page-break-inside: avoid;
+  object-fit: contain;
 }
 
 table {
@@ -229,6 +235,10 @@ em {
   margin: 1.5em 0;
 }
 
+.ai-samurai-dojo h2 {
+  margin-top: 0;
+}
+
 /* ページ区切り */
 .page-break {
   page-break-before: always;
@@ -242,6 +252,10 @@ em {
   padding: 1em;
   margin: 1em 0;
   page-break-inside: avoid;
+}
+
+.column-box h3 {
+  margin-top: 0;
 }
 
 /* 比較ボックス */
@@ -284,6 +298,42 @@ em {
   margin: 1.5em 0;
   page-break-inside: avoid;
 }
+
+/* 目次（Table of Contents） */
+nav#TOC {
+  page-break-after: always;
+  margin-bottom: 2em;
+}
+
+nav#TOC > ul {
+  list-style: none;
+  padding-left: 0;
+}
+
+nav#TOC ul ul {
+  padding-left: 1.5em;
+  list-style: none;
+}
+
+nav#TOC li {
+  margin: 0.4em 0;
+  line-height: 1.6;
+}
+
+nav#TOC a {
+  text-decoration: none;
+  color: #333;
+}
+
+nav#TOC a::after {
+  content: leader('.') target-counter(attr(href), page);
+  float: right;
+}
+
+nav#TOC > ul > li > a {
+  font-weight: bold;
+  font-size: 12pt;
+}
 `;
 
   fs.writeFileSync(paperbackCssPath, css, 'utf8');
@@ -297,7 +347,6 @@ function combineMarkdownFiles() {
   // _metadata.md と 00_toc.md を除外
   const files = bookConfig.files.filter(f => f !== '_metadata.md' && f !== '00_toc.md');
   let combined = '';
-  let chapterNum = 0;
 
   for (const file of files) {
     const filePath = path.join(baseDir, file);
@@ -307,14 +356,6 @@ function combineMarkdownFiles() {
     }
 
     let content = fs.readFileSync(filePath, 'utf8');
-
-    // 章番号の付与（01-1_xxx.md のようなファイル名のみ）
-    const match = file.match(/(\d+-\d+)_/);
-    if (match) {
-      chapterNum++;
-      // 見出しに章番号を付与
-      content = content.replace(/^(# )(.+)$/m, `$1第${chapterNum}章 $2`);
-    }
 
     // 画像パスの修正（./images/ → images/）
     content = content.replace(/\.\/(images\/)/g, '$1');
@@ -410,6 +451,8 @@ function generatePdf() {
       '--pdf-engine=weasyprint',
       `--css=${paperbackCssPath}`,
       '-f', 'gfm',
+      '--toc',
+      '--toc-depth=2',
       '--metadata', `title=${bookConfig.metadata.title}`
     ];
 
