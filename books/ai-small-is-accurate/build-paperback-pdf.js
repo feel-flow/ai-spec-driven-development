@@ -284,6 +284,42 @@ em {
   margin: 1.5em 0;
   page-break-inside: avoid;
 }
+
+/* 目次（Table of Contents） */
+nav#TOC {
+  page-break-after: always;
+  margin-bottom: 2em;
+}
+
+nav#TOC > ul {
+  list-style: none;
+  padding-left: 0;
+}
+
+nav#TOC ul ul {
+  padding-left: 1.5em;
+  list-style: none;
+}
+
+nav#TOC li {
+  margin: 0.4em 0;
+  line-height: 1.6;
+}
+
+nav#TOC a {
+  text-decoration: none;
+  color: #333;
+}
+
+nav#TOC a::after {
+  content: leader('.') target-counter(attr(href), page);
+  float: right;
+}
+
+nav#TOC > ul > li > a {
+  font-weight: bold;
+  font-size: 12pt;
+}
 `;
 
   fs.writeFileSync(paperbackCssPath, css, 'utf8');
@@ -410,6 +446,8 @@ function generatePdf() {
       '--pdf-engine=weasyprint',
       `--css=${paperbackCssPath}`,
       '-f', 'gfm',
+      '--toc',
+      '--toc-depth=2',
       '--metadata', `title=${bookConfig.metadata.title}`
     ];
 
