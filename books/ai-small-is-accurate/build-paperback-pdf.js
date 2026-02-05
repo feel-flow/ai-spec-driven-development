@@ -249,13 +249,36 @@ em {
   background-color: #f7fafc;
   border: 1px solid #e2e8f0;
   border-radius: 4px;
-  padding: 1em;
+  padding: 0 0.8em 0.8em 0.8em;
   margin: 1em 0;
   page-break-inside: avoid;
 }
 
+.column-box h2,
 .column-box h3 {
-  margin-top: 0;
+  margin-top: 0.3em;
+  margin-bottom: 0.2em;
+}
+
+/* 対話形式のハンギングインデント（AI侍、DJ町娘など） */
+.column-box p {
+  text-indent: -4em;
+  padding-left: 4em;
+  margin: 0.4em 0;
+}
+
+/* 画像を含むpはハンギングインデントを解除 */
+.column-box p:has(img) {
+  text-indent: 0;
+  padding-left: 0;
+}
+
+/* コラムボックス内の画像は横幅いっぱい */
+.column-box img {
+  display: block !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  margin: 0.5em 0 !important;
 }
 
 /* 比較ボックス */
