@@ -1,23 +1,15 @@
 ---
 name: generate-illustration
-description: 本書「ai-small-is-accurate」専用のイラスト生成スキル。キャラクター参照画像を自動で渡し、一貫したスタイルの画像を生成する。
-triggers:
-  - "nanobanana"
-  - "/nanobanana"
-  - "イラスト生成"
-  - "画像を作成"
-  - "図解を生成"
-  - "/generate-illustration"
-allowed-tools:
-  - Bash(python3:*)
+description: 本書「ai-small-is-accurate」専用のイラスト生成スキル。「イラスト生成」「画像を作成」「図解を生成」「nanobanana」と言われたときに使用。キャラクター参照画像を自動で渡し、一貫したスタイルの画像を生成する。
+argument-hint: "[character|diagram] [説明]"
+allowed-tools: Bash
 ---
 
-# イラスト生成スキル（/nanobanana）
+# イラスト生成スキル（/generate-illustration）
 
 ## 概要
 
 本書「ai-small-is-accurate」専用のイラスト生成スキルです。
-別名: `/generate-illustration`、`nanobanana`
 キャラクター参照画像（`characters.png`）を自動的にGemini APIに渡し、
 一貫したスタイルのイラストを生成します。
 
@@ -48,7 +40,7 @@ python3 .claude/scripts/generate_illustration.py diagram "<プロンプト>" -o 
 - **役割**: 読者代理、学ぶ側のキャラ
 - **外見**: 若い女性、オレンジ/金色の着物（花柄）、白いヘッドフォン
 - **スタイル**: 2〜3頭身のちびキャラ
-- **セリフ調**: 「〜ですか？」「なるほど！」「〜ですね✨」
+- **セリフ調**: 「〜ですか？」「なるほど！」「〜ですね」
 
 ## 画像タイプ
 
@@ -151,7 +143,7 @@ from google import genai
 import os
 
 genai.configure(api_key=os.environ.get('GEMINI_API_KEY'))
-model = genai.GenerativeModel('gemini-3-pro-image-preview')
+model = genai.GenerativeModel('gemini-2.0-flash-exp-image-generation')
 
 # 公式キャラクター画像を参照として渡す
 character_image = genai.upload_file("books/ai-small-is-accurate/images/characters.png")
@@ -187,7 +179,7 @@ from google import genai
 import os
 
 genai.configure(api_key=os.environ.get('GEMINI_API_KEY'))
-model = genai.GenerativeModel('gemini-3-pro-image-preview')
+model = genai.GenerativeModel('gemini-2.0-flash-exp-image-generation')
 
 prompt = """Create a clean infographic illustration showing [図解の説明].
 
@@ -230,27 +222,7 @@ response = model.generate_content(prompt)
 2. 適切な画像タイプを選択（character/diagram）
 3. 画像を生成
 4. ASCIIアートを `![alt](./image.png)` に置き換え
-5. コードブロック（```text ... ```）を削除
-
-### 置き換え例
-
-**Before（ASCIIアート）**:
-```markdown
-```text
-期待: 40分
-実際: 4時間
-```
-```
-
-**After（画像）**:
-```markdown
-![期待と実際の時間比較](./time_comparison.png)
-```
-
-## 関連スキル
-
-- `/proofread` - 総合校正
-- `/proofread-depth` - 内容充実度チェック
+5. コードブロックを削除
 
 ## 注意事項
 
