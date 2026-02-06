@@ -9,6 +9,7 @@
     "check": "npm --prefix mcp run check",
     "build:mcp": "npm --prefix mcp run build",
     "build:spec-index": "node scripts/build-spec-index.mjs",
+    "test": "npm --prefix mcp test",
     "setup:labels": "bash scripts/setup-github-labels.sh",
     "prepare": "husky"
   },
