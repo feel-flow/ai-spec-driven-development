@@ -17,7 +17,7 @@
 | 章 | 対象ツール | 内容 |
 |----|-----------|------|
 | 本章（第11章） | Claude Code | Skills、pr-review-toolkit |
-| 次章（第12章） | GitHub Copilot | カスタムエージェント |
+| 次章（第12章） | GitHub Copilot | Skills（共通）、カスタムエージェント |
 
 **重要な違い**:
 
@@ -25,7 +25,7 @@
 |------|-------------|----------------|
 | プラグイン | pr-review-toolkitなど公式提供済み | なし（自作が必要） |
 | 準備の手間 | すぐに使える | テンプレートを導入 |
-| カスタマイズ | Skills/Agentsファイル | `.github/agents/*.agent.md` |
+| カスタマイズ | Skills/Agentsファイル | Skills（共通）+ `.github/agents/*.md` |
 
 ---
 
