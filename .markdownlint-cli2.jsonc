@@ -1,0 +1,22 @@
+{
+  // AI Spec-Driven Development — Markdown Lint設定
+  "config": {
+    "default": true,
+    // 行の長さ制限を無効化（ドキュメントの可読性を優先）
+    "MD013": false,
+    // インラインHTMLを許容（画像やスタイリングで使用）
+    "MD033": false,
+    // コードブロック内の行の長さを無視
+    "MD046": { "style": "fenced" }
+  },
+  "globs": [
+    "docs/**/*.md",
+    "docs-template/**/*.md",
+    "*.md"
+  ],
+  "ignores": [
+    "node_modules",
+    "mcp/node_modules",
+    "**/CHANGELOG.md"
+  ]
+}
