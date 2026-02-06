@@ -115,10 +115,11 @@
 
 → [part3_practice/11_claude-code-skills.md](./part3_practice/11_claude-code-skills.md)
 
-### 第12章　ツール実装（後編）：GitHub Copilot Agentsで"仕様駆動"を自動化する
+### 第12章　ツール実装（後編）：GitHub Copilot Skills & Agentsで"仕様駆動"を自動化する
 
-- GitHub Copilot Agentsの仕組みと4つのタイプ
-- 仕様駆動開発向けエージェント（6種のテンプレート）
+- オープンスタンダード「Agent Skills」の仕組みと意義
+- 仕様駆動開発向けSkillsテンプレート（3種）
+- Skills vs Agents の使い分け
 - Claude Code vs GitHub Copilot 比較
 
 → [part3_practice/12_copilot-agents.md](./part3_practice/12_copilot-agents.md)

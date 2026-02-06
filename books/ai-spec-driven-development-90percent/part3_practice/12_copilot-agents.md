@@ -1,50 +1,361 @@
-# 第12章　ツール実装（後編）：GitHub Copilot Agentsで"仕様駆動"を自動化する
+# 第12章　ツール実装（後編）：GitHub Copilot Skills & Agentsで"仕様駆動"を自動化する
 
 ## この章で学ぶこと
 
-- GitHub Copilot Agentsの仕組みと4つのタイプ
-- カスタムエージェントの作成方法
-- 仕様駆動開発向け6つのエージェントテンプレート
-- Claude Code Skillsとの比較
+- オープンスタンダード「Agent Skills」の仕組みと意義
+- SKILL.md形式によるスキル作成方法
+- 仕様駆動開発向けSkillsテンプレート（3種）
+- Skills vs Agents の使い分け
+- カスタムエージェントによる専門レビュー
 
 ---
 
 ## 読者へのメッセージ
 
-前章（第11章）では**Claude Code Skills**を取り上げました。本章では**GitHub Copilot Agents**を解説します。
+前章（第11章）では**Claude Code Skills**を取り上げました。本章では**GitHub Copilot**側の仕組みを解説します。
 
-> **Note**: GitHub Copilotには、Claude Codeのpr-review-toolkitのような**公式プラグインが提供されていません**。同等の機能を実現するには、本章で紹介するエージェントテンプレートを自分でリポジトリに追加する必要があります。
+ここで朗報があります。2025年12月、Anthropicが発表した**Agent Skills**というオープンスタンダードにより、Claude CodeとGitHub Copilotで**同じスキルファイルを共有**できるようになりました。
+
+> **つまり**: `.github/skills/` に置いたスキルは、Claude CodeでもGitHub Copilotでも動きます。仕様駆動開発のノウハウを1回書けば、どちらのツールでも使い回せるのです。
+
+| 章 | 対象ツール | 内容 |
+|----|-----------|------|
+| 前章（第11章） | Claude Code | Skills、pr-review-toolkit |
+| 本章（第12章） | GitHub Copilot | Skills（共通）、カスタムエージェント |
 
 ---
 
-## GitHub Copilot Agentsとは
+## オープンスタンダード「Agent Skills」
 
-GitHub Copilotのカスタムエージェントは、**特定のタスクに特化したAIの専門家**を定義できる機能です。VS Code 1.107以降で利用可能です。
+### Agent Skillsとは
+
+2025年12月18日、Anthropicは**Agent Skills**というオープンスタンダードを発表しました。仕様は[agentskills.io](https://agentskills.io/specification)で公開されています。
+
+Agent Skillsの核心は**「AIエージェントへの指示書を、ツール横断で共有できる標準形式にする」**ことです。
 
 | 項目 | 内容 |
 |------|------|
-| 保存場所 | `.github/agents/` フォルダ |
-| ファイル形式 | `*.agent.md`（Markdown） |
-| 対応環境 | VS Code 1.107+、GitHub.com |
+| 仕様公開場所 | [agentskills.io/specification](https://agentskills.io/specification) |
+| ファイル形式 | `SKILL.md`（YAML frontmatter + Markdown本文） |
+| 採用ツール | Claude Code, GitHub Copilot, Cursor, OpenAI |
+| 管理団体 | Anthropic（オープンスタンダードとして公開） |
+
+### なぜオープンスタンダードが重要か
+
+第10章で解説した**AGENTS.md**を覚えていますか？ あれは「設定ファイル」の標準化でした。Agent Skillsは**「スキル（手順書）」の標準化**です。
+
+```text
+AGENTS.md     → AIへの基本設定（コーディングルール等）
+SKILL.md      → AIへのタスク手順（テスト方法、レビュー基準等）
+```
+
+どちらもオープンスタンダードなので、ツールに依存しません。チームの誰かがClaude Codeを使い、別の誰かがGitHub Copilotを使っていても、**同じスキルが同じように動く**のです。
+
+### Claude Code Skillsとの共通性
+
+GitHub公式ドキュメントにはこう書かれています。
+
+> "If you've already set up skills for Claude Code in the `.claude/skills` directory in your repository, Copilot will pick them up automatically."
+
+つまり、`.claude/skills/` に置いたスキルをGitHub Copilotも**自動検出**します。逆も同様で、`.github/skills/` に置いたスキルをClaude Codeも読めます。
+
+| 保存場所 | Claude Code | GitHub Copilot |
+|---------|-------------|----------------|
+| `.github/skills/` | 読める | 読める（推奨） |
+| `.claude/skills/` | 読める（推奨） | 読める |
+
+### Progressive Disclosure（段階的読み込み）
+
+Agent Skillsは**Progressive Disclosure**という3段階の読み込み方式を採用しています。
+
+**なぜ段階的か？** スキルを100個入れても、コンテキストウィンドウを圧迫しないようにするためです。
+
+| レベル | 読み込み内容 | トークン量 | タイミング |
+|--------|-------------|-----------|-----------|
+| Level 1 | `name` と `description` のみ | 約100トークン/スキル | 起動時（常に） |
+| Level 2 | SKILL.md の本文全体 | 推奨5,000トークン以下 | プロンプトが合致した時 |
+| Level 3 | scripts/ や references/ の中身 | 必要に応じて | エージェントが参照した時 |
+
+**ポイント**: `description` フィールドの書き方が重要です。ここが曖昧だと、AIがスキルを見つけられません。
+
+```yaml
+# 悪い例 — 曖昧すぎてAIが判断できない
+description: テストに関するスキル
+
+# 良い例 — いつ使うかが明確
+description: >
+  プロジェクトのテストパターンに従ってユニットテストを作成する。
+  新しいファイルのテストを書く時や、テストカバレッジを改善する時に使用。
+```
 
 ---
 
-## 4種類のエージェントタイプ
+## Skillsの作成方法
 
-GitHub Copilotには4種類のエージェントがあります。
+### SKILL.md のフォーマット
 
-| 種類 | 実行場所 | 特徴 | 用途 |
-|------|---------|------|------|
-| ローカル | VS Code | 対話的・リアルタイム | 小〜中規模タスク |
-| バックグラウンド | VS Code | Git worktreeで並行作業 | 大規模リファクタ |
-| クラウド | GitHub.com | 自律的にPR作成 | Issue解決 |
-| サブ | 親エージェント内 | 専門タスクを委譲 | 専門知識が必要な部分 |
+スキルは `SKILL.md` という名前のMarkdownファイルで定義します。YAML frontmatter（メタデータ）と本文（手順書）で構成されます。
+
+```markdown
+---
+name: skill-name
+description: >
+  スキルの説明。何をするか＋いつ使うかを書く。
+  AIはこのフィールドを見て自動的にスキルを選択する。
+license: MIT
+compatibility: Requires Node.js 18+
+metadata:
+  author: your-team
+  version: "1.0"
+---
+
+# スキル名
+
+## 手順
+
+1. まず〇〇を確認する
+2. 次に〇〇を実行する
+3. 最後に〇〇を検証する
+
+## 例
+
+（入出力の具体例）
+
+## エッジケース
+
+（注意すべき特殊ケース）
+```
+
+### frontmatter フィールド一覧
+
+| フィールド | 必須 | 説明 |
+|-----------|------|------|
+| `name` | はい | スキル名（小文字・ハイフン区切り、64文字以内） |
+| `description` | はい | 説明（1024文字以内）。**いつ使うか**を必ず含める |
+| `license` | いいえ | ライセンス名 |
+| `compatibility` | いいえ | 実行環境の要件 |
+| `metadata` | いいえ | 任意のキー/値ペア |
+
+### ディレクトリ構造
+
+```text
+.github/skills/
+└── review-standards/
+    ├── SKILL.md              # 必須 — 手順書
+    ├── scripts/              # 任意 — 実行スクリプト
+    │   └── check-patterns.sh
+    └── references/           # 任意 — 参考資料
+        └── style-guide.md
+```
+
+**ルール**: ディレクトリ名と `name` フィールドは**完全に一致**させる必要があります。
+
+### プロジェクトスキル vs パーソナルスキル
+
+| 種類 | 保存場所 | 共有範囲 | 用途 |
+|------|---------|---------|------|
+| プロジェクトスキル | `.github/skills/` | リポジトリ全員 | チーム共通のワークフロー |
+| パーソナルスキル | `~/.copilot/skills/` | 自分だけ | 個人の生産性向上 |
+
+**プロジェクトスキル**はGitで管理されるため、チーム全員が自動的に同じスキルを使えます。これは仕様駆動開発の「チームの暗黙知を明示知にする」という考え方と完全に一致します。
+
+**パーソナルスキル**は個人のホームディレクトリに置くため、チームには共有されません。自分だけの作業効率化に使います。
 
 ---
 
-## カスタムエージェントの作成方法
+## 仕様駆動開発向けSkills（テンプレート）
 
-`.github/agents/` ディレクトリに `*.agent.md` ファイルを作成します。
+以下は、仕様駆動開発チームが**すぐに使えるスキルテンプレート**です。`.github/skills/` に配置すれば、Claude CodeでもGitHub Copilotでも動きます。
+
+### 1. code-review-standards
+
+コードレビューの基準をスキルとして定義します。
+
+```markdown
+---
+name: code-review-standards
+description: >
+  プロジェクトのコーディング規約とアーキテクチャガイドラインに基づいてコードレビューを実行する。
+  PRのレビュー、コード品質チェック、コーディング規約の確認時に使用。
+metadata:
+  author: your-team
+  version: "1.0"
+---
+
+# コードレビュー標準
+
+## レビュー手順
+
+1. プロジェクトのガイドライン（CLAUDE.md / AGENTS.md）を読む
+2. 変更されたファイルを `git diff` で特定する
+3. 各変更をガイドラインと照合する
+4. 信頼度80以上の問題のみ報告する
+
+## レビュー観点
+
+- マジックナンバーの禁止（PATTERNS.mdの規約に従う）
+- ファイルサイズ制限（500行ソフトリミット、800行ハードリミット）
+- エラーハンドリングパターン（Result型の使用）
+- 命名規約（MASTER.mdに準拠）
+
+## 信頼度スコア
+
+| スコア | 判定 | アクション |
+|--------|------|-----------|
+| 80-90 | 重要な問題 | 報告する |
+| 91-100 | クリティカル | 必ず報告 |
+| 80未満 | マイナー | 報告しない |
+
+## 出力形式
+
+### Critical Issues (信頼度 91-100)
+- [ファイル名:行番号] 問題の説明
+  - 信頼度: XX
+  - 理由: なぜこれが問題か
+  - 修正提案: どう修正すべきか
+```
+
+### 2. test-patterns
+
+テスト作成のパターンをスキルとして定義します。
+
+```markdown
+---
+name: test-patterns
+description: >
+  プロジェクトのテスト戦略に従ってユニットテスト・統合テストを作成する。
+  新しいテストの作成、テストカバレッジの改善、テストパターンの確認時に使用。
+metadata:
+  author: your-team
+  version: "1.0"
+---
+
+# テストパターン
+
+## 基本方針
+
+- 動作カバレッジ（行カバレッジではなく、振る舞いを網羅）
+- テストピラミッド: Unit > Integration > E2E
+- テストファイル命名: `[対象ファイル名].test.ts`
+
+## テスト構造
+
+1つのテストは以下の構造に従う:
+
+1. **Arrange** — テストデータと前提条件を準備
+2. **Act** — テスト対象の操作を実行
+3. **Assert** — 期待結果を検証
+
+## 必須テストケース
+
+新しい機能には最低限以下のテストを含める:
+
+- 正常系（ハッピーパス）
+- 異常系（エラーケース）
+- 境界値（空入力、null、最大値/最小値）
+
+## エッジケースチェックリスト
+
+- [ ] 空文字列 / 空配列の入力
+- [ ] null / undefined の入力
+- [ ] 数値の上限・下限
+- [ ] 並行処理での競合状態
+- [ ] タイムアウト
+```
+
+### 3. error-handling-standards
+
+エラーハンドリングの基準をスキルとして定義します。
+
+```markdown
+---
+name: error-handling-standards
+description: >
+  エラーハンドリングの品質を検査し、沈黙する失敗を防ぐ。
+  エラー処理の実装、try-catchブロックの確認、障害対応パターンの検討時に使用。
+metadata:
+  author: your-team
+  version: "1.0"
+---
+
+# エラーハンドリング標準
+
+## コア原則（譲歩不可）
+
+1. **沈黙する失敗は受け入れない** — 空のcatchブロック禁止
+2. **ユーザーに実行可能なフィードバックを返す** — "エラーが発生しました"は不可
+3. **catchは特定的にする** — `catch (e)` ではなく具体的なエラー型を捕捉
+4. **フォールバックは明示的かつ正当化する** — なぜフォールバックするのかコメント必須
+
+## 重大度レベル
+
+| レベル | 例 | 対応 |
+|--------|-----|------|
+| CRITICAL | 空のcatchブロック、ブロードcatch | 即修正 |
+| HIGH | `console.log("error")` のみ | 修正推奨 |
+| MEDIUM | エラーの原因コンテキスト不足 | 改善提案 |
+
+## 推奨パターン
+
+- Result型パターン（`{ success: true, data } | { success: false, error }`）
+- カスタムエラークラスの使用
+- エラーバウンダリによる局所化
+- 構造化ログでのエラー記録
+```
+
+---
+
+## Skills vs Agents の使い分け
+
+GitHub Copilotには3つのカスタマイズ手段があります。それぞれ役割が異なるため、適切に使い分けましょう。
+
+### 3つのカスタマイズ手段
+
+| 手段 | ファイル | 目的 | ロード方式 |
+|------|---------|------|-----------|
+| Custom Instructions | `.github/copilot-instructions.md` | 常時適用のコーディング基準 | 常に自動 |
+| Agent Skills | `.github/skills/*/SKILL.md` | タスク固有の手順書 | プロンプト合致で自動 |
+| Custom Agents | `.github/agents/*.md` | 名前付き専門家 | `@名前` で明示的 |
+
+### どう組み合わせるか
+
+```text
+Custom Instructions（常に読み込み）
+  └→ 「TypeScriptのstrictモードを使用」「PRは日本語で書く」
+
+Agent Skills（自動的にロード）
+  └→ 「テストはこのパターンで書く」「レビューはこの基準で行う」
+
+Custom Agents（@で呼び出し）
+  └→ 「@security-agent セキュリティ観点でレビューして」
+```
+
+**比喩で説明すると**:
+
+- **Custom Instructions** = チームの「暗黙のルール」を明文化したもの
+- **Agent Skills** = チームの「プレイブック（手順書）」
+- **Custom Agents** = チームの「専門家」（呼べば来てくれる）
+
+### Skills と Agents の判断基準
+
+| 判断基準 | Skills を使う | Agents を使う |
+|---------|-------------|-------------|
+| 呼び出し方 | 自動（AIが判断） | 手動（`@名前`） |
+| 内容の性質 | 手順・基準 | 分析・判断 |
+| 再利用性 | ツール横断（オープンスタンダード） | GitHub Copilot専用 |
+| 例 | テストパターン、レビュー基準 | セキュリティ分析、型設計評価 |
+
+**原則**: まずSkillsで定義できないか検討し、Skillsでは表現しきれない「専門的な分析・判断」が必要な場合にAgentsを使います。
+
+---
+
+## カスタムエージェント
+
+Skills だけでは表現しきれない、**専門的な分析・判断**を行うタスクにはカスタムエージェントを使います。
+
+### エージェントの作成方法
+
+`.github/agents/` ディレクトリに `*.md` ファイルを作成します。
 
 ```markdown
 ---
@@ -66,334 +377,59 @@ tools:
 期待する出力フォーマット
 ```
 
-### VS Code設定
-
-カスタムエージェントを有効にするには、VS Codeの `settings.json` に以下を追加します。
-
-```json
-{
-  "github.copilot.chat.cli.customAgents.enabled": true
-}
-```
-
----
-
-## 仕様駆動開発向けエージェント（6種）
+### 仕様駆動開発向けエージェント（6種）
 
 以下は、Claude Codeのpr-review-toolkitと同等の機能を実現するためのエージェントテンプレートです。
 
-### 1. code-reviewer.agent.md
+| エージェント | ファイル名 | 役割 |
+|------------|-----------|------|
+| Code Reviewer | `code-reviewer.md` | ガイドラインへの準拠チェック |
+| Error Handler Hunter | `error-handler-hunter.md` | 沈黙する失敗の検出 |
+| Test Analyzer | `test-analyzer.md` | テストカバレッジの品質分析 |
+| Code Simplifier | `code-simplifier.md` | 不要な複雑性の排除 |
+| Comment Analyzer | `comment-analyzer.md` | コメントの正確性検証 |
+| Type Design Analyzer | `type-design-analyzer.md` | 型設計の品質と不変性分析 |
+
+> **Tip**: これらのエージェントの詳細なテンプレートは、本書のGitHubリポジトリで公開しています。本文では紙面の都合上、代表的な1つを示します。
+
+### エージェントテンプレート例: code-reviewer
 
 ```markdown
 ---
-description: プロジェクトガイドラインへの準拠をチェックし、バグ、スタイル違反、コード品質問題を検出するコードレビューエージェント
+description: >
+  プロジェクトガイドラインへの準拠をチェックし、
+  バグ、スタイル違反、コード品質問題を検出するコードレビューエージェント
 tools:
   - "*"
 ---
 
 # Code Reviewer
 
-プロジェクトガイドラインへの準拠をチェックし、高信頼度の問題のみを報告するコードレビューエージェントです。
-
 ## 役割
 
-- CLAUDE.md、README.md、その他のプロジェクトガイドラインとの照合
-- バグ検出
-- スタイル違反の特定
+- CLAUDE.md、README.md、その他のガイドラインとの照合
+- バグ検出とスタイル違反の特定
 - コード品質問題の発見
 
 ## 分析プロセス
 
-1. プロジェクトのガイドラインファイル（CLAUDE.md等）を読み込む
+1. プロジェクトのガイドラインファイルを読み込む
 2. 変更されたファイルを特定する（git diff）
 3. 各変更をガイドラインと照合する
-4. 問題に信頼度スコアを付与する
+4. 問題に信頼度スコア（0-100）を付与する
 
-## 信頼度スコア
+## 報告ルール
 
-各問題には0-100の信頼度スコアを付与してください：
+信頼度80以上の問題のみ報告する。
 
-| スコア | 意味 | 報告 |
-|--------|------|------|
-| 0-25 | 誤検出または既存の問題 | 報告しない |
-| 26-50 | マイナーな指摘（ガイドラインに明記なし） | 報告しない |
-| 51-79 | 有効だが低影響 | 報告しない |
+| スコア | 意味 | アクション |
+|--------|------|-----------|
 | 80-90 | 重要な問題 | 報告する |
-| 91-100 | クリティカルなバグまたは明示的な違反 | 必ず報告 |
-
-**報告閾値: 信頼度80以上のみ報告**
-
-## 出力形式
-
-## Code Review Results
-
-### Critical Issues (信頼度 91-100)
-- [ファイル名:行番号] 問題の説明
-  - 信頼度: XX
-  - 理由: なぜこれが問題か
-  - 修正提案: どう修正すべきか
-
-### Important Issues (信頼度 80-90)
-- [ファイル名:行番号] 問題の説明
-  - 信頼度: XX
-  - 理由: なぜこれが問題か
-  - 修正提案: どう修正すべきか
-
-### Summary
-- 検出された問題数: X
-- Critical: X
-- Important: X
-
-## 注意事項
-
-- 信頼度80未満の問題は報告しない
-- 既存のコード（変更されていない部分）の問題は報告しない
-- 推測や曖昧な指摘は避ける
-- 具体的な修正提案を含める
+| 91-100 | クリティカル | 必ず報告 |
+| 80未満 | マイナーまたは推測 | 報告しない |
 ```
 
-### 2. error-handler-hunter.agent.md
-
-```markdown
----
-description: エラーハンドリングの品質を検査し、沈黙する失敗を検出するエージェント
-tools:
-  - "*"
----
-
-# Error Handler Hunter
-
-沈黙する失敗を許さない、エラーハンドリングの厳格な検査官です。
-
-## 役割
-
-- try-catchブロックの検査
-- 沈黙する失敗の検出
-- 空のcatchブロックの禁止
-- フォールバックロジックの正当性確認
-
-## コア原則（譲歩不可）
-
-1. 沈黙する失敗は受け入れられない
-2. ユーザーは実行可能なフィードバックに値する
-3. フォールバックは明示的で正当化される必要がある
-4. キャッチブロックは特定的でなければならない
-
-## 重大度レベル
-
-| レベル | 説明 | 例 |
-|--------|------|-----|
-| CRITICAL | サイレント失敗、ブロードcatch | 空のcatchブロック |
-| HIGH | 不十分なエラーメッセージ | console.log("error") のみ |
-| MEDIUM | コンテキスト不足 | エラーの原因が不明確 |
-
-## 出力形式
-
-## Error Handling Analysis Results
-
-### CRITICAL Issues
-- [ファイル名:行番号] 問題の説明
-  - コード: 問題のあるコード
-  - 問題: 何が問題か
-  - 修正提案: 推奨される修正
-
-### Summary
-- CRITICAL: X
-- HIGH: X
-- MEDIUM: X
-```
-
-### 3. test-analyzer.agent.md
-
-```markdown
----
-description: テストカバレッジの品質を分析し、クリティカルなギャップを特定するエージェント
-tools:
-  - "*"
----
-
-# Test Analyzer
-
-行カバレッジではなく、動作カバレッジの観点からテスト品質を分析するエージェントです。
-
-## 役割
-
-- 動作カバレッジの分析
-- クリティカルなテストギャップの特定
-- エッジケースとエラー条件のカバレッジ確認
-
-## 識別対象のギャップ
-
-1. テストされていないエラーハンドリングパス
-2. 境界条件のエッジケース（空入力、null、最大値/最小値）
-3. クリティカルなビジネスロジック分岐
-4. ネガティブテストケース
-5. 非同期/並行処理
-
-## 優先度スケール
-
-| 優先度 | 意味 |
-|--------|------|
-| 9-10 | クリティカル（データ損失、セキュリティ、システム障害の可能性） |
-| 7-8 | 重要（ユーザー向けエラーの可能性） |
-| 5-6 | エッジケース（混乱や軽微な問題） |
-| 3-4 | Nice-to-have |
-| 1-2 | オプショナル |
-
-## 出力形式
-
-## Test Coverage Analysis Results
-
-### Critical Gaps (優先度 9-10)
-- [機能名] ファイル: path/to/file.ts
-  - テストされていない動作: 説明
-  - リスク: 影響
-  - 優先度: X
-  - 推奨テストケース: 具体的なテスト案
-```
-
-### 4. code-simplifier.agent.md
-
-```markdown
----
-description: コードの簡潔性と可読性を向上させるエージェント。機能を変更せずに、不要な複雑性を排除します
-tools:
-  - "*"
----
-
-# Code Simplifier
-
-機能を保持したまま、コードの簡潔性と可読性を向上させるエージェントです。
-
-## 役割
-
-- 不要な複雑性の排除
-- 可読性の向上
-- 冗長なコードの削減
-
-## 簡潔化のルール
-
-### 推奨する変更
-
-1. ネストした三項演算子 → if/else文へ
-2. 深いネスト → 早期リターンパターンへ
-3. 巧妙なコード → 分かりやすいコードへ
-
-### 禁止事項
-
-- 機能の変更
-- 新機能の追加
-- テストの削除
-
-## 出力形式
-
-## Code Simplification Results
-
-### Simplification Opportunities
-- [ファイル名:行番号]
-  - 現在のコード: ...
-  - 提案: ...
-  - 理由: なぜこの変更が可読性を向上させるか
-
-## 注意事項
-
-- 機能を絶対に変更しない
-- 最近変更されたコードのみに焦点を当てる
-- 簡潔性より明確性を優先する
-```
-
-### 5. comment-analyzer.agent.md
-
-```markdown
----
-description: コードコメントの正確性、完全性、長期的な保守性を分析するエージェント
-tools:
-  - "*"
----
-
-# Comment Analyzer
-
-コードコメントの品質を分析し、技術的負債を防ぐエージェントです。
-
-## 役割
-
-- コメントと実コードの照合
-- コメント腐れ（技術的負債）の検出
-- 誤解を招く・時代遅れなコメントの特定
-
-## 検証プロセス
-
-1. 事実精度の確認（関数署名、説明された動作）
-2. 完全性の評価（仮定、副作用、エラー状態）
-3. 長期的価値の評価（「なぜ」を説明しているか）
-4. 誤解要素の特定（曖昧性、古い参照）
-
-## 出力形式
-
-## Comment Analysis Results
-
-### Critical Issues（事実として不正確）
-- [ファイル名:行番号]
-  - コメント: "..."
-  - 問題: コメントが実際のコードと矛盾
-  - 推奨修正: ...
-
-### Improvement Opportunities（改善可能）
-- [ファイル名:行番号]
-  - 問題: 情報が不完全
-  - 推奨追加内容: ...
-```
-
-### 6. type-design-analyzer.agent.md
-
-```markdown
----
-description: 型設計の品質と不変性を分析するエージェント
-tools:
-  - "*"
----
-
-# Type Design Analyzer
-
-型設計品質と不変性の表現を分析し、堅牢な型システムの構築を支援するエージェントです。
-
-## 役割
-
-- 型カプセル化の評価
-- 不変性表現の分析
-- アンチパターンの検出
-
-## 評価軸（各1-10スコア）
-
-| 軸 | 評価内容 |
-|----|----------|
-| Encapsulation | 内部実装の隠蔽度 |
-| Invariant Expression | 不変性の型による表現度 |
-| Invariant Usefulness | 実バグ防止への有効性 |
-| Invariant Enforcement | 構築時・変異時の検証度 |
-
-## アンチパターン
-
-- 貧血ドメインモデル（データのみで振る舞いがない）
-- 変更可能な内部の公開
-- ドキュメント依存の不変性
-- 構築境界での検証不足
-
-## 出力形式
-
-## Type Design Analysis Results
-
-### [型名]
-- ファイル: path/to/file.ts
-- スコア: Encapsulation X/10, Invariant Expression X/10, ...
-- 総合スコア: X/10
-- 検出されたアンチパターン: ...
-- 改善提案: ...
-```
-
----
-
-## エージェントの呼び出し方
+### エージェントの呼び出し方
 
 VS CodeのCopilot Chatで `@` に続けてエージェント名を入力します。
 
@@ -407,14 +443,21 @@ VS CodeのCopilot Chatで `@` に続けてエージェント名を入力しま�
 
 ## 推奨ワークフロー
 
-**コミット前**:
+Skills と Agents を組み合わせた推奨ワークフローです。
+
+**日常のコーディング中**（Skills が自動的に動作）:
+
+- テスト作成 → `test-patterns` スキルが自動ロード
+- エラー処理の実装 → `error-handling-standards` スキルが自動ロード
+
+**コミット前**（Agents を明示的に呼び出し）:
 
 ```text
 @code-reviewer
 @error-handler-hunter
 ```
 
-**PR作成前**:
+**PR作成前**（Agents で総合チェック）:
 
 ```text
 @code-reviewer
@@ -429,11 +472,13 @@ VS CodeのCopilot Chatで `@` に続けてエージェント名を入力しま�
 @type-design-analyzer
 ```
 
+> **ポイント**: Skillsは「やり方」を定義し、Agentsは「チェック」を実行します。Skillsが充実していれば、Agentsの指摘は自然と減っていきます。
+
 ---
 
 ## Premium Requestsとコスト
 
-GitHub Copilotのカスタムエージェントは**Premium Requests**を消費します。
+GitHub Copilotのエージェント機能は**Premium Requests**を消費します。
 
 | モデル | 消費量 |
 |--------|--------|
@@ -452,128 +497,100 @@ GitHub Copilotのカスタムエージェントは**Premium Requests**を消費�
 
 ### 基本比較
 
-| 観点 | Claude Code Skills | GitHub Copilot Agents |
-|------|-------------------|----------------------|
-| 実行環境 | Claude Code CLI | VS Code / GitHub.com |
-| 設定ファイル | plugin.json + commands/ | .github/agents/*.agent.md |
+| 観点 | Claude Code | GitHub Copilot |
+|------|-------------|----------------|
+| 実行環境 | CLI | VS Code / GitHub.com |
+| スキル共有 | `.claude/skills/` | `.github/skills/`（相互参照可） |
+| エージェント | plugin.json + commands/ | `.github/agents/*.md` |
 | Git連携 | Bash経由 | ネイティブ（worktree, PR作成） |
 | 並列実行 | 順次 | Background/Sub-Agents |
 | コスト | サブスクリプション | Premium Requests |
 | 公式プラグイン | pr-review-toolkit等あり | なし（自作が必要） |
 
-### レビューエージェント対応表
+### レビュー機能対応表
 
 | 目的 | Claude Code (pr-review-toolkit) | GitHub Copilot Agent |
 |------|--------------------------------|---------------------|
-| コードレビュー | code-reviewer | code-reviewer.agent.md |
-| サイレント失敗検出 | silent-failure-hunter | error-handler-hunter.agent.md |
-| コード簡素化 | code-simplifier | code-simplifier.agent.md |
-| コメント分析 | comment-analyzer | comment-analyzer.agent.md |
-| テスト分析 | pr-test-analyzer | test-analyzer.agent.md |
-| 型設計評価 | type-design-analyzer | type-design-analyzer.agent.md |
-| 包括的レビュー | /review-pr | （複数エージェント組み合わせ） |
+| コードレビュー | code-reviewer | @code-reviewer |
+| サイレント失敗検出 | silent-failure-hunter | @error-handler-hunter |
+| コード簡素化 | code-simplifier | @code-simplifier |
+| コメント分析 | comment-analyzer | @comment-analyzer |
+| テスト分析 | pr-test-analyzer | @test-analyzer |
+| 型設計評価 | type-design-analyzer | @type-design-analyzer |
 
-**どちらのツールを使っても、同等のレビュー機能を実現できます。**
+### 最大の違い: Skills の互換性
 
----
+以前はClaude CodeとGitHub Copilotで**別々にカスタマイズファイルを書く**必要がありました。
 
-## 章末チェックリスト（GitHub Copilot ユーザー向け）
+Agent Skillsの登場により、**Skills部分は1回書けば両方で動く**ようになりました。残るのはAgentsの差異だけです。
 
-- [ ] `.github/agents/` ディレクトリを作成する
-- [ ] 本章の6つのエージェントテンプレートを導入する
-- [ ] VS Code設定でカスタムエージェントを有効化する
-- [ ] `@code-reviewer` などのエージェントをPR前に実行する習慣をつける
-- [ ] プロジェクトで繰り返している作業を洗い出す
-- [ ] 最もよく使う作業をエージェント化する
-- [ ] description（起動条件）を明確に書く
-
----
-
-## 🥷 AI侍道場 - エージェントの使い分け
-
-![AI侍道場：エージェントの使い分け](../images/ch12-ai-samurai-dojo.png)
-
----
-
-### 🗡️ AI侍の秘伝書
-
-エージェントを使いこなす3つの極意を授ける。
-
-#### 秘伝その1：「何を見てほしいか」で選べ
-
-エージェントは**見る視点**が違う。何を見てほしいかで選べ。
-
-- **全体的なコード品質** → `code-reviewer`
-- **テストの網羅性** → `test-analyzer`
-- **コメントの正確性** → `comment-analyzer`
-- **エラーの隠蔽** → `silent-failure-hunter`
-- **型設計の品質** → `type-design-analyzer`
-- **コードの簡潔性** → `code-simplifier`
-
-1つのエージェントですべて見ようとするな。**視点を分けよ**。
-
-#### 秘伝その2：Claude CodeとCopilot、どちらでもいい
-
-本質は**仕様駆動開発**である。ツールは選択肢の1つに過ぎぬ。
-
-| 機能 | Claude Code | GitHub Copilot |
-|------|-------------|----------------|
-| コードレビュー | Skill: `pr-review` | Agent: `@code-reviewer` |
-| テスト分析 | エージェント | Agent: `@test-analyzer` |
-| コメント分析 | エージェント | Agent: `@comment-analyzer` |
-
-**どちらを使っても、同じ価値を得られる**。
-
-大事なのは：
-- 仕様を書いているか
-- レビューを回しているか
-- ナレッジを蓄積しているか
-
-これらができていれば、ツールは何でもよい。
-
-#### 秘伝その3：「繰り返し実行」を習慣化せよ
-
-エージェントは**PR前に必ず実行**せよ。
-
-```bash
-# Claude Codeの場合
-/pr-review-toolkit:review-pr
-
-# GitHub Copilotの場合
-@code-reviewer ファイルをレビューして
-@test-analyzer テストをチェックして
+```text
+共通（Skills）: .github/skills/ → Claude Code + GitHub Copilot
+個別（Agents）: .github/agents/ → GitHub Copilot のみ
+個別（Agents）: plugin.json     → Claude Code のみ
 ```
 
-これを**PRを出す前の儀式**にせよ。習慣化すれば、品質は自然と上がる。
+---
+
+## 章末チェックリスト
+
+- [ ] `.github/skills/` ディレクトリを作成する
+- [ ] `code-review-standards` スキルを導入する
+- [ ] `test-patterns` スキルを導入する
+- [ ] `error-handling-standards` スキルを導入する
+- [ ] SKILL.md の `description` に「いつ使うか」を明記する
+- [ ] `.github/agents/` に必要なエージェントテンプレートを配置する
+- [ ] `@code-reviewer` 等のエージェントをPR前に実行する習慣をつける
+- [ ] Claude Code ユーザーは `.claude/skills/` との相互参照を確認する
 
 ---
 
-## 参考: GitHub Copilot Skills
+## AI侍道場 - Skills & Agentsの極意
 
-2025年12月、GitHubは**Copilot Skills**を発表しました。本章で紹介したAgentsとは別の機能です。
+![AI侍道場：Skills & Agentsの極意](../images/ch12-ai-samurai-dojo.png)
 
-### Agents vs Skills の違い
+---
 
-| 観点 | Agents | Skills |
-|------|--------|--------|
-| 保存場所 | `.github/agents/*.agent.md` | `.github/skills/[skill-name]/SKILLS.md` |
-| 目的 | 「何を見るか」「どう判断するか」を定義 | 「特定タスクをどう実行するか」を定義 |
-| 呼び出し | `@エージェント名` で明示的に呼び出し | 関連するプロンプトで**自動的に**ロード |
-| 比喩 | 専門家（レビュアー、テスター等） | チームのプレイブック・手順書 |
+### AI侍の秘伝書
 
-### Skills でできること
+Skills と Agents を使いこなす3つの極意を授ける。
 
-- **コードレビュー標準**: チーム固有のレビュー観点を定義
-- **テストパターン**: 「このプロジェクトではこう書く」を明文化
-- **ドキュメント作成**: テンプレートに沿った一貫した記述
+#### 秘伝その1：「手順書」と「専門家」を分けよ
 
-Skills を使うと、新メンバーもベテランと同じ方法でタスクを実行できます。
+**Skills**は手順書、**Agents**は専門家じゃ。
 
-### 現時点での制限（2026年1月時点）
+- 「テストをこう書け」→ Skills（手順）
+- 「このコードの品質を判定せよ」→ Agents（判断）
 
-- リポジトリ単位での作成のみ（Organization/Enterprise単位は今後対応予定）
-- Copilot有料プラン（Individual/Business/Enterprise）が必要
+手順書を充実させれば、専門家に聞く回数が減る。**Skillsを先に整備せよ**。
 
-詳細は[GitHub公式ドキュメント](https://docs.github.com/en/copilot)を参照してください。
+#### 秘伝その2：1回書けば、どのツールでも動く
+
+Agent Skills はオープンスタンダードじゃ。
+
+```text
+.github/skills/test-patterns/SKILL.md
+  → Claude Code で動く
+  → GitHub Copilot で動く
+  → Cursor でも動く
+```
+
+ツールのロックインを恐れるな。**仕様を書けば、ツールは後から選べる**。これこそが仕様駆動開発の真髄じゃ。
+
+#### 秘伝その3：description が9割
+
+Skills が自動的に呼ばれるかどうかは、`description` フィールドの書き方で決まる。
+
+```yaml
+# ダメな例
+description: テスト関連のスキル
+
+# 良い例
+description: >
+  プロジェクトのテスト戦略に従ってユニットテストを作成する。
+  新しいファイルのテストを書く時や、テストカバレッジを改善する時に使用。
+```
+
+**何をするか**と**いつ使うか**。この2つを書けば、AIは自分で判断できる。
 
 ---

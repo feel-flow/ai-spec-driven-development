@@ -654,7 +654,7 @@ Layer 1の設定ファイルとLayer 2の仕様文書が**事前に整備され�
 
 ほとんどのツールが**AGENTS.md**（Linux Foundation傘下のAgentic AI Foundationが管理するオープンスタンダード）に対応しています。複数のツールを併用するチームでは、`CLAUDE.md`と`AGENTS.md`の両方を用意するとよいでしょう。各ツールの詳しい設定方法は「付録：AIエージェント設定ファイル一覧」を参照してください。
 
-また、設定ファイルが「基本ルール」を定義するのに対し、**Skills**（Claude Code）や**Agents**（GitHub Copilot）はより専門的なワークフローを定義します。これらの詳細は第11章（Claude Code Skills）、第12章（GitHub Copilot Agents）で解説します。
+また、設定ファイルが「基本ルール」を定義するのに対し、**Skills**や**Agents**はより専門的なワークフローを定義します。特にSkillsはオープンスタンダード（agentskills.io）として、Claude CodeとGitHub Copilotの両方で共有できます。これらの詳細は第11章（Claude Code Skills）、第12章（GitHub Copilot Skills & Agents）で解説します。
 
 ### 実際のコマンド
 
