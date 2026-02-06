@@ -88,6 +88,35 @@ docs/
 
 **なぜ7文書か**: AIツールは情報の散在に弱い。少数の高密度ドキュメントに集約することで、コンテキスト理解の精度が劇的に向上する。詳細は [AI Spec Driven Development 概念と実践](./docs/AI_SPEC_DRIVEN_DEVELOPMENT.md) を参照。
 
+## 関連書籍
+
+本フレームワークの背景と実践を解説する書籍です。
+
+<table>
+<tr>
+<td width="160"><img src="./images/book-ai-spec-driven-development.jpg" alt="AI仕様駆動開発" width="150"></td>
+<td>
+<h3>AI仕様駆動開発 ── AIエージェント開発の新常識</h3>
+<p>AIに最適化されたドキュメント戦略と7文書構造の詳細を解説。Claude Code / GitHub Copilot対応。</p>
+<p>
+<a href="https://amzn.asia/d/05n5IlFH">Kindle版</a> ｜
+<a href="https://amzn.asia/d/03bcN32G">ペーパーバック版</a>
+</p>
+</td>
+</tr>
+<tr>
+<td width="160"><img src="./images/book-ai-small-is-accurate.jpg" alt="なぜあの人のAIは優秀なのか" width="150"></td>
+<td>
+<h3>なぜあの人のAIは優秀なのか ──「分割と余白」で変わるAIと協働術</h3>
+<p>AI開発ツールを最大限活用するための考え方と実践テクニック。コピペで使えるプロンプト例付き。</p>
+<p>
+<a href="https://amzn.asia/d/01CGoGhI">Kindle版</a> ｜
+<a href="https://amzn.asia/d/07ycceB8">ペーパーバック版</a>
+</p>
+</td>
+</tr>
+</table>
+
 ## ドキュメント
 
 ### 概念・ガイド
