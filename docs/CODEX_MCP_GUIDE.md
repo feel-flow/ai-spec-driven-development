@@ -428,7 +428,6 @@ tool_timeout_sec = 120  # 2分に延長
 ### このリポジトリの関連ドキュメント
 
 - [MCPサーバーセットアップ](../mcp/README.md) - AI Spec-Driven Development MCPサーバー
-- [AIエージェント設定ファイル一覧](../books/ai-spec-driven-development-90percent/appendix_agent-config.md) - AGENTS.md標準
 
 ### コミュニティリソース
 
