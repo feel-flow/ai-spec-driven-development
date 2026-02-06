@@ -181,40 +181,12 @@ MASTER.mdには以下の重要な情報が含まれています：
 
 ### GitHub Copilot
 
-**設定ファイル**: `.github/copilot-instructions.md` または `AGENTS.md`  
-**校正スキル**: `.github/copilot/skills/*.md`
+**設定ファイル**: `.github/copilot-instructions.md` または `AGENTS.md`
 
 **必須手順**:
 1. リポジトリのルートに `AGENTS.md` を配置
 2. コード補完前にMASTER.mdの内容を確認
 3. コメントでMASTER.mdの参照を明記
-
-**校正スキル（Book Writing Workflow 用）**:
-
-スコープを分割した 5 つの校正スキルを `.github/copilot/skills` に配置：
-
-| スキル | 対象 | 説明 |
-|--------|------|------|
-| [`proofread-japanese.md`](.github/copilot/skills/proofread-japanese.md) | 日本語表現 | 誤字脱字、文法、読みやすさ |
-| [`proofread-terms.md`](.github/copilot/skills/proofread-terms.md) | 用語統一 | 表記揺れ、用語の一貫性 |
-| [`proofread-facts.md`](.github/copilot/skills/proofread-facts.md) | ファクトチェック | 統計データ、出典、技術的正確性 |
-| [`proofread-structure.md`](.github/copilot/skills/proofread-structure.md) | 文書構造 | 見出しレベル、必須セクション |
-| [`proofread-markdown.md`](.github/copilot/skills/proofread-markdown.md) | Markdown 記法 | リスト、強調、コードブロック、テーブル |
-
-**スキル実行方法**:
-
-PR コメントで自動実行（PR 作成時）：
-```
-PR #XXX が作成されると、5 つのスキルが自動実行され、
-各スキルが独立した PR コメントを投稿
-```
-
-または手動実行：
-```markdown
-@github-copilot /proofread-japanese
-@github-copilot /proofread-terms
-@github-copilot /proofread-facts
-```
 
 **コメント例（コード補完時）**:
 ```typescript
@@ -226,8 +198,6 @@ interface User {
   email: string;
 }
 ```
-
-**詳細**: [`.github/copilot/skills/README.md`](.github/copilot/skills/README.md) を参照
 
 ### Cursor
 
