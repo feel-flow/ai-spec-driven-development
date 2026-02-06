@@ -42,8 +42,9 @@ const __filename = url.fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const REPO_ROOT = path.resolve(__dirname, '..', '..');
 const DOCS_ROOT = path.join(REPO_ROOT, 'docs');
+const DOCS_TEMPLATE_ROOT = path.join(REPO_ROOT, 'docs-template');
 const SPECS_DIR = path.join(DOCS_ROOT, 'specs');
-const GLOSSARY_PATH = path.join(DOCS_ROOT, '06-reference', 'GLOSSARY.md');
+const GLOSSARY_PATH = path.join(DOCS_TEMPLATE_ROOT, '06-reference', 'GLOSSARY.md');
 
 // ---------- FS helpers ----------
 const readFileSafe = (p: string): string => { try { return fs.readFileSync(p, 'utf-8'); } catch { return ''; } };
@@ -74,7 +75,7 @@ const splitSections = (markdown: string): SectionIndexEntry[] => {
 };
 
 // ---------- Build indexes ----------
-const MD_FILES = [path.join(REPO_ROOT, 'README.md'), path.join(REPO_ROOT, 'ai_spec_driven_development.md'), ...listMarkdown(DOCS_ROOT)].filter(f => fs.existsSync(f));
+const MD_FILES = [path.join(REPO_ROOT, 'README.md'), path.join(REPO_ROOT, 'ai_spec_driven_development.md'), ...listMarkdown(DOCS_ROOT), ...listMarkdown(DOCS_TEMPLATE_ROOT)].filter(f => fs.existsSync(f));
 const buildSearchIndex = (files: string[]): SectionIndexEntry[] => files.flatMap(f => {
   const rel = path.relative(REPO_ROOT, f);
   const text = readFileSafe(f);
