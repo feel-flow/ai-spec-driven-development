@@ -8,9 +8,6 @@
 
 - 情報確認プロトコル
 - MASTER.md参照ルール
-- 書籍執筆Git Workflow
-- 挿絵ルール
-- 校正レビュー指示
 
 これらはすべて AGENTS.md に記載されています。
 
@@ -161,6 +158,7 @@ When reviewing pull requests, GitHub Copilot MUST follow these rules:
 
 3. **Comment Structure**
    When commenting, use this structure:
+
    ```markdown
    ## Review Summary
    [Overall assessment]

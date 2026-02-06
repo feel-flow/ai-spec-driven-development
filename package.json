@@ -6,6 +6,7 @@
   "scripts": {
     "setup": "npm install && npm --prefix mcp install && npm --prefix mcp run build",
     "validate": "node scripts/validate-docs.mjs",
+    "lint:md": "markdownlint-cli2 'docs/**/*.md' 'docs-template/**/*.md' '*.md'",
     "check": "npm --prefix mcp run check",
     "build:mcp": "npm --prefix mcp run build",
     "build:spec-index": "node scripts/build-spec-index.mjs",
