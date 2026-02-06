@@ -40,7 +40,7 @@ STEP 5: 実装を始める準備（1時間）
 #### A. Visual Studio Code（VS Code）
 無料のコードエディタです。
 
-1. https://code.visualstudio.com/ にアクセス
+1. <https://code.visualstudio.com/> にアクセス
 2. 「Download」ボタンをクリック
 3. ダウンロードしたファイルを開いてインストール
 4. インストール完了後、VS Codeを起動
@@ -49,17 +49,19 @@ STEP 5: 実装を始める準備（1時間）
 コードの変更履歴を管理するツールです。
 
 **macOSの場合:**
+
 ```bash
 # ターミナルを開いて以下を実行
 xcode-select --install
 ```
 
 **Windowsの場合:**
-1. https://git-scm.com/ にアクセス
+1. <https://git-scm.com/> にアクセス
 2. 「Download」をクリック
 3. インストーラーを実行（全て「Next」でOK）
 
 **確認方法:**
+
 ```bash
 git --version
 # バージョンが表示されればOK
@@ -151,6 +153,7 @@ VS Codeで `docs/00-planning/my-planning.md` を開きます。
 ```
 
 **あなたの答え:**
+
 ```
 [ここに記入]
 ```
@@ -164,6 +167,7 @@ VS Codeで `docs/00-planning/my-planning.md` を開きます。
 ```
 
 **あなたの答え:**
+
 ```
 [ここに記入]
 ```
@@ -178,6 +182,7 @@ VS Codeで `docs/00-planning/my-planning.md` を開きます。
 ```
 
 **あなたの答え:**
+
 ```
 [ここに記入]
 ```
@@ -194,6 +199,7 @@ VS Codeで `docs/00-planning/my-planning.md` を開きます。
 ```
 
 **あなたの答え:**
+
 ```
 1. [機能1]
 2. [機能2]
@@ -396,7 +402,7 @@ AIが教えてくれた方法で、「Hello World」が表示されることを�
 
 ---
 
-## 🎉 実装開始！
+## 🎉 実装開始
 
 ここまで完了すれば、いよいよ実際の機能を作り始められます！
 
@@ -527,14 +533,14 @@ AIが教えてくれた方法で、「Hello World」が表示されることを�
 ### 初心者向けの無料リソース
 
 #### プログラミング基礎
-- **Progate**: https://prog-8.com/ （日本語、初心者向け）
-- **ドットインストール**: https://dotinstall.com/ （動画で学べる）
+- **Progate**: <https://prog-8.com/> （日本語、初心者向け）
+- **ドットインストール**: <https://dotinstall.com/> （動画で学べる）
 
 #### Git/GitHub
-- **サル先生のGit入門**: https://backlog.com/ja/git-tutorial/
+- **サル先生のGit入門**: <https://backlog.com/ja/git-tutorial/>
 
 #### VS Code
-- **公式ドキュメント（日本語）**: https://code.visualstudio.com/docs
+- **公式ドキュメント（日本語）**: <https://code.visualstudio.com/docs>
 
 ---
 

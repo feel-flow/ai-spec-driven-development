@@ -165,6 +165,7 @@ Cursorを使用する場合は、`.cursorrules` ファイルを作成し、以�
 ## 2. 外部サービス統合
 
 ### 統合サービス一覧
+
 | サービス名 | 用途 | 統合方式 | 認証方式 | 環境 |
 |---|---|---|---|---|
 | Stripe | 決済処理 | REST API | API Key | 本番/テスト |
@@ -176,6 +177,7 @@ Cursorを使用する場合は、`.cursorrules` ファイルを作成し、以�
 ## 2. 決済システム統合
 
 ### Stripe統合
+
 ```typescript
 // Stripe設定
 import Stripe from 'stripe';
@@ -223,6 +225,7 @@ class PaymentService {
 ```
 
 ### Webhook設定
+
 ```typescript
 // Webhook エンドポイント
 app.post('/webhooks/stripe', 
@@ -250,6 +253,7 @@ app.post('/webhooks/stripe',
 ## 3. メール送信統合
 
 ### SendGrid統合
+
 ```typescript
 // SendGrid設定
 import sgMail from '@sendgrid/mail';
@@ -302,6 +306,7 @@ class EmailService {
 ## 4. ストレージ統合
 
 ### AWS S3統合
+
 ```typescript
 // S3設定
 import { S3Client, PutObjectCommand, GetObjectCommand } from '@aws-sdk/client-s3';
@@ -348,6 +353,7 @@ class StorageService {
 ## 5. 通知システム統合
 
 ### Slack統合
+
 ```typescript
 // Slack Webhook設定
 import { IncomingWebhook } from '@slack/webhook';
@@ -411,6 +417,7 @@ class NotificationService {
 ## 6. 認証プロバイダー統合
 
 ### OAuth2.0統合
+
 ```typescript
 // Google OAuth設定
 import { OAuth2Client } from 'google-auth-library';
@@ -455,6 +462,7 @@ class AuthService {
 ## 7. 分析ツール統合
 
 ### Google Analytics統合
+
 ```typescript
 // GA4設定
 import { BetaAnalyticsDataClient } from '@google-analytics/data';
@@ -499,6 +507,7 @@ class AnalyticsService {
 ## 8. キューシステム統合
 
 ### Redis/Bull統合
+
 ```typescript
 // Bull Queue設定
 import Bull from 'bull';
@@ -559,6 +568,7 @@ class QueueService {
 ## 9. モニタリング統合
 
 ### Datadog統合
+
 ```typescript
 // Datadog設定
 import { StatsD } from 'node-dogstatsd';
@@ -595,6 +605,7 @@ class MetricsService {
 ## 10. 統合テスト
 
 ### 統合テスト戦略
+
 ```typescript
 // モックサービス
 class MockPaymentService implements IPaymentService {
@@ -639,6 +650,7 @@ describe('Payment Integration', () => {
 ## 11. エラーハンドリングと再試行
 
 ### 再試行ロジック
+
 ```typescript
 // 指数バックオフによる再試行
 async function retryWithBackoff<T>(

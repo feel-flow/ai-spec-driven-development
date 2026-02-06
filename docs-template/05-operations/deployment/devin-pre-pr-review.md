@@ -114,6 +114,7 @@ git diff --name-only --diff-filter=ACMR
 ### 各観点のチェック例
 
 **Security観点**:
+
 ```python
 # NG: SQLインジェクションリスク
 query = f"SELECT * FROM users WHERE id = {user_id}"
@@ -124,6 +125,7 @@ cursor.execute(query, (user_id,))
 ```
 
 **Performance観点**:
+
 ```python
 # NG: N+1クエリ
 for user in users:
@@ -134,6 +136,7 @@ users = db.query(User).options(joinedload(User.orders)).all()
 ```
 
 **Testing観点**:
+
 ```python
 # NG: エッジケース未テスト
 def test_divide():
@@ -148,6 +151,7 @@ def test_divide():
 ```
 
 **Documentation観点**:
+
 ```python
 # NG: docstring/型ヒントなし
 def process(data):
@@ -167,6 +171,7 @@ def process(data: int) -> int:
 ```
 
 **Business Logic観点**:
+
 ```python
 # NG: マジックナンバー
 if user.age > 18:

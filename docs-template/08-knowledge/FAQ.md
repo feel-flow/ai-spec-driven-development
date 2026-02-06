@@ -22,12 +22,14 @@
 **A**: 以下の手順でセットアップしてください：
 
 1. **リポジトリのクローン**
+
    ```bash
    git clone https://github.com/your-org/your-project.git
    cd your-project
    ```
 
 2. **依存関係のインストール**
+
    ```bash
    npm install
    # または
@@ -35,18 +37,21 @@
    ```
 
 3. **環境変数の設定**
+
    ```bash
    cp .env.example .env
    # .envファイルを編集して必要な値を設定
    ```
 
 4. **データベースのセットアップ**
+
    ```bash
    npm run db:migrate
    npm run db:seed
    ```
 
 5. **アプリケーションの起動**
+
    ```bash
    npm run dev
    ```
@@ -85,6 +90,7 @@
 **A**: 基本的にany型の使用は禁止ですが、やむを得ない場合は以下の手順を踏んでください：
 
 1. **代替手段を検討**
+
    ```typescript
    // ❌ 避けるべき
    const data: any = response.data;
@@ -97,6 +103,7 @@
    ```
 
 2. **やむを得ない場合はコメントで理由を明記**
+
    ```typescript
    // 外部ライブラリの型定義が不完全なため、一時的にany型を使用
    // TODO: 適切な型定義を作成する
@@ -104,6 +111,7 @@
    ```
 
 3. **型アサーションを使用**
+
    ```typescript
    const data = response.data as User;
    ```
@@ -179,11 +187,13 @@ const config = {
 **A**: 以下の手順でマイグレーションを実行してください：
 
 1. **マイグレーションファイルの作成**
+
    ```bash
    npm run db:migrate:create add_user_table
    ```
 
 2. **マイグレーションの実行**
+
    ```bash
    # 開発環境
    npm run db:migrate
@@ -193,6 +203,7 @@ const config = {
    ```
 
 3. **ロールバック**
+
    ```bash
    npm run db:rollback
    ```
@@ -209,12 +220,14 @@ const config = {
 **A**: 以下の方法でパフォーマンスを改善できます：
 
 1. **インデックスの追加**
+
    ```sql
    CREATE INDEX CONCURRENTLY idx_users_email_active 
    ON users(email) WHERE active = true;
    ```
 
 2. **クエリの最適化**
+
    ```sql
    -- ❌ 避けるべき
    SELECT * FROM users WHERE LOWER(email) = LOWER($1);
@@ -224,6 +237,7 @@ const config = {
    ```
 
 3. **N+1クエリ問題の回避**
+
    ```typescript
    // ❌ 避けるべき
    const users = await userRepository.findAll();
@@ -242,16 +256,19 @@ const config = {
 **A**: 以下の手順で対処してください：
 
 1. **接続状態の確認**
+
    ```bash
    psql -c "SELECT 1;"
    ```
 
 2. **接続プールの確認**
+
    ```bash
    psql -c "SELECT count(*) FROM pg_stat_activity;"
    ```
 
 3. **アプリケーションの再起動**
+
    ```bash
    sudo systemctl restart your-app-service
    ```
@@ -267,6 +284,7 @@ const config = {
 **A**: 以下の点に注意してAPIを設計してください：
 
 1. **RESTfulな設計**
+
    ```typescript
    // ✅ 推奨
    GET    /api/users          // ユーザー一覧取得
@@ -277,6 +295,7 @@ const config = {
    ```
 
 2. **適切なHTTPステータスコード**
+
    ```typescript
    // 200: 成功
    res.status(200).json(data);
@@ -292,6 +311,7 @@ const config = {
    ```
 
 3. **一貫性のあるレスポンス形式**
+
    ```typescript
    // 成功レスポンス
    {
@@ -414,6 +434,7 @@ describe('UserService', () => {
 - **E2Eテスト**: 主要なユーザージャーニーをカバー
 
 カバレッジの確認方法：
+
 ```bash
 npm run test:coverage
 ```
@@ -427,6 +448,7 @@ npm run test:coverage
 **A**: 以下の手順でデプロイしてください：
 
 1. **事前準備**
+
    ```bash
    # テストの実行
    npm run test
@@ -437,6 +459,7 @@ npm run test:coverage
    ```
 
 2. **デプロイの実行**
+
    ```bash
    # ステージング環境
    npm run deploy:staging
@@ -446,6 +469,7 @@ npm run test:coverage
    ```
 
 3. **デプロイ後の確認**
+
    ```bash
    # ヘルスチェック
    curl https://your-app.com/health
@@ -463,11 +487,13 @@ npm run test:coverage
 **A**: 以下の手順でロールバックを実行してください：
 
 1. **現在のバージョンの確認**
+
    ```bash
    kubectl get deployment your-app -o jsonpath='{.spec.template.spec.containers[0].image}'
    ```
 
 2. **ロールバックの実行**
+
    ```bash
    # 前のバージョンにロールバック
    kubectl rollout undo deployment/your-app
@@ -477,6 +503,7 @@ npm run test:coverage
    ```
 
 3. **ロールバックの確認**
+
    ```bash
    kubectl rollout status deployment/your-app
    ```
@@ -490,6 +517,7 @@ npm run test:coverage
 **A**: 以下の手順で問題を特定してください：
 
 1. **ログの確認**
+
    ```bash
    # アプリケーションログ
    kubectl logs deployment/your-app
@@ -499,6 +527,7 @@ npm run test:coverage
    ```
 
 2. **リソースの確認**
+
    ```bash
    # メモリ使用量
    kubectl top pods
@@ -508,6 +537,7 @@ npm run test:coverage
    ```
 
 3. **設定の確認**
+
    ```bash
    # 環境変数
    kubectl describe pod your-app-pod
@@ -525,12 +555,14 @@ npm run test:coverage
 **A**: 以下の手順で対処してください：
 
 1. **接続プールの確認**
+
    ```sql
    SELECT count(*) FROM pg_stat_activity;
    SELECT * FROM pg_stat_activity WHERE state = 'active';
    ```
 
 2. **接続設定の調整**
+
    ```typescript
    const poolConfig = {
      max: 20,
@@ -541,6 +573,7 @@ npm run test:coverage
    ```
 
 3. **監視の設定**
+
    ```typescript
    // 接続プールの監視
    pool.on('connect', () => {

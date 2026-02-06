@@ -192,7 +192,7 @@ while not all_tests_pass():
 - **総額**: 最大8億円（懸賞金）
 - **テーマ例**: 製造業の暗黙知形式知化、カスタマーサポート生産性向上など
 - **適合性**: 「完全自立型ソフトウェア開発エージェント」として「開発生産性向上」テーマに該当する可能性
-- **公式情報**: https://geniac-prize.nedo.go.jp/
+- **公式情報**: <https://geniac-prize.nedo.go.jp/>
 - **注意点**: 懸賞金型のため、成果物ベースの評価。実績があると有利
 
 #### 2. NEDO SBIR推進プログラム（一気通貫型）
@@ -200,7 +200,7 @@ while not all_tests_pass():
 - **概要**: 研究開発型スタートアップの研究開発促進と社会実装
 - **フェーズ2（実用化開発支援）**: 最大1億円
 - **適合性**: 「仕様→ステージングデプロイまで自動」を「実用化開発」として位置づけ可能
-- **公式情報**: SBIRポータル https://sbir.csti.go.jp/ およびNEDO公式サイト
+- **公式情報**: SBIRポータル <https://sbir.csti.go.jp/> およびNEDO公式サイト
 - **注意点**: フェーズ1（POC/FS）通過が必要な場合あり
 
 #### 3. 事業再構築補助金（経済産業省）
@@ -269,9 +269,9 @@ while not all_tests_pass():
 ### 次のアクション
 
 1. **公式サイトで最新公募を確認**
-   - NEDO: https://www.nedo.go.jp/koubo/
-   - SBIR: https://sbir.csti.go.jp/
-   - jGrants: https://www.jgrants-portal.go.jp/
+   - NEDO: <https://www.nedo.go.jp/koubo/>
+   - SBIR: <https://sbir.csti.go.jp/>
+   - jGrants: <https://www.jgrants-portal.go.jp/>
 
 2. **公募要領の精査**
    - 応募要件・対象経費・締切を確認
@@ -511,18 +511,18 @@ while not all_tests_pass():
 
 ### 公式サイト
 
-- **NEDO**: https://www.nedo.go.jp/
-- **SBIRポータル**: https://sbir.csti.go.jp/
-- **jGrants**: https://www.jgrants-portal.go.jp/
-- **GENIAC-PRIZE**: https://geniac-prize.nedo.go.jp/
+- **NEDO**: <https://www.nedo.go.jp/>
+- **SBIRポータル**: <https://sbir.csti.go.jp/>
+- **jGrants**: <https://www.jgrants-portal.go.jp/>
+- **GENIAC-PRIZE**: <https://geniac-prize.nedo.go.jp/>
 
 ### 既存ツール
 
-- **Cursor**: https://cursor.sh/
+- **Cursor**: <https://cursor.sh/>
 - **Antigravity**: （公式情報を確認）
 - **Kiro**: （公式情報を確認）
-- **Devin**: https://www.cognition.com/devin
-- **OpenHands**: https://github.com/OpenHandsAI/OpenHands
+- **Devin**: <https://www.cognition.com/devin>
+- **OpenHands**: <https://github.com/OpenHandsAI/OpenHands>
 
 ---
 
@@ -537,4 +537,3 @@ while not all_tests_pass():
 ---
 
 **注意**: このドキュメントは調査時点の情報に基づいています。公募情報は随時更新されるため、最新情報は各機関の公式サイトで確認してください。
-

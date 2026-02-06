@@ -11,7 +11,7 @@
 ### サブスクリプションの購入
 
 1. **GitHub Copilotのページにアクセス**
-   - https://github.com/features/copilot
+   - <https://github.com/features/copilot>
 
 2. **「Start a free trial」または「Subscribe」をクリック**
    - 個人プラン: $10/月
@@ -28,7 +28,7 @@
 ### サブスクリプションの確認
 
 購入後、以下のURLで確認：
-- https://github.com/settings/copilot
+- <https://github.com/settings/copilot>
 
 アクティブな状態になっていることを確認してください。
 
@@ -111,7 +111,7 @@ JetBrains製品（IntelliJ IDEA、PyCharm、WebStormなど）を使用する場�
    - Tools → GitHub Copilot → Sign in
 
 詳細は公式ドキュメントを参照：
-- https://docs.github.com/ja/copilot/getting-started-with-github-copilot
+- <https://docs.github.com/ja/copilot/getting-started-with-github-copilot>
 
 ---
 
@@ -135,7 +135,7 @@ JetBrains製品（IntelliJ IDEA、PyCharm、WebStormなど）を使用する場�
 
 **対処法**:
 1. GitHubアカウントを確認（サブスクリプションのあるアカウントか）
-2. https://github.com/settings/copilot でアクティブか確認
+2. <https://github.com/settings/copilot> でアクティブか確認
 3. VS Codeを再起動
 4. 一度サインアウトして再サインイン
 

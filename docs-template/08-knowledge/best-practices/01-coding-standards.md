@@ -18,6 +18,7 @@
 ### 型安全性の確保
 
 **推奨**:
+
 ```typescript
 // 厳密な型定義
 interface User {
@@ -54,6 +55,7 @@ class Repository<T> {
 ### エラーハンドリング
 
 **推奨: Resultパターン**
+
 ```typescript
 type Result<T, E = Error> =
   | { success: true; data: T }
@@ -73,6 +75,7 @@ async function createUser(userData: CreateUserRequest): Promise<Result<User>> {
 ```
 
 **カスタムエラークラス**:
+
 ```typescript
 class ValidationError extends Error {
   constructor(
@@ -98,6 +101,7 @@ class ValidationError extends Error {
 ### クエリの最適化
 
 **推奨**:
+
 ```sql
 -- インデックスの活用
 CREATE INDEX CONCURRENTLY idx_users_email_active
@@ -122,6 +126,7 @@ SELECT * FROM users WHERE email = $1 AND active = $2;
 ### トランザクション管理
 
 **推奨**:
+
 ```typescript
 async function transferMoney(
   fromUserId: string,
@@ -184,6 +189,7 @@ async function transferMoney(
 ### RESTful API
 
 **推奨: 適切なHTTPメソッドとステータスコード**
+
 ```typescript
 // GET: リソース取得
 app.get('/api/users/:id', async (req, res) => {
@@ -245,6 +251,7 @@ app.delete('/api/users/:id', async (req, res) => {
 ### バリデーション
 
 **推奨: スキーマベースのバリデーション**
+
 ```typescript
 import Joi from 'joi';
 
@@ -283,6 +290,7 @@ app.post('/api/users', validateCreateUser, createUserHandler);
 ### APIレスポンス形式
 
 **推奨: 一貫したレスポンス構造**
+
 ```typescript
 // 成功レスポンス
 {

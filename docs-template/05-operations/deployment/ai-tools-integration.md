@@ -325,7 +325,7 @@ GitHub Actionsの無料枠：
 3. **Huskyなどローカルフック**を優先使用
 4. 無料枠の範囲内で運用計画を立てる
 
-詳細: https://docs.github.com/ja/billing/managing-billing-for-github-actions/about-billing-for-github-actions
+詳細: <https://docs.github.com/ja/billing/managing-billing-for-github-actions/about-billing-for-github-actions>
 
 ### 代替案（完全無料）
 

@@ -98,6 +98,7 @@ scripts/
 ### 環境変数体系
 
 **階層構造**:
+
 ```
 config/
 ├── index.ts              # 設定エントリポイント
@@ -135,6 +136,7 @@ config/
 - Kubernetes Secrets（K8s環境）
 
 **管理対象**:
+
 ```yaml
 app-secrets:
   - database-password       # DB認証情報
@@ -194,6 +196,7 @@ app-secrets:
 ### 手動ロールバック
 
 **コマンド実行**:
+
 ```bash
 ./scripts/rollback.sh <deployment-id> [--dry-run]
 ```
@@ -241,6 +244,7 @@ app-secrets:
 ### 災害復旧スクリプト
 
 **データベース復旧**:
+
 ```bash
 # 最新スナップショットから復元
 aws rds restore-db-instance-from-db-snapshot \
@@ -249,12 +253,14 @@ aws rds restore-db-instance-from-db-snapshot \
 ```
 
 **アプリケーション復旧**:
+
 ```bash
 # 災害復旧モードでデプロイ
 ./scripts/deploy-production.sh disaster-recovery
 ```
 
 **DNSフェイルオーバー**:
+
 ```bash
 # Route53レコード変更
 aws route53 change-resource-record-sets \

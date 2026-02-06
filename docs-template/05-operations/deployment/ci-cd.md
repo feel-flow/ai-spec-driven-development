@@ -8,10 +8,10 @@
 
 ## 目次
 
-1. [パイプライン概要](#パイプライン概要)
-2. [GitHub Actions設定](#github-actions設定)
-3. [Dockerコンテナ設定](#dockerコンテナ設定)
-4. [環境別デプロイメント戦略](#環境別デプロイメント戦略)
+1. [パイプライン概要](#1-パイプライン概要)
+2. [GitHub Actions設定](#2-github-actions設定)
+3. [Dockerコンテナ設定](#3-dockerコンテナ設定)
+4. [環境別デプロイメント戦略](#4-環境別デプロイメント戦略)
 
 ---
 
@@ -131,6 +131,7 @@
 - ビルド成果物生成
 
 **主要処理**:
+
 ```dockerfile
 FROM node:18-alpine AS builder
 WORKDIR /app
@@ -150,6 +151,7 @@ RUN npm run build
 - セキュリティ強化設定
 
 **主要処理**:
+
 ```dockerfile
 FROM node:18-alpine
 WORKDIR /app

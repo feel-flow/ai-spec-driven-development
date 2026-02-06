@@ -9,11 +9,13 @@ AI開発ツール（Claude Code、GitHub Copilot、Cursor）に最適化され�
 従来のGit Workflowに **セルフレビュー（PR作成前）** と **ナレッジ体系化（マージ後）** を組み込むことで、AIツールの力を最大限に活用します。
 
 **従来のワークフロー**:
+
 ```
 Issue → Branch → Commit → PR → Review → Merge
 ```
 
 **AI駆動Git Workflow**:
+
 ```
 Issue → Branch → Commit → Self-Review → PR → Review → Merge → Knowledge → Cleanup
 ```
@@ -104,6 +106,7 @@ gh issue create \
 ```
 
 **AIツールへのプロンプト例**:
+
 ```
 「ユーザー認証機能のIssueを作成してください。
 受入基準、技術的な考慮事項、関連ドキュメントへの参照を含めてください。」

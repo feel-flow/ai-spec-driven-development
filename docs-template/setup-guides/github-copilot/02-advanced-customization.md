@@ -158,7 +158,7 @@ GitHub Copilot用に変換してください。
 以下のいずれかを使用：
 
 1. **GitHub Copilot Chat** - VS Code内: `Cmd+I` (macOS) / `Ctrl+I` (Windows/Linux)
-2. **Claude Code** - https://claude.ai/code
+2. **Claude Code** - <https://claude.ai/code>
 3. **Cursor** - `Cmd+L` (macOS) / `Ctrl+L` (Windows/Linux)
 
 ### ステップバイステップ

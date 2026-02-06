@@ -85,12 +85,14 @@ These defaults can be assumed if not specified, but **must be explicitly stated*
 ### Examples of Good vs Bad Practice
 
 ❌ **Bad - Making Assumptions**:
+
 ```
 "Since you didn't specify a database, I'll use PostgreSQL as it's common."
 → User wanted MongoDB, entire design needs rework
 ```
 
 ✅ **Good - Requesting Confirmation**:
+
 ```
 "I notice the database type wasn't specified. Please choose:
 1. PostgreSQL (best for relational data, ACID compliance)

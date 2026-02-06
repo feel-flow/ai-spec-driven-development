@@ -72,6 +72,7 @@ AIツールは、ドキュメント生成やコード生成時に**情報が不�
 - **命名規則**: MASTER.mdの規則に従う（明記）
 
 **❌ 推論禁止の例**:
+
 ```
 悪い例:
 「データベースは一般的なので、PostgreSQLで進めます」
@@ -131,9 +132,9 @@ AIが生成したドキュメント・コードは、以下のタイミングで
 
 ## プロジェクト概要
 [30秒で理解できるプロジェクトの説明を記載]
-- **何を作るか**: 
-- **なぜ作るか**: 
-- **誰のためか**: 
+- **何を作るか**:
+- **なぜ作るか**:
+- **誰のためか**:
 
 ## 技術スタック
 
@@ -187,7 +188,7 @@ AIが生成したドキュメント・コードは、以下のタイミングで
 - リンター/フォーマッター:
 - AI駆動デバッグ: Playwright MCP（推奨）
 
-※ 詳細な技術スタックと選定理由（ADR）は [ARCHITECTURE.md](./02-design/ARCHITECTURE.md) を参照 
+※ 詳細な技術スタックと選定理由（ADR）は [ARCHITECTURE.md](./02-design/ARCHITECTURE.md) を参照
 
 ## アーキテクチャパターン
 - [ ] Clean Architecture
@@ -196,7 +197,7 @@ AIが生成したドキュメント・コードは、以下のタイミングで
 - [ ] Event-Driven Architecture
 - [ ] Microservices
 - [ ] Monolithic
-- [ ] その他: 
+- [ ] その他:
 
 ## コード生成ルール
 ### 必須事項
@@ -213,13 +214,13 @@ AIが生成したドキュメント・コードは、以下のタイミングで
 - **変数名**: camelCase（例: userName, isActive）
 - **定数名**: UPPER_SNAKE_CASE（例: MAX_RETRY_COUNT）
 - **型名/インターフェース**: PascalCase（例: UserProfile, ApiResponse）
-- **ファイル名**: 
+- **ファイル名**:
   - コンポーネント: PascalCase（例: UserCard.tsx）
   - ユーティリティ: camelCase（例: dateHelpers.ts）
   - 設定ファイル: kebab-case（例: eslint-config.js）
 
 #### ドキュメントファイル
-- **ディレクトリ**: 
+- **ディレクトリ**:
   - 形式: `数字-英語小文字（ハイフン区切り）`
   - 例: `01-context`, `02-design`, `03-implementation`
   
@@ -247,19 +248,19 @@ AIが生成したドキュメント・コードは、以下のタイミングで
 
 ## 実装優先順位
 ### Phase 1: MVP（必須機能）
-1. 
-2. 
-3. 
+1.
+2.
+3.
 
 ### Phase 2: 拡張機能
-1. 
-2. 
-3. 
+1.
+2.
+3.
 
 ### Phase 3: 最適化
-1. 
-2. 
-3. 
+1.
+2.
+3.
 
 ## エラーハンドリング方針
 - **API通信エラー**: リトライ機構とフォールバック表示
@@ -328,6 +329,7 @@ AIが生成したドキュメント・コードは、以下のタイミングで
 - サンプル: `docs/specs/authentication.md`
 
 ### Front Matter スキーマ（必須フィールド）
+
 ```
 specId: ASDD-DOMAIN-###   # 一意。例: ASDD-AUTH-001
 title: <短く的確>
@@ -352,14 +354,15 @@ metrics:
 ```
 
 ### ライフサイクル
+
 | 状態 | 目的 | 代表アクション | 出口条件 |
 |------|------|---------------|----------|
-| draft | 初稿作成 | 草案コミット | レビューワ割当 | 
+| draft | 初稿作成 | 草案コミット | レビューワ割当 |
 | review | 内容検証 | フィードバック反映 | 全必須コメント解消 |
-| approved | 合意済 | 実装Issue紐付 | 実装着手 | 
-| implementing | 実装中 | PRリンク追加 | 全PRマージ | 
-| done | 運用 | メトリクス監視 | 非推奨決定 | 
-| deprecated | 廃止準備 | 代替spec参照 | 削除 or 置換 | 
+| approved | 合意済 | 実装Issue紐付 | 実装着手 |
+| implementing | 実装中 | PRリンク追加 | 全PRマージ |
+| done | 運用 | メトリクス監視 | 非推奨決定 |
+| deprecated | 廃止準備 | 代替spec参照 | 削除 or 置換 |
 
 ### 命名規約（specId）
 `ASDD-<DOMAIN>-<連番3桁>` 例: `ASDD-AUTH-001`, `ASDD-OBS-002`
@@ -372,9 +375,10 @@ metrics:
 - 出力: `dist/spec-index.json`（MCPおよびCI用）
 
 ### MCP連携
+
 | ツール | 目的 | 入力 | 出力 |
 |--------|------|------|------|
-| `spec_lookup` | spec詳細取得 | specId | front matter + 本文 | 
+| `spec_lookup` | spec詳細取得 | specId | front matter + 本文 |
 | `spec_search` | タイトル/タグ簡易検索 | query, limit | specId/score一覧 |
 
 ### 開発フロー統合
@@ -403,6 +407,7 @@ metrics:
 - [ ] links.docs / issues / prs の更新整合
 
 ### LLM利用時推奨プロンプト追記例
+
 ```
 必要spec: ASDD-AUTH-001 を `spec_lookup` で取得し、未定義領域が他specに依存する場合は spec_search で補集合を提案せよ。
 ```
@@ -450,6 +455,7 @@ metrics:
 **原則**: ドキュメントが800行を超える場合、以下の構造を採用
 
 **構造**:
+
 ```
 親ドキュメント（索引）     # 200-500行
 ├── サブディレクトリ/
@@ -459,6 +465,7 @@ metrics:
 ```
 
 **例**: DEPLOYMENT.md（2379行 → 分割済み）
+
 ```
 DEPLOYMENT.md（222行 - 索引）
 ├── deployment/
@@ -478,6 +485,7 @@ DEPLOYMENT.md（222行 - 索引）
 **ステップ3**: 必要に応じて関連ドキュメントを追加読み込み
 
 **例**:
+
 ```
 ユーザー: 「セルフレビューの方法を教えて」
 AI: DEPLOYMENT.md（索引）→ deployment/self-review.md を読み込み

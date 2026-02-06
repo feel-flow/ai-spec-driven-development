@@ -3,6 +3,7 @@
 ## 1. 監視戦略
 
 ### 監視レイヤー
+
 ```
 ┌─────────────────────────────────┐
 │     ビジネスメトリクス          │ <- KPI、売上、コンバージョン率
@@ -16,6 +17,7 @@
 ```
 
 ### 監視指標（SLI/SLO）
+
 | 指標 | SLI | SLO | 測定方法 |
 |---|---|---|---|
 | 可用性 | アップタイム | 99.9% | (稼働時間/総時間) × 100 |
@@ -26,6 +28,7 @@
 ## 2. アプリケーション監視
 
 ### APM設定（Datadog）
+
 ```typescript
 // monitoring/apm.ts
 import tracer from 'dd-trace';
@@ -82,6 +85,7 @@ export function recordBusinessMetric(event: string, metadata: any) {
 ```
 
 ### エラー監視（Sentry）
+
 ```typescript
 // monitoring/error-tracking.ts
 import * as Sentry from '@sentry/node';
@@ -169,6 +173,7 @@ export function measureTransaction<T>(
 ## 3. インフラストラクチャ監視
 
 ### CloudWatch設定
+
 ```typescript
 // monitoring/cloudwatch.ts
 import { CloudWatch } from '@aws-sdk/client-cloudwatch';
@@ -224,6 +229,7 @@ export async function createAlarm(config: AlarmConfig) {
 ```
 
 ### Prometheus設定
+
 ```yaml
 # prometheus.yml
 global:
@@ -254,6 +260,7 @@ alerting:
 ```
 
 ### Grafanaダッシュボード
+
 ```json
 {
   "dashboard": {
@@ -307,6 +314,7 @@ alerting:
 ## 4. ログ管理
 
 ### 構造化ログ設定
+
 ```typescript
 // logging/logger.ts
 import winston from 'winston';
@@ -373,6 +381,7 @@ export function requestLogger(req: Request, res: Response, next: NextFunction) {
 ```
 
 ### ログ集約（ELK Stack）
+
 ```yaml
 # logstash.conf
 input {
@@ -416,6 +425,7 @@ output {
 ## 5. アラート設定
 
 ### アラートルール
+
 ```yaml
 # alerts.yml
 groups:
@@ -450,6 +460,7 @@ groups:
 ```
 
 ### 通知設定
+
 ```typescript
 // notifications/alerting.ts
 interface AlertChannel {
@@ -517,6 +528,7 @@ class AlertManager {
 ## 6. パフォーマンス監視
 
 ### リアルユーザー監視（RUM）
+
 ```javascript
 // frontend/rum.js
 // Web Vitals監視
@@ -580,6 +592,7 @@ class PerformanceMonitor {
 ## 7. セキュリティ監視
 
 ### 侵入検知
+
 ```typescript
 // security/intrusion-detection.ts
 class IntrusionDetector {
@@ -628,6 +641,7 @@ class IntrusionDetector {
 ## 8. 合成監視
 
 ### Synthetic Monitoring
+
 ```typescript
 // synthetic/monitoring.ts
 import { chromium } from 'playwright';
@@ -692,6 +706,7 @@ setInterval(async () => {
 ## 9. キャパシティプランニング
 
 ### リソース予測
+
 ```typescript
 // capacity/planning.ts
 class CapacityPlanner {
@@ -750,6 +765,7 @@ class CapacityPlanner {
 ## 10. ダッシュボード
 
 ### 運用ダッシュボード構成
+
 ```yaml
 dashboards:
   - name: "Executive Dashboard"
