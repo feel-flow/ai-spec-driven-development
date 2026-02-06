@@ -32,14 +32,14 @@ npm install
 ```bash
 npm run check
 # または
-node index.mjs --check
+node dist/index.js --check
 ```
 
 3) MCPクライアントから起動（推奨）
 - このサーバーは標準入出力（stdio）で動作し、MCP対応クライアントから起動されます。
 - 設定例（外部MCPサーバーの登録）:
   - Command: `node`
-  - Args: `/absolute/path/to/ai-spec-driven-development/mcp/index.mjs`
+  - Args: `/absolute/path/to/ai-spec-driven-development/mcp/dist/index.js`
   - Working Directory: `/absolute/path/to/ai-spec-driven-development/mcp`
 - 例: Claude Code (VS Code) / Claude Desktop / MCP対応クライアントで上記を登録してください。
 
@@ -48,7 +48,7 @@ node index.mjs --check
 ```bash
 npm start
 # または
-node index.mjs
+node dist/index.js
 ```
 
 - 標準入出力で待機します（HTTPサーバーではありません）。停止は Ctrl+C。
@@ -59,7 +59,7 @@ node index.mjs
 This server is intended to run as an MCP over stdio, launched by an MCP-capable client (e.g., Claude Desktop, VS Code MCP clients). To validate locally:
 
 ```bash
-node index.mjs --check
+node dist/index.js --check
 ```
 
 This will parse and build the in-memory index without opening stdio.
@@ -72,7 +72,7 @@ npm run check
 
 ## Configure in an MCP client
 
-- Command: `node /absolute/path/to/ai-spec-driven-development/mcp/index.mjs`
+- Command: `node /absolute/path/to/ai-spec-driven-development/mcp/dist/index.js`
 - Working directory: repository root or `mcp/`
 
 The server will expose:
@@ -89,7 +89,7 @@ The server will expose:
 
 - Add an external MCP server in the extension settings:
   - Command: `node`
-  - Args: `/absolute/path/to/ai-spec-driven-development/mcp/index.mjs`
+  - Args: `/absolute/path/to/ai-spec-driven-development/mcp/dist/index.js`
   - Working Directory: `/absolute/path/to/ai-spec-driven-development/mcp`
 - Open this repository and verify Prompts/Tools/Resources are listed.
 
