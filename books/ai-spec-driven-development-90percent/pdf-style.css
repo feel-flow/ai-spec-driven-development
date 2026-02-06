@@ -41,10 +41,10 @@ pre {
   color: #333;
   padding: 12px;
   border-radius: 4px;
-  font-size: 9pt;
+  font-size: 8pt;
   line-height: 1.4;
   overflow-x: auto;
-  page-break-inside: avoid;
+  page-break-inside: auto;
   border-left: 2px solid #4a9eff;
   white-space: pre;
 }
@@ -62,7 +62,7 @@ code {
   background-color: #e8e8e8;
   padding: 2px 6px;
   border-radius: 3px;
-  font-size: 9pt;
+  font-size: 8pt;
 }
 
 /* テーブル */
