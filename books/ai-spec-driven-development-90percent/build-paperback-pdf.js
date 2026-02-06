@@ -38,7 +38,7 @@ function createPaperbackCss() {
   const css = `
 @page {
   size: 5.83in 8.27in;
-  margin: 0.625in 0.625in 0.625in 0.875in; /* 上 右 下 左（ノド側広め） */
+  margin: 0.625in 0.625in 0.625in 0.75in; /* 上 右 下 左（ノド側） */
 
   @bottom-center {
     content: counter(page);
