@@ -268,7 +268,7 @@ AIに「エラー処理を追加して」とだけ伝える
 → AIは独自の判断で `throw new Error("Something went wrong")` を書く
 
 **⭕ 良い例（PATTERNS.mdに明示）**：
-```markdown
+````markdown
 ## エラーハンドリング規約
 
 ### エラーレスポンス形式（統一）
@@ -286,7 +286,7 @@ AIに「エラー処理を追加して」とだけ伝える
 - ✅ ファイル名：kebab-case（例：`user-service.ts`）
 - ✅ テストパターン：Arrange-Act-Assert
 - ✅ コミットメッセージ：Conventional Commits形式
-```
+````
 
 これらをPATTERNS.mdに書けば、AIは「プロジェクトの当たり前」を共有できる。
 

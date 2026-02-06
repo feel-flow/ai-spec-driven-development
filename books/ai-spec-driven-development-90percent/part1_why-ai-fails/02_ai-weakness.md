@@ -181,17 +181,17 @@ AIが推測すること：
 
 Next.jsを例に見てみましょう。
 
+**AIが書いたコード（Next.js 13.x想定）** — `pages/api/users.ts`（Pages Routerの書き方）
+
 ```typescript
-// AIが書いたコード（Next.js 13.x想定）
-// pages/api/users.ts ← Pages Routerの書き方
 export default function handler(req, res) {
   res.status(200).json({ users: [] });
 }
 ```
 
+**実際のプロジェクト（Next.js 15.x）では** — `app/api/users/route.ts`（App Routerの書き方）
+
 ```typescript
-// 実際のプロジェクト（Next.js 15.x）では
-// app/api/users/route.ts ← App Routerの書き方
 export async function GET() {
   return Response.json({ users: [] });
 }
@@ -203,9 +203,9 @@ AIが古い書き方で実装すると、プロジェクトの構成と合わず
 
 ### Reactでも同様の問題
 
+**AIが書いたコード（React 18想定）** — クライアントコンポーネントとして全体を実装
+
 ```typescript
-// AIが書いたコード（React 18想定）
-// クライアントコンポーネントとして全体を実装
 'use client';
 import { useState, useEffect } from 'react';
 
@@ -220,9 +220,9 @@ export default function UserList() {
 }
 ```
 
+**実際のプロジェクト（React 19 + Next.js 15）** — Server Componentとしてシンプルに実装
+
 ```typescript
-// React 19 + Next.js 15では
-// Server Componentとしてシンプルに実装
 export default async function UserList() {
   const users = await fetch('/api/users').then(r => r.json());
   return <ul>{users.map(u => <li key={u.id}>{u.name}</li>)}</ul>;

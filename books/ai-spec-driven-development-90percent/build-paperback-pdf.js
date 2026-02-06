@@ -55,16 +55,16 @@ function createPaperbackCss() {
 
 body {
   font-family: "Hiragino Kaku Gothic ProN", "Hiragino Sans", "Yu Gothic", "Meiryo", sans-serif;
-  font-size: 11pt;
+  font-size: 9.5pt;
   line-height: 1.8;
   color: #333;
-  text-align: justify;
+  text-align: left;
   orphans: 2;
   widows: 2;
 }
 
 h1 {
-  font-size: 20pt;
+  font-size: 17pt;
   font-weight: bold;
   margin-top: 2em;
   margin-bottom: 1em;
@@ -72,6 +72,7 @@ h1 {
   page-break-after: avoid;
   border-bottom: 2px solid #3182CE;
   padding-bottom: 0.3em;
+  text-align: left;
 }
 
 h1:first-of-type {
@@ -79,20 +80,22 @@ h1:first-of-type {
 }
 
 h2 {
-  font-size: 16pt;
+  font-size: 13pt;
   font-weight: bold;
   margin-top: 1.5em;
   margin-bottom: 0.8em;
   page-break-after: avoid;
   color: #1a365d;
+  text-align: left;
 }
 
 h3 {
-  font-size: 13pt;
+  font-size: 11pt;
   font-weight: bold;
   margin-top: 1.2em;
   margin-bottom: 0.6em;
   page-break-after: avoid;
+  text-align: left;
 }
 
 p {
@@ -121,20 +124,44 @@ blockquote {
 
 pre, code {
   font-family: "SF Mono", "Monaco", "Inconsolata", "Fira Mono", monospace;
-  font-size: 9pt;
+  font-size: 7.5pt;
+}
+
+/* タイトル・ラベル直後のコードブロックは間隔を詰める */
+p + pre, p + div.sourceCode,
+h2 + pre, h2 + div.sourceCode,
+h3 + pre, h3 + div.sourceCode {
+  margin-top: 0.2em;
 }
 
 pre {
   background-color: #1a202c;
-  color: #e2e8f0;
-  padding: 1em;
-  margin: 1em 0;
+  color: #f1f5f9;
+  padding: 0.8em;
+  margin: 0.8em 0;
+  line-height: 1.3;
   border-radius: 4px;
   page-break-inside: avoid;
   white-space: pre-wrap;
   word-wrap: break-word;
   overflow-wrap: break-word;
 }
+
+/* シンタックスハイライト — 印刷向けに明るさを調整 */
+code span.fu { color: #d8a0ff !important; } /* 関数名：明るい紫 */
+code span.kw { color: #7cc4ff !important; } /* キーワード：明るい青 */
+code span.st { color: #98d9a0 !important; } /* 文字列：明るい緑 */
+code span.co { color: #8899aa !important; } /* コメント：灰色（やや控えめ） */
+code span.dt { color: #7cc4ff !important; } /* データ型：明るい青 */
+code span.dv { color: #f5a97f !important; } /* 数値：明るいオレンジ */
+code span.at { color: #7cc4ff !important; } /* 属性：明るい青 */
+code span.ss { color: #f5c97f !important; } /* セクション：明るいゴールド */
+code span.sc { color: #f5a97f !important; } /* 特殊文字：明るいオレンジ */
+code span.va { color: #f1f5f9 !important; } /* 変数：ベース白 */
+code span.cf { color: #7cc4ff !important; } /* 制御フロー：明るい青 */
+code span.op { color: #f1f5f9 !important; } /* 演算子：ベース白 */
+code span.bu { color: #7cc4ff !important; } /* 組み込み：明るい青 */
+code span.ot { color: #98d9a0 !important; } /* その他：明るい緑 */
 
 code {
   background-color: #edf2f7;
@@ -148,11 +175,14 @@ pre code {
 }
 
 img {
-  max-width: 85%;
+  max-width: 100%;
+  max-height: 90vh;
+  width: auto;
   height: auto;
   display: block;
-  margin: 1em auto;
+  margin: 0.5em auto;
   page-break-inside: avoid;
+  object-fit: contain;
 }
 
 table {
@@ -178,12 +208,13 @@ th {
 }
 
 ul, ol {
-  margin: 1em 0;
+  margin: 0.5em 0;
   padding-left: 2em;
 }
 
 li {
-  margin: 0.3em 0;
+  margin: 0.1em 0;
+  line-height: 1.5;
 }
 
 hr {
@@ -210,6 +241,11 @@ em {
 
 /* ページ区切り */
 .page-break {
+  page-break-before: always;
+}
+
+/* 部（Part）の扉ページ */
+.part-divider {
   page-break-before: always;
 }
 
@@ -263,6 +299,50 @@ em {
   margin: 1.5em 0;
   page-break-inside: avoid;
 }
+
+/* チェックリスト */
+.checklist-item {
+  font-size: 8.5pt;
+  margin: 0.4em 0;
+  padding-left: 1.5em;
+  text-indent: -1.5em;
+}
+
+/* 目次（Table of Contents） */
+nav#TOC {
+  page-break-after: always;
+  margin-bottom: 2em;
+}
+
+nav#TOC > ul {
+  list-style: none;
+  padding-left: 0;
+}
+
+nav#TOC ul ul {
+  padding-left: 1.5em;
+  list-style: none;
+}
+
+nav#TOC li {
+  margin: 0.4em 0;
+  line-height: 1.6;
+}
+
+nav#TOC a {
+  text-decoration: none;
+  color: #333;
+}
+
+nav#TOC a::after {
+  content: leader('.') target-counter(attr(href), page);
+  float: right;
+}
+
+nav#TOC > ul > li > a {
+  font-weight: bold;
+  font-size: 12pt;
+}
 `;
 
   fs.writeFileSync(paperbackCssPath, css, 'utf8');
@@ -276,8 +356,15 @@ function combineMarkdownFiles() {
   // _metadata.md と 00_toc.md を除外
   const files = bookConfig.files.filter(f => f !== '_metadata.md' && f !== '00_toc.md');
   let combined = '';
+  let currentPart = null;
 
   for (const file of files) {
+    // 新しい部（Part）の最初のファイルを検知して改ページを挿入
+    const partMatch = file.match(/^(part\d+)_/);
+    if (partMatch && partMatch[1] !== currentPart) {
+      currentPart = partMatch[1];
+      combined += '<div class="part-divider"></div>\n\n';
+    }
     const filePath = path.join(baseDir, file);
     if (!fs.existsSync(filePath)) {
       console.warn(`  警告: ファイルが見つかりません: ${file}`);
@@ -301,6 +388,31 @@ function combineMarkdownFiles() {
     content = content.replace(/\[([^\]]+)\]\(#[^)]+\)/g, '$1');
     // 外部リンク: [テキスト](https://...) → テキスト（URL）
     content = content.replace(/\[([^\]]+)\]\((https?:\/\/[^)]+)\)/g, '$1（$2）');
+
+    // GFMタスクリストをHTML段落に変換（印刷版ではリスト記号・チェックボックス要素は不適切）
+    // コードブロック内は変換しない（Markdownの例示がそのまま表示されるように）
+    // 行単位でコードブロック内外を判定する安全な方式
+    const lines = content.split('\n');
+    let inCodeBlock = false;
+    let codeFence = '';
+    for (let i = 0; i < lines.length; i++) {
+      const fenceMatch = lines[i].match(/^(`{3,})/);
+      if (fenceMatch) {
+        if (!inCodeBlock) {
+          inCodeBlock = true;
+          codeFence = fenceMatch[1];
+        } else if (lines[i].startsWith(codeFence) && lines[i].trim() === codeFence) {
+          inCodeBlock = false;
+          codeFence = '';
+        }
+        continue;
+      }
+      if (!inCodeBlock) {
+        lines[i] = lines[i].replace(/^(\s*)- \[ \] (.+)$/, '<p class="checklist-item">□　$2</p>');
+        lines[i] = lines[i].replace(/^(\s*)- \[x\] (.+)$/, '<p class="checklist-item">☑　$2</p>');
+      }
+    }
+    content = lines.join('\n');
 
     combined += content + '\n\n';
   }
@@ -348,6 +460,9 @@ function generatePdf() {
       '--pdf-engine=weasyprint',
       `--css=${paperbackCssPath}`,
       '-f', 'gfm',
+      '--syntax-highlighting=breezedark',
+      '--toc',
+      '--toc-depth=2',
       '--metadata', `title=${bookConfig.metadata.title}`
     ];
 
