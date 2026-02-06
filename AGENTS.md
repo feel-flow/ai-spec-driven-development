@@ -168,6 +168,14 @@ MASTER.mdには以下の重要な情報が含まれています：
 2. `docs-template/MASTER.md` を必ず読み込む
 3. コード生成前にMASTER.mdの内容を参照
 
+**利用可能なスラッシュコマンド**:
+
+| コマンド | 用途 |
+| --------- | ------ |
+| `/init-docs` | 7ドキュメント構造を新規プロジェクトに初期化 |
+| `/validate-docs` | 既存docsが7ドキュメント要件を満たすか検証 |
+| `/setup-ai-config` | CLAUDE.md / .cursorrules / copilot-instructions.md を生成 |
+
 **プロンプト例**:
 ```
 このプロジェクトで作業を開始する前に、docs-template/MASTER.mdの内容を確認し、以下の点を理解してください：
