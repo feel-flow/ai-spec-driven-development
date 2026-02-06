@@ -1,112 +1,135 @@
 # AI Spec-Driven Development
 
-AI開発ツール（Claude Code、GitHub Copilot、Cursor）に最適化された7文書構造によるドキュメント戦略。
+AI開発ツール（Claude Code、GitHub Copilot、Cursor）に最適化された**7文書構造**によるドキュメント戦略フレームワーク。
 
-## 📚 主要ドキュメント
+従来の60+文書から**7つの必須文書**へ ── AIが迷わず理解できる、最小限の高品質ドキュメントでプロジェクトを駆動します。
 
-このリポジトリの主要なドキュメントは以下の通りです。
+## 導入方法
 
-- **[インデックス](./ai_spec_driven_development.md)**: すべてのドキュメントへの入り口。
-- **[AI Spec Driven Development 概念と実践](./docs/AI_SPEC_DRIVEN_DEVELOPMENT.md)**: この開発アプローチの背景にある思想、具体的な実践方法を解説。
-- **[AI駆動 Git Workflow](./docs/AI_GIT_WORKFLOW.md)**: AIツールに最適化されたGit Flowベースのワークフロー。セルフレビューとナレッジ体系化を組み込んだ9ステップ。
-- **[運用ガイド (AIエージェント向け)](./docs/OPERATIONAL_GUIDE.md)**: AIエージェントが開発プロセスで参照すべき操作仕様書。
+3つの方法でプロジェクトに導入できます。
 
-## 🚀 Quick Start
+### 方法A: テンプレートをコピー（最もシンプル）
 
-### 🌟 完全初心者の方へ
-**何も決まっていない状態から始める**: [`docs-template/GETTING_STARTED_ABSOLUTE_BEGINNER.md`](./docs-template/GETTING_STARTED_ABSOLUTE_BEGINNER.md)
-- 環境準備からアイデア発想まで完全サポート（所要時間: 約4.5時間）
-- AIツールの初期設定ガイド付き
+[`docs-template/`](./docs-template/) から7ドキュメントをプロジェクトにコピー:
 
-### 新規プロジェクトを始める場合
-1. **企画から始める**: [`docs-template/GETTING_STARTED_NEW_PROJECT.md`](./docs-template/GETTING_STARTED_NEW_PROJECT.md) - ゼロから完全ガイド（8-12時間）
-2. **企画書を作成**: [`docs-template/00-planning/PLANNING_TEMPLATE.md`](./docs-template/00-planning/PLANNING_TEMPLATE.md) - アイデア→要件定義
+```bash
+# テンプレートをコピー
+cp -r docs-template/MASTER.md your-project/docs/
+cp -r docs-template/01-context/ your-project/docs/
+cp -r docs-template/02-design/ your-project/docs/
+cp -r docs-template/03-implementation/ your-project/docs/
+cp -r docs-template/04-quality/ your-project/docs/
+cp -r docs-template/05-operations/ your-project/docs/
+cp -r docs-template/06-reference/ your-project/docs/
+```
 
-### 既存プロジェクトに導入する場合
-1. **理論を学ぶ**: [`docs/AI_SPEC_DRIVEN_DEVELOPMENT.md`](./docs/AI_SPEC_DRIVEN_DEVELOPMENT.md) - なぜ7文書構造が最適なのか
-2. **実装を始める**: [`docs-template/GETTING_STARTED.md`](./docs-template/GETTING_STARTED.md) - ステップバイステップガイド
-3. **テンプレート活用**: [`docs-template/`](./docs-template/) - すぐに使える7文書テンプレート
+### 方法B: Claude Code Skills で初期化
 
-### AIツール初期設定ガイド
-- **GitHub Copilot**: [`docs-template/SETUP_GITHUB_COPILOT.md`](./docs-template/SETUP_GITHUB_COPILOT.md) - copilot-instructions.md設定（約30分）
-- **Claude Code**: [`docs-template/SETUP_CLAUDE_CODE.md`](./docs-template/SETUP_CLAUDE_CODE.md) - CLAUDE.md設定（約40分）
-- **Cursor**: [`docs-template/SETUP_CURSOR.md`](./docs-template/SETUP_CURSOR.md) - .cursorrules設定（約60分）
+Claude Code でこのリポジトリを参照し、スラッシュコマンドで自動セットアップ:
 
-## 💡 中核概念
+```
+/init-docs          # 7ドキュメント構造を初期化
+/validate-docs      # ドキュメント要件を検証
+/setup-ai-config    # CLAUDE.md / .cursorrules / copilot-instructions.md を生成
+```
 
-従来の60+文書から**7つの必須文書**への革新的転換：
+### 方法C: MCP Server で AI ツール連携
 
-1. **MASTER.md** - プロジェクト中央管理
-2. **PROJECT.md** - ビジョンと要件（`01-business/PROJECT.md`）
-3. **ARCHITECTURE.md** - システム設計（`02-design/ARCHITECTURE.md`）
-4. **DOMAIN.md** - ビジネスロジック（`01-business/DOMAIN.md`）
-5. **PATTERNS.md** - 実装パターン（`03-implementation/PATTERNS.md`）
-6. **TESTING.md** - テスト戦略（`07-quality/TESTING.md`）
-7. **DEPLOYMENT.md** - 運用手順（`05-operations/DEPLOYMENT.md`）
+MCP対応クライアント（Claude Code, Claude Desktop等）にサーバーを登録:
 
-詳細な説明と実装例は[AI Spec Driven Development 概念と実践](./docs/AI_SPEC_DRIVEN_DEVELOPMENT.md)を参照。
+```json
+{
+  "command": "node",
+  "args": ["/path/to/ai-spec-driven-development/mcp/dist/index.js"]
+}
+```
 
-### 📁 ドキュメント構造（番号付きフォルダ）
+詳細: [`mcp/README.md`](./mcp/README.md)
 
-**重要**: AIツールは以下の番号付きフォルダ構造を使用してください。
+## セットアップ
+
+```bash
+git clone https://github.com/feel-flow/ai-spec-driven-development.git
+cd ai-spec-driven-development
+npm install && npm run setup
+```
+
+### 利用可能なコマンド
+
+| コマンド | 説明 |
+| -------- | ---- |
+| `npm run setup` | 依存関係インストール + MCP サーバービルド |
+| `npm run validate` | 7ドキュメント構造の検証 |
+| `npm run check` | MCP サーバーの動作確認 |
+| `npm run build:mcp` | MCP サーバーのビルド |
+| `npm run setup:labels` | GitHub ラベルの自動セットアップ |
+
+## 7文書構造
 
 ```
 docs/
-├── MASTER.md                           # 中央管理文書（必須）
-├── 01-business/
-│   ├── PROJECT.md                      # ビジョンと要件
-│   └── DOMAIN.md                       # ビジネスロジック
+├── MASTER.md                    # 中央管理ハブ（必須・最初に読む）
+├── 01-context/
+│   ├── PROJECT.md               # ビジョンと要件
+│   └── CONSTRAINTS.md           # 制約条件
 ├── 02-design/
-│   └── ARCHITECTURE.md                 # システム設計
+│   ├── ARCHITECTURE.md          # システム設計
+│   └── DOMAIN.md                # ビジネスロジック
 ├── 03-implementation/
-│   └── PATTERNS.md                     # 実装パターン
+│   └── PATTERNS.md              # 実装パターン
+├── 04-quality/
+│   └── TESTING.md               # テスト戦略
 ├── 05-operations/
-│   └── DEPLOYMENT.md                   # 運用手順
-└── 07-quality/
-    └── TESTING.md                      # テスト戦略
+│   └── DEPLOYMENT.md            # 運用手順
+└── 06-reference/
+    ├── GLOSSARY.md              # 用語集
+    └── DECISIONS.md             # 設計判断記録
 ```
 
-**なぜ番号付きフォルダか**:
-- カテゴリの明確化（ビジネス、設計、実装、運用、品質）
-- 文書間の依存関係が視覚的に理解しやすい
-- AIツールが適切な文書を素早く見つけられる
-- スケーラビリティ（各カテゴリ内で詳細文書を追加可能）
+**なぜ7文書か**: AIツールは情報の散在に弱い。少数の高密度ドキュメントに集約することで、コンテキスト理解の精度が劇的に向上する。詳細は [AI Spec Driven Development 概念と実践](./docs/AI_SPEC_DRIVEN_DEVELOPMENT.md) を参照。
 
-## 🤖 AIエージェント向けガイド
+## ドキュメント
 
-### 🚨 重要: 作業開始前に必ずMASTER.mdを参照
+### 概念・ガイド
 
-すべてのAIエージェントは、このプロジェクトで作業を開始する前に **`docs-template/MASTER.md`** を必ず読み込んでください。
+- [AI Spec-Driven Development 概念と実践](./docs/AI_SPEC_DRIVEN_DEVELOPMENT.md) — なぜ7文書構造が最適なのか
+- [AI駆動 Git Workflow](./docs/AI_GIT_WORKFLOW.md) — AIに最適化された9ステップのワークフロー
+- [運用ガイド (AIエージェント向け)](./docs/OPERATIONAL_GUIDE.md) — AIエージェントの操作仕様書
 
-### エージェント別設定
+### Quick Start
 
-- **Claude Code**: [`CLAUDE.md`](./CLAUDE.md) - Claude Code専用ガイド
-- **GitHub Copilot**: [`.github/copilot-instructions.md`](./.github/copilot-instructions.md) - Copilot設定
-- **Cursor**: [`.cursorrules`](./.cursorrules) - Cursor設定
-- **その他AIエージェント**: [`AGENTS.md`](./AGENTS.md) - 統一ガイド
+| 対象 | ガイド | 所要時間 |
+| ---- | ------ | -------- |
+| 完全初心者 | [GETTING_STARTED_ABSOLUTE_BEGINNER.md](./docs-template/GETTING_STARTED_ABSOLUTE_BEGINNER.md) | 約4.5時間 |
+| 新規プロジェクト | [GETTING_STARTED_NEW_PROJECT.md](./docs-template/GETTING_STARTED_NEW_PROJECT.md) | 8-12時間 |
+| 既存プロジェクト | [GETTING_STARTED.md](./docs-template/GETTING_STARTED.md) | 約2時間 |
 
-### 必須手順
+### AIツール設定ガイド
 
-1. **MASTER.mdを読み込む** - プロジェクトの技術スタック、コーディング規約、制約事項を理解
-2. **関連文書を確認** - アーキテクチャ、ドメイン、パターン文書を参照
-3. **コード生成** - MASTER.mdのルールに従って実装
-4. **品質確認** - マジックナンバー禁止、型安全性、エラーハンドリング等をチェック
+| ツール | ガイド | 設定ファイル |
+| ------ | ------ | ------------ |
+| Claude Code | [SETUP_CLAUDE_CODE.md](./docs-template/SETUP_CLAUDE_CODE.md) | `CLAUDE.md` |
+| GitHub Copilot | [SETUP_GITHUB_COPILOT.md](./docs-template/SETUP_GITHUB_COPILOT.md) | `.github/copilot-instructions.md` |
+| Cursor | [SETUP_CURSOR.md](./docs-template/SETUP_CURSOR.md) | `.cursorrules` |
 
-### MCPサーバー
+## AIエージェント向け
 
-AIエージェント連携の設定: [`mcp/README.md`](./mcp/README.md)
+すべてのAIエージェントは作業開始前に [`docs-template/MASTER.md`](./docs-template/MASTER.md) を必ず読んでください。
+
+- **Claude Code**: [`CLAUDE.md`](./CLAUDE.md)
+- **GitHub Copilot**: [`.github/copilot-instructions.md`](./.github/copilot-instructions.md)
+- **Cursor**: [`.cursorrules`](./.cursorrules)
+- **その他**: [`AGENTS.md`](./AGENTS.md)
 
 ## ライセンス
 
-このプロジェクトは[MITライセンス](./LICENSE)の下で公開されています。
+[MIT License](./LICENSE)
 
-## リリース/変更履歴
+## リリース
 
-- 変更履歴: [CHANGELOG.md](./CHANGELOG.md)
-- リリース一覧: https://github.com/feel-flow/ai-spec-driven-development/releases
+- [CHANGELOG.md](./CHANGELOG.md)
+- [Releases](https://github.com/feel-flow/ai-spec-driven-development/releases)
 
 ---
 
-**プロジェクト管理者**: FEEL-FLOW  
-**最終更新**: 2025年9月25日  
-**お問い合わせ**: [https://feelflow.co.jp](https://feelflow.co.jp) のお問い合わせフォームへ
+**FEEL-FLOW** | [https://feelflow.co.jp](https://feelflow.co.jp) | 最終更新: 2026年2月
