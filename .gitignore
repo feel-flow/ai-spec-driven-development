@@ -23,19 +23,3 @@ coverage/
 # Claude Code
 .claude/settings.local.json
 .claude/plans/
-books/**/.claude/
-
-# Generated books (EPUB/PDF)
-books/**/*.epub
-books/**/*.pdf
-!books/**/images/cover_paperback.pdf
-
-# Vivliostyle (PDF build tool)
-books/**/.vivliostyle/
-books/**/output/
-
-# Temporary cover images (work in progress)
-books/**/images/cover_bg*.png
-books/**/images/cover_kindle_v2.png
-books/**/images/cover_kindle.png
-books/**/images/cover_kindle_final.jpg
