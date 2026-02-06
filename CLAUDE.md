@@ -143,29 +143,47 @@ The project enforces strict prohibition of magic numbers/hardcoded values:
 - Prompt assistance included for magic number avoidance
 - Code generation rules emphasize type safety and error handling
 
-## Development Approach
+## Repository Structure
 
-This is a **documentation-only project** with no executable code. The focus is on:
-- Template creation and refinement
-- Documentation strategy research
-- Best practice compilation
-- Real-world pattern validation
+This is a **framework and tooling repository** providing:
+
+- `docs-template/` — 7-document template system (copy to your project)
+- `docs/` — Concept documents, practical guides, operational guides
+- `mcp/` — MCP server (TypeScript) for AI tool integration
+- `scripts/` — Setup automation (GitHub labels, spec index, automated review)
+- `.claude/` — Claude Code hooks and skills
+
+### Build Commands
+
+```bash
+# MCP server
+cd mcp && npm install && npm run build
+
+# MCP validation (index check)
+cd mcp && npm run check
+
+# Spec index generation
+node scripts/build-spec-index.mjs
+
+# GitHub labels setup
+bash scripts/setup-github-labels.sh
+```
 
 ### Working with This Repository
 
 When making changes:
 1. Understand the AI-optimization principles in `ai_spec_driven_development.md`
-2. Follow the 7-document structure templates
+2. Follow the 7-document structure templates in `docs-template/`
 3. Maintain consistency with the established patterns
-4. Keep magic number prohibition guidelines updated
-5. Ensure all examples remain practical and actionable
+4. Ensure MCP server builds successfully after doc changes (`cd mcp && npm run check`)
+5. Keep magic number prohibition guidelines updated
 
 ## Special Considerations
 
-- **No build/test commands** - This is a pure documentation project
-- **Version control** - All changes should maintain the integrity of the 7-document system
-- **Examples** - All code examples should demonstrate anti-magic number practices
-- **Templates** - Maintain template sections as placeholders for actual project adaptation
+- **Version control** — All changes should maintain the integrity of the 7-document system
+- **MCP server** — After modifying `docs/` or `docs-template/`, verify with `cd mcp && npm run check`
+- **Examples** — All code examples should demonstrate anti-magic number practices
+- **Templates** — Maintain template sections as placeholders for actual project adaptation
 
 ## Document Relationships
 
