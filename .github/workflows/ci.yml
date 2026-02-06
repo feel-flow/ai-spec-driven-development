@@ -42,4 +42,3 @@ jobs:
 
       - name: Lint Markdown
         run: npm run lint:md
-        continue-on-error: true

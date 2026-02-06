@@ -127,6 +127,7 @@ MASTER.mdには以下の重要な情報が含まれています：
 - ✅ 命名規則: MASTER.mdの規則に従う
 
 **❌ 推論禁止の例**:
+
 ```
 悪い例:
 「データベースは一般的なので、PostgreSQLで進めます」
@@ -177,6 +178,7 @@ MASTER.mdには以下の重要な情報が含まれています：
 | `/setup-ai-config` | CLAUDE.md / .cursorrules / copilot-instructions.md を生成 |
 
 **プロンプト例**:
+
 ```
 このプロジェクトで作業を開始する前に、docs-template/MASTER.mdの内容を確認し、以下の点を理解してください：
 - 技術スタック（TypeScript、React、Node.js等）
@@ -197,6 +199,7 @@ MASTER.mdには以下の重要な情報が含まれています：
 3. コメントでMASTER.mdの参照を明記
 
 **コメント例（コード補完時）**:
+
 ```typescript
 // MASTER.md参照: TypeScript、型安全性必須、マジックナンバー禁止
 // Phase 1 MVP機能: ユーザー認証システム
@@ -217,6 +220,7 @@ interface User {
 3. コード生成時にMASTER.mdの制約を適用
 
 **`.cursorrules` の例**:
+
 ```
 # Cursor Rules for AI Spec-Driven Development
 
@@ -271,6 +275,7 @@ Always reference MASTER.md for project-specific requirements.
 ## 作業フロー
 
 ### 1. プロジェクト開始時
+
 ```
 1. AGENTS.md を確認
 2. docs-template/MASTER.md を読み込む
@@ -280,6 +285,7 @@ Always reference MASTER.md for project-specific requirements.
 ```
 
 ### 2. コード生成時
+
 ```
 1. MASTER.mdのコード生成ルールを適用
 2. 禁止事項を回避
@@ -289,6 +295,7 @@ Always reference MASTER.md for project-specific requirements.
 ```
 
 ### 3. コードレビュー時
+
 ```
 1. MASTER.mdのチェックリストを確認
 2. マジックナンバー/ハードコードがないか確認
@@ -306,6 +313,7 @@ Always reference MASTER.md for project-specific requirements.
    - 回避: 必ずMASTER.mdを最初に読み込む
 
 2. **マジックナンバーの使用**
+
    ```typescript
    // ❌ 間違い
    if (user.age > 18) { ... }
@@ -316,6 +324,7 @@ Always reference MASTER.md for project-specific requirements.
    ```
 
 3. **any型の使用**
+
    ```typescript
    // ❌ 間違い
    const data: any = response.data;
@@ -328,6 +337,7 @@ Always reference MASTER.md for project-specific requirements.
    ```
 
 4. **エラーハンドリングの不備**
+
    ```typescript
    // ❌ 間違い
    try {
@@ -370,7 +380,6 @@ Always reference MASTER.md for project-specific requirements.
 | 日付 | 更新者 | 更新内容 |
 |------|--------|----------|
 | 2026-01-25 | Gemini | 言語設定（日本語固定）およびGemini Code Assist設定の追加 |
-
 
 ---
 

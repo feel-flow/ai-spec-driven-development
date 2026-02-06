@@ -25,6 +25,7 @@
 
 **解決策**:
 1. **即座の対応**:
+
    ```bash
    # 現在の接続数を確認
    psql -c "SELECT count(*) FROM pg_stat_activity;"
@@ -34,6 +35,7 @@
    ```
 
 2. **根本的な解決**:
+
    ```typescript
    // 接続プールの設定を調整
    const poolConfig = {
@@ -45,6 +47,7 @@
    ```
 
 3. **接続リークの確認**:
+
    ```typescript
    // 接続の適切な解放
    try {
@@ -72,6 +75,7 @@
 
 **解決策**:
 1. **即座の対応**:
+
    ```sql
    -- デッドロックの詳細を確認
    SELECT * FROM pg_stat_activity WHERE state = 'active';
@@ -81,6 +85,7 @@
    ```
 
 2. **根本的な解決**:
+
    ```sql
    -- テーブルロックの順序を統一
    BEGIN;
@@ -110,6 +115,7 @@
 
 **解決策**:
 1. **即座の対応**:
+
    ```bash
    # Redisサーバーの状態確認
    sudo systemctl status redis
@@ -122,6 +128,7 @@
    ```
 
 2. **設定確認**:
+
    ```bash
    # Redis設定ファイルの確認
    sudo nano /etc/redis/redis.conf
@@ -152,12 +159,14 @@
 
 **解決策**:
 1. **即座の対応**:
+
    ```bash
    # メモリ制限を増加してアプリケーションを再起動
    node --max-old-space-size=4096 app.js
    ```
 
 2. **根本的な解決**:
+
    ```typescript
    // ストリーミング処理でメモリ使用量を抑制
    import { createReadStream } from 'fs';
@@ -202,6 +211,7 @@
 
 **解決策**:
 1. **即座の対応**:
+
    ```bash
    # ネットワーク接続の確認
    ping api.example.com
@@ -212,6 +222,7 @@
    ```
 
 2. **アプリケーション側の対応**:
+
    ```typescript
    // リトライ機能付きHTTPクライアント
    class ResilientHttpClient {
@@ -263,6 +274,7 @@
 
 **解決策**:
 1. **即座の対応**:
+
    ```bash
    # Dockerサービスの状態確認
    sudo systemctl status docker
@@ -275,6 +287,7 @@
    ```
 
 2. **権限の確認**:
+
    ```bash
    # Dockerソケットの権限確認
    ls -la /var/run/docker.sock
@@ -305,6 +318,7 @@
 
 **解決策**:
 1. **即座の対応**:
+
    ```bash
    # キャッシュをクリアして再インストール
    rm -rf node_modules package-lock.json
@@ -313,6 +327,7 @@
    ```
 
 2. **CI/CD設定の確認**:
+
    ```yaml
    # .github/workflows/deploy.yml
    - name: Install dependencies
@@ -339,6 +354,7 @@
 
 **解決策**:
 1. **即座の対応**:
+
    ```bash
    # アプリケーションのログを確認
    kubectl logs deployment/your-app
@@ -348,6 +364,7 @@
    ```
 
 2. **設定の確認**:
+
    ```yaml
    # Kubernetes deployment
    livenessProbe:
@@ -382,12 +399,14 @@
 
 **解決策**:
 1. **即座の対応**:
+
    ```bash
    # トークンの内容を確認
    echo "your-jwt-token" | base64 -d
    ```
 
 2. **アプリケーション側の対応**:
+
    ```typescript
    // 安全なJWT検証
    import jwt from 'jsonwebtoken';
@@ -426,12 +445,14 @@
 
 **解決策**:
 1. **即座の対応**:
+
    ```bash
    # 暗号化キーの確認
    echo $ENCRYPTION_KEY | base64 -d | hexdump -C
    ```
 
 2. **アプリケーション側の対応**:
+
    ```typescript
    // 安全な暗号化実装
    import crypto from 'crypto';
@@ -479,6 +500,7 @@
 
 **解決策**:
 1. **即座の対応**:
+
    ```bash
    # アプリケーションのリソース使用量を確認
    top -p $(pgrep node)
@@ -488,6 +510,7 @@
    ```
 
 2. **根本的な解決**:
+
    ```typescript
    // データベースクエリの最適化
    // インデックスの追加
@@ -517,9 +540,9 @@
 ## 緊急時の連絡先
 
 ### 内部連絡先
-- **開発チームリード**: 田中 (tanaka@company.com) - 090-1234-5678
-- **インフラチーム**: 佐藤 (sato@company.com) - 090-2345-6789
-- **セキュリティチーム**: 山田 (yamada@company.com) - 090-3456-7890
+- **開発チームリード**: 田中 (<tanaka@company.com>) - 090-1234-5678
+- **インフラチーム**: 佐藤 (<sato@company.com>) - 090-2345-6789
+- **セキュリティチーム**: 山田 (<yamada@company.com>) - 090-3456-7890
 
 ### 外部連絡先
 - **クラウドプロバイダー**: AWS Support - 24時間対応

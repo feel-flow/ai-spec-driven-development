@@ -46,7 +46,7 @@ mkdir -p .github
 #### 1. AIツールを開く
 
 - **GitHub Copilot Chat**: VS Codeで `Cmd+I` (macOS) または `Ctrl+I` (Windows/Linux)
-- **Claude Code**: https://claude.ai/code
+- **Claude Code**: <https://claude.ai/code>
 - **Cursor**: `Cmd+L` (macOS) または `Ctrl+L` (Windows/Linux)
 
 #### 2. プロンプトを使用
@@ -102,15 +102,16 @@ mkdir -p .github
 
 確認の出力形式:
 ```
+
 ⚠️ 情報不足により確認が必要です
 
 【必須確認事項】
-1. [項目名]: [何が不明か]
-   - 理由: [なぜ確認が必要か]
-   - 推奨: [推奨される選択肢]
+- 理由: [なぜ確認が必要か]
+- 推奨: [推奨される選択肢]
 
 【次のステップ】
 上記を確認後、「[確認された情報]で進めてください」と指示してください。
+
 ```
 
 詳細は docs-template/MASTER.md の「情報不足時の必須確認プロトコル」を参照。

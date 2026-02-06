@@ -13,6 +13,7 @@
 #### JWT認証の実装
 
 **推奨**:
+
 ```typescript
 import jwt from 'jsonwebtoken';
 
@@ -43,6 +44,7 @@ class AuthService {
 #### 認可ミドルウェア
 
 **推奨**:
+
 ```typescript
 const requireRole = (role: string) => {
   return (req: Request, res: Response, next: NextFunction) => {
@@ -58,6 +60,7 @@ app.get('/api/admin/users', authenticateJWT, requireRole('admin'), getUsers);
 ```
 
 **避けるべき**:
+
 ```typescript
 // 脆弱な認証
 const token = jwt.sign({ userId: user.id }, 'weak-secret');
@@ -76,6 +79,7 @@ app.get('/api/admin/users', (req, res) => {
 #### パスワードのハッシュ化
 
 **推奨**:
+
 ```typescript
 import bcrypt from 'bcrypt';
 
@@ -93,6 +97,7 @@ class PasswordService {
 ```
 
 **避けるべき**:
+
 ```typescript
 // 平文でのパスワード保存
 const user = {
@@ -107,6 +112,7 @@ const encrypted = Buffer.from(data).toString('base64');
 #### 機密データの暗号化
 
 **推奨**:
+
 ```typescript
 import crypto from 'crypto';
 
@@ -154,6 +160,7 @@ class EncryptionService {
 #### スキーマベースのバリデーション
 
 **推奨**:
+
 ```typescript
 import Joi from 'joi';
 
@@ -176,6 +183,7 @@ const validateCreateUser = (req: Request, res: Response, next: NextFunction) => 
 ```
 
 **避けるべき**:
+
 ```typescript
 // 手動バリデーション
 if (!req.body.name || req.body.name.length < 1) {
@@ -193,6 +201,7 @@ if (req.body.email) {
 ### セキュリティヘッダー
 
 **推奨**:
+
 ```typescript
 import helmet from 'helmet';
 
@@ -222,6 +231,7 @@ app.use(helmet({
 #### AAAパターン（Arrange-Act-Assert）
 
 **推奨**:
+
 ```typescript
 describe('UserService', () => {
   let userService: UserService;
@@ -277,6 +287,7 @@ describe('UserService', () => {
 ```
 
 **避けるべき**:
+
 ```typescript
 // テストの不備
 it('should work', async () => {
@@ -299,6 +310,7 @@ it('should create user', async () => {
 #### データベース統合テスト
 
 **推奨**:
+
 ```typescript
 describe('User API Integration', () => {
   let app: Express;
@@ -406,6 +418,7 @@ module.exports = {
 #### Playwrightを使用したE2Eテスト
 
 **推奨**:
+
 ```typescript
 import { test, expect } from '@playwright/test';
 

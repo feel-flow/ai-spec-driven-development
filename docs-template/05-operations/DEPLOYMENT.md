@@ -140,6 +140,7 @@ GitHub Actions/GitLab CI/Jenkinsによる自動化パイプライン。
 - メモリ使用率が90%を超える
 
 ### 手動ロールバック
+
 ```bash
 # 前バージョンにロールバック
 ./scripts/rollback.sh [deployment-id]
@@ -156,6 +157,7 @@ GitHub Actions/GitLab CI/Jenkinsによる自動化パイプライン。
 - **設定ファイル**: 変更時バックアップ、90日保持
 
 ### 復旧手順
+
 ```bash
 # 最新バックアップから復元
 ./scripts/disaster-recovery.sh

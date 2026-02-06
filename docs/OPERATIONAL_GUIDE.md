@@ -19,7 +19,7 @@ changeImpact: high
 
 この文書は「AIエージェントが迷わない最小・高精度なドキュメント構造」を保証するための操作仕様書です。`docs-template/MASTER.md` を上位規約 (Source of Truth) とし、本書はその実務ガイドライン層に位置します。フォルダ生成、ファイル分類、更新、監査をすべて自動化しやすくするための厳密なルールを定義します。
 
-> **関連文書**: 
+> **関連文書**:
 > - [AI Spec Driven Development 概念と実践](AI_SPEC_DRIVEN_DEVELOPMENT.md) - AI駆動開発の理論と実践方法
 > - [MASTER.md](../docs-template/MASTER.md) - プロジェクトの中央管理文書
 
@@ -114,6 +114,7 @@ AIモデル (Claude Code / GitHub Copilot / Cursor など) が以下を行う際
 ## 3. FOLDER SPEC (必須構造と責務)
 
 番号付きフォルダ構造:
+
 ```
 docs-template/
 ├── MASTER.md                          # 中央管理文書
@@ -464,6 +465,7 @@ AIエージェントがエラーに遭遇した場合の対応方針:
 各ファイル末尾に `Revision History` セクションを配置し、更新ごとに1行追加します。
 
 **形式**:
+
 ```markdown
 ## Revision History
 
@@ -473,6 +475,7 @@ AIエージェントがエラーに遭遇した場合の対応方針:
 ```
 
 **例**:
+
 ```markdown
 ## Revision History
 
@@ -492,11 +495,13 @@ AIエージェントがエラーに遭遇した場合の対応方針:
 ## 15. GLOSSARY / LINKING 指針
 
 ### 用語参照形式
+
 ```markdown
 [用語](../06-reference/GLOSSARY.md#term-kebab)
 ```
 
 **例**:
+
 ```markdown
 このシステムは[マイクロサービス](../06-reference/GLOSSARY.md#microservice)アーキテクチャを採用しています。
 ```
@@ -508,6 +513,7 @@ AIエージェントがエラーに遭遇した場合の対応方針:
 3. **新しい概念**である (既存の用語では表現できない)
 
 ### 定義フォーマット
+
 ```markdown
 ### <用語名> {#term-kebab}
 

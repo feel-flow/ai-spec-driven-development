@@ -5,6 +5,7 @@
 このプロジェクトでは、AIツールが効率的に理解できるよう、統一されたドキュメント命名規則を採用しています。
 
 ### ディレクトリ構造
+
 ```
 docs-template/
 ├── 00-planning/              # 数字-英語小文字（ハイフン区切り）
@@ -28,6 +29,7 @@ docs-template/
 - **形式**: `数字-英語小文字（ハイフン区切り）`
 - **目的**: AIツールが順序を理解しやすい
 - **例**:
+
   ```
   ✅ 正しい例:
   - 01-context
@@ -47,6 +49,7 @@ docs-template/
 - **形式**: `英語大文字.md`
 - **理由**: AIツールが重要文書として優先的に認識
 - **例**:
+
   ```
   ✅ 正しい例:
   - MASTER.md
@@ -63,13 +66,14 @@ docs-template/
 
 #### 特殊ファイル（例外）
 - **標準慣習**: `README.md`（GitHubの標準）
-- **AIツール設定**: 
+- **AIツール設定**:
   - `CLAUDE.md`（Claude Code用）
   - `AGENTS.md`（全AIエージェント共通）
   - `.github/copilot-instructions.md`（GitHub Copilot用）
   - `.cursorrules`（Cursor用）
 
 ### 禁止事項
+
 ```
 ❌ 日本語ファイル名
    - 仕様書.md
@@ -93,6 +97,7 @@ docs-template/
 ### 命名ガイドライン
 
 #### いつディレクトリを作るか
+
 ```
 ✅ 作成する場合:
 - 論理的なグループが3つ以上のファイルを持つ
@@ -103,6 +108,7 @@ docs-template/
 ```
 
 #### いつ大文字ファイル名を使うか
+
 ```
 ✅ 使用する場合:
 - プロジェクトの中核文書
@@ -115,6 +121,7 @@ docs-template/
 ```
 
 ### 実例: プロジェクト全体の構造
+
 ```
 my-project/
 ├── .github/
@@ -153,6 +160,7 @@ my-project/
 - **明示性**: 暗黙より明示的に
 
 ### マジックナンバー禁止
+
 ```typescript
 // ❌ 悪い例
 if (items.length > 100) {
@@ -169,6 +177,7 @@ if (items.length > MAX_ITEMS_PER_PAGE) {
 ## 2. ファイル構成
 
 ### ディレクトリ構造
+
 ```
 src/
 ├── domain/           # ドメイン層
@@ -193,6 +202,7 @@ src/
 ```
 
 ### ファイル命名規則
+
 | 種類 | パターン | 例 |
 |---|---|---|
 | TypeScript | kebab-case.ts | user-service.ts |
@@ -204,6 +214,7 @@ src/
 ## 3. TypeScript/JavaScript規約
 
 ### 変数・関数命名
+
 ```typescript
 // 変数: camelCase
 const userName: string = 'John';
@@ -240,6 +251,7 @@ enum Status {
 ```
 
 ### 型定義
+
 ```typescript
 // 明示的な型定義を推奨
 const count: number = 0;
@@ -268,6 +280,7 @@ function identity<T>(value: T): T {
 ```
 
 ### 非同期処理
+
 ```typescript
 // async/awaitを優先
 async function fetchUser(id: string): Promise<User> {
@@ -296,6 +309,7 @@ async function fetchDashboard(userId: string): Promise<Dashboard> {
 ```
 
 ### エラーハンドリング
+
 ```typescript
 // カスタムエラークラス
 class ValidationError extends Error {
@@ -323,6 +337,7 @@ try {
 ## 4. React/Vue規約
 
 ### コンポーネント命名
+
 ```tsx
 // React: PascalCase
 const UserProfile: React.FC<UserProfileProps> = ({ user }) => {
@@ -334,6 +349,7 @@ const UserProfile: React.FC<UserProfileProps> = ({ user }) => {
 ```
 
 ### Props定義
+
 ```tsx
 // Props型定義
 interface UserProfileProps {
@@ -349,6 +365,7 @@ const defaultProps: Partial<UserProfileProps> = {
 ```
 
 ### Hooks使用規則
+
 ```tsx
 // カスタムHooksは'use'プレフィックス
 function useUser(id: string) {
@@ -377,6 +394,7 @@ function UserComponent({ id }: Props) {
 ## 5. CSS/スタイリング規約
 
 ### CSS Modules
+
 ```scss
 // styles.module.scss
 .container {
@@ -398,6 +416,7 @@ function UserComponent({ id }: Props) {
 ```
 
 ### CSS-in-JS
+
 ```typescript
 // styled-components
 const Container = styled.div<{ isActive: boolean }>`
@@ -417,6 +436,7 @@ const containerStyle = css`
 ## 6. データベース規約
 
 ### テーブル・カラム命名
+
 ```sql
 -- テーブル名: 複数形、snake_case
 CREATE TABLE users (
@@ -439,6 +459,7 @@ FOREIGN KEY (user_id) REFERENCES users(id);
 ## 7. API規約
 
 ### RESTful URL設計
+
 ```
 GET    /api/v1/users          # 一覧取得
 GET    /api/v1/users/:id      # 詳細取得
@@ -453,6 +474,7 @@ POST   /api/v1/users/:id/posts
 ```
 
 ### レスポンス形式
+
 ```json
 // 成功レスポンス
 {
@@ -485,6 +507,7 @@ POST   /api/v1/users/:id/posts
 ## 8. Git規約
 
 ### コミットメッセージ
+
 ```
 <type>(<scope>): <subject>
 
@@ -503,6 +526,7 @@ POST   /api/v1/users/:id/posts
 - chore: ビルド・補助ツール
 
 **例**:
+
 ```
 feat(auth): add OAuth2.0 login support
 
@@ -514,6 +538,7 @@ Closes #123
 ```
 
 ### ブランチ命名
+
 ```
 feature/user-authentication
 bugfix/payment-calculation-error
@@ -524,6 +549,7 @@ release/v1.2.0
 ## 9. テスト規約
 
 ### テストファイル構成
+
 ```typescript
 describe('UserService', () => {
   let service: UserService;
@@ -561,6 +587,7 @@ describe('UserService', () => {
 ```
 
 ### テスト命名
+
 ```typescript
 // テストケース名は具体的に
 it('should return 401 when authorization header is missing', () => {});
@@ -571,6 +598,7 @@ it('should retry 3 times before failing', () => {});
 ## 10. ドキュメント規約
 
 ### JSDoc/TSDoc
+
 ```typescript
 /**
  * ユーザー情報を取得する
@@ -589,6 +617,7 @@ async function getUserById(id: string): Promise<User> {
 ```
 
 ### README構成
+
 ```markdown
 # プロジェクト名
 
@@ -620,6 +649,7 @@ npm test
 ## 11. セキュリティ規約
 
 ### 機密情報の取り扱い
+
 ```typescript
 // ❌ 悪い例: ハードコーディング
 const apiKey = 'sk_live_abc123';
@@ -635,6 +665,7 @@ logger.info(`User login: ${email}`);
 ```
 
 ### 入力検証
+
 ```typescript
 // 必ず入力を検証
 function processUserInput(input: unknown): void {

@@ -25,6 +25,7 @@ Cursor は、AIネイティブなコードエディタで、以下の特徴が�
 ### ステップ1: Cursor のインストール（10分）
 
 1. **Cursor をダウンロード**
+
    ```
    https://cursor.sh
    ```
@@ -43,6 +44,7 @@ Cursor は、AIネイティブなコードエディタで、以下の特徴が�
 既存のVS Code設定がある場合：
 
 1. **設定のインポート**
+
    ```
    Cursor > Settings > Import VS Code Settings
    ```
@@ -66,6 +68,7 @@ Cursor は、AIネイティブなコードエディタで、以下の特徴が�
      - より多くのチャットリクエスト
 
 3. **AI設定の確認**
+
    ```
    Settings (⌘,) > Cursor Settings > AI
    - Enable AI Completions: ON
@@ -188,6 +191,7 @@ When information is missing, DO NOT make assumptions. Always ask for confirmatio
 
 ### Confirmation Format
 ```
+
 ⚠️ Missing Information - Confirmation Required
 
 [Required Information]
@@ -201,6 +205,7 @@ When information is missing, DO NOT make assumptions. Always ask for confirmatio
 
 [Next Steps]
 After confirmation, please instruct: "Proceed with [confirmed information]"
+
 ```
 
 ### Allowed Assumptions (must be explicitly stated)
@@ -249,6 +254,7 @@ EOF
 あなたのプロジェクトに合わせて `.cursorrules` をカスタマイズします：
 
 **例1: Reactプロジェクトの場合**
+
 ```
 ## Project-Specific Rules
 
@@ -270,6 +276,7 @@ EOF
 ```
 
 **例2: Node.js APIプロジェクトの場合**
+
 ```
 ## Project-Specific Rules
 
@@ -331,6 +338,7 @@ EOF
 よく使う機能にショートカットを設定：
 
 1. **Keyboard Shortcuts を開く**
+
    ```
    ⌘K ⌘S (macOS) または Ctrl+K Ctrl+S (Windows/Linux)
    ```
@@ -347,16 +355,19 @@ EOF
 ### 1. AI Chat (⌘L)
 
 **プロジェクト全体の質問**:
+
 ```
 @codebase このプロジェクトのユーザー認証はどのように実装されていますか?
 ```
 
 **特定ファイルの質問**:
+
 ```
 @file:user-service.ts この関数のエラーハンドリングを改善してください
 ```
 
 **ドキュメント参照**:
+
 ```
 docs-template/MASTER.md の規約に従って、このコードをリファクタリングしてください
 ```
@@ -366,18 +377,21 @@ docs-template/MASTER.md の規約に従って、このコードをリファク�
 コードを選択してから `⌘K` を押すと、選択範囲に対してAIが操作します：
 
 **リファクタリング**:
+
 ```
 選択: 長い関数
 ⌘K: "この関数を30行以下の複数の関数に分割してください"
 ```
 
 **テスト生成**:
+
 ```
 選択: 関数
 ⌘K: "AAA patternでユニットテストを生成してください"
 ```
 
 **ドキュメント生成**:
+
 ```
 選択: 関数またはクラス
 ⌘K: "JSDocコメントを追加してください"
@@ -386,12 +400,14 @@ docs-template/MASTER.md の規約に従って、このコードをリファク�
 ### 3. インラインAI補完
 
 **コメントからコード生成**:
+
 ```typescript
 // MASTER.mdのResult patternを使用してユーザーを取得する関数
 // [Tabを押すとAIが実装を提案]
 ```
 
 **型定義からコード生成**:
+
 ```typescript
 interface User {
   id: string;
@@ -408,11 +424,13 @@ interface User {
 複数ファイルを同時に編集する高度な機能：
 
 1. **Composer を開く**
+
    ```
    ⌘I (macOS) または Ctrl+I (Windows/Linux)
    ```
 
 2. **複数ファイル編集の例**
+
    ```
    プロンプト:
    ユーザー認証機能を以下のファイルに追加してください:
@@ -432,18 +450,21 @@ interface User {
 
 **解決策**:
 1. **AI設定を確認**
+
    ```
    Settings > Cursor Settings > AI
    - Enable AI Completions: ON にする
    ```
 
 2. **ネットワーク接続を確認**
+
    ```
    Settings > Network
    - プロキシ設定を確認
    ```
 
 3. **ログアウト/ログイン**
+
    ```
    Cursor > Sign Out
    再度ログイン
@@ -455,12 +476,14 @@ interface User {
 
 **解決策**:
 1. **ファイル名を確認**
+
    ```bash
    # 正しい: .cursorrules
    # 間違い: cursorrules, .cursor-rules, cursor-rules.md
    ```
 
 2. **配置場所を確認**
+
    ```bash
    # プロジェクトルートに配置
    my-project/
@@ -479,11 +502,13 @@ interface User {
 
 **解決策**:
 1. **.cursorrules を更新**
+
    ```
    このガイドの完全版 .cursorrules テンプレートを使用
    ```
 
 2. **プロンプトで明示的に指定**
+
    ```
    ❌ 悪い例:
    「ユーザー登録機能を作って」
@@ -498,6 +523,7 @@ interface User {
    ```
 
 3. **AI Chat で確認**
+
    ```
    @codebase .cursorrules の内容を確認して、
    MASTER.md のルールが含まれているか教えてください
@@ -509,18 +535,21 @@ interface User {
 
 **解決策**:
 1. **インデックスを確認**
+
    ```
    Settings > Cursor Settings > Indexing
    - 不要なフォルダを除外 (node_modules, .git, dist, build)
    ```
 
 2. **拡張機能を減らす**
+
    ```
    Extensions > Installed
    - 使っていない拡張機能を無効化
    ```
 
 3. **.cursorignore を作成**
+
    ```bash
    # プロジェクトルートに .cursorignore 作成
    cat > .cursorignore << 'EOF'
@@ -557,6 +586,7 @@ interface User {
 ### 2. プロンプトのコツ
 
 **具体的に指示**:
+
 ```
 ❌ 「エラー処理を追加して」
 ✅ 「MASTER.mdのResult patternを使ってエラー処理を追加してください。
@@ -565,6 +595,7 @@ interface User {
 ```
 
 **コンテキストを提供**:
+
 ```
 @file:docs-template/MASTER.md
 @file:docs-template/03-implementation/PATTERNS.md
@@ -572,6 +603,7 @@ interface User {
 ```
 
 **段階的に進める**:
+
 ```
 1. まずインターフェースを定義
 2. 次に基本実装
@@ -582,6 +614,7 @@ interface User {
 ### 3. チーム開発での活用
 
 **.cursorrules の共有**:
+
 ```bash
 # リポジトリに追加
 git add .cursorrules
@@ -590,6 +623,7 @@ git push origin main
 ```
 
 **チームメンバー向けドキュメント**:
+
 ```markdown
 # Cursor セットアップ（チーム用）
 
@@ -610,7 +644,7 @@ git push origin main
 Cursor のセットアップは以下の4ステップ：
 
 1. **Cursor インストール**（10分）
-   - https://cursor.sh からダウンロード
+   - <https://cursor.sh> からダウンロード
    - Pro プラン推奨（月額 $20）
 
 2. **.cursorrules 作成**（25分）

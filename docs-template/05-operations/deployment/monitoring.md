@@ -192,7 +192,7 @@ aws cloudwatch get-metric-statistics \
 |---|---|---|
 | オンコール | PagerDuty | 24/7 |
 | DevOps Team | Slack #incidents | 24/7 |
-| Security Team | security@example.com | 24/7 |
+| Security Team | <security@example.com> | 24/7 |
 | Management | emergency-contact-list | Business Hours |
 
 ---

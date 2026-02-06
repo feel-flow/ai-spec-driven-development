@@ -31,6 +31,7 @@ Phase 4: 実装準備 (1時間)
 ### ステップ0-1: 企画書テンプレートを開く
 
 1. **企画書をコピー**
+
    ```bash
    cp docs-template/00-planning/PLANNING_TEMPLATE.md \
       docs/00-planning/my-project-planning.md
@@ -99,12 +100,13 @@ mkdir -p docs/{00-planning,01-context,02-design,03-implementation,04-quality,05-
 ### ステップ1-2: PROJECT.mdを作成
 
 1. **テンプレートをコピー**
+
    ```bash
    cp docs-template/01-context/PROJECT.md docs/01-context/PROJECT.md
    ```
 
 2. **企画書の内容を転記**
-   
+
    | 企画書のセクション | PROJECT.mdのセクション |
    |-------------------|---------------------|
    | 1. 発想・アイデア | 2. プロジェクトビジョン |
@@ -139,18 +141,20 @@ mkdir -p docs/{00-planning,01-context,02-design,03-implementation,04-quality,05-
 
 不明な点があれば、以下の形式で質問してください：
 ```
+
 ⚠️ 情報不足により確認が必要です
 
 【必須確認事項】
-1. [項目名]: [何が不明か]
-   - 理由: [なぜ確認が必要か]
-   - 推奨: [推奨される選択肢]
+- 理由: [なぜ確認が必要か]
+- 推奨: [推奨される選択肢]
+
 ```
 ```
 
 ### ステップ1-3: CONSTRAINTS.mdを作成
 
 1. **テンプレートをコピー**
+
    ```bash
    cp docs-template/01-context/CONSTRAINTS.md docs/01-context/CONSTRAINTS.md
    ```
@@ -204,6 +208,7 @@ mkdir -p docs/{00-planning,01-context,02-design,03-implementation,04-quality,05-
 ### ステップ2-2: MASTER.mdを作成
 
 1. **テンプレートをコピー**
+
    ```bash
    cp docs-template/MASTER.md docs/MASTER.md
    ```
@@ -250,6 +255,7 @@ mkdir -p docs/{00-planning,01-context,02-design,03-implementation,04-quality,05-
 ### ステップ3-1: ARCHITECTURE.mdを作成
 
 1. **テンプレートをコピー**
+
    ```bash
    cp docs-template/02-design/ARCHITECTURE.md docs/02-design/ARCHITECTURE.md
    ```
@@ -291,6 +297,7 @@ mkdir -p docs/{00-planning,01-context,02-design,03-implementation,04-quality,05-
 ビジネスロジックが複雑な場合のみ作成：
 
 1. **テンプレートをコピー**
+
    ```bash
    cp docs-template/02-design/DOMAIN.md docs/02-design/DOMAIN.md
    ```
@@ -305,6 +312,7 @@ mkdir -p docs/{00-planning,01-context,02-design,03-implementation,04-quality,05-
 データベース設計が必要な場合：
 
 1. **テンプレートをコピー**
+
    ```bash
    cp docs-template/02-design/DATABASE.md docs/02-design/DATABASE.md
    ```
@@ -338,6 +346,7 @@ Mermaid形式のER図と、テーブル定義（DDL）を生成してくださ�
 ### ステップ4-1: PATTERNS.mdを作成
 
 1. **テンプレートをコピー**
+
    ```bash
    cp docs-template/03-implementation/PATTERNS.md docs/03-implementation/PATTERNS.md
    ```
@@ -351,6 +360,7 @@ Mermaid形式のER図と、テーブル定義（DDL）を生成してくださ�
 ### ステップ4-2: TESTING.mdを作成
 
 1. **テンプレートをコピー**
+
    ```bash
    cp docs-template/04-quality/TESTING.md docs/04-quality/TESTING.md
    ```
@@ -415,7 +425,7 @@ Mermaid形式のER図と、テーブル定義（DDL）を生成してくださ�
 
 ---
 
-## 🎉 実装開始！
+## 🎉 実装開始
 
 ここまで完了すれば、AI駆動開発の準備が整いました！
 

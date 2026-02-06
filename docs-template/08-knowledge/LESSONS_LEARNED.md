@@ -31,6 +31,7 @@
 3. 接続リークの調査 → 根本原因を発見
 
 **最終的な解決策**:
+
 ```typescript
 // 接続プールの適切な設定
 const poolConfig = {
@@ -71,6 +72,7 @@ try {
 - 複数のテーブルを同時に変更するマイグレーションで発生
 
 **解決策**:
+
 ```sql
 -- テーブルロックの順序を統一
 BEGIN;
@@ -99,6 +101,7 @@ COMMIT;
 - 長時間稼働後にメモリ不足でアプリケーションが停止
 
 **解決策**:
+
 ```typescript
 // Redisを使用したレート制限実装
 import Redis from 'ioredis';
@@ -146,6 +149,7 @@ class RateLimiter {
 - ネットワーク遅延とサービスBの処理時間が原因
 
 **解決策**:
+
 ```typescript
 // リトライ機能付きHTTPクライアント
 class ResilientHttpClient {
@@ -209,6 +213,7 @@ class ResilientHttpClient {
 - Node.jsのメモリ制限（デフォルト1.4GB）を超過
 
 **解決策**:
+
 ```typescript
 // ストリーミング処理でメモリ使用量を抑制
 import { createReadStream } from 'fs';
@@ -263,6 +268,7 @@ async function processInBatches(data: any[], batchSize: number = 1000) {
 - アルゴリズム指定なしでトークンを検証していた
 
 **解決策**:
+
 ```typescript
 // 安全なJWT検証実装
 import jwt from 'jsonwebtoken';
@@ -327,6 +333,7 @@ class SecureJWTValidator {
 - ロールバック時にデータの整合性が保てない
 
 **解決策**:
+
 ```yaml
 # デプロイメント戦略の改善
 deployment_strategy:
@@ -371,6 +378,7 @@ deployment_strategy:
 - レビュアーの負荷が集中している
 
 **解決策**:
+
 ```markdown
 # コードレビューガイドライン
 
@@ -479,4 +487,3 @@ deployment_strategy:
 
 ### インサイトまとめ
 構造化 + インパクト分類は AI 支援下でのドキュメント運用摩擦を大幅に低減する。次段階は「自動検証」と「影響度推定モデル」による人為判断負荷の削減。継続的計測 (解析時間, 衝突率, レビュー所要時間) のメトリクス化が必須。
-

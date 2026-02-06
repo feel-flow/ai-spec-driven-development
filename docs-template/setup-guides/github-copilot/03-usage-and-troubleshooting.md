@@ -64,13 +64,16 @@ mkdir -p .vscode
 
 1. **新しいファイルを作成** (`test.ts`)
 2. **コメントを書く**
+
    ```typescript
    // ユーザー情報を持つインターフェースを定義
    ```
+
 3. **Enterキーを押す**
 4. **`Tab`キーで受け入れ**
 
 **期待される結果:**
+
 ```typescript
 // ユーザー情報を持つインターフェースを定義
 interface User {
@@ -87,6 +90,7 @@ interface User {
    - Windows/Linux: `Ctrl + I`
 
 2. **質問してみる**
+
    ```
    このプロジェクトのMASTER.mdのルールに従って、
    ユーザー登録機能のコードを生成してください。
@@ -125,6 +129,7 @@ private/
 ### 5-1: コメント駆動開発
 
 **良い例（具体的）:**
+
 ```typescript
 // 【関数名】validateEmail
 // 【引数】email: string
@@ -134,6 +139,7 @@ private/
 ```
 
 **悪い例（曖昧）:**
+
 ```typescript
 // メールチェック
 ```
@@ -141,6 +147,7 @@ private/
 ### 5-2: Copilot Chatの活用パターン
 
 **パターン1: コード生成依頼**
+
 ```
 【タスク】ユーザー登録APIエンドポイントを作成
 【制約】MASTER.mdのルール、マジックナンバー禁止、TypeScript strict mode、単体テストも生成
@@ -148,6 +155,7 @@ private/
 ```
 
 **パターン2: コードレビュー依頼**
+
 ```
 以下のコードをレビューしてください。
 【チェック項目】MASTER.mdのルール、マジックナンバー、エラーハンドリング、型安全性
@@ -155,6 +163,7 @@ private/
 ```
 
 **パターン3: リファクタリング依頼**
+
 ```
 以下のコードをリファクタリングしてください。
 【目標】関数を30行以内、マジックナンバー定数化、型安全性向上
@@ -247,7 +256,7 @@ git push
    - 「Sign in to GitHub」が表示される場合は再ログイン
 
 2. **サブスクリプションを確認**
-   - https://github.com/settings/copilot
+   - <https://github.com/settings/copilot>
    - アクティブになっているか確認
 
 3. **VS Codeを再起動**
@@ -265,6 +274,7 @@ git push
    - MASTER.mdへの参照が明記されているか
 
 2. **Copilot Chatで明示的に指示**
+
    ```
    必ず docs-template/MASTER.md のルールに従ってください。
    特に以下を遵守：

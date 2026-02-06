@@ -32,10 +32,10 @@ AIエージェントがプロジェクトの構造を理解し、タスクを自
 - **ファイル**: [`docs/OPERATIONAL_GUIDE.md`](docs/OPERATIONAL_GUIDE.md)
 - **対象読者**: AIエージェント、開発者
 - **内容**:
-    - 必須のフォルダ構造とファイルセット
-    - ファイル分類マトリクス
-    - 命名規則とバージョニングルール
-    - AIエージェント向けの実行チェックリスト
+  - 必須のフォルダ構造とファイルセット
+  - ファイル分類マトリクス
+  - 命名規則とバージョニングルール
+  - AIエージェント向けの実行チェックリスト
 
 ### 2. AI Spec Driven Development
 
@@ -69,6 +69,7 @@ AIエージェントがプロジェクトの構造を理解し、タスクを自
 
 ---
 ## Revision History
+
 | Date       | Author  | Version | Impact | Summary |
 |------------|---------|---------|--------|---------|
 | 2025-11-07 | copilot | 3.1.0   | medium | Updated index to reflect the 3-way split of the main documentation. |

@@ -3,6 +3,7 @@
 ## 1. コーディング規約
 
 ### 命名規則
+
 | 要素 | パターン | 例 |
 |---|---|---|
 | クラス | PascalCase | UserService |
@@ -13,6 +14,7 @@
 | ファイル | kebab-case | user-service.ts |
 
 ### コード構造
+
 ```typescript
 // ファイル構造の標準パターン
 // 1. imports
@@ -40,6 +42,7 @@ export { UserService, UserData };
 ## 2. デザインパターン
 
 ### Repository Pattern
+
 ```typescript
 // リポジトリインターフェース
 interface IUserRepository {
@@ -60,6 +63,7 @@ class UserRepository implements IUserRepository {
 ```
 
 ### Factory Pattern
+
 ```typescript
 // ファクトリーパターン
 class NotificationFactory {
@@ -79,6 +83,7 @@ class NotificationFactory {
 ```
 
 ### Singleton Pattern
+
 ```typescript
 // シングルトンパターン
 class ConfigManager {
@@ -101,6 +106,7 @@ class ConfigManager {
 ## 3. エラーハンドリング
 
 ### カスタムエラークラス
+
 ```typescript
 // エラー基底クラス
 abstract class AppError extends Error {
@@ -124,6 +130,7 @@ class ValidationError extends AppError {
 ```
 
 ### エラーハンドリングパターン
+
 ```typescript
 // Try-Catch with proper error handling
 async function processUser(userId: string): Promise<Result<User>> {
@@ -151,6 +158,7 @@ async function processUser(userId: string): Promise<Result<User>> {
 ## 4. 非同期処理パターン
 
 ### Promise Chain
+
 ```typescript
 // Promise チェーンパターン
 function fetchUserWithPosts(userId: string): Promise<UserWithPosts> {
@@ -166,6 +174,7 @@ function fetchUserWithPosts(userId: string): Promise<UserWithPosts> {
 ```
 
 ### Async/Await
+
 ```typescript
 // Async/Awaitパターン
 async function fetchUserWithPosts(userId: string): Promise<UserWithPosts> {
@@ -181,6 +190,7 @@ async function fetchUserWithPosts(userId: string): Promise<UserWithPosts> {
 ```
 
 ### 並列処理
+
 ```typescript
 // 並列処理パターン
 async function fetchDashboardData(userId: string): Promise<Dashboard> {
@@ -201,6 +211,7 @@ async function fetchDashboardData(userId: string): Promise<Dashboard> {
 ## 5. バリデーションパターン
 
 ### DTOバリデーション
+
 ```typescript
 // DTOバリデーション using class-validator
 import { IsEmail, IsNotEmpty, MinLength } from 'class-validator';
@@ -217,6 +228,7 @@ class CreateUserDto {
 ```
 
 ### カスタムバリデーター
+
 ```typescript
 // カスタムバリデーター
 class Validator {
@@ -249,6 +261,7 @@ class Validator {
 ## 6. テストパターン
 
 ### Unit Test
+
 ```typescript
 // ユニットテストパターン
 describe('UserService', () => {
@@ -282,6 +295,7 @@ describe('UserService', () => {
 ```
 
 ### Integration Test
+
 ```typescript
 // 統合テストパターン
 describe('User API', () => {
@@ -318,6 +332,7 @@ describe('User API', () => {
 ## 7. セキュリティパターン
 
 ### 入力サニタイゼーション
+
 ```typescript
 // 入力のサニタイゼーション
 class Sanitizer {
@@ -338,6 +353,7 @@ class Sanitizer {
 ```
 
 ### 認証・認可
+
 ```typescript
 // 認証ミドルウェア
 function authMiddleware(req: Request, res: Response, next: NextFunction) {
@@ -375,6 +391,7 @@ function RequireRole(role: Role) {
 ## 8. パフォーマンス最適化
 
 ### キャッシングパターン
+
 ```typescript
 // キャッシングデコレーター
 function Cacheable(ttl: number = 3600) {
@@ -401,6 +418,7 @@ function Cacheable(ttl: number = 3600) {
 ```
 
 ### バッチ処理
+
 ```typescript
 // バッチ処理パターン
 class BatchProcessor<T> {
@@ -440,6 +458,7 @@ class BatchProcessor<T> {
 ## 9. ログパターン
 
 ### 構造化ログ
+
 ```typescript
 // 構造化ログパターン
 class Logger {
@@ -479,6 +498,7 @@ class Logger {
 ## 10. マジックナンバー禁止
 
 ### 定数の定義
+
 ```typescript
 // ❌ 悪い例
 if (retryCount > 3) {
@@ -493,6 +513,7 @@ if (retryCount > MAX_RETRY_COUNT) {
 ```
 
 ### 設定の外部化
+
 ```typescript
 // config/constants.ts
 export const API_CONFIG = {

@@ -11,7 +11,7 @@ This guide covers STEP 1 (Installation) and STEP 2 (copilot-instructions.md setu
 ### 1-1: GitHub Copilot Subscription
 
 1. **Access GitHub Copilot page**
-   - https://github.com/features/copilot
+   - <https://github.com/features/copilot>
 
 2. **Subscribe or start free trial**
    - Individual: $10/month
@@ -26,7 +26,7 @@ This guide covers STEP 1 (Installation) and STEP 2 (copilot-instructions.md setu
    - Can cancel before trial ends
 
 5. **Verify subscription**
-   - Check at: https://github.com/settings/copilot
+   - Check at: <https://github.com/settings/copilot>
    - Ensure status shows as "Active"
 
 ### 1-2: VS Code Extension Installation
@@ -109,7 +109,7 @@ mkdir -p .github
 #### 1. Open your AI tool
 
 - **GitHub Copilot Chat**: `Cmd+I` (macOS) or `Ctrl+I` (Windows/Linux)
-- **Claude Code**: https://claude.ai/code
+- **Claude Code**: <https://claude.ai/code>
 - **Cursor**: `Cmd+L` (macOS) or `Ctrl+L` (Windows/Linux)
 
 #### 2. Use this prompt
@@ -162,6 +162,7 @@ Required confirmations:
 
 Confirmation format:
 ```
+
 ⚠️ Missing Information - Confirmation Required
 
 [Required Confirmations]
@@ -171,6 +172,7 @@ Confirmation format:
 
 [Next Steps]
 After confirmation, instruct: "Proceed with [confirmed details]"
+
 ```
 
 See docs-template/MASTER.md "Information Verification Protocol" for details.
@@ -350,7 +352,7 @@ Before generating code suggestions, read and understand `docs-template/MASTER.md
 
 **Solution**:
 1. Verify GitHub account (correct account with subscription)
-2. Check status at https://github.com/settings/copilot
+2. Check status at <https://github.com/settings/copilot>
 3. Restart VS Code
 4. Sign out and sign in again
 

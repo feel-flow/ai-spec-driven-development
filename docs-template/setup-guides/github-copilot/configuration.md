@@ -89,6 +89,7 @@ mkdir -p .vscode
    - 例: `test.ts` または `test.js`
 
 2. **コメントを書く**
+
    ```typescript
    // ユーザー情報を持つインターフェースを定義
    ```
@@ -124,6 +125,7 @@ interface User {
    - Windows/Linux: `Ctrl + I`
 
 2. **質問してみる**
+
    ```
    このプロジェクトのMASTER.mdのルールに従って、
    ユーザー登録機能のコードを生成してください。
@@ -223,9 +225,11 @@ private/
    - MASTER.mdへの参照が明記されているか
    - パスが正しいか
 2. Copilot Chatで明示的に指示
+
    ```
    必ず docs-template/MASTER.md のルールに従ってください。
    ```
+
 3. VS Codeを再起動
 
 ### 提案される速度が遅い

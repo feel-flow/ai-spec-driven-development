@@ -9,6 +9,7 @@
 - **照合順序**: [照合順序]
 
 ### データベース一覧
+
 | DB名 | 用途 | 種別 | サイズ見込み |
 |---|---|---|---|
 | [DB名1] | [用途] | [Master/Replica] | [サイズ] |
@@ -17,6 +18,7 @@
 ## 2. テーブル設計
 
 ### ER図
+
 ```mermaid
 erDiagram
     User ||--o{ Order : places
@@ -27,6 +29,7 @@ erDiagram
 ### テーブル定義
 
 #### users テーブル
+
 | カラム名 | データ型 | NULL | キー | デフォルト | 説明 |
 |---|---|---|---|---|---|
 | id | UUID | NO | PK | gen_random_uuid() | ユーザーID |
@@ -43,6 +46,7 @@ erDiagram
 - `idx_users_created_at` (created_at)
 
 #### orders テーブル
+
 | カラム名 | データ型 | NULL | キー | デフォルト | 説明 |
 |---|---|---|---|---|---|
 | id | UUID | NO | PK | gen_random_uuid() | 注文ID |
@@ -60,6 +64,7 @@ erDiagram
 ## 3. リレーション設計
 
 ### 外部キー制約
+
 | テーブル | カラム | 参照テーブル | 参照カラム | ON DELETE | ON UPDATE |
 |---|---|---|---|---|---|
 | orders | user_id | users | id | RESTRICT | CASCADE |
@@ -79,6 +84,7 @@ erDiagram
 - カーディナリティの高いカラムを優先
 
 ### パフォーマンスインデックス
+
 | インデックス名 | テーブル | カラム | 種別 | 用途 |
 |---|---|---|---|---|
 | idx_compound_1 | orders | (user_id, status, ordered_at) | BTREE | 複合検索用 |
@@ -87,12 +93,14 @@ erDiagram
 ## 5. パーティショニング
 
 ### パーティション戦略
+
 | テーブル | パーティション方式 | パーティションキー | 分割数 |
 |---|---|---|---|
 | orders | RANGE | ordered_at | 月単位 |
 | logs | HASH | id | 10 |
 
 ### パーティション管理
+
 ```sql
 -- 月次パーティション作成例
 CREATE TABLE orders_2024_01 PARTITION OF orders
@@ -112,6 +120,7 @@ FOR VALUES FROM ('2024-01-01') TO ('2024-02-01');
 ## 7. 制約とバリデーション
 
 ### CHECK制約
+
 ```sql
 ALTER TABLE products ADD CONSTRAINT chk_price 
 CHECK (price >= 0);
@@ -127,6 +136,7 @@ CHECK (total_amount >= 0);
 ## 8. ビュー設計
 
 ### マテリアライズドビュー
+
 ```sql
 CREATE MATERIALIZED VIEW user_order_summary AS
 SELECT 
@@ -139,6 +149,7 @@ GROUP BY u.id;
 ```
 
 ### 通常ビュー
+
 | ビュー名 | 用途 | 更新頻度 |
 |---|---|---|
 | active_users | アクティブユーザー一覧 | リアルタイム |
@@ -147,6 +158,7 @@ GROUP BY u.id;
 ## 9. ストアドプロシージャ/関数
 
 ### 主要な関数
+
 ```sql
 CREATE FUNCTION calculate_order_total(order_id UUID)
 RETURNS DECIMAL(10,2) AS $$
@@ -170,6 +182,7 @@ $$ LANGUAGE plpgsql;
 ## 11. 最適化とメンテナンス
 
 ### 定期メンテナンス
+
 | 作業 | 頻度 | 実行時間 | 影響 |
 |---|---|---|---|
 | VACUUM | 日次 | 02:00 | 最小 |

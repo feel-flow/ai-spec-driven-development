@@ -19,7 +19,7 @@ changeImpact: medium
 > **関連文書**:
 > - [MCPサーバーセットアップ](../mcp/README.md) - このリポジトリのMCPサーバー
 > - [AI Spec Driven Development](AI_SPEC_DRIVEN_DEVELOPMENT.md) - 仕様駆動開発の概要
-
+>
 > **注意**: この情報は2025年1月時点の調査結果です。Codexは急速に進化しているため、最新情報は[公式ドキュメント](https://developers.openai.com/codex/)を参照してください。
 
 ## 目次
