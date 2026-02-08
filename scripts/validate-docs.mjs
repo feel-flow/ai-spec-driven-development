@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
  * validate-docs.mjs
- * AI仕様駆動開発の7ドキュメント構造を検証するスクリプト
+ * AI仕様駆動開発のコア7文書の存在を検証するスクリプト
  *
  * Usage: node scripts/validate-docs.mjs [docs-dir]
  *   docs-dir: 検証対象のdocsディレクトリ（デフォルト: ./docs）
@@ -12,7 +12,7 @@ import path from 'path';
 const DOCS_DIR = process.argv[2] || 'docs';
 const MINIMUM_LINES = 10;
 
-// コア7ドキュメントの定義（フォルダ名の揺れに対応）
+// コア7文書の定義（最小構成 — フォルダ名の揺れに対応）
 const CORE_DOCS = [
   {
     name: 'MASTER.md',
