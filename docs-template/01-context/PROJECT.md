@@ -2,7 +2,7 @@
 title: "PROJECT"
 version: "1.0.0"
 status: "draft"
-owner: ""
+owner: "@your-github-handle"
 created: "YYYY-MM-DD"
 updated: "YYYY-MM-DD"
 ---
@@ -15,10 +15,12 @@ updated: "YYYY-MM-DD"
 [プロジェクト名]
 
 ### バージョン
-1.0.0
+
+Frontmatter の `version` を参照
 
 ### 最終更新日
-[YYYY-MM-DD]
+
+Frontmatter の `updated` を参照
 
 ## 2. プロジェクトビジョン
 

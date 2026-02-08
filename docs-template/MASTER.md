@@ -2,7 +2,7 @@
 title: "MASTER"
 version: "1.0.0"
 status: "draft"
-owner: ""
+owner: "@your-github-handle"
 created: "YYYY-MM-DD"
 updated: "YYYY-MM-DD"
 ---
@@ -135,9 +135,9 @@ AIが生成したドキュメント・コードは、以下のタイミングで
 
 ## プロジェクト識別情報
 - **プロジェクト名**: [プロジェクト名を入力]
-- **バージョン**: 1.0.0
+- **バージョン**: Frontmatter の `version` を参照
 - **使用AIツール**: Claude Code, GitHub Copilot, Cursor
-- **最終更新日**: 2025-07-28
+- **最終更新日**: Frontmatter の `updated` を参照
 
 ## プロジェクト概要
 [30秒で理解できるプロジェクトの説明を記載]
@@ -551,7 +551,9 @@ AI: DEPLOYMENT.md（索引）→ deployment/self-review.md を読み込み
 
 ### Frontmatter
 
-7文書全てに以下の YAML Frontmatter を付与する。Frontmatter が文書のメタデータの正式なソースとなる。
+コア7文書（MASTER/PROJECT/ARCHITECTURE/DOMAIN/PATTERNS/TESTING/DEPLOYMENT）に以下の YAML Frontmatter を付与する。Frontmatter が文書のメタデータの正式なソースとなる。
+
+> **注**: `docs/specs/` 配下の仕様ファイルには Spec Kit 運用ガイドの Front Matter スキーマ（6ステータス: draft/review/approved/implementing/done/deprecated）を適用すること。本ルールはコア7文書専用。
 
 必須フィールド:
 
@@ -559,7 +561,7 @@ AI: DEPLOYMENT.md（索引）→ deployment/self-review.md を読み込み
 |-----------|------|-----|
 | title | 文書タイトル | ARCHITECTURE |
 | version | セマンティックバージョン | 1.2.0 |
-| status | 文書の状態 | draft / review / approved |
+| status | 文書の状態（有効値: `draft`, `review`, `approved`） | draft |
 | owner | 責任者 | @username |
 | created | 作成日 | 2026-01-01 |
 | updated | 最終更新日 | 2026-01-15 |
@@ -587,7 +589,7 @@ draft → review → approved
 | review | レビュー中 | ほぼ確定だが変更の可能性あり |
 | approved | 承認済み | 正式な仕様として遵守 |
 
-1週間レビューコメントがなければ `approved` に昇格する。
+`review` ステータスの文書に対し1週間レビューコメントがなければ、ドキュメントオーナーが `approved` に昇格する。
 
 ### バージョニングルール
 
@@ -599,7 +601,20 @@ draft → review → approved
 | MEDIUM | 項目追加、既存概念の拡張 | マイナー（0.x.0） |
 | HIGH | 構造変更、概念の再定義・削除 | メジャー（x.0.0） |
 
-変更時は Frontmatter の `version`、`updated`、`changeImpact` を同時に更新し、末尾の Changelog セクションにエントリを追加すること。
+変更時は Frontmatter の `version`、`updated`、`changeImpact` を同時に更新し、末尾の Changelog セクションにエントリを追加すること。`changeImpact` は初版では省略可。初回変更時に Frontmatter へ追加する。
+
+### Changelog カテゴリ
+
+Changelog エントリには以下のカテゴリを使用する（[Keep a Changelog](https://keepachangelog.com/) 準拠）。
+
+| カテゴリ | 用途 |
+|---------|------|
+| 追加 | 新機能・新項目 |
+| 変更 | 既存機能の変更 |
+| 非推奨 | 将来削除予定の機能 |
+| 削除 | 削除された機能 |
+| 修正 | バグ修正 |
+| セキュリティ | セキュリティ関連の修正 |
 
 ## コードレビュー チェックリスト（追補）
 

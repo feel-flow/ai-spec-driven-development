@@ -2,7 +2,7 @@
 title: "DEPLOYMENT"
 version: "1.0.0"
 status: "draft"
-owner: ""
+owner: "@your-github-handle"
 created: "YYYY-MM-DD"
 updated: "YYYY-MM-DD"
 ---
@@ -235,4 +235,4 @@ PRマージ後のブランチ切り替え忘れを防ぐため、セッション
 
 #### 追加
 
-- 初版作成
+- 初版作成（旧「ドキュメント更新履歴」セクションを Changelog 形式に移行）

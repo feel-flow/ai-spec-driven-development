@@ -2,7 +2,7 @@
 title: "TESTING"
 version: "1.0.0"
 status: "draft"
-owner: ""
+owner: "@your-github-handle"
 created: "YYYY-MM-DD"
 updated: "YYYY-MM-DD"
 ---
