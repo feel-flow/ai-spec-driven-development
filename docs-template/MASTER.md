@@ -555,7 +555,7 @@ AI: DEPLOYMENT.md（索引）→ deployment/self-review.md を読み込み
 
 コア7文書（MASTER/PROJECT/ARCHITECTURE/DOMAIN/PATTERNS/TESTING/DEPLOYMENT）およびプロジェクトで追加した文書に以下の YAML Frontmatter を付与する。Frontmatter が文書のメタデータの正式なソースとなる。
 
-> **注**: `docs/specs/` 配下の仕様ファイルには Spec Kit 運用ガイドの Front Matter スキーマ（6ステータス: draft/review/approved/implementing/done/deprecated）を適用すること。本ルールはコア7文書専用。
+> **注**: `docs/specs/` 配下の仕様ファイルには Spec Kit 運用ガイドの Front Matter スキーマ（6ステータス: draft/review/approved/implementing/done/deprecated）を適用すること。上記 Frontmatter ルールはコア7文書および拡張文書に適用される。
 
 必須フィールド:
 
