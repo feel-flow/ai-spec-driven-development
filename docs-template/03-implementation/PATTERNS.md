@@ -1,3 +1,12 @@
+---
+title: "PATTERNS"
+version: "1.0.0"
+status: "draft"
+owner: "@your-github-handle"
+created: "YYYY-MM-DD"
+updated: "YYYY-MM-DD"
+---
+
 # PATTERNS.md - 実装パターンガイド
 
 ## 1. コーディング規約
@@ -531,3 +540,12 @@ async function fetchWithRetry(url: string) {
     // implementation
   }
 }
+```
+
+## Changelog
+
+### [1.0.0] - YYYY-MM-DD
+
+#### 追加
+
+- 初版作成

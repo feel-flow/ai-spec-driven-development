@@ -1,3 +1,12 @@
+---
+title: "TESTING"
+version: "1.0.0"
+status: "draft"
+owner: "@your-github-handle"
+created: "YYYY-MM-DD"
+updated: "YYYY-MM-DD"
+---
+
 # TESTING.md - テスト戦略ガイド
 
 ## 1. テスト戦略概要
@@ -628,3 +637,11 @@ test('update user', () => {
   updateUser(globalUser); // 前のテストに依存
 });
 ```
+
+## Changelog
+
+### [1.0.0] - YYYY-MM-DD
+
+#### 追加
+
+- 初版作成

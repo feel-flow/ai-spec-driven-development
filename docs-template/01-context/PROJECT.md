@@ -1,3 +1,12 @@
+---
+title: "PROJECT"
+version: "1.0.0"
+status: "draft"
+owner: "@your-github-handle"
+created: "YYYY-MM-DD"
+updated: "YYYY-MM-DD"
+---
+
 # PROJECT.md - プロジェクト定義書
 
 ## 1. プロジェクト識別情報
@@ -6,10 +15,12 @@
 [プロジェクト名]
 
 ### バージョン
-1.0.0
+
+Frontmatter の `version` を参照
 
 ### 最終更新日
-[YYYY-MM-DD]
+
+Frontmatter の `updated` を参照
 
 ## 2. プロジェクトビジョン
 
@@ -103,6 +114,15 @@
 - [KPI3]: [目標値]
 
 ### 定性的指標
+
 - [品質基準1]
 - [品質基準2]
 - [品質基準3]
+
+## Changelog
+
+### [1.0.0] - YYYY-MM-DD
+
+#### 追加
+
+- 初版作成

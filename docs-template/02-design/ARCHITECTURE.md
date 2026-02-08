@@ -1,3 +1,12 @@
+---
+title: "ARCHITECTURE"
+version: "1.0.0"
+status: "draft"
+owner: "@your-github-handle"
+created: "YYYY-MM-DD"
+updated: "YYYY-MM-DD"
+---
+
 # ARCHITECTURE.md - システムアーキテクチャ設計書
 
 ## 1. アーキテクチャ概要
@@ -287,3 +296,11 @@ PostgreSQL 17.xを採用する。
 |---|---|---|
 | Phase 1 | [時期] | [内容] |
 | Phase 2 | [時期] | [内容] |
+
+## Changelog
+
+### [1.0.0] - YYYY-MM-DD
+
+#### 追加
+
+- 初版作成

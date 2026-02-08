@@ -1,3 +1,12 @@
+---
+title: "DOMAIN"
+version: "1.0.0"
+status: "draft"
+owner: "@your-github-handle"
+created: "YYYY-MM-DD"
+updated: "YYYY-MM-DD"
+---
+
 # DOMAIN.md - ドメインモデル設計書
 
 ## 1. ドメイン概要
@@ -205,3 +214,11 @@ interface UserRepository {
 | 対象 | 現状の問題 | 改善案 | 優先度 |
 |---|---|---|---|
 | [対象1] | [問題] | [改善案] | 高/中/低 |
+
+## Changelog
+
+### [1.0.0] - YYYY-MM-DD
+
+#### 追加
+
+- 初版作成
