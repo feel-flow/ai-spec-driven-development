@@ -241,7 +241,7 @@ GitHub Copilot には複数の拡張方式があり、コンテキスト隔離�
 | --- | --- | --- | --- |
 | Skills（`.github/skills/`） | **メイン内**（共有） | AI が自動判断 | コーディング規約、テストパターン |
 | @workspace / @vscode | **メイン内**（共有） | `@` メンション | ファイル検索、IDE操作 |
-| Subagents | **隔離** | AI が自動委任 | 重い調査・分析タスク |
+| Subagents | **隔離** | ユーザーがプロンプトで指示（自動委任も可能） | 重い調査・分析タスク |
 | Coding Agent | **完全隔離**（GitHub Actions） | Issue 割り当て | 自律的なPR作成 |
 | Extensions | **外部プロセス**（HTTP/SSE） | `@extension名` | 外部サービス連携 |
 
@@ -249,34 +249,36 @@ GitHub Copilot には複数の拡張方式があり、コンテキスト隔離�
 
 | 概念 | Claude Code | GitHub Copilot | 備考 |
 | --- | --- | --- | --- |
-| メイン内・手動呼出 | Commands（`.claude/commands/`） | なし（相当機能なし） | Copilot は手動呼出コマンドを持たない |
+| メイン内・手動呼出（カスタム定義） | Commands（`.claude/commands/`） | なし（ユーザー定義非対応） | Copilot は組込みスラッシュコマンドはあるが、ユーザー定義プロンプトテンプレートは非対応 |
 | メイン内・自動起動 | Skills（`.claude/skills/`） | Skills（`.github/skills/`） | 同一標準（agentskills.io） |
 | 隔離コンテキスト | Task ツール（サブエージェント） | Subagents | どちらもサマリーのみ返却 |
 | 自律コーディング | Agent mode | Coding Agent | Copilot は GitHub Actions 上で実行 |
-| コンテキスト上限 | 200K+ tokens | 64K〜128K tokens | Copilot はモデル・エディタで変動 |
+| コンテキスト上限 | 200K+ tokens | 64K〜128K tokens（2025年12月時点、GPT-4o 基準） | Copilot は複数モデル対応のため上限が異なる |
 
 ### 5.3 Agent Skills オープンスタンダード
 
-Claude Code Skills と GitHub Copilot Skills は **agentskills.io** という共通のオープンスタンダードに基づいている。Anthropic、GitHub（Microsoft）、OpenAI、Cursor、Figma 等が共同策定した仕様であり、`.github/skills/SKILL.md` の形式で定義する。
+Claude Code Skills と GitHub Copilot Skills は **agentskills.io** という共通のオープンスタンダードに基づいている。Anthropic が開発・公開した仕様であり、GitHub（Microsoft）、OpenAI、Cursor、Figma 等の主要ツールが採用している。`.github/skills/SKILL.md` の形式で定義する。
 
 Agent Skills の特徴:
 
-- **Progressive Disclosure**: Level 1（メタデータ読み込み）→ Level 2（本文注入）→ Level 3（追加リソースアクセス）の3段階
+- **Progressive Disclosure**: Metadata（~100 tokens）→ Instructions（<5,000 tokens 推奨）→ Resources（必要時のみ）の3段階
 - **自動トリガー**: `description` フィールドに基づいて AI が関連性を判断し、自動的に読み込む
 - **クロスツール互換**: 1つのスキル定義が Claude Code、Copilot、Cursor で利用可能
 
 ### 5.4 Copilot Skills の現状と信頼性
 
+> 以下の情報は 2026年2月時点のものであり、最新状況は公式ドキュメントを参照してください。
+
 | 項目 | 状態 |
 | --- | --- |
-| 仕様公開 | 2025年12月18日（Public Preview） |
+| 仕様公開 | 2025年12月18日（Coding Agent / CLI 向け GA） |
 | VS Code Insiders | 動作する |
-| VS Code Stable | 対応中 |
-| CLI | バグあり（Skills が読み込まれない報告: Issue #1080） |
+| VS Code Stable | 対応中（2025年1月以降順次対応） |
+| CLI | 安定化途中（初期に Skills 読み込みバグの報告あり） |
 | GitHub.com Web | 非対応 |
 | 依存関係バリデーション | 未実装 |
 
-**推奨**: 個人プロジェクトでの活用は可能だが、チーム必須ワークフローへの組み込みは CLI の安定化を待つのが安全。
+**推奨**: 個人プロジェクトでの活用は可能だが、チーム必須ワークフローへの組み込みはエディタ・CLI の安定化状況を確認してから行うのが安全。
 
 ### 5.5 コンテキスト管理の共通原則
 
@@ -347,7 +349,7 @@ Agent Skills の特徴:
 
 ### 外部リファレンス
 
-- [Agent Skills Specification](https://agentskills.io/specification) - Anthropic/GitHub/Microsoft 共同策定のオープンスタンダード
+- [Agent Skills Specification](https://agentskills.io/specification) - Anthropic が開発・公開したオープンスタンダード
 - [About Agent Skills - GitHub Docs](https://docs.github.com/en/copilot/concepts/agents/about-agent-skills) - Copilot Skills 公式ドキュメント
 - [Subagents in VS Code](https://code.visualstudio.com/docs/copilot/agents/subagents) - Copilot Subagents の解説
 - [About Coding Agent - GitHub Docs](https://docs.github.com/en/copilot/concepts/agents/coding-agent/about-coding-agent) - 自律型コーディングエージェント
