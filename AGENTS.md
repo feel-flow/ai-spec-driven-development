@@ -329,7 +329,15 @@ Always reference MASTER.md for project-specific requirements.
 
 ### 4. Git Workflow・セルフレビュー
 
-Git Workflowの詳細やセルフレビューチェックリストは、以下のテンプレートを参照してください:
+**基本フロー**: Issue作成 → Branch作成 → 実装 → セルフレビュー → テスト → Commit → PR作成 → マージ後ブランチ削除
+
+**ブランチ命名**: `feature/#{issue}-{description}` / `fix/#{issue}-{description}` / `chore/#{issue}-{description}`
+
+**コミット形式**: `<type>: #<issue> <subject>`（types: feat, fix, docs, style, refactor, test, chore）
+
+**セルフレビュー必須項目**: DRY原則、コード品質、Import整理、テスト、自動チェック通過
+
+詳細は以下のテンプレートを参照:
 
 - [Git Workflow 詳細](docs-template/05-operations/deployment/git-workflow.md)
 - [セルフレビュー チェックリスト](docs-template/05-operations/deployment/self-review.md)

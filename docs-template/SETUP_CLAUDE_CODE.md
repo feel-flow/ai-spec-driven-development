@@ -284,6 +284,7 @@ docs-template/TESTING.mdのテスト戦略に従って、以下の機能のユ�
 
 ### 報告テンプレート
 
+```text
 ✅ 完了しました
 - [完了した作業の説明]
 - 変更内容は自動でチェック済みです
@@ -295,6 +296,7 @@ docs-template/TESTING.mdのテスト戦略に従って、以下の機能のユ�
 ❌ 問題が見つかりました
 - [問題の説明]
 - 次のステップ: [具体的な解決手順]
+```
 
 ## 🚨 Git Workflow（必須）
 
@@ -308,7 +310,7 @@ docs-template/TESTING.mdのテスト戦略に従って、以下の機能のユ�
 4. **セルフレビュー** → 後述のチェックリストを確認
 5. **テスト実行** → 全テスト合格必須
 6. **Commit** → `git commit -m "feat: #123 説明"`
-7. **PR作成** → `gh pr create --base develop`（セルフレビューセクション付き）
+7. **PR作成** → `gh pr create --base develop`（セルフレビューセクション + `Closes #XXX` 付き）
 8. **マージ後** → developに戻り、featureブランチを削除
 
 ### ブランチ命名

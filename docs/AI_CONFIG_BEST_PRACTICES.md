@@ -113,9 +113,9 @@ AIの読み取り精度は、情報の構造化度合いに大きく依存しま
 | **マジックナンバー禁止** | 名前付き定数を使用。単位・有効範囲をコメントに記載 |
 | **型安全性** | TypeScript strict: true, any型禁止 |
 | **ファイルサイズ** | ソフトリミット: 500行, ハードリミット: 800行 |
-| **関数サイズ** | 50行以下を目標 |
+| **関数サイズ** | 30行以下を目標（プロジェクトに合わせて調整） |
 | **テストカバレッジ** | 80%以上 |
-| **エラーハンドリング** | try-catch + ユーザー向けメッセージ |
+| **エラーハンドリング** | プロジェクトの方針に従う（例: Result pattern, try-catch等） |
 ```
 
 ### 命名規則のテーブル例
@@ -142,6 +142,9 @@ AIの読み取り精度は、情報の構造化度合いに大きく依存しま
 | **関数サイズ** | 50行以下を目標 |
 | **テストカバレッジ** | 80%以上 |
 | **エラーハンドリング** | try-catch + ユーザー向け日本語メッセージ |
+
+> **注**: 上記は実プロジェクトの例です。関数サイズやエラーハンドリング方針はプロジェクトごとに異なります。
+> 自プロジェクトの MASTER.md に定義された値を使用してください。
 ```
 
 ---
@@ -166,7 +169,7 @@ AIはGit操作を自律的に行うことが増えています。しかし、ブ
 3. **実装** → MASTER.md の規約に従う
 4. **セルフレビュー** → 後述のチェックリストを確認
 5. **テスト実行** → `npm test`（全テスト合格必須）
-6. **Commit** → `git commit -m "feat: #123 説明\n\nCloses #123"`
+6. **Commit** → `git commit -m "feat: #123 説明"`
 7. **PR作成** → `gh pr create --base develop`（セルフレビューセクション付き）
 8. **マージ後** → developに戻り、featureブランチを削除
 
@@ -176,7 +179,7 @@ AIはGit操作を自律的に行うことが増えています。しかし、ブ
 - `fix/#{issue}-{description}` — バグ修正
 - `chore/#{issue}-{description}` — メンテナンス
 
-### コミットメッセージ形式（Conventional Commits）
+### コミットメッセージ形式
 
 <type>: #<issue> <subject>
 
@@ -361,7 +364,8 @@ CLAUDE.mdはClaude Codeが自動的に読み込む設定ファイルです。マ
 
 - [x] MASTER.md必須参照ルール
 - [x] 情報確認プロトコル
-- [x] **作業スタイル**（進捗報告、Taskツール活用）
+- [x] **作業スタイル**（進捗報告）
+- [ ] Taskツール活用（Claude Code固有、推奨）
 - [x] Key Constraints テーブル
 - [x] 命名規則テーブル
 - [x] **Git Workflow**（ブランチ、コミット、PR）
@@ -415,6 +419,6 @@ Cursorはエディタ内でのコード補完とチャットが主用途です�
 - [Claude Code セットアップ](../docs-template/SETUP_CLAUDE_CODE.md) — CLAUDE.md テンプレート
 - [Cursor セットアップ](../docs-template/SETUP_CURSOR.md) — .cursorrules テンプレート
 - [GitHub Copilot セットアップ](../docs-template/SETUP_GITHUB_COPILOT.md) — copilot-instructions.md テンプレート
-- [Git Workflow 詳細](../docs-template/05-operations/deployment/git-workflow.md) — 9ステップワークフロー
+- [Git Workflow 詳細](../docs-template/05-operations/deployment/git-workflow.md) — 7ステップワークフロー
 - [セルフレビュー 詳細](../docs-template/05-operations/deployment/self-review.md) — 5観点チェックリスト
 - [自動コードレビュー](../docs-template/05-operations/deployment/automated-code-review.md) — Claude Code + Husky
