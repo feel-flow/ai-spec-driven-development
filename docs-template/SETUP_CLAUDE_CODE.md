@@ -154,33 +154,28 @@ Claude Codeは、ドキュメント生成やコード生成時に**情報が不�
 
 ## コーディング規約（重要）
 
-### 必須事項
-- ✅ TypeScript with strict type safety
-- ✅ Named constants for all values (マジックナンバー禁止)
-- ✅ Result pattern for error handling
-- ✅ Test coverage 80%+
-- ✅ Proper logging (console.logは本番環境で禁止)
-
-### 禁止事項
-- ❌ `any` type (use `unknown` or proper types)
-- ❌ Magic numbers/hardcoded values
-- ❌ `console.log` in production code
-- ❌ Unused imports/variables
-- ❌ Error swallowing
-- ❌ Functions over 30 lines
+| ルール | 適用方法 |
+| ------ | -------- |
+| **マジックナンバー禁止** | 名前付き定数を使用。単位・有効範囲をコメントに記載 |
+| **型安全性** | TypeScript strict: true, any型禁止（unknownまたは適切な型を使用） |
+| **ファイルサイズ** | ソフトリミット: 500行, ハードリミット: 800行 |
+| **関数サイズ** | 30行以下を目標 |
+| **テストカバレッジ** | 80%以上 |
+| **エラーハンドリング** | Result pattern使用、console.logは本番環境で禁止 |
+| **未使用コード** | 未使用のimport・変数は即座に削除 |
 
 ### 命名規則
 
-#### コード
-- Variables: camelCase (例: `userName`, `isActive`)
-- Constants: UPPER_SNAKE_CASE (例: `MAX_RETRY_COUNT`)
-- Types/Interfaces: PascalCase (例: `UserProfile`, `ApiResponse`)
-- Files: kebab-case (例: `user-service.ts`, `api-client.ts`)
+| 対象 | 規則 | 例 |
+| ---- | ---- | --- |
+| 変数・関数 | camelCase | `userName`, `isActive` |
+| 定数 | UPPER_SNAKE_CASE | `MAX_RETRY_COUNT` |
+| 型・インターフェース | PascalCase | `UserProfile`, `ApiResponse` |
+| ファイル（コード） | kebab-case | `user-service.ts`, `api-client.ts` |
+| ディレクトリ（docs） | 数字-英語小文字 | `01-context`, `02-design` |
+| ファイル（docs） | 英語大文字.md | `MASTER.md`, `ARCHITECTURE.md` |
 
-#### ドキュメントファイル
-- Directories: `数字-英語小文字（ハイフン区切り）` (例: `01-context`, `02-design`)
-- Files: `英語大文字.md` (例: `MASTER.md`, `ARCHITECTURE.md`)
-- 詳細は `docs-template/03-implementation/CONVENTIONS.md` を参照
+詳細は `docs-template/03-implementation/CONVENTIONS.md` を参照
 
 ## アーキテクチャパターン
 - Clean Architecture
@@ -278,7 +273,102 @@ docs-template/TESTING.mdのテスト戦略に従って、以下の機能のユ�
    const data: ApiResponse = response.data;
    ```
 
+## 🤖 作業スタイル
+
+### 進め方
+
+1. 複雑な作業はバックグラウンドで効率的に実行する
+2. 定期的に進捗を報告する
+3. 専門用語を避け、分かりやすい言葉で説明する
+4. エラー発生時は次にやるべきことを具体的に案内する
+
+### 報告テンプレート
+
+✅ 完了しました
+- [完了した作業の説明]
+- 変更内容は自動でチェック済みです
+
+⏳ 作業中...
+- [現在の作業内容]
+- あと少しで完了します
+
+❌ 問題が見つかりました
+- [問題の説明]
+- 次のステップ: [具体的な解決手順]
+
+## 🚨 Git Workflow（必須）
+
+**常にIssue作成から始める。PRにはセルフレビュー結果を記載すること。**
+
+### ワークフロー
+
+1. **Issue作成** → `gh issue create --title "タイトル" --body "説明"`
+2. **Branch作成** → `git checkout -b feature/#123-description`（developから）
+3. **実装** → MASTER.mdの規約に従う
+4. **セルフレビュー** → 後述のチェックリストを確認
+5. **テスト実行** → 全テスト合格必須
+6. **Commit** → `git commit -m "feat: #123 説明"`
+7. **PR作成** → `gh pr create --base develop`（セルフレビューセクション付き）
+8. **マージ後** → developに戻り、featureブランチを削除
+
+### ブランチ命名
+
+- `feature/#{issue}-{description}` — 新機能
+- `fix/#{issue}-{description}` — バグ修正
+- `chore/#{issue}-{description}` — メンテナンス
+
+### コミットメッセージ形式
+
+Types: `feat`, `fix`, `docs`, `style`, `refactor`, `test`, `chore`
+
+形式: `<type>: #<issue> <subject>`
+
+### レビュー指摘への対応
+
+レビュー指摘を修正した際は、以下の形式でコメントすること:
+
+```
+@reviewer-username ご指摘ありがとうございました！
+変更内容は commit abc1234 に反映されています。
+```
+
+## 🚨 セルフレビューチェックリスト（PR前に必須）
+
+PR作成前に以下を確認すること:
+
+1. **DRY原則**: 重複コード・インポート・マジックナンバーなし
+2. **コード品質**: 型注釈、エラーハンドリング、命名規則、デバッグログなし
+3. **Import整理**: stdlib → サードパーティ → ローカル（未使用なし）
+4. **テスト**: 新規テスト追加、既存テスト更新、全テスト合格
+5. **自動チェック**: lint通過、ビルド成功、hook成功
+
+## スコープ外問題の取り扱い
+
+作業中にスコープ外の問題を発見した場合、**即座にGitHub Issueを作成**:
+
+```bash
+gh issue create --title "fix: 問題の説明" --body "詳細..." --label "bug"
+```
+
+報告形式:
+
+```
+📋 スコープ外の問題を発見しました
+Issue #XXX を作成しました: [タイトル]
+優先度: Critical / High / Medium / Low
+```
+
+## よくある問題
+
+| 問題 | 解決方法 |
+| ---- | -------- |
+| ポート競合 | 実行中のプロセスを確認 |
+| CORS エラー | バックエンドのCORS設定を確認 |
+| 型エラー | 型チェックコマンドでエラー箇所を特定 |
+| テスト失敗 | ローカルでテスト実行し、差分を確認 |
+
 ## 参照ドキュメント
+
 - `docs-template/MASTER.md` - プロジェクト概要とルール
 - `docs-template/01-context/PROJECT.md` - ビジネス要件
 - `docs-template/02-design/ARCHITECTURE.md` - 技術アーキテクチャ
@@ -296,7 +386,13 @@ EOF
 
 ### ステップ2: プロジェクト固有のカスタマイズ（15分）
 
-あなたのプロジェクトに合わせて `CLAUDE.md` をカスタマイズします：
+あなたのプロジェクトに合わせて `CLAUDE.md` をカスタマイズします。
+
+> **他のAIツール設定ファイルにも同様の記載を推奨**:
+> CLAUDE.md に記載した作業スタイル、Git Workflow、セルフレビューチェックリストなどは、
+> `AGENTS.md`（Gemini等）や `.github/copilot-instructions.md`（GitHub Copilot）にも
+> 同様に記載することで、どのAIツールでも統一された開発体験が得られます。
+> 詳細は [AIツール設定ファイルのベストプラクティス](../docs/AI_CONFIG_BEST_PRACTICES.md) を参照してください。
 
 **例1: Reactプロジェクトの場合**
 ```markdown

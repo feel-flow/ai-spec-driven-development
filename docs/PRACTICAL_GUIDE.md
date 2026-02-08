@@ -11,14 +11,17 @@ tags: [ai, documentation, development, practical-guide]
 references:
    - docs/AI_SPEC_DRIVEN_DEVELOPMENT.md
    - docs/DEEP_DIVE.md
+   - docs/AI_CONFIG_BEST_PRACTICES.md
 changeImpact: medium
 ---
 
 # 実践ガイド：AI Spec Driven Development
 
 > **関連文書**:
+>
 > - [概念と実践](AI_SPEC_DRIVEN_DEVELOPMENT.md) - AI Spec Driven Developmentのコアコンセプト
 > - [深掘り](DEEP_DIVE.md) - 理論的背景と詳細な分析
+> - [AIツール設定ファイルのベストプラクティス](AI_CONFIG_BEST_PRACTICES.md) - CLAUDE.md / AGENTS.md / copilot-instructions.md / .cursorrules 横断ガイド
 
 ## 目次
 
@@ -75,6 +78,7 @@ changeImpact: medium
     - [5.3 スキルによる自動化機能](#53-スキルによる自動化機能)
     - [5.4 実践例：プロジェクトライフサイクル全体での活用](#54-実践例プロジェクトライフサイクル全体での活用)
     - [5.5 チーム導入のベストプラクティス](#55-チーム導入のベストプラクティス)
+  - [6. AIツール設定ファイルのベストプラクティス](#6-aiツール設定ファイルのベストプラクティス)
 
 ## 1. 実践編：各文書の詳細解説
 
@@ -487,6 +491,23 @@ Claude Skillsは、特定のタスクやワークフローを自動化するた�
 5. **デプロイ**: `DEPLOYMENT.md` に基づき、デプロイスクリプトを自動生成
 
 ### 5.5 チーム導入のベストプラクティス
+
 - **共有スキルセットの構築**: チームで共通のスキルセットを開発・共有
 - **段階的導入**: まずは単純なタスクから自動化し、徐々に範囲を拡大
 - **継続的改善**: スキルの利用状況を分析し、定期的に改善
+
+## 6. AIツール設定ファイルのベストプラクティス
+
+AIツール設定ファイル（CLAUDE.md、AGENTS.md、copilot-instructions.md、.cursorrules）には、コーディング規約だけでなく **運用プロセス全体のルール** を記載することで、AIの作業品質が大幅に向上します。
+
+実プロダクト開発の経験から特に効果が高いのは以下の実践です:
+
+- **作業スタイルの定義** — AIの報告形式・説明の仕方を統一
+- **Git Workflowの記載** — ブランチ命名・コミット形式・PRルールを設定ファイル内に明記
+- **セルフレビューチェックリスト** — PR作成前の必須確認項目
+- **スコープ外問題の取り扱い** — 発見した問題の即Issue作成ルール
+- **Automated Hooks情報** — Git hookやCIの存在をAIに伝える
+
+これらのベストプラクティスは、CLAUDE.mdだけでなくAGENTS.mdやcopilot-instructions.mdにも同様に適用できます。
+
+詳細は [AIツール設定ファイルのベストプラクティス](AI_CONFIG_BEST_PRACTICES.md) を参照してください。
