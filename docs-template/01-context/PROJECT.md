@@ -1,3 +1,12 @@
+---
+title: "PROJECT"
+version: "1.0.0"
+status: "draft"
+owner: ""
+created: "YYYY-MM-DD"
+updated: "YYYY-MM-DD"
+---
+
 # PROJECT.md - プロジェクト定義書
 
 ## 1. プロジェクト識別情報
@@ -103,6 +112,15 @@
 - [KPI3]: [目標値]
 
 ### 定性的指標
+
 - [品質基準1]
 - [品質基準2]
 - [品質基準3]
+
+## Changelog
+
+### [1.0.0] - YYYY-MM-DD
+
+#### 追加
+
+- 初版作成
