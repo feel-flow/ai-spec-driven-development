@@ -181,7 +181,7 @@ AIはGit操作を自律的に行うことが増えています。しかし、ブ
 
 ### コミットメッセージ形式
 
-<type>: #<issue> <subject>
+`<type>: #<issue> <subject>`
 
 Types: `feat`, `fix`, `docs`, `style`, `refactor`, `test`, `chore`
 
@@ -260,7 +260,7 @@ AIが作業中にスコープ外の問題を発見することはよくありま
 
 1. **スコープを拡大しない** — 現在のIssueに集中
 2. **GitHub Issueを即座に作成**:
-   gh issue create --title "fix: 問題の説明" --body "詳細..." --label "bug"
+   `gh issue create --title "fix: 問題の説明" --body "詳細..." --label "bug"`
 3. **PRに関連Issueを記載**（ブロッキングでない場合）
 4. **現在の作業を続行**
 
@@ -286,8 +286,8 @@ Issue #XXX を作成しました: [タイトル]
 
 レビュー指摘を修正した際は、以下の形式でコメントすること:
 
-@reviewer-username ご指摘ありがとうございました！
-変更内容は commit abc1234 に反映されています。
+> @reviewer-username ご指摘ありがとうございました！
+> 変更内容は commit abc1234 に反映されています。
 
 ### 必須要素
 
