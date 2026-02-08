@@ -1,13 +1,13 @@
 ---
-id: claude-code-commands-skills
-title: Claude Code Commands vs Skills — コンテキスト管理の最適化戦略
-version: 1.0.0
+id: ai-tools-context-management
+title: AIツール拡張機能とコンテキスト管理の最適化戦略
+version: 1.1.0
 status: active
 created: 2026-02-08
 updated: 2026-02-08
 owner: feel-flow
 phase: mvp
-tags: [claude-code, commands, skills, subagent, context-management]
+tags: [claude-code, github-copilot, commands, skills, subagent, context-management]
 references:
   - docs/AI_CONFIG_BEST_PRACTICES.md
   - docs/PRACTICAL_GUIDE.md
@@ -15,7 +15,7 @@ references:
 changeImpact: medium
 ---
 
-# Claude Code Commands vs Skills — コンテキスト管理の最適化戦略
+# AIツール拡張機能とコンテキスト管理の最適化戦略
 
 > **関連文書**:
 >
@@ -25,11 +25,13 @@ changeImpact: medium
 
 ## はじめに
 
-Claude Code には 2 種類の拡張機能がある。**コマンド**と**スキル**である。
+AI開発ツール（Claude Code、GitHub Copilot、Cursor 等）にはそれぞれ拡張機能があるが、共通する重要な設計判断がある。**メインセッション内で処理するか、隔離されたサブエージェントで処理するか** — すなわち **コンテキスト戦略** の選択である。
 
-この 2 つは機能的に似ているが、根本的な違いは **コンテキスト戦略** にある。コマンドはメインセッション内で動作し、スキルは独立したサブエージェントとして隔離実行される。この違いは、特にコードレビューのような大量ファイルを読み込む処理で決定的な差を生む。
+この判断を誤ると、コードレビューのような大量ファイルを読み込む処理でコンテキストが枯渇し、後続の対話品質が劣化する。
 
-> **重要な洞察**: コードレビューのような重い処理は、サブエージェントとして動かさないと、コンテキスト量の観点で効果が出にくい。
+> **ツール共通の原則**: 重い処理はサブエージェントとして隔離実行し、メインセッションのコンテキストウィンドウを節約すべきである。この原則は Claude Code、GitHub Copilot、Cursor のいずれにも当てはまる。
+
+本文書では Claude Code を中心に解説し、セクション 5 で他ツールとの比較を行う。
 
 ---
 
@@ -227,9 +229,71 @@ Q3. メインセッションの会話履歴が必要か？
 
 ---
 
-## 5. ベストプラクティス
+## 5. 他ツールとのコンテキスト管理比較
 
-### 5.1 コマンド設計の原則
+「重い処理はサブエージェントで隔離」という原則は Claude Code に限らない。GitHub Copilot や Cursor でも同様の構造が存在する。
+
+### 5.1 GitHub Copilot の拡張機能マップ
+
+GitHub Copilot には複数の拡張方式があり、コンテキスト隔離の有無が異なる。
+
+| 拡張方式 | コンテキスト | 起動方法 | 用途 |
+| --- | --- | --- | --- |
+| Skills（`.github/skills/`） | **メイン内**（共有） | AI が自動判断 | コーディング規約、テストパターン |
+| @workspace / @vscode | **メイン内**（共有） | `@` メンション | ファイル検索、IDE操作 |
+| Subagents | **隔離** | AI が自動委任 | 重い調査・分析タスク |
+| Coding Agent | **完全隔離**（GitHub Actions） | Issue 割り当て | 自律的なPR作成 |
+| Extensions | **外部プロセス**（HTTP/SSE） | `@extension名` | 外部サービス連携 |
+
+### 5.2 ツール横断比較
+
+| 概念 | Claude Code | GitHub Copilot | 備考 |
+| --- | --- | --- | --- |
+| メイン内・手動呼出 | Commands（`.claude/commands/`） | なし（相当機能なし） | Copilot は手動呼出コマンドを持たない |
+| メイン内・自動起動 | Skills（`.claude/skills/`） | Skills（`.github/skills/`） | 同一標準（agentskills.io） |
+| 隔離コンテキスト | Task ツール（サブエージェント） | Subagents | どちらもサマリーのみ返却 |
+| 自律コーディング | Agent mode | Coding Agent | Copilot は GitHub Actions 上で実行 |
+| コンテキスト上限 | 200K+ tokens | 64K〜128K tokens | Copilot はモデル・エディタで変動 |
+
+### 5.3 Agent Skills オープンスタンダード
+
+Claude Code Skills と GitHub Copilot Skills は **agentskills.io** という共通のオープンスタンダードに基づいている。Anthropic、GitHub（Microsoft）、OpenAI、Cursor、Figma 等が共同策定した仕様であり、`.github/skills/SKILL.md` の形式で定義する。
+
+Agent Skills の特徴:
+
+- **Progressive Disclosure**: Level 1（メタデータ読み込み）→ Level 2（本文注入）→ Level 3（追加リソースアクセス）の3段階
+- **自動トリガー**: `description` フィールドに基づいて AI が関連性を判断し、自動的に読み込む
+- **クロスツール互換**: 1つのスキル定義が Claude Code、Copilot、Cursor で利用可能
+
+### 5.4 Copilot Skills の現状と信頼性
+
+| 項目 | 状態 |
+| --- | --- |
+| 仕様公開 | 2025年12月18日（Public Preview） |
+| VS Code Insiders | 動作する |
+| VS Code Stable | 対応中 |
+| CLI | バグあり（Skills が読み込まれない報告: Issue #1080） |
+| GitHub.com Web | 非対応 |
+| 依存関係バリデーション | 未実装 |
+
+**推奨**: 個人プロジェクトでの活用は可能だが、チーム必須ワークフローへの組み込みは CLI の安定化を待つのが安全。
+
+### 5.5 コンテキスト管理の共通原則
+
+ツールに関わらず、以下の原則が適用される:
+
+| 原則 | 説明 |
+| --- | --- |
+| 3ファイル以下 → メイン内 | コンテキスト消費が少ないため隔離不要 |
+| 10ファイル以上 → サブエージェント | コンテキスト枯渇を防ぐため隔離必須 |
+| サマリーのみ返却 | サブエージェントの全出力をメインに戻さない |
+| 並列実行を活用 | 複数のサブエージェントを同時起動して効率化 |
+
+---
+
+## 6. ベストプラクティス
+
+### 6.1 コマンド設計の原則
 
 | 原則 | 説明 |
 | --- | --- |
@@ -238,7 +302,7 @@ Q3. メインセッションの会話履歴が必要か？
 | 対話的に活用 | ユーザーとの対話（AskUserQuestion）を積極活用 |
 | 即座のフィードバック | 結果をその場で会話に出力する |
 
-### 5.2 スキル設計の原則
+### 6.2 スキル設計の原則
 
 | 原則 | 説明 |
 | --- | --- |
@@ -247,7 +311,7 @@ Q3. メインセッションの会話履歴が必要か？
 | 専門性を持たせる | 1 つのスキルは 1 つの専門領域に特化する |
 | 並列実行を想定 | 他のスキルとの独立性を確保する |
 
-### 5.3 避けるべきアンチパターン
+### 6.3 避けるべきアンチパターン
 
 | アンチパターン | 問題 | 対策 |
 | --- | --- | --- |
@@ -258,7 +322,7 @@ Q3. メインセッションの会話履歴が必要か？
 
 ---
 
-## 6. コマンドからスキルへの移行判断
+## 7. コマンドからスキルへの移行判断
 
 プロジェクトの成長に伴い、既存コマンドをスキルに移行すべきか判断する基準:
 
@@ -274,7 +338,16 @@ Q3. メインセッションの会話履歴が必要か？
 
 ## 参考資料
 
+### プロジェクト内文書
+
 - [AIツール設定ベストプラクティス](AI_CONFIG_BEST_PRACTICES.md) - 設定ファイルの書き方全般
 - [実践ガイド セクション5](PRACTICAL_GUIDE.md#5-claude-skillsによる実践的活用) - Claude Skills の概要
 - [Claude Code セットアップ](../docs-template/SETUP_CLAUDE_CODE.md) - CLAUDE.md テンプレートと初期設定
 - [Issue #297](https://github.com/feel-flow/ai-spec-driven-development/issues/297) - スキル設計ガイド + オーケストレーション例
+
+### 外部リファレンス
+
+- [Agent Skills Specification](https://agentskills.io/specification) - Anthropic/GitHub/Microsoft 共同策定のオープンスタンダード
+- [About Agent Skills - GitHub Docs](https://docs.github.com/en/copilot/concepts/agents/about-agent-skills) - Copilot Skills 公式ドキュメント
+- [Subagents in VS Code](https://code.visualstudio.com/docs/copilot/agents/subagents) - Copilot Subagents の解説
+- [About Coding Agent - GitHub Docs](https://docs.github.com/en/copilot/concepts/agents/coding-agent/about-coding-agent) - 自律型コーディングエージェント
