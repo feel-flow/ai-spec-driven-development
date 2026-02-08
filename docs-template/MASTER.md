@@ -457,6 +457,7 @@ metrics:
 ### 開発プロセスガイド
 
 - [06-reference/DEVELOPMENT_PREPARATION.md](./06-reference/DEVELOPMENT_PREPARATION.md) - 開発準備ガイド（5 Phases: Issue-First → Document-Driven → MECE検証 → AI Spec-Driven → Git Workflow）
+- [06-reference/DECISION_MATRIX.md](./06-reference/DECISION_MATRIX.md) - 「どの文書に書く？」判断ガイド（Decision Matrix・曖昧ケース例・機能×文書マトリクス）
 - [06-reference/COPILOT-AGENTS.md](./06-reference/COPILOT-AGENTS.md) - GitHub Copilot Agents設定リファレンス（6種のレビューエージェントテンプレート）
 
 ## ドキュメント構造ガイド（AIツール向け）
