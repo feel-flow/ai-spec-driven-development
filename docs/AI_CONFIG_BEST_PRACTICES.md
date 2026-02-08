@@ -417,6 +417,7 @@ Cursorはエディタ内でのコード補完とチャットが主用途です�
 ## 参考資料
 
 - [Claude Code セットアップ](../docs-template/SETUP_CLAUDE_CODE.md) — CLAUDE.md テンプレート
+- [Commands vs Skills ガイド](CLAUDE_CODE_COMMANDS_SKILLS.md) — コンテキスト管理の最適化戦略
 - [Cursor セットアップ](../docs-template/SETUP_CURSOR.md) — .cursorrules テンプレート
 - [GitHub Copilot セットアップ](../docs-template/SETUP_GITHUB_COPILOT.md) — copilot-instructions.md テンプレート
 - [Git Workflow 詳細](../docs-template/05-operations/deployment/git-workflow.md) — 7ステップワークフロー
