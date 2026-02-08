@@ -2,7 +2,7 @@
   "name": "ai-spec-driven-development",
   "version": "1.4.0",
   "private": true,
-  "description": "AI仕様駆動開発フレームワーク — 7ドキュメント構造テンプレート、MCP Server、Claude Code Skills",
+  "description": "AI仕様駆動開発フレームワーク — コア7文書テンプレート + 拡張構造、MCP Server、Claude Code Skills",
   "scripts": {
     "setup": "npm install && npm --prefix mcp install && npm --prefix mcp run build",
     "validate": "node scripts/validate-docs.mjs",

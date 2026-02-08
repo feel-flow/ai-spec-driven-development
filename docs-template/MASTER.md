@@ -438,13 +438,15 @@ metrics:
 ### 既存プロジェクト向け
 - [GETTING_STARTED.md](./GETTING_STARTED.md) - Quickstart（既存プロジェクトへの導入・AI駆動・読み順・プロンプト）
 
-### コア7文書
+### コア7文書（起点）
 - [01-context/PROJECT.md](./01-context/PROJECT.md) - ビジョンと要件
 - [02-design/ARCHITECTURE.md](./02-design/ARCHITECTURE.md) - システム設計
 - [02-design/DOMAIN.md](./02-design/DOMAIN.md) - ビジネスロジック
 - [03-implementation/PATTERNS.md](./03-implementation/PATTERNS.md) - 実装パターン
 - [04-quality/TESTING.md](./04-quality/TESTING.md) - テスト戦略
 - [05-operations/DEPLOYMENT.md](./05-operations/DEPLOYMENT.md) - デプロイ戦略
+
+> コア7文書はプロジェクトの最小構成です。成長に応じて各フォルダ内に文書を追加してください。全文書が揃わなくてもAIと対話しながら段階的に仕様を策定できます。
 
 ### ナレッジベース
 - [08-knowledge/LESSONS_LEARNED.md](./08-knowledge/LESSONS_LEARNED.md) - 開発過程で得た知見・解決策
@@ -551,9 +553,9 @@ AI: DEPLOYMENT.md（索引）→ deployment/self-review.md を読み込み
 
 ### Frontmatter
 
-コア7文書（MASTER/PROJECT/ARCHITECTURE/DOMAIN/PATTERNS/TESTING/DEPLOYMENT）に以下の YAML Frontmatter を付与する。Frontmatter が文書のメタデータの正式なソースとなる。
+コア7文書（MASTER/PROJECT/ARCHITECTURE/DOMAIN/PATTERNS/TESTING/DEPLOYMENT）およびプロジェクトで追加した文書に以下の YAML Frontmatter を付与する。Frontmatter が文書のメタデータの正式なソースとなる。
 
-> **注**: `docs/specs/` 配下の仕様ファイルには Spec Kit 運用ガイドの Front Matter スキーマ（6ステータス: draft/review/approved/implementing/done/deprecated）を適用すること。本ルールはコア7文書専用。
+> **注**: `docs/specs/` 配下の仕様ファイルには Spec Kit 運用ガイドの Front Matter スキーマ（6ステータス: draft/review/approved/implementing/done/deprecated）を適用すること。上記 Frontmatter ルールはコア7文書および拡張文書に適用される。
 
 必須フィールド:
 

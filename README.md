@@ -1,8 +1,8 @@
 # AI Spec-Driven Development
 
-AI開発ツール（Claude Code、GitHub Copilot、Cursor）に最適化された**7文書構造**によるドキュメント戦略フレームワーク。
+AI開発ツール（Claude Code、GitHub Copilot、Cursor）に最適化された**7文書構造**を起点とするドキュメント戦略フレームワーク。
 
-従来の60+文書から**7つの必須文書**へ ── AIが迷わず理解できる、最小限の高品質ドキュメントでプロジェクトを駆動します。
+従来の60+文書から**最小7文書**で始動 ── AIが迷わず理解できる高品質ドキュメントでプロジェクトを駆動し、成長に応じて拡張します。
 
 ## 導入方法
 
@@ -10,7 +10,7 @@ AI開発ツール（Claude Code、GitHub Copilot、Cursor）に最適化され�
 
 ### 方法A: テンプレートをコピー（最もシンプル）
 
-[`docs-template/`](./docs-template/) から7ドキュメントをプロジェクトにコピー:
+[`docs-template/`](./docs-template/) からコア7文書とフォルダ構造をプロジェクトにコピー:
 
 ```bash
 # テンプレートをコピー
@@ -28,7 +28,7 @@ cp -r docs-template/06-reference/ your-project/docs/
 Claude Code でこのリポジトリを参照し、スラッシュコマンドで自動セットアップ:
 
 ```
-/init-docs          # 7ドキュメント構造を初期化
+/init-docs          # コア7文書 + 拡張フォルダ構造を初期化
 /validate-docs      # ドキュメント要件を検証
 /setup-ai-config    # CLAUDE.md / .cursorrules / copilot-instructions.md を生成
 ```
@@ -59,12 +59,12 @@ npm install && npm run setup
 | コマンド | 説明 |
 | -------- | ---- |
 | `npm run setup` | 依存関係インストール + MCP サーバービルド |
-| `npm run validate` | 7ドキュメント構造の検証 |
+| `npm run validate` | コア7文書の存在と構造の検証 |
 | `npm run check` | MCP サーバーの動作確認 |
 | `npm run build:mcp` | MCP サーバーのビルド |
 | `npm run setup:labels` | GitHub ラベルの自動セットアップ |
 
-## 7文書構造
+## 7文書構造（起点）
 
 ```
 docs/
@@ -86,7 +86,7 @@ docs/
     └── DECISIONS.md             # 設計判断記録
 ```
 
-**なぜ7文書か**: AIツールは情報の散在に弱い。少数の高密度ドキュメントに集約することで、コンテキスト理解の精度が劇的に向上する。詳細は [AI Spec Driven Development 概念と実践](./docs/AI_SPEC_DRIVEN_DEVELOPMENT.md) を参照。
+**なぜ7文書から始めるか**: AIツールは情報の散在に弱い。まず7文書に集約してコンテキスト理解の精度を確保し、プロジェクトの成長に応じて各フォルダ内に文書を追加していく。全文書が揃わなくてもAIと対話しながら段階的に仕様を策定できる。詳細は [AI Spec Driven Development 概念と実践](./docs/AI_SPEC_DRIVEN_DEVELOPMENT.md) を参照。
 
 ## 関連書籍
 
@@ -121,7 +121,7 @@ docs/
 
 ### 概念・ガイド
 
-- [AI Spec-Driven Development 概念と実践](./docs/AI_SPEC_DRIVEN_DEVELOPMENT.md) — なぜ7文書構造が最適なのか
+- [AI Spec-Driven Development 概念と実践](./docs/AI_SPEC_DRIVEN_DEVELOPMENT.md) — 7文書から始めて段階的に拡張する戦略
 - [AI駆動 Git Workflow](./docs/AI_GIT_WORKFLOW.md) — AIに最適化された9ステップのワークフロー
 - [運用ガイド (AIエージェント向け)](./docs/OPERATIONAL_GUIDE.md) — AIエージェントの操作仕様書
 

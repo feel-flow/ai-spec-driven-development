@@ -38,7 +38,7 @@ changeImpact: high
   - [7. FRONTMATTER TEMPLATE（統一メタデータ）](#7-frontmatter-template統一メタデータ)
   - [8. UPDATE / CHANGE POLICY](#8-update--change-policy)
   - [9. EXTENSION \& SCALING POLICY](#9-extension--scaling-policy)
-    - [Phase 1: MVP (必須7文書)](#phase-1-mvp-必須7文書)
+    - [Phase 1: MVP (コア7文書 — 最小構成)](#phase-1-mvp-コア7文書--最小構成)
     - [Phase 2: Extension (推奨追加)](#phase-2-extension-推奨追加)
     - [Phase 3: Optimization (必要に応じて)](#phase-3-optimization-必要に応じて)
   - [10. AI AGENT EXECUTION CHECKLIST](#10-ai-agent-execution-checklist)
@@ -166,7 +166,7 @@ docs-template/
 ---
 ## 4. REQUIRED MINIMUM FILE SET
 
-**必須7文書** (Phase 1: MVP):
+**コア7文書** (Phase 1: 最小構成):
 - `MASTER.md` - 中央管理文書
 - `01-context/PROJECT.md` - プロジェクト概要
 - `02-design/ARCHITECTURE.md` - システム設計
@@ -328,7 +328,7 @@ changeImpact: low | medium | high   # 変更の影響度
 
 プロジェクトフェーズに応じた文書の拡張ポリシー:
 
-### Phase 1: MVP (必須7文書)
+### Phase 1: MVP (コア7文書 — 最小構成)
 - MASTER.md
 - PROJECT.md
 - ARCHITECTURE.md

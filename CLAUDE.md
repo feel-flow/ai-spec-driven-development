@@ -108,13 +108,13 @@ For complete details, see `docs-template/MASTER.md` section "Information Verific
 
 ## Project Overview
 
-This repository contains a comprehensive guide and template system for AI-driven development documentation strategy. It demonstrates how to optimize documentation for AI development tools (Claude Code, GitHub Copilot, Cursor) through a streamlined 7-document structure instead of traditional 60+ document approaches.
+This repository contains a comprehensive guide and template system for AI-driven development documentation strategy. It demonstrates how to optimize documentation for AI development tools (Claude Code, GitHub Copilot, Cursor) by starting with a core 7-document structure (instead of traditional 60+ documents) and extending as the project grows.
 
 **Key Concept**: The project advocates for "less is more" - fewer, highly-focused documents that AI tools can effectively parse and understand, rather than sprawling documentation that becomes counterproductive.
 
 ## Architecture & Document Structure
 
-This project implements an AI-optimized documentation framework with 7 core documents:
+This project implements an AI-optimized documentation framework starting with 7 core documents (extensible as the project grows):
 
 1. **MASTER.md** - Central coordination document containing project identification, tech stack, coding rules, and AI prompts
 2. **PROJECT.md** - Vision, requirements, stakeholder analysis, and business objectives  
@@ -149,7 +149,7 @@ The project enforces strict prohibition of magic numbers/hardcoded values:
 
 This is a **framework and tooling repository** providing:
 
-- `docs-template/` — 7-document template system (copy to your project)
+- `docs-template/` — Core 7-document template system with extensible folder structure (copy to your project)
 - `docs/` — Concept documents, practical guides, operational guides
 - `mcp/` — MCP server (TypeScript) for AI tool integration
 - `scripts/` — Setup automation (GitHub labels, spec index, automated review)
@@ -175,14 +175,14 @@ bash scripts/setup-github-labels.sh
 
 When making changes:
 1. Understand the AI-optimization principles in `ai_spec_driven_development.md`
-2. Follow the 7-document structure templates in `docs-template/`
+2. Follow the core 7-document templates in `docs-template/` (extensible per project needs)
 3. Maintain consistency with the established patterns
 4. Ensure MCP server builds successfully after doc changes (`cd mcp && npm run check`)
 5. Keep magic number prohibition guidelines updated
 
 ## Special Considerations
 
-- **Version control** — All changes should maintain the integrity of the 7-document system
+- **Version control** — All changes should maintain the integrity of the core document system and its extensions
 - **MCP server** — After modifying `docs/` or `docs-template/`, verify with `cd mcp && npm run check`
 - **Examples** — All code examples should demonstrate anti-magic number practices
 - **Templates** — Maintain template sections as placeholders for actual project adaptation

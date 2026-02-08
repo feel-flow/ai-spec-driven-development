@@ -91,7 +91,7 @@ cat > .cursorrules << 'EOF'
 Before generating any code, you MUST read and understand docs-template/MASTER.md.
 
 ## Project Context
-This is an AI-driven development project using a streamlined 7-document structure optimized for AI tools.
+This is an AI-driven development project starting with a core 7-document structure (extensible as your project grows) optimized for AI tools.
 
 ## Key Constraints from MASTER.md
 

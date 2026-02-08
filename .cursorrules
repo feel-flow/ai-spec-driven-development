@@ -4,7 +4,7 @@
 Before generating any code, you MUST read and understand `docs/MASTER.md`.
 
 ## Project Context
-This is an AI-driven development project that uses a streamlined 7-document structure optimized for AI tools. The project emphasizes "less is more" - fewer, highly-focused documents that AI can effectively parse and understand.
+This is an AI-driven development project starting with a core 7-document structure optimized for AI tools, extensible as the project grows. The project emphasizes "less is more" - beginning with fewer, highly-focused documents that AI can effectively parse, then adding documents as needed.
 
 ## Key Constraints from MASTER.md
 
