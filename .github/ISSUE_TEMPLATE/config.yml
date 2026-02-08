@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: "AI仕様駆動開発について質問・相談"
+    url: https://github.com/feel-flow/ai-spec-driven-development/discussions
+    about: "テンプレートに当てはまらない質問や議論はDiscussionsへどうぞ"
