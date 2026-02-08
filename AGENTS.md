@@ -272,37 +272,76 @@ Always reference MASTER.md for project-specific requirements.
 2. `docs-template/MASTER.md` を必ず読み込む
 3. プロジェクト固有の要件を理解してから作業開始
 
+## 🤖 作業スタイル（全AIエージェント共通）
+
+すべてのAIエージェントは、以下の作業スタイルに従ってください。
+
+### 進め方
+
+1. **効率的に作業を進める** — 複雑な作業はバックグラウンドで並列処理
+2. **定期的に進捗を報告する** — 何をしているか、短く分かりやすく伝える
+3. **分かりやすい言葉で説明する** — 専門用語を避け、日常的な言葉を使う
+4. **エラー時は次にやることを案内する** — 問題の説明 + 具体的な解決手順
+
+### 報告テンプレート
+
+```text
+✅ 完了しました
+- [完了した作業の説明]
+- 変更内容は自動でチェック済みです
+
+⏳ 作業中...
+- [現在の作業内容]
+- あと少しで完了します
+
+❌ 問題が見つかりました
+- [問題の説明]
+- 次のステップ: [具体的な解決手順]
+```
+
+---
+
 ## 作業フロー
 
 ### 1. プロジェクト開始時
 
-```
 1. AGENTS.md を確認
 2. docs-template/MASTER.md を読み込む
 3. プロジェクトの技術スタックと要件を理解
 4. 実装優先順位を確認
 5. コーディング規約を理解
-```
 
 ### 2. コード生成時
 
-```
 1. MASTER.mdのコード生成ルールを適用
 2. 禁止事項を回避
 3. セキュリティ要件を満たす
 4. パフォーマンス目標を考慮
 5. テストコードも同時生成
-```
 
 ### 3. コードレビュー時
 
-```
 1. MASTER.mdのチェックリストを確認
 2. マジックナンバー/ハードコードがないか確認
 3. 型安全性が確保されているか確認
 4. エラーハンドリングが適切か確認
 5. セキュリティ要件を満たしているか確認
-```
+
+### 4. Git Workflow・セルフレビュー
+
+**基本フロー**: Issue作成 → Branch作成 → 実装 → セルフレビュー → テスト → Commit → PR作成 → マージ後ブランチ削除
+
+**ブランチ命名**: `feature/#{issue}-{description}` / `fix/#{issue}-{description}` / `chore/#{issue}-{description}`
+
+**コミット形式**: `<type>: #<issue> <subject>`（types: feat, fix, docs, style, refactor, test, chore）
+
+**セルフレビュー必須項目**: DRY原則、コード品質、Import整理、テスト、自動チェック通過
+
+詳細は以下のテンプレートを参照:
+
+- [Git Workflow 詳細](docs-template/05-operations/deployment/git-workflow.md)
+- [セルフレビュー チェックリスト](docs-template/05-operations/deployment/self-review.md)
+- [自動コードレビュー（Claude Code + Husky）](docs-template/05-operations/deployment/automated-code-review.md)
 
 ## よくある間違いと回避方法
 
@@ -362,6 +401,32 @@ Always reference MASTER.md for project-specific requirements.
 3. **適切なエラーハンドリング**
 4. **セキュリティ要件の遵守**
 5. **パフォーマンス目標の考慮**
+
+## スコープ外問題の取り扱い
+
+作業中にスコープ外の問題を発見した場合、**即座にGitHub Issueを作成**し、現在のタスクに集中すること。
+
+### 手順
+
+1. **スコープを拡大しない** — 現在のIssueに集中
+2. **GitHub Issueを即座に作成**:
+
+   ```bash
+   gh issue create --title "fix: 問題の説明" --body "詳細..." --label "bug"
+   ```
+
+3. **PRに関連Issueを記載**（ブロッキングでない場合）
+4. **現在の作業を続行**
+
+### 報告形式
+
+```text
+📋 スコープ外の問題を発見しました
+Issue #XXX を作成しました: [タイトル]
+優先度: Critical / High / Medium / Low
+```
+
+---
 
 ## 緊急時の対応
 
