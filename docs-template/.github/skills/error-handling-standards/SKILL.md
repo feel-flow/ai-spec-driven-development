@@ -58,7 +58,7 @@ abstract class AppError extends Error {
 
 // バリデーションエラー
 class ValidationError extends AppError {
-  constructor(message: string, public details: string[] = []) {
+  constructor(message: string, public details: any[]) {
     super(message, 'VALIDATION_ERROR', 400);
   }
 }
@@ -88,6 +88,7 @@ class InternalError extends AppError {
 | ConflictError | `CONFLICT` | 409 | 重複・競合 |
 | InternalError | `INTERNAL_ERROR` | 500 | 予期しない内部エラー |
 
+ForbiddenError と ConflictError は PATTERNS.md の基本階層には未定義だが、一般的な HTTP エラーとして推奨される拡張。
 新しいエラー種別が必要な場合は、必ず AppError を継承して作成する。
 
 ## 4. Result パターン
@@ -115,7 +116,7 @@ async function processUser(userId: string): Promise<Result<User>> {
     return Result.ok(processed);
 
   } catch (error) {
-    logger.error('Failed to process user', { userId, error });
+    logger.error('Failed to process user', error, { userId });
 
     if (error instanceof ValidationError) {
       return Result.fail(error);

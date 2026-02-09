@@ -202,12 +202,14 @@ export const fixtures = {
     email: 'john@example.com',
     name: 'John Doe',
     role: 'user',
+    createdAt: new Date('2024-01-01'),
   },
   adminUser: {
     id: '456',
     email: 'admin@example.com',
     name: 'Admin User',
     role: 'admin',
+    createdAt: new Date('2024-01-01'),
   },
 };
 ```
