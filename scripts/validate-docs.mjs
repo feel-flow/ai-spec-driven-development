@@ -58,6 +58,76 @@ const CORE_DOCS = [
   },
 ];
 
+// Frontmatter バリデーション定数
+const REQUIRED_FRONTMATTER_FIELDS = ['title', 'version', 'status', 'owner', 'created', 'updated'];
+const VALID_STATUS_VALUES = ['draft', 'review', 'approved'];
+const SEMVER_PATTERN = /^\d+\.\d+\.\d+$/;
+
+/**
+ * Frontmatter を解析する（外部ライブラリ不要）
+ * 参照実装: mcp/src/utils.ts parseFrontMatter
+ * @param {string} content - ファイル全文
+ * @returns {{ meta: Record<string, string>, body: string } | null}
+ */
+function parseFrontMatter(content) {
+  const DELIM = '---';
+  const lines = content.split(/\r?\n/);
+  if (lines[0].trim() !== DELIM) return null;
+
+  let i = 1;
+  const metaLines = [];
+  while (i < lines.length && lines[i].trim() !== DELIM) {
+    metaLines.push(lines[i]);
+    i++;
+  }
+  if (i === lines.length) return null; // 閉じデリミタなし
+
+  const meta = {};
+  for (const line of metaLines) {
+    const match = line.match(/^(\w+)\s*:\s*(.+)$/);
+    if (match) {
+      // 引用符を除去（"MASTER" → MASTER）
+      meta[match[1]] = match[2].replace(/^["']|["']$/g, '').trim();
+    }
+  }
+  return { meta, body: lines.slice(i + 1).join('\n') };
+}
+
+/**
+ * Frontmatter のバリデーション
+ * @param {Record<string, string>} meta - パース済み Frontmatter
+ * @param {string} fileName - ファイル名（エラーメッセージ用）
+ * @returns {{ level: string, message: string }[]}
+ */
+function validateFrontMatter(meta, fileName) {
+  const errors = [];
+
+  // 必須フィールド存在チェック
+  for (const field of REQUIRED_FRONTMATTER_FIELDS) {
+    if (!meta[field]) {
+      errors.push({ level: 'error', message: `${fileName}: 必須フィールド "${field}" が未設定です` });
+    }
+  }
+
+  // status 値検証
+  if (meta.status && !VALID_STATUS_VALUES.includes(meta.status)) {
+    errors.push({
+      level: 'error',
+      message: `${fileName}: status "${meta.status}" は無効です (有効値: ${VALID_STATUS_VALUES.join(', ')})`,
+    });
+  }
+
+  // version 形式検証（SemVer）
+  if (meta.version && !SEMVER_PATTERN.test(meta.version)) {
+    errors.push({
+      level: 'error',
+      message: `${fileName}: version "${meta.version}" はSemVer形式ではありません (例: 1.0.0)`,
+    });
+  }
+
+  return errors;
+}
+
 // MASTER.md 必須セクション
 const MASTER_REQUIRED_SECTIONS = [
   { pattern: /プロジェクト|project\s*(name|識別)/i, label: 'プロジェクト識別情報' },
@@ -152,11 +222,40 @@ if (qualityIssues === 0) {
   console.log('  ✅ 品質上の問題は見つかりませんでした');
 }
 
+// --- Frontmatter バリデーション ---
+console.log('\n== Frontmatter ==\n');
+let frontmatterIssues = 0;
+
+for (const file of results.files) {
+  if (file.status !== 'ok') continue;
+  const content = fs.readFileSync(file.path, 'utf-8');
+  const parsed = parseFrontMatter(content);
+
+  if (!parsed) {
+    console.log(`  ⚠️  ${file.name} — Frontmatter が見つかりません`);
+    frontmatterIssues++;
+    continue;
+  }
+
+  const errors = validateFrontMatter(parsed.meta, file.name);
+  for (const err of errors) {
+    console.log(`  ❌ ${err.message}`);
+    frontmatterIssues++;
+    exitCode = 1;
+  }
+}
+
+if (frontmatterIssues === 0) {
+  console.log('  ✅ Frontmatterに問題はありません');
+}
+
 // --- サマリー ---
 const total = CORE_DOCS.length;
 const score = Math.round((foundCount / total) * 100);
 console.log('\n== サマリー ==\n');
 console.log(`  必須ファイル: ${foundCount}/${total} ✅`);
+console.log(`  品質警告: ${qualityIssues}件${qualityIssues === 0 ? ' ✅' : ' ⚠️'}`);
+console.log(`  Frontmatter: ${frontmatterIssues}件${frontmatterIssues === 0 ? ' ✅' : ' ❌'}`);
 console.log(`  全体スコア: ${score}%${score === 100 ? ' — 完璧！' : score >= 70 ? ' — 良好' : ' — 改善が必要'}`);
 console.log('');
 
