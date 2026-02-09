@@ -71,7 +71,7 @@ describe('UserService', () => {
 
   beforeEach(() => {
     // Arrange: テスト準備（各テストで新しいインスタンス）
-    mockRepository = createMock<IUserRepository>();
+    mockRepository = mock<IUserRepository>();
     service = new UserService(mockRepository);
   });
 
@@ -151,12 +151,15 @@ test('update user', () => { updateUser(globalUser); }); // 前のテストに依
 
 ## 6. モック・テストデータ管理
 
-### モック作成ヘルパー
+### モック作成
+
+型安全なモック生成には `jest-mock-extended` などのライブラリを使用する：
 
 ```typescript
-function createMock<T>(partial?: Partial<T>): jest.Mocked<T> {
-  return { ...partial } as jest.Mocked<T>;
-}
+// jest-mock-extended の使用を推奨
+import { mock } from 'jest-mock-extended';
+
+const mockRepository = mock<IUserRepository>();
 ```
 
 ### データビルダーパターン

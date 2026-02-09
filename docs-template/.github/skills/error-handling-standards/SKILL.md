@@ -116,9 +116,10 @@ async function processUser(userId: string): Promise<Result<User>> {
     return Result.ok(processed);
 
   } catch (error) {
-    logger.error('Failed to process user', error, { userId });
+    const err = error instanceof Error ? error : new Error(String(error));
+    logger.error('Failed to process user', err, { userId });
 
-    if (error instanceof ValidationError) {
+    if (error instanceof AppError) {
       return Result.fail(error);
     }
 
