@@ -58,6 +58,82 @@ const CORE_DOCS = [
   },
 ];
 
+// Frontmatter バリデーション定数
+const REQUIRED_FRONTMATTER_FIELDS = ['title', 'version', 'status', 'owner', 'created', 'updated'];
+const VALID_STATUS_VALUES = ['draft', 'review', 'approved'];
+const SEMVER_PATTERN = /^\d+\.\d+\.\d+$/;
+
+/**
+ * Frontmatter を解析する（外部ライブラリ不要の簡易版パーサー）
+ * mcp/src/utils.ts parseFrontMatter を参考にした簡略化実装。
+ * 差異: null返却（utils.tsは空meta返却）、trim付きデリミタ判定、YAML配列非対応、引用符除去あり。
+ * @param {string} content - ファイル全文
+ * @returns {{ meta: Record<string, string>, body: string, warnings: string[] } | null}
+ *   Frontmatter未検出時または閉じデリミタ欠落時は null
+ */
+function parseFrontMatter(content) {
+  const DELIM = '---';
+  const lines = content.split(/\r?\n/);
+  if (lines[0].trim() !== DELIM) return null;
+
+  let i = 1;
+  const metaLines = [];
+  while (i < lines.length && lines[i].trim() !== DELIM) {
+    metaLines.push(lines[i]);
+    i++;
+  }
+  if (i === lines.length) return null; // 閉じデリミタなし
+
+  const meta = {};
+  const warnings = [];
+  for (const line of metaLines) {
+    if (!line.trim()) continue; // 空行はスキップ
+    const match = line.match(/^(\w+)\s*:\s*(.+)$/);
+    if (match) {
+      // 先頭/末尾の引用符を個別に除去
+      meta[match[1]] = match[2].replace(/^["']|["']$/g, '').trim();
+    } else {
+      warnings.push(`パース不能な行: "${line.trim()}"`);
+    }
+  }
+  return { meta, body: lines.slice(i + 1).join('\n'), warnings };
+}
+
+/**
+ * Frontmatter のバリデーション
+ * @param {Record<string, string>} meta - パース済み Frontmatter
+ * @param {string} fileName - ファイル名（エラーメッセージ用）
+ * @returns {{ level: 'error', message: string }[]} バリデーションエラーの配列（問題なしの場合は空配列）
+ */
+function validateFrontMatter(meta, fileName) {
+  const errors = [];
+
+  // 必須フィールド存在チェック（in 演算子でプロパティ存在を正確に判定）
+  for (const field of REQUIRED_FRONTMATTER_FIELDS) {
+    if (!(field in meta)) {
+      errors.push({ level: 'error', message: `${fileName}: 必須フィールド "${field}" が未設定です` });
+    }
+  }
+
+  // status 値検証
+  if (meta.status && !VALID_STATUS_VALUES.includes(meta.status)) {
+    errors.push({
+      level: 'error',
+      message: `${fileName}: status "${meta.status}" は無効です (有効値: ${VALID_STATUS_VALUES.join(', ')})`,
+    });
+  }
+
+  // version 形式検証（SemVer）
+  if (meta.version && !SEMVER_PATTERN.test(meta.version)) {
+    errors.push({
+      level: 'error',
+      message: `${fileName}: version "${meta.version}" はSemVer形式ではありません (例: 1.0.0)`,
+    });
+  }
+
+  return errors;
+}
+
 // MASTER.md 必須セクション
 const MASTER_REQUIRED_SECTIONS = [
   { pattern: /プロジェクト|project\s*(name|識別)/i, label: 'プロジェクト識別情報' },
@@ -152,11 +228,47 @@ if (qualityIssues === 0) {
   console.log('  ✅ 品質上の問題は見つかりませんでした');
 }
 
+// --- Frontmatter バリデーション ---
+console.log('\n== Frontmatter ==\n');
+let frontmatterIssues = 0;
+
+for (const file of results.files) {
+  if (file.status !== 'ok') continue;
+  const content = fs.readFileSync(file.path, 'utf-8');
+  const parsed = parseFrontMatter(content);
+
+  if (!parsed) {
+    console.log(`  ❌ ${file.name} — Frontmatter が見つかりません`);
+    frontmatterIssues++;
+    exitCode = 1;
+    continue;
+  }
+
+  // パース時の警告を表示
+  for (const warn of parsed.warnings) {
+    console.log(`  ⚠️  ${file.name}: ${warn}`);
+    frontmatterIssues++;
+  }
+
+  const errors = validateFrontMatter(parsed.meta, file.name);
+  for (const err of errors) {
+    console.log(`  ❌ ${err.message}`);
+    frontmatterIssues++;
+    exitCode = 1;
+  }
+}
+
+if (frontmatterIssues === 0) {
+  console.log('  ✅ Frontmatterに問題はありません');
+}
+
 // --- サマリー ---
 const total = CORE_DOCS.length;
 const score = Math.round((foundCount / total) * 100);
 console.log('\n== サマリー ==\n');
 console.log(`  必須ファイル: ${foundCount}/${total} ✅`);
+console.log(`  品質警告: ${qualityIssues}件${qualityIssues === 0 ? ' ✅' : ' ⚠️'}`);
+console.log(`  Frontmatter: ${frontmatterIssues}件${frontmatterIssues === 0 ? ' ✅' : ' ❌'}`);
 console.log(`  全体スコア: ${score}%${score === 100 ? ' — 完璧！' : score >= 70 ? ' — 良好' : ' — 改善が必要'}`);
 console.log('');
 
