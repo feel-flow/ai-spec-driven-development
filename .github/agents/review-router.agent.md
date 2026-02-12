@@ -60,7 +60,8 @@ Copilot CLI が利用できない場合、従来の `read_file` による動的�
 │   ├── comment-analysis/SKILL.md
 │   └── code-simplification/SKILL.md
 scripts/
-└── review.sh                        ← Copilot CLI 実行スクリプト
+├── review.sh                        ← Copilot CLI 実行スクリプト（macOS/Linux）
+└── review.ps1                       ← Copilot CLI 実行スクリプト（Windows）
 ```
 
 ## ワークフロー
@@ -73,7 +74,9 @@ scripts/
 
 ### ステップ2: モード1 の場合（Copilot CLI セッション分離）
 
-1. `bash scripts/review.sh --all` をターミナルで実行する
+1. OS を判定し、適切なスクリプトをターミナルで実行する
+   - macOS/Linux: `bash scripts/review.sh --all`
+   - Windows: `powershell -ExecutionPolicy Bypass -File scripts/review.ps1 -All`
 2. スクリプト完了後、`read_file` で `.review-results/review-report.md` を読み込む
 3. 統合レポートの内容をユーザーに表示する
 

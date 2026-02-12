@@ -565,7 +565,8 @@ Claude Code の `pr-review-toolkit` では、複数のスキル（code-reviewer�
 │   ├── comment-analysis/SKILL.md
 │   └── code-simplification/SKILL.md
 scripts/
-└── review.sh                        ← Copilot CLI 実行スクリプト
+├── review.sh                        ← Copilot CLI 実行スクリプト（macOS/Linux）
+└── review.ps1                       ← Copilot CLI 実行スクリプト（Windows）
 ```
 
 #### セッション分離アーキテクチャ（推奨）
@@ -654,6 +655,8 @@ PR作成後、VS Code の Copilot Chat で以下を入力するだけで、Copil
 
 #### 方法2: ターミナルから直接実行
 
+**macOS / Linux:**
+
 ```bash
 # 必須スキルのみ（自動判定で条件付きスキルも追加）
 bash scripts/review.sh
@@ -666,6 +669,22 @@ bash scripts/review.sh --all --parallel
 
 # 特定スキルのみ
 bash scripts/review.sh --skill code-review --skill test-analysis
+```
+
+**Windows (PowerShell):**
+
+```powershell
+# 必須スキルのみ（自動判定で条件付きスキルも追加）
+.\scripts\review.ps1
+
+# 全スキル実行
+.\scripts\review.ps1 -All
+
+# 全スキル並列実行
+.\scripts\review.ps1 -All -Parallel
+
+# 特定スキルのみ（カンマ区切り）
+.\scripts\review.ps1 -Skill code-review,test-analysis
 ```
 
 結果は `.review-results/` ディレクトリに出力されます。
@@ -708,14 +727,25 @@ Issue → Branch → Commit → Self-Review → PR → @review-router → Review
 4. Copilot CLI のインストール：
 
 ```bash
+# macOS / Linux
 brew install copilot-cli
+
+# Windows
+winget install GitHub.CopilotCLI
+# または
+scoop install copilot-cli
 ```
 
 5. `.github/skills/` ディレクトリに Agent Skills を配置（本リポジトリに同梱済み）
-6. `scripts/review.sh` に実行権限を付与：
+6. スクリプトの準備：
 
 ```bash
+# macOS / Linux
 chmod +x scripts/review.sh
+
+# Windows は特別な準備不要（PowerShell で直接実行可能）
+# ただし実行ポリシーの制限がある場合:
+# Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
 ```
 
 7. `.gitignore` に結果ディレクトリを追加：
