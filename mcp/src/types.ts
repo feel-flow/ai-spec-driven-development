@@ -36,3 +36,26 @@ export interface SearchResultItem {
   score: number;
   excerpt: string;
 }
+
+// Obsidian統合関連の型定義
+
+export interface UpdateResult {
+  success: boolean;
+  updated: number;
+  total: number;
+  failed: Array<{ file: string; error: string }>;
+}
+
+export interface ValidationResult {
+  success: boolean;
+  totalFiles: number;
+  totalLinks: number;
+  brokenLinks: number;
+  errors: Array<{
+    file: string;
+    linkText: string;
+    linkPath: string;
+    errorType: 'FILE_NOT_FOUND' | 'INVALID_ANCHOR';
+    message: string;
+  }>;
+}

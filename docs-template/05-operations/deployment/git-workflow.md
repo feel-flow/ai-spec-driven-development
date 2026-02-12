@@ -699,3 +699,85 @@ gh pr close ${PR_NUMBER} --comment "重大な設計問題を発見したため�
 5. **継続的改善**: フィードバックループを通じてプロセスを進化
 
 ワークフローは形式ではなく、チームの生産性向上と品質確保のための手段です。状況に応じて柔軟に調整してください。
+
+## Obsidian統合による自動ナレッジベース管理
+
+### 概要
+
+developブランチへのマージ時、Husky post-mergeフックが自動的にドキュメントのバックリンクを更新します。これにより、ナレッジベースの整合性が常に保たれます。
+
+### 自動実行される処理
+
+マージ時に以下が自動実行されます：
+
+1. **バックリンク更新**: 各ドキュメント末尾の「## Linked from」セクションを更新
+2. **自動コミット**: 変更があれば `docs: Update backlinks [skip ci]` でコミット
+
+### セットアップ
+
+初回のみ、以下を実行してHuskyフックを設定：
+
+```bash
+npm run obsidian:setup
+```
+
+### 動作確認
+
+```bash
+# 1. featureブランチで作業
+git checkout -b feature/#123-new-doc
+# ドキュメントを編集...
+
+# 2. developにマージ
+git checkout develop
+git merge feature/#123-new-doc
+
+# ⚡ post-mergeフックが自動実行され、バックリンクが更新される
+# 自動コミットが追加される
+```
+
+### 手動でのバックリンク更新
+
+必要に応じて手動で実行することも可能：
+
+```bash
+# バックリンク更新
+npm run obsidian:sync -- backlinks
+
+# リンク検証（PRマージ前の確認推奨）
+npm run obsidian:sync -- validate
+
+# ナレッジベースレポート
+npm run obsidian:sync -- report
+```
+
+### Obsidianでの閲覧
+
+1. Obsidianで `docs-template/` を Vault として開く
+2. グラフビューでドキュメント間の関連性を可視化
+3. バックリンクパネルで参照元を確認
+
+詳細は [OBSIDIAN_GUIDE.md](../../08-knowledge/OBSIDIAN_GUIDE.md) を参照してください。
+
+### トラブルシューティング
+
+**バックリンクが更新されない場合**:
+
+```bash
+# MCPサーバーをビルド
+cd mcp
+npm install
+npm run build
+
+# フックの実行権限を確認
+chmod +x .husky/post-merge
+```
+
+**リンクエラーが発生した場合**:
+
+```bash
+# リンク検証を実行
+npm run obsidian:sync -- validate
+
+# エラー内容を確認し、リンクを修正
+```

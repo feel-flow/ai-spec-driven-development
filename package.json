@@ -12,6 +12,8 @@
     "build:spec-index": "node scripts/build-spec-index.mjs",
     "test": "npm --prefix mcp test",
     "setup:labels": "bash scripts/setup-github-labels.sh",
+    "obsidian:sync": "node scripts/obsidian-sync.mjs",
+    "obsidian:setup": "bash scripts/setup-obsidian-hook.sh",
     "prepare": "husky"
   },
   "devDependencies": {
