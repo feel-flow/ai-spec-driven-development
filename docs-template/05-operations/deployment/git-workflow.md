@@ -6,7 +6,7 @@
 
 AI開発ツールに最適化されたGit Flowベースのワークフローです。Issue作成からマージ、ナレッジ体系化までをAIツールと協働で効率的に進めます。
 
-**コアサイクル**: Issue → Branch → Commit → Self-Review → PR → Review → Merge → Knowledge → Cleanup
+**コアサイクル**: Issue → Branch → Commit → Self-Review → PR → **@review-router** → Review → Merge → Knowledge → Cleanup
 
 ## ブランチ戦略
 
@@ -256,6 +256,49 @@ Closes #${ISSUE_NUM}
 - 変更ファイルと行番号を明記
 - テスト結果を含める
 - セルフレビュー結果を含める
+
+### ステップ3.5: AIレビュールーターによるレビュー（PR作成後）
+
+**原則**: PR作成後、マージ前に `@review-router` エージェントで包括的なレビューを実施する
+
+#### 実行方法
+
+VS Code の Copilot Chat で以下を入力：
+
+```text
+@review-router このPRをレビューして
+```
+
+#### ルーターの動作
+
+`@review-router` は変更内容を自動分析し、以下のスキルを判定・実行します：
+
+| スキル | 実行条件 |
+|--------|----------|
+| Code Review | 常に実行（必須） |
+| Error Handler Hunt | 常に実行（必須） |
+| Test Analysis | テストファイルの追加・変更がある場合 |
+| Type Design Analysis | 型定義の追加・変更がある場合 |
+| Comment Analysis | ドキュメント・コメントの変更がある場合 |
+| Code Simplification | 30行超の関数、深いネストがある場合 |
+
+#### 統合レポートの確認
+
+ルーターは1つの統合レポートを出力します。以下の判定結果に従って対応してください：
+
+| 判定 | 意味 | 対応 |
+|------|------|------|
+| `PASS` | 問題なし | マージ可能 |
+| `NEEDS_WORK` | 改善推奨の問題あり | 修正後に再レビュー |
+| `CRITICAL_BLOCK` | 重大な問題あり | 必ず修正が必要 |
+
+#### 特定スキルのみ実行する場合
+
+```text
+@review-router テスト分析だけ
+@review-router 型設計を分析して
+@review-router エラーハンドリングを検査して
+```
 
 ### ステップ4: AI支援レビュー対応
 

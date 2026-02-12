@@ -633,9 +633,24 @@ tools:
 
 ## 使用方法
 
-### エージェントの呼び出し
+### Review Router（推奨）
 
-VS CodeのCopilot Chatで `@` に続けてエージェント名を入力します。
+PR作成後に `@review-router` を呼び出すだけで、変更内容を自動分析し、
+必要なレビュースキルを選択・実行します。
+
+```text
+@review-router このPRをレビューして
+```
+
+`@review-router` は以下を自動判定します：
+- **常に実行**: Code Review、Error Handler Hunt
+- **条件付き**: Test Analysis、Type Design Analysis、Comment Analysis、Code Simplification
+
+詳細は `.github/agents/review-router.agent.md` を参照。
+
+### 個別エージェントの呼び出し
+
+特定のレビューのみ実行したい場合は、個別エージェントを直接呼び出せます。
 
 ```text
 @code-reviewer このPRをレビューして
@@ -648,7 +663,15 @@ VS CodeのCopilot Chatで `@` に続けてエージェント名を入力しま�
 
 ### 推奨ワークフロー
 
-#### コミット前
+#### PR作成後（推奨フロー）
+
+```text
+@review-router このPRをレビューして
+```
+
+ルーターが自動的に必要なスキルを判定・実行し、統合レポートを出力。
+
+#### コミット前（軽量チェック）
 
 ```text
 @code-reviewer
@@ -657,21 +680,10 @@ VS CodeのCopilot Chatで `@` に続けてエージェント名を入力しま�
 
 最低限、コード品質とエラーハンドリングを確認。
 
-#### PR作成前
-
-```text
-@code-reviewer
-@test-analyzer
-@error-handler-hunter
-@comment-analyzer
-```
-
-包括的なレビューを実施。
-
 #### 新しい型を追加した場合
 
 ```text
-@type-design-analyzer
+@review-router 型設計を分析して
 ```
 
 型設計の品質を確認。
