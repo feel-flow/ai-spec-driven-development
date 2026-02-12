@@ -24,28 +24,34 @@ Claude Codeには`pr-review-toolkit`という公式プラグインが提供さ�
 
 ## ディレクトリ構造
 
+Review Router パターンでは、ルーターエージェントが個別スキルファイルを動的に読み込んで実行します。
+
 ```text
 your-project/
 └── .github/
     └── agents/
-        ├── code-reviewer.agent.md
-        ├── error-handler-hunter.agent.md
-        ├── test-analyzer.agent.md
-        ├── code-simplifier.agent.md
-        ├── comment-analyzer.agent.md
-        └── type-design-analyzer.agent.md
+        ├── review-router.agent.md          ← ルーター（選択 + 実行制御）
+        └── skills/                          ← 個別スキル定義
+            ├── code-review.md
+            ├── error-handler-hunt.md
+            ├── test-analysis.md
+            ├── type-design-analysis.md
+            ├── comment-analysis.md
+            └── code-simplification.md
 ```
+
+Router は `tools: ["*"]` を持つため、`read_file` ツールで必要なスキルファイルのみを動的に読み込みます。これにより、不要なスキルのコンテキストを消費しません。
 
 ## Claude Code との対応表
 
-| 目的 | Claude Code (pr-review-toolkit) | GitHub Copilot Agent |
-|------|--------------------------------|---------------------|
-| コードレビュー | code-reviewer | code-reviewer.agent.md |
-| サイレント失敗検出 | silent-failure-hunter | error-handler-hunter.agent.md |
-| コード簡素化 | code-simplifier | code-simplifier.agent.md |
-| コメント分析 | comment-analyzer | comment-analyzer.agent.md |
-| テスト分析 | pr-test-analyzer | test-analyzer.agent.md |
-| 型設計評価 | type-design-analyzer | type-design-analyzer.agent.md |
+| 目的 | Claude Code (pr-review-toolkit) | GitHub Copilot (skills/) |
+| ------ | -------------------------------- | ------------------------- |
+| コードレビュー | code-reviewer | code-review.md |
+| サイレント失敗検出 | silent-failure-hunter | error-handler-hunt.md |
+| コード簡素化 | code-simplifier | code-simplification.md |
+| コメント分析 | comment-analyzer | comment-analysis.md |
+| テスト分析 | pr-test-analyzer | test-analysis.md |
+| 型設計評価 | type-design-analyzer | type-design-analysis.md |
 
 ---
 
@@ -636,7 +642,7 @@ tools:
 ### Review Router（推奨）
 
 PR作成後に `@review-router` を呼び出すだけで、変更内容を自動分析し、
-必要なレビュースキルを選択・実行します。
+必要なスキルファイルを動的に読み込んでレビューを実行します。
 
 ```text
 @review-router このPRをレビューして
