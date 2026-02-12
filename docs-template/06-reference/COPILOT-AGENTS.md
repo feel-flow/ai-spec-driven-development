@@ -24,34 +24,49 @@ Claude Codeには`pr-review-toolkit`という公式プラグインが提供さ�
 
 ## ディレクトリ構造
 
-Review Router パターンでは、ルーターエージェントが個別スキルファイルを動的に読み込んで実行します。
+Review Router は**デュアルモード**で動作します。Copilot CLI によるセッション分離（推奨）と、従来の動的 `read_file` 読み込み（フォールバック）の両方をサポートします。
 
 ```text
 your-project/
-└── .github/
-    └── agents/
-        ├── review-router.agent.md          ← ルーター（選択 + 実行制御）
-        └── skills/                          ← 個別スキル定義
-            ├── code-review.md
-            ├── error-handler-hunt.md
-            ├── test-analysis.md
-            ├── type-design-analysis.md
-            ├── comment-analysis.md
-            └── code-simplification.md
+├── .github/
+│   ├── agents/
+│   │   ├── review-router.agent.md      ← ルーター（実行制御）
+│   │   └── skills/                      ← VS Code Chat 用（フォールバック）
+│   │       ├── code-review.md
+│   │       ├── error-handler-hunt.md
+│   │       ├── test-analysis.md
+│   │       ├── type-design-analysis.md
+│   │       ├── comment-analysis.md
+│   │       └── code-simplification.md
+│   └── skills/                          ← 公式 Agent Skills（Copilot CLI 用）
+│       ├── code-review/SKILL.md
+│       ├── error-handler-hunt/SKILL.md
+│       ├── test-analysis/SKILL.md
+│       ├── type-design-analysis/SKILL.md
+│       ├── comment-analysis/SKILL.md
+│       └── code-simplification/SKILL.md
+└── scripts/
+    └── review.sh                        ← Copilot CLI 実行スクリプト
 ```
 
-Router は `tools: ["*"]` を持つため、`read_file` ツールで必要なスキルファイルのみを動的に読み込みます。これにより、不要なスキルのコンテキストを消費しません。
+### モード1: Copilot CLI セッション分離（推奨）
+
+`scripts/review.sh` が各スキルを独立した `copilot -p` プロセスで実行。各スキルが独立した LLM セッションで動作するため、コンテキスト汚染がゼロです。
+
+### モード2: 動的 `read_file` 読み込み（フォールバック）
+
+Copilot CLI が利用不可の場合、Router が `read_file` ツールで `.github/agents/skills/` から必要なスキルファイルのみを読み込みます。
 
 ## Claude Code との対応表
 
-| 目的 | Claude Code (pr-review-toolkit) | GitHub Copilot (skills/) |
-| ------ | -------------------------------- | ------------------------- |
-| コードレビュー | code-reviewer | code-review.md |
-| サイレント失敗検出 | silent-failure-hunter | error-handler-hunt.md |
-| コード簡素化 | code-simplifier | code-simplification.md |
-| コメント分析 | comment-analyzer | comment-analysis.md |
-| テスト分析 | pr-test-analyzer | test-analysis.md |
-| 型設計評価 | type-design-analyzer | type-design-analysis.md |
+| 目的 | Claude Code (pr-review-toolkit) | Copilot agents/skills/ | Copilot CLI skills/ |
+| ------ | -------------------------------- | ------------------------- | ---------------------- |
+| コードレビュー | code-reviewer | code-review.md | code-review/SKILL.md |
+| サイレント失敗検出 | silent-failure-hunter | error-handler-hunt.md | error-handler-hunt/SKILL.md |
+| コード簡素化 | code-simplifier | code-simplification.md | code-simplification/SKILL.md |
+| コメント分析 | comment-analyzer | comment-analysis.md | comment-analysis/SKILL.md |
+| テスト分析 | pr-test-analyzer | test-analysis.md | test-analysis/SKILL.md |
+| 型設計評価 | type-design-analyzer | type-design-analysis.md | type-design-analysis/SKILL.md |
 
 ---
 

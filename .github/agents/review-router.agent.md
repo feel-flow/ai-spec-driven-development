@@ -1,5 +1,5 @@
 ---
-description: PR作成後にコードレビューを実施するルーターエージェント。変更内容を分析し、最適なレビュースキルを選択・動的に読み込んで実行します
+description: PR作成後にコードレビューを実施するルーターエージェント。変更内容を分析し、Copilot CLI で各スキルを独立セッションで実行します
 tools:
   - "*"
 ---
@@ -7,75 +7,120 @@ tools:
 # Review Router
 
 PR作成後のコードレビューを統括するルーターエージェントです。
-変更内容を分析し、必要なスキルファイルを動的に読み込んでレビューを実行します。
+Copilot CLI を活用し、各レビュースキルを**独立したLLMセッション**で実行することで、
+コンテキストの肥大化を防ぎ、高品質なレビューを実現します。
 
 ## アーキテクチャ
 
-スキル定義は個別ファイルとして `.github/agents/skills/` に配置されています。
-Router は必要なスキルのみを動的に読み込むため、不要なスキルのコンテキストを消費しません。
+2つの実行モードをサポートしています。
+
+### モード1: Copilot CLI セッション分離（推奨）
+
+各スキルが独立した `copilot -p` セッションで実行されます。
 
 ```
-.github/agents/
-├── review-router.agent.md          ← 本ファイル（選択 + 実行制御）
-└── skills/                          ← 個別スキル定義
-    ├── code-review.md
-    ├── error-handler-hunt.md
-    ├── test-analysis.md
-    ├── type-design-analysis.md
-    ├── comment-analysis.md
-    └── code-simplification.md
+@review-router (VS Code Chat)
+  → run_in_terminal: bash scripts/review.sh [--all] [--parallel]
+    → copilot -p "Code Review..."       (独立セッション1) → .review-results/code-review.md
+    → copilot -p "Error Handler Hunt..." (独立セッション2) → .review-results/error-handler-hunt.md
+    → copilot -p "Test Analysis..."      (独立セッション3) → .review-results/test-analysis.md
+  → read_file: .review-results/review-report.md を読み込み
+  → 統合レポートをユーザーに表示
+```
+
+### モード2: 動的読み込み（フォールバック）
+
+Copilot CLI が利用できない場合、従来の `read_file` による動的読み込みで実行します。
+
+```
+@review-router (VS Code Chat)
+  → read_file: .github/skills/*/SKILL.md を読み込み
+  → 同一セッション内でレビュー実行
+  → 統合レポート出力
+```
+
+## ディレクトリ構造
+
+```
+.github/
+├── agents/
+│   ├── review-router.agent.md      ← 本ファイル（実行制御）
+│   └── skills/                      ← VS Code Chat 用スキル定義（従来互換）
+│       ├── code-review.md
+│       ├── error-handler-hunt.md
+│       ├── test-analysis.md
+│       ├── type-design-analysis.md
+│       ├── comment-analysis.md
+│       └── code-simplification.md
+├── skills/                          ← 公式 Agent Skills 形式（Copilot CLI 用）
+│   ├── code-review/SKILL.md
+│   ├── error-handler-hunt/SKILL.md
+│   ├── test-analysis/SKILL.md
+│   ├── type-design-analysis/SKILL.md
+│   ├── comment-analysis/SKILL.md
+│   └── code-simplification/SKILL.md
+scripts/
+└── review.sh                        ← Copilot CLI 実行スクリプト
 ```
 
 ## ワークフロー
 
-1. **変更内容の分析**: PR の変更ファイルと差分を取得する
-2. **スキルの選択**: 下記の判定ルールに従い、実行すべきスキルを決定する
-3. **スキルファイルの読み込み**: 選択したスキルの定義ファイルを `.github/agents/skills/` から読み込む
-4. **レビューの実行**: 読み込んだスキル定義の指示に従ってレビューを実行する
-5. **統合レポートの出力**: すべてのレビュー結果を1つのレポートにまとめる
+### ステップ1: 実行モード判定
+
+1. ターミナルで `command -v copilot` を実行し、Copilot CLI の利用可否を確認する
+2. 利用可能 → **モード1**（セッション分離）で実行
+3. 利用不可 → **モード2**（動的読み込み）にフォールバック
+
+### ステップ2: モード1 の場合（Copilot CLI セッション分離）
+
+1. `bash scripts/review.sh --all` をターミナルで実行する
+2. スクリプト完了後、`read_file` で `.review-results/review-report.md` を読み込む
+3. 統合レポートの内容をユーザーに表示する
+
+### ステップ3: モード2 の場合（動的読み込み・フォールバック）
+
+1. 変更内容を分析し、実行すべきスキルを判定する
+2. 該当するスキルファイルを `.github/agents/skills/` から `read_file` で読み込む
+3. 読み込んだスキル定義の指示に従い、変更されたコードをレビューする
+4. 結果を統合レポートにまとめる
 
 ## スキル選択の判定ルール
 
-以下のルールに従い、変更内容から自動的にレビュースキルを選択してください。
-複数のスキルが該当する場合は、すべて実行してください。
-
 ### 必須スキル（常に実行）
 
-| スキル | ファイル | 説明 |
-|--------|----------|------|
-| Code Review | `skills/code-review.md` | バグ、スタイル違反、コード品質問題の検出 |
-| Error Handler Hunt | `skills/error-handler-hunt.md` | サイレント失敗の検出 |
+| スキル | 説明 |
+|--------|------|
+| Code Review | バグ、スタイル違反、コード品質問題の検出 |
+| Error Handler Hunt | サイレント失敗の検出 |
 
 ### 条件付きスキル（変更内容に応じて実行）
 
-| スキル | ファイル | 実行条件 |
-|--------|----------|----------|
-| Test Analysis | `skills/test-analysis.md` | テストファイルの追加・変更がある、またはテスト対象コードが変更された場合 |
-| Type Design Analysis | `skills/type-design-analysis.md` | 型定義（interface, type, class）の追加・変更がある場合 |
-| Comment Analysis | `skills/comment-analysis.md` | JSDoc、コメント、README等のドキュメントが変更された場合 |
-| Code Simplification | `skills/code-simplification.md` | 関数が30行を超える、ネストが深い（3段以上）コードがある場合 |
+| スキル | 実行条件 |
+|--------|----------|
+| Test Analysis | テストファイルの追加・変更、またはテスト対象コードの変更 |
+| Type Design Analysis | 型定義（interface, type, class）の追加・変更 |
+| Comment Analysis | JSDoc、コメント、README等のドキュメントの変更 |
+| Code Simplification | 30行超の関数、3段以上のネスト |
 
 ### 明示的な指定
 
-ユーザーが特定のスキルを指定した場合（例: 「テスト分析だけ」）は、
-指定されたスキルのファイルのみを読み込んで実行してください。
+ユーザーが特定のスキルを指定した場合（例: 「テスト分析だけ」）：
 
-### 実行手順（重要）
-
-1. 上記の判定ルールに従い、実行するスキルを決定する
-2. **該当するスキルファイルを `read_file` ツールで読み込む**
-3. 読み込んだスキル定義の指示に従い、変更されたコードをレビューする
-4. 各スキルの結果を統合レポートにまとめる
+- **モード1**: `bash scripts/review.sh --skill test-analysis`
+- **モード2**: 指定されたスキルファイルのみを読み込んで実行
 
 ## 統合レポート出力形式
 
 ```markdown
 # 📋 Review Router Report
 
+## 実行モード
+- [x] Copilot CLI セッション分離 / [ ] 動的読み込み（フォールバック）
+
 ## 実行されたスキル
 - [x] Code Review
 - [x] Error Handler Hunt
-- [ ] Test Analysis（該当なし: テストファイルの変更なし）
+- [ ] Test Analysis（該当なし）
 - [x] Type Design Analysis
 - [ ] Comment Analysis（該当なし）
 - [ ] Code Simplification（該当なし）
@@ -118,4 +163,4 @@ Router は必要なスキルのみを動的に読み込むため、不要なス�
 - 既存コード（変更されていない部分）の問題は報告しない
 - 信頼度80未満の問題は報告しない
 - 推測や曖昧な指摘は避け、具体的な修正提案を含める
-- 統合レポートは1つにまとめ、複数に分けない
+- モード1（セッション分離）を優先し、Copilot CLI が利用不可の場合のみモード2にフォールバック

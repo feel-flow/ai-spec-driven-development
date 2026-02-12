@@ -81,8 +81,19 @@ changeImpact: medium
   - [6. GitHub Copilot Review Routerによるコードレビュー自動化](#6-github-copilot-review-routerによるコードレビュー自動化)
     - [6.1 背景と課題](#61-背景と課題)
     - [6.2 Review Routerパターン](#62-review-routerパターン)
+      - [ディレクトリ構造](#ディレクトリ構造)
+      - [アーキテクチャ](#アーキテクチャ)
+      - [設計の要点](#設計の要点)
+      - [VS Code Extension API との違い](#vs-code-extension-api-との違い)
     - [6.3 スキル選択の自動化](#63-スキル選択の自動化)
+      - [必須スキル（常に実行）](#必須スキル常に実行)
+      - [条件付きスキル（変更内容に応じて実行）](#条件付きスキル変更内容に応じて実行)
+      - [統合レポートの判定基準](#統合レポートの判定基準)
     - [6.4 使用方法](#64-使用方法)
+      - [基本的な使い方](#基本的な使い方)
+      - [特定スキルのみ実行](#特定スキルのみ実行)
+      - [Git Workflowへの統合](#git-workflowへの統合)
+      - [セットアップ](#セットアップ)
     - [6.5 Claude Code pr-review-toolkit との比較](#65-claude-code-pr-review-toolkit-との比較)
   - [7. AIツール設定ファイルのベストプラクティス](#7-aiツール設定ファイルのベストプラクティス)
 
@@ -521,74 +532,80 @@ Claude Code の `pr-review-toolkit` では、複数のスキル（code-reviewer�
 2. **判断の属人化**: どのレビューが必要かの判断が開発者に依存する
 3. **網羅性の欠如**: 必要なレビューの実行漏れが発生しやすい
 
-### 6.2 Review Routerパターン
+### 6.2 Review Router アーキテクチャ
 
-この制約を克服するため、**ルーターエージェントが個別スキルファイルを動的に読み込んで実行する**パターンを採用しました。
+この制約を克服するため、**Copilot CLI によるセッション分離パターン**を採用しました。
+
+#### アーキテクチャの進化
+
+| 世代 | パターン | セッション分離 | コンテキスト効率 |
+| ------ | ---------- | -------------- | ---------------- |
+| v1 | 全スキル埋め込み | 不可 | 低（常に全スキルがコンテキストに載る） |
+| v2 | 動的 `read_file` 読み込み | 不可 | 中（条件付きスキルを省略可能） |
+| **v3** | **Copilot CLI セッション分離** | **実現** | **高（各スキルが独立プロセス）** |
 
 #### ディレクトリ構造
 
-```
-.github/agents/
-├── review-router.agent.md          ← ルーター（選択 + 実行制御）
-└── skills/                          ← 個別スキル定義
-    ├── code-review.md
-    ├── error-handler-hunt.md
-    ├── test-analysis.md
-    ├── type-design-analysis.md
-    ├── comment-analysis.md
-    └── code-simplification.md
+```text
+.github/
+├── agents/
+│   ├── review-router.agent.md      ← ルーター（実行制御）
+│   └── skills/                      ← VS Code Chat 用（従来互換）
+│       ├── code-review.md
+│       ├── error-handler-hunt.md
+│       ├── test-analysis.md
+│       ├── type-design-analysis.md
+│       ├── comment-analysis.md
+│       └── code-simplification.md
+├── skills/                          ← 公式 Agent Skills 形式（Copilot CLI 用）
+│   ├── code-review/SKILL.md
+│   ├── error-handler-hunt/SKILL.md
+│   ├── test-analysis/SKILL.md
+│   ├── type-design-analysis/SKILL.md
+│   ├── comment-analysis/SKILL.md
+│   └── code-simplification/SKILL.md
+scripts/
+└── review.sh                        ← Copilot CLI 実行スクリプト
 ```
 
-#### アーキテクチャ
+#### セッション分離アーキテクチャ（推奨）
 
 ```
-┌──────────────────────────────────────────────────┐
-│              @review-router                       │
-│                                                   │
-│  ┌───────────────┐  ┌────────────────────────┐   │
-│  │  変更分析      │  │  スキル選択（LLM判定）  │   │
-│  │  - git diff    │→│  - 必須スキル（常時）   │   │
-│  │  - ファイル種別 │  │  - 条件付きスキル      │   │
-│  └───────────────┘  └────────────────────────┘   │
-│                          │                        │
-│                   read_file で動的読み込み          │
-│           ┌──────────────┼──────────────┐         │
-│           ▼              ▼              ▼         │
-└───────────┼──────────────┼──────────────┼─────────┘
-            │              │              │
-   skills/  │     skills/  │     skills/  │
- ┌──────────┴──┐ ┌────────┴────┐ ┌───────┴───────┐
- │ code-review  │ │ error-      │ │ test-         │
- │ .md          │ │ handler-    │ │ analysis.md   │
- │              │ │ hunt.md     │ │ (条件付き)     │
- └──────────────┘ └─────────────┘ └───────────────┘
-            │              │              │
-            └──────────────┼──────────────┘
-                           ▼
-                  ┌──────────────┐
-                  │ 統合レポート  │
-                  └──────────────┘
+ユーザー → @review-router (VS Code Chat)
+  │
+  ├─ run_in_terminal: bash scripts/review.sh --all --parallel
+  │   │
+  │   ├─ copilot -p "Code Review..."        [独立セッション1] → .review-results/code-review.md
+  │   ├─ copilot -p "Error Handler Hunt..." [独立セッション2] → .review-results/error-handler-hunt.md
+  │   ├─ copilot -p "Test Analysis..."      [独立セッション3] → .review-results/test-analysis.md
+  │   └─ ... (並列実行可能)
+  │   │
+  │   └─ → .review-results/review-report.md (統合レポート)
+  │
+  └─ read_file: .review-results/review-report.md
+     → 統合レポートをユーザーに表示
 ```
+
+**ポイント**: 各 `copilot -p` 呼び出しは独立したLLMセッション。Router のコンテキストにはスキル定義が一切載らず、結果ファイルのみを読み込みます。
 
 #### 設計の要点
 
-1. **動的コンテキスト読み込み**: Router が `read_file` ツールで必要なスキルファイルのみを読み込む。不要なスキルの定義はコンテキストに載らない
-2. **LLMによる自動判定**: 変更内容（diff）を分析し、どのスキルを実行すべきかをLLMが自動判断
-3. **統合レポート**: すべてのレビュー結果を1つのレポートに集約
-4. **スキルの独立性**: 各スキル定義は独立したMarkdownファイルであり、個別にメンテナンス・拡張が可能
+1. **真のセッション分離**: 各スキルが独立した `copilot -p` プロセスで実行。コンテキスト汚染ゼロ
+2. **並列実行**: `--parallel` オプションで全スキルを同時実行可能
+3. **自動スキル判定**: `scripts/review.sh` が変更ファイルのパターンから条件付きスキルの要否を自動判定
+4. **公式 Agent Skills 形式**: `.github/skills/*/SKILL.md` は Copilot CLI、Copilot coding agent、VS Code Insiders で共通利用可能
+5. **フォールバック**: Copilot CLI が利用不可の場合、従来の動的 `read_file` 読み込みにフォールバック
 
-#### VS Code Extension API との違い
+#### 各アプローチの比較
 
-VS Code Extension API（プログラマティックモデル）では、`vscode.lm.invokeTool()` を使ってツール間の呼び出しが可能です。しかし、この方法はTypeScriptでの拡張機能開発が必要であり、`.agent.md` の宣言的モデルよりも導入コストが高くなります。
-
-| 観点 | .agent.md + 動的読み込み | Extension API（プログラマティック） |
-| ------ | --------------------- | ------------------------------------- |
-| 導入コスト | 低（Markdownのみ） | 高（TypeScript開発必要） |
-| 柔軟性 | 中（LLM依存） | 高（完全制御） |
-| メンテナンス | 容易（スキル単位で編集） | 開発・テスト必要 |
-| スキル間連携 | 動的読み込みで解決 | 可能（invokeTool） |
-| コンテキスト効率 | 高（必要なスキルのみ読み込み） | 高（プログラム制御） |
-| 推奨用途 | チーム開発、レビュー自動化 | 高度なカスタムツール |
+| 観点 | Copilot CLI セッション分離 | 動的 `read_file`（フォールバック） | Extension API |
+| ------ | ----------------------- | --------------------------------- | ------------- |
+| 導入コスト | 低（シェルスクリプト） | 低（Markdownのみ） | 高（TypeScript） |
+| セッション分離 | 完全分離 | 不可（単一セッション） | 完全分離 |
+| 並列実行 | 可能 | 不可 | 可能 |
+| コンテキスト効率 | 高（結果のみ読み込み） | 中（スキル定義も読み込み） | 高 |
+| プレミアムリクエスト | スキル数分消費 | 1リクエスト | 1リクエスト |
+| 推奨用途 | チーム開発、CI統合 | Copilot CLI 未導入環境 | 高度なカスタム |
 
 ### 6.3 スキル選択の自動化
 
@@ -620,27 +637,53 @@ Review Routerは、変更内容に基づいて実行するスキルを自動選�
 
 ### 6.4 使用方法
 
-#### 基本的な使い方
+#### 方法1: VS Code Chat から実行（推奨）
 
-PR作成後、VS Code の Copilot Chat で以下を入力するだけで包括的なレビューが実行されます。
+PR作成後、VS Code の Copilot Chat で以下を入力するだけで、Copilot CLI によるセッション分離レビューが自動実行されます。
 
 ```text
 @review-router このPRをレビューして
 ```
 
-#### 特定スキルのみ実行
+特定スキルのみ実行する場合：
 
 ```text
 @review-router テスト分析だけ
 @review-router 型設計を分析して
-@review-router エラーハンドリングを検査して
+```
+
+#### 方法2: ターミナルから直接実行
+
+```bash
+# 必須スキルのみ（自動判定で条件付きスキルも追加）
+bash scripts/review.sh
+
+# 全スキル実行
+bash scripts/review.sh --all
+
+# 全スキル並列実行
+bash scripts/review.sh --all --parallel
+
+# 特定スキルのみ
+bash scripts/review.sh --skill code-review --skill test-analysis
+```
+
+結果は `.review-results/` ディレクトリに出力されます。
+
+#### 方法3: Copilot CLI のインタラクティブモード
+
+Copilot CLI は Agent Skills（`.github/skills/*/SKILL.md`）を自動検出するため、プロンプト内容に応じて適切なスキルが自動適用されます。
+
+```bash
+copilot
+> このPRの変更をレビューして
 ```
 
 #### Git Workflowへの統合
 
 AI仕様駆動開発の Git Workflow に以下のステップとして統合されています：
 
-```
+```text
 Issue → Branch → Commit → Self-Review → PR → @review-router → Review → Merge
 ```
 
@@ -648,8 +691,10 @@ Issue → Branch → Commit → Self-Review → PR → @review-router → Review
 
 #### セットアップ
 
+##### 必須（VS Code Chat）
+
 1. VS Code 1.107 以降と GitHub Copilot 拡張機能が必要
-2. `.github/agents/review-router.agent.md` と `.github/agents/skills/` ディレクトリをリポジトリに配置
+2. `.github/agents/review-router.agent.md` をリポジトリに配置
 3. `settings.json` に以下を追加：
 
 ```json
@@ -658,18 +703,41 @@ Issue → Branch → Commit → Self-Review → PR → @review-router → Review
 }
 ```
 
+##### 推奨（Copilot CLI セッション分離）
+
+4. Copilot CLI のインストール：
+
+```bash
+brew install copilot-cli
+```
+
+5. `.github/skills/` ディレクトリに Agent Skills を配置（本リポジトリに同梱済み）
+6. `scripts/review.sh` に実行権限を付与：
+
+```bash
+chmod +x scripts/review.sh
+```
+
+7. `.gitignore` に結果ディレクトリを追加：
+
+```text
+.review-results/
+```
+
 ### 6.5 Claude Code pr-review-toolkit との比較
 
 AI仕様駆動開発では、Claude Code と GitHub Copilot の両方でレビュー自動化を実現しています。
 
 | 観点 | Claude Code (pr-review-toolkit) | GitHub Copilot (Review Router) |
 | ------ | ------ | ------ |
-| アーキテクチャ | 独立スキル型（各スキルが独立） | ルーター + 個別スキル型（動的読み込み） |
-| スキル選択 | 手動（各スキルを個別呼び出し） | 自動（LLMが変更内容から判定） |
+| アーキテクチャ | 独立スキル型（各スキルが独立） | ルーター + Copilot CLI セッション分離 |
+| スキル選択 | 手動（各スキルを個別呼び出し） | 自動（スクリプトが変更内容から判定） |
 | 呼び出し方法 | `/review` コマンド | `@review-router` エージェント |
+| セッション分離 | 各スキルが独立セッション | 各 `copilot -p` が独立セッション |
 | 統合レポート | なし（個別出力） | あり（1つに集約） |
-| コンテキスト効率 | 実行スキル分のみ消費 | 必要なスキルファイルのみ動的読み込み |
-| カスタマイズ | スキル定義ファイルを編集 | `skills/` 配下のスキルファイルを編集 |
+| 並列実行 | 不可 | 可能（`--parallel`） |
+| コンテキスト効率 | 実行スキル分のみ消費 | 結果ファイルのみ読み込み（最高効率） |
+| カスタマイズ | スキル定義ファイルを編集 | `.github/skills/` 配下の SKILL.md を編集 |
 
 **どちらを使うべきか**：
 - **Claude Code** を主に使う場合 → `pr-review-toolkit` の各スキルを活用
