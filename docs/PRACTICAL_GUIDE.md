@@ -731,7 +731,7 @@ Issue → Branch → Commit → Self-Review → PR → @review-router → Review
 brew install copilot-cli
 
 # Windows
-winget install GitHub.CopilotCLI
+winget install GitHub.Copilot
 # または
 scoop install copilot-cli
 ```

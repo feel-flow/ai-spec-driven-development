@@ -14,6 +14,7 @@
 #   --skill <name>      指定スキルのみ実行（複数指定可）
 #   --parallel          並列実行（デフォルト: 順次実行）
 #   --output-dir <dir>  出力ディレクトリ（デフォルト: .review-results）
+#   --no-copilot        Copilot CLI をスキップし、手動レビュー推奨メッセージのみ出力
 #
 # 例:
 #   bash scripts/review.sh                          # 必須スキルのみ
@@ -48,6 +49,7 @@ readonly ALL_SKILLS=("${MANDATORY_SKILLS[@]}" "${CONDITIONAL_SKILLS[@]}")
 OUTPUT_DIR="$DEFAULT_OUTPUT_DIR"
 RUN_ALL=false
 RUN_PARALLEL=false
+NO_COPILOT=false
 SELECTED_SKILLS=()
 PIDS=()
 FAILED_SKILLS=()
@@ -104,6 +106,10 @@ parse_args() {
         OUTPUT_DIR="$1"
         shift
         ;;
+      --no-copilot)
+        NO_COPILOT=true
+        shift
+        ;;
       --help|-h)
         show_help
         exit 0
@@ -129,6 +135,7 @@ Review Router Script - Copilot CLI セッション分離レビュー
   --skill <name>      指定スキルのみ実行（複数指定可）
   --parallel          並列実行（デフォルト: 順次実行）
   --output-dir <dir>  出力ディレクトリ（デフォルト: .review-results）
+  --no-copilot        Copilot CLI をスキップし、手動レビュー推奨メッセージのみ出力
   --help, -h          このヘルプを表示
 
 利用可能なスキル:
@@ -145,6 +152,11 @@ Review Router Script - Copilot CLI セッション分離レビュー
   bash scripts/review.sh --skill code-review          # 単一スキル
   bash scripts/review.sh --skill code-review --skill test-analysis
   bash scripts/review.sh --all --parallel             # 全スキル並列実行
+
+トラブルシューティング:
+  - Copilot CLI の確認: command -v copilot && copilot version
+  - 非インタラクティブモード: 本スクリプトは --allow-all-tools を使用
+  - 環境変数: COPILOT_ALLOW_ALL=1 でツール許可を事前設定可能
 EOF
 }
 
@@ -154,11 +166,20 @@ EOF
 check_copilot_cli() {
   if ! command -v copilot &> /dev/null; then
     log_error "Copilot CLI がインストールされていません"
-    log_info "インストール方法: brew install copilot-cli"
+    log_warn "Copilot CLI が利用できません。以下のいずれかを選択してください:"
+    log_info "  1. brew install copilot-cli でインストール（macOS/Linux）"
+    log_info "  2. npm install -g @github/copilot（全プラットフォーム）"
+    log_info "  3. curl -fsSL https://gh.io/copilot-install | bash"
+    log_info "  4. 手動でレビューを実施"
+    log_info "  5. @review-router エージェントのモード2（動的読み込み）を利用"
     log_info "詳細: https://github.com/github/copilot-cli"
     exit 1
   fi
   log_info "Copilot CLI: $(command -v copilot)"
+  local version_output
+  if version_output=$(copilot version 2>/dev/null); then
+    log_info "バージョン: $(echo "$version_output" | head -1)"
+  fi
 }
 
 # ---------------------------------------------------------------------------
@@ -262,16 +283,23 @@ run_skill() {
   log_info "実行中: $skill ..."
 
   # Copilot CLI をプログラマティックモードで実行
+  # 非インタラクティブモードでは --allow-all-tools が必須（公式ドキュメント参照）
   # 各呼び出しが独立したLLMセッション = 真のセッション分離
-  if copilot -p "
+  copilot -p "
 変更されたコードに対して、@${skill_path} のスキル定義に従いレビューを実施してください。
 git diff で変更内容を確認し、変更されたファイルのみを対象にレビューしてください。
 結果はMarkdown形式で出力してください。
-" --allow-tool 'shell(git)' --allow-tool 'read' > "$output_file" 2>/dev/null; then
+" -s --allow-all-tools > "$output_file" 2>&1
+  local exit_code=$?
+  if [[ $exit_code -eq 0 ]]; then
     log_success "$skill 完了 → $output_file"
     SUCCEEDED_SKILLS+=("$skill")
   else
-    log_error "$skill 失敗"
+    log_error "$skill 失敗（終了コード: $exit_code）"
+    if [[ -s "$output_file" ]]; then
+      log_error "詳細は $output_file を確認してください（最後の15行）:"
+      tail -15 "$output_file" >&2
+    fi
     FAILED_SKILLS+=("$skill")
     echo "# $skill - 実行失敗" > "$output_file"
     echo "" >> "$output_file"
@@ -290,6 +318,16 @@ main() {
 
   # 引数解析
   parse_args "$@"
+
+  # --no-copilot の場合は手動レビュー推奨メッセージのみ
+  if [[ "$NO_COPILOT" == true ]]; then
+    log_warn "Copilot CLI をスキップしました（--no-copilot）"
+    log_info "手動レビューを推奨します。または以下の方法で Copilot CLI を利用できます:"
+    log_info "  1. brew install copilot-cli でインストール後、本スクリプトを再実行"
+    log_info "  2. @review-router エージェントのモード2（動的読み込み）を利用"
+    log_info "詳細: https://github.com/github/copilot-cli"
+    exit 0
+  fi
 
   # Copilot CLI チェック
   check_copilot_cli
@@ -338,12 +376,14 @@ main() {
   log_info "結果ファイル:"
   for skill in "${SELECTED_SKILLS[@]}"; do
     local status="✅"
-    for failed in "${FAILED_SKILLS[@]}"; do
-      if [[ "$failed" == "$skill" ]]; then
-        status="❌"
-        break
-      fi
-    done
+    if [[ ${#FAILED_SKILLS[@]} -gt 0 ]]; then
+      for failed in "${FAILED_SKILLS[@]}"; do
+        if [[ "$failed" == "$skill" ]]; then
+          status="❌"
+          break
+        fi
+      done
+    fi
     log_info "  $status $OUTPUT_DIR/${skill}.md"
   done
 
@@ -381,21 +421,23 @@ EOF
     done
 
     local failed=false
-    for f in "${FAILED_SKILLS[@]}"; do
-      if [[ "$f" == "$skill" ]]; then
-        failed=true
-        break
-      fi
-    done
+    if [[ ${#FAILED_SKILLS[@]} -gt 0 ]]; then
+      for f in "${FAILED_SKILLS[@]}"; do
+        if [[ "$f" == "$skill" ]]; then
+          failed=true
+          break
+        fi
+      done
+    fi
 
     if [[ "$executed" == true ]]; then
       if [[ "$failed" == true ]]; then
-        echo "- ❌ $skill（実行失敗）" >> "$report"
+        echo "- ❌ ${skill}（実行失敗）" >> "$report"
       else
-        echo "- ✅ $skill" >> "$report"
+        echo "- ✅ ${skill}" >> "$report"
       fi
     else
-      echo "- ⏭️ $skill（スキップ）" >> "$report"
+      echo "- ⏭️ ${skill}（スキップ）" >> "$report"
     fi
   done
 

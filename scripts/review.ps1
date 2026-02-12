@@ -29,6 +29,7 @@ param(
     [string[]]$Skill = @(),
     [switch]$Parallel,
     [string]$OutputDir = ".review-results",
+    [switch]$NoCopilot,
     [switch]$Help
 )
 
@@ -95,6 +96,7 @@ Review Router Script - Copilot CLI セッション分離レビュー (Windows)
   -Skill <name>       指定スキルのみ実行（カンマ区切りで複数指定可）
   -Parallel           並列実行（デフォルト: 順次実行）
   -OutputDir <dir>    出力ディレクトリ（デフォルト: .review-results）
+  -NoCopilot          Copilot CLI をスキップし、手動レビュー推奨メッセージのみ出力
   -Help               このヘルプを表示
 
 利用可能なスキル:
@@ -121,12 +123,22 @@ function Test-CopilotCli {
     $copilotPath = Get-Command copilot -ErrorAction SilentlyContinue
     if (-not $copilotPath) {
         Write-Err "Copilot CLI がインストールされていません"
-        Write-Info "インストール方法: winget install GitHub.CopilotCLI"
-        Write-Info "または: scoop install copilot-cli"
+        Write-Info "インストール方法:"
+        Write-Info "  winget install GitHub.Copilot"
+        Write-Info "  または: scoop install copilot-cli"
+        Write-Info "  または: npm install -g @github/copilot"
         Write-Info "詳細: https://github.com/github/copilot-cli"
         exit 1
     }
     Write-Info "Copilot CLI: $($copilotPath.Source)"
+    try {
+        $versionOutput = & copilot version 2>$null
+        if ($versionOutput) {
+            Write-Info "バージョン: $($versionOutput -join ' ')"
+        }
+    } catch {
+        # バージョン取得はオプション、失敗しても続行
+    }
 }
 
 # ---------------------------------------------------------------------------
@@ -244,6 +256,7 @@ function Invoke-Skill {
     Write-Info "実行中: $SkillName ..."
 
     # Copilot CLI をプログラマティックモードで実行
+    # 非インタラクティブモードでは --allow-all-tools が必須（公式ドキュメント参照）
     # 各呼び出しが独立したLLMセッション = 真のセッション分離
     $prompt = @"
 変更されたコードに対して、@$skillPath のスキル定義に従いレビューを実施してください。
@@ -251,23 +264,27 @@ git diff で変更内容を確認し、変更されたファイルのみを対�
 結果はMarkdown形式で出力してください。
 "@
 
-    try {
-        $result = copilot -p $prompt --allow-tool 'shell(git)' --allow-tool 'read' 2>$null
-        if ($LASTEXITCODE -eq 0) {
-            $result | Out-File -FilePath $outputFile -Encoding utf8
-            Write-Success "$SkillName 完了 → $outputFile"
-            [void]$SucceededSkills.Add($SkillName)
-        } else {
-            throw "Copilot CLI が非ゼロの終了コードを返しました: $LASTEXITCODE"
+    $result = & copilot -p $prompt -s --allow-all-tools 2>&1
+    $exitCode = $LASTEXITCODE
+    $result | Out-File -FilePath $outputFile -Encoding utf8
+
+    if ($exitCode -eq 0) {
+        Write-Success "$SkillName 完了 → $outputFile"
+        [void]$SucceededSkills.Add($SkillName)
+    } else {
+        Write-Err "$SkillName 失敗（終了コード: $exitCode）"
+        if (Test-Path $outputFile -PathType Leaf) {
+            $lines = Get-Content $outputFile
+            if ($lines) {
+                Write-Err "詳細は $outputFile を確認してください（最後の15行）:"
+                $lines | Select-Object -Last 15 | ForEach-Object { Write-Err $_ }
+            }
         }
-    } catch {
-        Write-Err "$SkillName 失敗: $_"
         [void]$FailedSkills.Add($SkillName)
         @"
 # $SkillName - 実行失敗
 
 スキルの実行中にエラーが発生しました。
-エラー: $_
 "@ | Out-File -FilePath $outputFile -Encoding utf8
     }
 }
@@ -341,6 +358,16 @@ function Main {
             return
         }
 
+        # -NoCopilot の場合は手動レビュー推奨メッセージのみ
+        if ($NoCopilot) {
+            Write-Warn "Copilot CLI をスキップしました（-NoCopilot）"
+            Write-Info "手動レビューを推奨します。または以下の方法で Copilot CLI を利用できます:"
+            Write-Info "  1. winget install GitHub.Copilot でインストール後、本スクリプトを再実行"
+            Write-Info "  2. @review-router エージェントのモード2（動的読み込み）を利用"
+            Write-Info "詳細: https://github.com/github/copilot-cli"
+            return
+        }
+
         # Copilot CLI チェック
         Test-CopilotCli
 
@@ -377,22 +404,19 @@ git diff で変更内容を確認し、変更されたファイルのみを対�
 結果はMarkdown形式で出力してください。
 "@
 
-                    try {
-                        $result = copilot -p $prompt --allow-tool 'shell(git)' --allow-tool 'read' 2>$null
-                        if ($LASTEXITCODE -eq 0) {
-                            $result | Out-File -FilePath $outputFile -Encoding utf8
-                            return @{ Skill = $SkillName; Success = $true }
-                        } else {
-                            throw "Exit code: $LASTEXITCODE"
-                        }
-                    } catch {
+                    $result = & copilot -p $prompt -s --allow-all-tools 2>&1
+                    $exitCode = $LASTEXITCODE
+                    $result | Out-File -FilePath $outputFile -Encoding utf8
+
+                    if ($exitCode -eq 0) {
+                        return @{ Skill = $SkillName; Success = $true }
+                    } else {
                         @"
 # $SkillName - 実行失敗
 
 スキルの実行中にエラーが発生しました。
-エラー: $_
 "@ | Out-File -FilePath $outputFile -Encoding utf8
-                        return @{ Skill = $SkillName; Success = $false; Error = $_.ToString() }
+                        return @{ Skill = $SkillName; Success = $false; Error = "終了コード: $exitCode" }
                     }
                 }
 
