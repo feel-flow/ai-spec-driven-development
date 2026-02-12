@@ -1,11 +1,26 @@
 # GitHub Copilot Instructions
 
-## 🚨 MANDATORY: Read MASTER.md First
+## � はじめに
 
-Before generating any code suggestions, you MUST read and understand `docs/MASTER.md`.
+このファイルはGitHub Copilot固有の設定を記載しています。
+
+**全AIエージェント共通のルールは [`AGENTS.md`](../AGENTS.md) を参照してください。**
+
+- 情報確認プロトコル
+- MASTER.md参照ルール
+
+これらはすべて AGENTS.md に記載されています。
+
+---
+
+## 🚨 MANDATORY: Read MASTER.md and AGENTS.md First
+
+Before generating any code suggestions:
+1. **Read `AGENTS.md`** for common AI agent guidelines
+2. **Read `docs-template/MASTER.md`** for project-specific requirements
 
 ## Project Context
-This is an AI-driven development project using a streamlined 7-document structure optimized for AI tools. The project emphasizes "less is more" - fewer, highly-focused documents that AI can effectively parse and understand.
+This is an AI-driven development project starting with a core 7-document structure optimized for AI tools, extensible as the project grows. The project emphasizes "less is more" - beginning with fewer, highly-focused documents that AI can effectively parse, then adding documents as needed.
 
 ## Key Constraints from MASTER.md
 
@@ -65,10 +80,10 @@ This is an AI-driven development project using a streamlined 7-document structur
 ## Code Generation Rules
 
 ### Before Suggesting Code
-1. Read `docs/MASTER.md` for project context
-2. Check `docs/03-implementation/PATTERNS.md` for implementation patterns
-3. Verify `docs/02-design/ARCHITECTURE.md` for technical decisions
-4. Review `docs/02-design/DOMAIN.md` for business logic
+1. Read `docs-template/MASTER.md` for project context
+2. Check `docs-template/03-implementation/PATTERNS.md` for implementation patterns
+3. Verify `docs-template/02-design/ARCHITECTURE.md` for technical decisions
+4. Review `docs-template/02-design/DOMAIN.md` for business logic
 
 ### During Code Suggestion
 1. Follow the coding rules from MASTER.md
@@ -106,24 +121,100 @@ This is an AI-driven development project using a streamlined 7-document structur
 When suggesting code, always consider this constraint:
 
 ```
-制約: マジックナンバー／ハードコード禁止。意味のある値は名前付き定数へ抽出し、環境変数や設定モジュールから注入する。単位（ms, KB など）と有効範囲をコメント/型で明示すること。URL, パス, ヘッダ名, エラーコードは定数化する。
+Constraint: No magic numbers or hardcoded values. Extract meaningful values into named constants and inject via environment variables or configuration modules. Document units (ms, KB, etc.) and valid ranges in comments or types. URLs, paths, header names, and error codes must be constantized.
 
-推奨ツール:
-- Playwright MCP統合によりAI駆動のビジュアルデバッグ・自動テスト修復を活用すること。E2Eテストの失敗時は自動的にスクリーンショット分析と修正提案を生成する。
-- Chrome DevTools MCP統合によりリアルタイムのDOM操作・ネットワーク監視・パフォーマンス分析を活用すること。Web開発時のインタラクティブなデバッグに最適。
+Recommended Tooling: Use Playwright with MCP integration for AI-driven visual debugging and automated test healing. On E2E test failure, automatically analyze screenshots and generate remediation suggestions.
 ```
 
 ## Document References
-- `docs/MASTER.md` - Project overview and rules
-- `docs/01-context/PROJECT.md` - Business requirements
-- `docs/02-design/ARCHITECTURE.md` - Technical architecture
-- `docs/02-design/DOMAIN.md` - Business logic
-- `docs/03-implementation/PATTERNS.md` - Implementation patterns
-- `docs/04-quality/TESTING.md` - Testing strategies
-- `docs/05-operations/DEPLOYMENT.md` - Deployment procedures
-- `docs/08-knowledge/` - Knowledge base and best practices
+- **`AGENTS.md`** - Common AI agent guidelines (READ THIS FIRST)
+- `docs-template/MASTER.md` - Project overview and rules
+- `docs-template/01-context/PROJECT.md` - Business requirements
+- `docs-template/02-design/ARCHITECTURE.md` - Technical architecture
+- `docs-template/02-design/DOMAIN.md` - Business logic
+- `docs-template/03-implementation/PATTERNS.md` - Implementation patterns
+- `docs-template/04-quality/TESTING.md` - Testing strategies
+- `docs-template/05-operations/DEPLOYMENT.md` - Deployment procedures
+- `docs-template/08-knowledge/` - Knowledge base and best practices
+
+## GitHub Copilot for Pull Requests Behavior Control
+
+### PR Comment Policy
+When reviewing pull requests, GitHub Copilot MUST follow these rules:
+
+1. **Single Comment per Review Session**
+   - Provide ONE comprehensive review comment per PR update
+   - Consolidate all feedback into a single structured comment
+   - DO NOT post multiple separate comments for different issues
+
+2. **Triggering Conditions**
+   - Comment ONLY on the following PR events:
+     - Initial PR creation (`opened`)
+     - New commits pushed (`synchronize`)
+   - DO NOT comment on:
+     - PR reopening (`reopened`)
+     - PR closing (`closed`)
+     - Draft PR state changes
+
+3. **Comment Structure**
+   When commenting, use this structure:
+
+   ```markdown
+   ## Review Summary
+   [Overall assessment]
+
+   ## Critical Issues
+   - [Issue 1]
+   - [Issue 2]
+
+   ## Suggestions
+   - [Suggestion 1]
+   - [Suggestion 2]
+
+   ## Checklist
+   - [ ] MASTER.md rules followed
+   - [ ] No magic numbers
+   - [ ] Type safety ensured
+   ```
+
+4. **Avoid Redundant Comments**
+   - Check if a similar comment already exists before posting
+   - Update existing comments instead of creating new ones when possible
+   - Group related issues together
+
+5. **Rate Limiting**
+   - Maximum 1 review comment per PR event
+   - Wait for human response before providing follow-up suggestions
+   - Respect the "review requested" flag
+
+### Workflow Integration
+- Align with `.github/workflows/release-drafter.yml` triggers
+- Do not interfere with automated release note generation
+- Focus on code quality, not administrative tasks
+
+### Review Router Workflow
+
+PR作成後、マージ前に `@review-router` エージェントを呼び出して包括的なレビューを実施します。
+
+**ワークフロー**: Issue → Branch → Commit → Self-Review → PR → **@review-router** → Review → Merge
+
+**使用方法**:
+```text
+@review-router このPRをレビューして
+```
+
+`@review-router` は変更内容を分析し、以下のスキルを自動判定・実行します：
+- Code Review（常に実行）
+- Error Handler Hunt（常に実行）
+- Test Analysis（テスト変更時）
+- Type Design Analysis（型定義変更時）
+- Comment Analysis（コメント・ドキュメント変更時）
+- Code Simplification（複雑なコード検出時）
+
+詳細は `.github/agents/review-router.agent.md` を参照。
 
 ## Code Review Checklist
+- [ ] AGENTS.md common rules followed
 - [ ] MASTER.md rules followed
 - [ ] No magic numbers/hardcoded values
 - [ ] Type safety ensured
@@ -134,4 +225,6 @@ When suggesting code, always consider this constraint:
 - [ ] Naming conventions followed
 - [ ] Constants properly organized by layer
 
-Remember: Always reference MASTER.md for project-specific requirements and constraints.
+---
+
+Remember: Always reference AGENTS.md and MASTER.md for project requirements and constraints.

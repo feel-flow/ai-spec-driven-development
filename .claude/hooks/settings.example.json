@@ -1,0 +1,12 @@
+{
+  "$schema": "https://claude.ai/schemas/settings.json",
+  "hooks": {
+    "SessionStart": [
+      {
+        "type": "command",
+        "command": ".claude/hooks/check-branch-status.sh",
+        "description": "Check git branch status and warn if needed"
+      }
+    ]
+  }
+}

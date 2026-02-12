@@ -1,0 +1,29 @@
+{
+  "name": "ai-spec-driven-development",
+  "version": "1.4.0",
+  "private": true,
+  "description": "AI仕様駆動開発フレームワーク — コア7文書テンプレート + 拡張構造、MCP Server、Claude Code Skills",
+  "scripts": {
+    "setup": "npm install && npm --prefix mcp install && npm --prefix mcp run build",
+    "validate": "node scripts/validate-docs.mjs",
+    "lint:md": "markdownlint-cli2 'docs/**/*.md' 'docs-template/**/*.md' '*.md'",
+    "check": "npm --prefix mcp run check",
+    "build:mcp": "npm --prefix mcp run build",
+    "build:spec-index": "node scripts/build-spec-index.mjs",
+    "test": "npm --prefix mcp test",
+    "setup:labels": "bash scripts/setup-github-labels.sh",
+    "prepare": "husky"
+  },
+  "devDependencies": {
+    "husky": "^9.1.0",
+    "markdownlint-cli2": "^0.17.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/feel-flow/ai-spec-driven-development.git"
+  },
+  "license": "MIT"
+}

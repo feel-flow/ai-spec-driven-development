@@ -1,0 +1,10 @@
+{
+  // AI Spec-Driven Development — Markdown Lint CLI設定
+  // ルール設定は .markdownlint.json を参照
+  // globs は npm script 側で指定（pre-commit hookとの共存のため）
+  "ignores": [
+    "node_modules",
+    "mcp/node_modules",
+    "**/CHANGELOG.md"
+  ]
+}

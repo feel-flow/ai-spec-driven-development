@@ -9,7 +9,7 @@ import url from "url";
 const __filename = url.fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const repoRoot = path.resolve(__dirname, "..");
-const docsRoot = path.join(repoRoot, "docs");
+const docsRoot = path.join(repoRoot, "docs-template");
 
 // Utilities
 function walkMarkdownFiles(dir) {
@@ -181,7 +181,7 @@ mcp.registerTool("extract_section", {
   title: "Extract section",
   description: "Extract a level-2 heading section from a markdown file.",
   inputSchema: {
-    file: z.string().describe("Relative path like docs/02-design/API.md"),
+    file: z.string().describe("Relative path like docs-template/02-design/API.md"),
     heading: z.string().describe("Exact heading text after '## '")
   }
 }, async ({ file, heading }) => {
@@ -213,7 +213,7 @@ mcp.registerTool("glossary_lookup", {
 mcp.registerTool("list_docs", {
   title: "List docs",
   description: "List repository documentation markdown files (relative paths).",
-  inputSchema: { prefix: z.string().optional().describe("Filter by prefix, e.g., docs/02-design/") }
+  inputSchema: { prefix: z.string().optional().describe("Filter by prefix, e.g., docs-template/02-design/") }
 }, async ({ prefix }) => {
   const rels = mdFiles.map(f => path.relative(repoRoot, f));
   const filtered = prefix ? rels.filter(r => r.startsWith(prefix)) : rels;
@@ -225,7 +225,7 @@ mcp.prompt("adr", "Architecture Decision Record prompt", async () => ({
   description: "Architecture Decision Record prompt",
   messages: [
     { role: "system", content: "You are an AI engineer recording an Architecture Decision (ADR). Follow the repository's docs and constraints. Fill in Context, Decision, Consequences." },
-    { role: "user", content: "Create an ADR draft referencing docs/06-reference/DECISIONS.md and related design docs." }
+    { role: "user", content: "Create an ADR draft referencing docs-template/06-reference/DECISIONS.md and related design docs." }
   ],
   metadata: { tags: ["adr", "architecture"] }
 }));

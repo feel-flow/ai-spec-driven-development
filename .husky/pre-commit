@@ -1,0 +1,9 @@
+#!/bin/sh
+
+# 変更されたMarkdownファイルのみlint
+CHANGED_MD=$(git diff --cached --name-only --diff-filter=ACM | grep -E '\.md$' || true)
+
+if [ -n "$CHANGED_MD" ]; then
+  echo "Linting changed Markdown files..."
+  echo "$CHANGED_MD" | xargs npx markdownlint-cli2
+fi
