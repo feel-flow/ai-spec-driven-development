@@ -211,9 +211,3 @@ Each document serves a specific AI-readable purpose while maintaining cross-refe
 - Consult DEPLOYMENT.md for operational requirements
 
 This structure enables AI tools to quickly locate relevant information without parsing through dozens of scattered documents.
-
----
-
-## 📚 Related Repositories
-
-- [ai-books](https://github.com/feel-flow/ai-books) - AI技術書の執筆リポジトリ（書籍コンテンツ・校正ツール・ビルドスクリプト）
