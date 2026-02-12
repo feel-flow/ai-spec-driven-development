@@ -192,6 +192,27 @@ When reviewing pull requests, GitHub Copilot MUST follow these rules:
 - Do not interfere with automated release note generation
 - Focus on code quality, not administrative tasks
 
+### Review Router Workflow
+
+PR作成後、マージ前に `@review-router` エージェントを呼び出して包括的なレビューを実施します。
+
+**ワークフロー**: Issue → Branch → Commit → Self-Review → PR → **@review-router** → Review → Merge
+
+**使用方法**:
+```text
+@review-router このPRをレビューして
+```
+
+`@review-router` は変更内容を分析し、以下のスキルを自動判定・実行します：
+- Code Review（常に実行）
+- Error Handler Hunt（常に実行）
+- Test Analysis（テスト変更時）
+- Type Design Analysis（型定義変更時）
+- Comment Analysis（コメント・ドキュメント変更時）
+- Code Simplification（複雑なコード検出時）
+
+詳細は `.github/agents/review-router.agent.md` を参照。
+
 ## Code Review Checklist
 - [ ] AGENTS.md common rules followed
 - [ ] MASTER.md rules followed

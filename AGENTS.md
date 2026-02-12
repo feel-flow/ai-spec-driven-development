@@ -330,7 +330,7 @@ Always reference MASTER.md for project-specific requirements.
 
 ### 4. Git Workflow・セルフレビュー
 
-**基本フロー**: Issue作成 → Branch作成 → 実装 → セルフレビュー → テスト → Commit → PR作成 → マージ後ブランチ削除
+**基本フロー**: Issue作成 → Branch作成 → 実装 → セルフレビュー → テスト → Commit → PR作成 → **@review-router でAIレビュー** → マージ後ブランチ削除
 
 **ブランチ命名**: `feature/#{issue}-{description}` / `fix/#{issue}-{description}` / `chore/#{issue}-{description}`
 
