@@ -4,7 +4,7 @@
 
 ## 概要
 
-ベストプラクティス集は、AIが一貫性のある高品質なコードを生成するための指針をまとめたものです。以下の9つのカテゴリに分類し、それぞれ詳細ガイドとして独立したファイルで管理しています。
+ベストプラクティス集は、AIが一貫性のある高品質なコードを生成するための指針をまとめたものです。以下のカテゴリに分類し、それぞれ詳細ガイドとして独立したファイルで管理しています。
 
 ## クイックリファレンス
 
@@ -19,6 +19,7 @@
 | ログ・監視 | [logging.md](best-practices/logging.md) | 構造化ログ、エラー追跡、監視 | ロギング実装時 |
 | アーキテクチャ | [architecture.md](best-practices/architecture.md) | レイヤー設計、依存性注入、SOLID原則 | アーキテクチャ設計時 |
 | Git Workflow | [git-workflow.md](best-practices/git-workflow.md) | ブランチ戦略、SessionStart Hook、PR運用 | Git操作時 |
+| ACE Playbook | [PLAYBOOK.md](./PLAYBOOK.md) | 構造化エントリ追記ルール、helpful/harmfulカウンター管理 | PR/Issueマージ後 |
 
 ## 各カテゴリの概要
 
@@ -121,6 +122,17 @@
 
 **適用場面**: 開発開始時、PRマージ後
 
+### 10. ACE Playbook運用
+**ファイル**: [PLAYBOOK.md](./PLAYBOOK.md)
+
+**主要内容**:
+- 構造化エントリの追記ルール（delta方式・末尾追記のみ）
+- helpful/harmful カウンターによる知見の有効性追跡
+- エントリのライフサイクル管理（active → deprecated）
+- 800行超過時のファイル分割ルール
+
+**適用場面**: PR/Issueマージ後のナレッジ記録、AIツール向け知見供給
+
 ## 使用ガイド
 
 ### AI開発時の参照順序
@@ -179,6 +191,8 @@ docs-template/08-knowledge/best-practices/
 ├── architecture.md        # アーキテクチャパターン（レイヤー、DI）
 └── git-workflow.md        # Git Workflow（SessionStart Hook、ブランチ戦略）
 ```
+
+See also: [PLAYBOOK.md](./PLAYBOOK.md) — ACE Playbook（構造化知見、delta方式）
 
 ## 更新履歴
 
