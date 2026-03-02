@@ -1,6 +1,6 @@
 # Knowledge Management (ナレッジ体系化)
 
-> **Parent**: [DEPLOYMENT.md](../DEPLOYMENT.md) | **Workflow Step**: 5.5
+> **Parent**: [DEPLOYMENT.md](../DEPLOYMENT.md) | **Workflow Step**: 5.5a
 
 ## 概要
 

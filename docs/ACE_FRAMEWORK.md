@@ -117,6 +117,7 @@ ACE サイクルは以下の3フェーズで構成される：
 3. セキュリティ: 脆弱性対策の知見
 4. パフォーマンス: 最適化のヒント
 5. アーキテクチャ: 構造上の決定事項
+6. プロセス: ワークフロー・ツール活用の改善点
 ```
 
 **出力**: 候補となる知見のリスト（まだ Playbook には書かない）
@@ -183,7 +184,7 @@ Playbook は **AIツールが直接参照できる構造化ナレッジベース
 
 | フィールド | 値 |
 |-----------|---|
-| Category | coding / architecture / testing / security / performance / devops |
+| Category | coding / architecture / testing / security / performance / devops / process / tooling |
 | Origin | PR #XXX / Issue #YYY |
 | Date | YYYY-MM-DD |
 | Helpful | 0 |
@@ -224,7 +225,7 @@ Playbook は **AIツールが直接参照できる構造化ナレッジベース
 | カウンター更新 | Yes | 既存エントリの Helpful/Harmful を +1 |
 | ステータス変更 | Yes | active → deprecated |
 | エントリ削除 | No | deprecated にするのみ |
-| エントリ内容の書き換え | No | 新エントリとして追記 |
+| エントリ本文の書き換え（Insight/Context/Action） | No | 新エントリとして追記 |
 | Frontmatter 更新 | Yes | version, updated, ace_entry_count |
 
 ### ファイルサイズ管理
@@ -233,12 +234,16 @@ Playbook が 800 行を超えた場合：
 
 ```
 08-knowledge/
-├── PLAYBOOK.md        ← 索引 + 最新エントリ（200行程度）
+├── PLAYBOOK.md           ← 索引 + 運用ルール（200行程度）
 └── playbook/
-    ├── coding.md      ← Category: coding のエントリ群
-    ├── architecture.md ← Category: architecture のエントリ群
-    ├── testing.md     ← Category: testing のエントリ群
-    └── security.md    ← Category: security のエントリ群
+    ├── coding.md         ← Category: coding のエントリ群
+    ├── architecture.md   ← Category: architecture のエントリ群
+    ├── testing.md        ← Category: testing のエントリ群
+    ├── security.md       ← Category: security のエントリ群
+    ├── performance.md    ← Category: performance のエントリ群
+    ├── devops.md         ← Category: devops のエントリ群
+    ├── process.md        ← Category: process のエントリ群
+    └── tooling.md        ← Category: tooling のエントリ群
 ```
 
 分割時の移行ルール：

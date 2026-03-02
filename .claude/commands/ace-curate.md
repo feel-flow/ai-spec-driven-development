@@ -51,6 +51,7 @@ gh pr view $ARGUMENTS --json number,title,body,url,comments,reviews
 
 - [ ] 再現性が「中」以上か？（低→スキップ）
 - [ ] 影響度が「中」以上か？（低→スキップ）
+- [ ] 汎用的すぎないか？（プロジェクト固有の文脈が含まれているか？）
 
 次に、既存 Playbook エントリとの照合を行います:
 
@@ -93,7 +94,7 @@ PLAYBOOK.md の既存エントリから最新のIDを確認し、次の連番を
 #### 4-c. Frontmatter の更新
 - `version` のマイナーバージョンをインクリメント
 - `updated` を今日の日付に更新
-- `ace_entry_count` をインクリメント
+- `ace_entry_count` をインクリメント（新規エントリ追加時のみ。カウンター更新のみの場合は変更しない）
 
 ### 5. コミット
 
@@ -124,7 +125,8 @@ git commit -m "knowledge: ACE-XXX [category] [summary]"
 
 ## 注意事項
 
-- エントリの追記は **末尾のみ**。既存エントリの内容書き換えは禁止
-- カウンターの更新は **インクリメントのみ**
+- エントリの追記は **末尾のみ**。既存エントリの本文（Insight/Context/Action）の書き換えは禁止
+- 既存エントリの Helpful/Harmful カウンター更新と Status 変更（active → deprecated）は許可
+- カウンターの更新は **インクリメントのみ**（減算しない）
 - 知見が抽出されない場合（typo修正のみ等）は「知見なし」と報告して終了
 - PLAYBOOK.md が 800 行を超えている場合は分割を提案

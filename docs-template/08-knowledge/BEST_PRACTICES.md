@@ -4,7 +4,7 @@
 
 ## 概要
 
-ベストプラクティス集は、AIが一貫性のある高品質なコードを生成するための指針をまとめたものです。以下の9つのカテゴリに分類し、それぞれ詳細ガイドとして独立したファイルで管理しています。
+ベストプラクティス集は、AIが一貫性のある高品質なコードを生成するための指針をまとめたものです。以下のカテゴリに分類し、それぞれ詳細ガイドとして独立したファイルで管理しています。
 
 ## クイックリファレンス
 
@@ -189,9 +189,10 @@ docs-template/08-knowledge/best-practices/
 ├── performance.md         # パフォーマンス（キャッシュ、非同期）
 ├── logging.md             # ログ・監視（構造化ログ）
 ├── architecture.md        # アーキテクチャパターン（レイヤー、DI）
-├── git-workflow.md        # Git Workflow（SessionStart Hook、ブランチ戦略）
-└── ../PLAYBOOK.md         # ACE Playbook（構造化知見、delta方式）
+└── git-workflow.md        # Git Workflow（SessionStart Hook、ブランチ戦略）
 ```
+
+See also: [PLAYBOOK.md](./PLAYBOOK.md) — ACE Playbook（構造化知見、delta方式）
 
 ## 更新履歴
 
