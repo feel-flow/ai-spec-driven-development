@@ -41,6 +41,34 @@
 
 ---
 
+## ACE Playbook 連携（推奨）
+
+既存の GitHub Discussions によるナレッジ管理に加え、ACE (Agentic Context Engineering) Playbook への構造化記録を推奨します。
+
+### なぜ Playbook が必要か
+
+GitHub Discussions は **人間が読むためのナラティブ（物語的記録）** として優れていますが、AIツールが自動参照するには構造化が不足しています。Playbook は **AIツールが直接参照できる形式** で知見を蓄積し、次回タスクで自動的に活用されます。
+
+### 推奨フロー（マージ後）
+
+1. **ACE サイクルを実行** → Playbook にエントリ追記
+2. **重要な知見は GitHub Discussions にも投稿**（任意）
+3. **相互参照を記録**:
+   - Playbook エントリの Context に「詳細は Discussion #XX を参照」
+   - Discussion 本文に「ACE Playbook (ACE-XXX) にも構造化記録済み」
+
+### 使い分け
+
+| 観点 | ACE Playbook | GitHub Discussions |
+|------|-------------|-------------------|
+| 対象読者 | AIツール（+ 人間） | チームメンバー（人間） |
+| 形式 | 構造化テーブル + 短文 | 自由記述 |
+| 更新頻度 | 毎回のマージ後 | 重要な知見のみ |
+
+詳細: [ace-cycle.md](./ace-cycle.md)
+
+---
+
 ## ナレッジ分類体系
 
 GitHub Discussionsでは、以下のカテゴリで分類します：
@@ -249,5 +277,8 @@ GitHubのDiscussionsはタグ機能が制限的です。代わりに、本文内
 ## 関連リソース
 
 - **親ドキュメント**: [DEPLOYMENT.md](../DEPLOYMENT.md) - 完全なテンプレートと詳細手順
+- **ACE サイクル**: [ace-cycle.md](./ace-cycle.md) - ACE Playbook 更新の具体手順
+- **Playbook テンプレート**: [PLAYBOOK.md](../../08-knowledge/PLAYBOOK.md) - 構造化ナレッジの追記先
+- **ACE フレームワーク概念**: [ACE_FRAMEWORK.md](../../../docs/ACE_FRAMEWORK.md) - ACE の理論的背景
 - **ワークフロー全体**: DEPLOYMENT.md「AI駆動Git Workflow」
 - **GitHub CLI**: [gh discussion](https://cli.github.com/manual/gh_discussion)

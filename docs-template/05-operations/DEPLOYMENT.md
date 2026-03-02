@@ -21,6 +21,7 @@ updated: "YYYY-MM-DD"
 | [devin-pre-pr-review.md](./deployment/devin-pre-pr-review.md) | Devin Pre-PRレビューシステム（5エージェント並列） | ⭐⭐⭐⭐ 2.5th |
 | [automated-code-review.md](./deployment/automated-code-review.md) | 自動コードレビュー（Claude Code + Husky） | ⭐⭐⭐⭐ - |
 | [knowledge-management.md](./deployment/knowledge-management.md) | ナレッジ体系化（マージ後） | ⭐⭐⭐⭐ 3rd |
+| [ace-cycle.md](./deployment/ace-cycle.md) | ACEサイクル（Playbook増分更新） | ⭐⭐⭐⭐ 3.5th |
 | [ai-tools-integration.md](./deployment/ai-tools-integration.md) | AIツール統合設定 | ⭐⭐⭐ - |
 | [ci-cd.md](./deployment/ci-cd.md) | CI/CDパイプライン | ⭐⭐⭐ 4th |
 | [infrastructure.md](./deployment/infrastructure.md) | インフラ構成 | ⭐⭐⭐ - |
@@ -31,7 +32,7 @@ updated: "YYYY-MM-DD"
 ### AI駆動開発の基本フロー
 
 ```
-Issue → Branch → Commit → Self-Review → PR → Review → Merge → Knowledge → Cleanup → Next Task
+Issue → Branch → Commit → Self-Review → PR → Review → Merge → Knowledge (ACE + Discussions) → Cleanup → Next Task
 ```
 
 **詳細**: [deployment/git-workflow.md](./deployment/git-workflow.md)
@@ -68,7 +69,7 @@ Git Flowベースで、**セルフレビュー（PR前）** と **ナレッジ�
 5. **PR作成** - 構造化されたPR本文
 6. **レビュー対応** - **レビュワーへのコメント必須**（修正内容・理由・変更箇所を明記）← [詳細](./deployment/git-workflow.md)
 7. **マージ** - Squash推奨
-8. **ナレッジ体系化** ← [詳細](./deployment/knowledge-management.md)
+8. **ナレッジ体系化** ← [詳細](./deployment/knowledge-management.md) | [ACE Playbook](./deployment/ace-cycle.md)
 9. **クリーンアップ** - ブランチ削除、次タスク
 
 ### 詳細ドキュメント
@@ -212,6 +213,7 @@ PRマージ後のブランチ切り替え忘れを防ぐため、セッション
 | Gitワークフロー全体 | [git-workflow.md](./deployment/git-workflow.md) | 全体 |
 | セルフレビュー方法 | [self-review.md](./deployment/self-review.md) | 全体 |
 | ナレッジ記録方法 | [knowledge-management.md](./deployment/knowledge-management.md) | 全体 |
+| ACE Playbook更新 | [ace-cycle.md](./deployment/ace-cycle.md) | 全体 |
 | PRレビュー対応 | [git-workflow.md](./deployment/git-workflow.md) | ステップ4 |
 | CI/CD設定 | [ci-cd.md](./deployment/ci-cd.md) | GitHub Actions |
 | インフラ構成 | [infrastructure.md](./deployment/infrastructure.md) | Terraform |
