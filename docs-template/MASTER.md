@@ -302,7 +302,7 @@ AIが生成したドキュメント・コードは、以下のタイミングで
 ## AI仕様駆動Git Workflow
 本プロジェクトでは、Git FlowをベースとしたAI開発ツール最適化ワークフローを採用しています。
 
-**基本フロー**: Issue → Branch → Commit → **Self-Review** → PR → Review → Merge → **Knowledge** → Cleanup → Next Task
+**基本フロー**: Issue → Branch → Commit → **Self-Review** → PR → Review → Merge → **Knowledge (ACE + Discussions)** → Cleanup → Next Task
 
 詳細は [DEPLOYMENT.md](./05-operations/DEPLOYMENT.md#1-ai仕様駆動git-workflow) を参照してください。
 
@@ -312,7 +312,7 @@ AIが生成したドキュメント・コードは、以下のタイミングで
 - コミットメッセージにドキュメント参照を含める（例: `docs/MASTER.md:29`）
 - **【重要】PR作成前にセルフレビューを実施** - AIツールを活用してコーディング規約・仕様整合性・テスト充実度を事前確認
 - AIがPRレビュー指摘を自動読み取り・対応
-- **【重要】マージ後にナレッジを体系化** - 得られた知見をGitHub Discussionsに分類・記録し、チーム資産として蓄積
+- **【重要】マージ後にナレッジを体系化** - ACE Playbook に構造化知見を追記（AIツール向け）し、重要な知見は GitHub Discussions にも記録（人間向け）
 - ロードマップ更新と次タスク提案
 
 ## AIへのプロンプト補助（貼り付け用）
@@ -453,6 +453,7 @@ metrics:
 - [08-knowledge/TROUBLESHOOTING.md](./08-knowledge/TROUBLESHOOTING.md) - トラブルシューティング集
 - [08-knowledge/BEST_PRACTICES.md](./08-knowledge/BEST_PRACTICES.md) - ベストプラクティス集
 - [08-knowledge/FAQ.md](./08-knowledge/FAQ.md) - よくある質問と回答
+- [08-knowledge/PLAYBOOK.md](./08-knowledge/PLAYBOOK.md) - ACE Playbook（AIツール向け構造化知見）
 
 ### 開発プロセスガイド
 

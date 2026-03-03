@@ -613,6 +613,21 @@ gh issue comment ${ISSUE_NUM} --body "ナレッジをDiscussionsに登録しま�
 - コード例は最小限かつ実用的に
 - 記録したナレッジはIssueにリンクを残す
 
+#### ACE Playbook 更新（推奨）
+
+GitHub Discussions への記録に加え、ACE Playbook への構造化記録を推奨します。
+
+**ACE サイクル** (Generate → Reflect → Curate):
+1. **Generate**: PR diff・レビューコメントから知見を抽出
+2. **Reflect**: 既存 Playbook エントリとの重複・矛盾を照合
+3. **Curate**: PLAYBOOK.md 末尾にエントリを追記
+
+詳細手順: [ace-cycle.md](./ace-cycle.md)
+
+**ナレッジ記録の使い分け**:
+- **GitHub Discussions**: 人間向けナラティブ（物語的記録）
+- **ACE Playbook**: AIツール向け構造化知見（delta方式）
+
 ## ワークフロー全体のベストプラクティス
 
 ### 1. Issue駆動開発の徹底
