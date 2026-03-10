@@ -7,7 +7,7 @@
 #
 # Env:
 #   SKIP_CODEX_REVIEW=1              Skip review
-#   CODEX_MODEL=gpt-5.3-codex        Override model (default: gpt-5.3-codex)
+#   CODEX_MODEL=gpt-5.4        Override model (default: gpt-5.4)
 #   REVIEW_BASE_BRANCH=main          Override base branch for --branch mode (default: develop)
 #   REVIEW_TIMEOUT_SEC=600           Max seconds per reviewer (default: 600)
 
@@ -35,7 +35,7 @@ if ! command -v codex &> /dev/null; then
 fi
 
 # Configuration
-CODEX_MODEL="${CODEX_MODEL:-gpt-5.3-codex}"
+CODEX_MODEL="${CODEX_MODEL:-gpt-5.4}"
 REVIEW_TIMEOUT_SEC="${REVIEW_TIMEOUT_SEC:-600}"
 
 # Define CLI invocation (called by run_all_reviewers)
