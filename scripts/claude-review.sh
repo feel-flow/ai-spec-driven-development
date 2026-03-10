@@ -4,6 +4,7 @@
 #
 # Env:
 #   SKIP_CLAUDE_REVIEW=1     Skip review
+#   REQUIRE_CLAUDE_REVIEW=1  Hard fail if claude CLI not found (default: soft skip)
 #   CLAUDECODE=<set>         Auto-set by Claude Code; skips CLI review when present
 #   CLAUDE_MODEL=<model>     Override model (default: auto)
 #   REVIEW_BASE_BRANCH=main  Override base branch for --branch mode (default: develop)
@@ -21,6 +22,11 @@ done
 source "$SCRIPT_DIR/review-prompts.sh"
 source "$SCRIPT_DIR/review-common.sh"
 
+if [ "$SKIP_CLAUDE_REVIEW" = "1" ] && [ "${REQUIRE_CLAUDE_REVIEW:-0}" = "1" ]; then
+    echo -e "${RED}ERROR: SKIP_CLAUDE_REVIEW and REQUIRE_CLAUDE_REVIEW cannot both be set${NC}" >&2
+    exit 2
+fi
+
 if [ "$SKIP_CLAUDE_REVIEW" = "1" ]; then
     echo -e "${YELLOW}Skipping Claude review (SKIP_CLAUDE_REVIEW=1)${NC}"
     exit 0
@@ -36,8 +42,13 @@ fi
 if ! command -v claude &> /dev/null; then
     echo -e "${YELLOW}Warning: claude CLI not found, skipping review${NC}"
     echo -e "${YELLOW}Install: https://docs.anthropic.com/en/docs/claude-code${NC}"
+    if [ "${REQUIRE_CLAUDE_REVIEW:-0}" = "1" ]; then
+        echo -e "${RED}ERROR: REQUIRE_CLAUDE_REVIEW=1 but claude not found${NC}" >&2
+        exit 2
+    fi
     exit 0
 fi
+
 
 # Configuration
 CLAUDE_MODEL="${CLAUDE_MODEL:-}"
@@ -55,8 +66,16 @@ invoke_cli() {
         cmd=(claude -p "$prompt" --allowedTools "Read,Grep,Glob")
     fi
 
+    # Resolve timeout command (GNU timeout or macOS gtimeout)
+    local timeout_cmd=""
     if command -v timeout &>/dev/null; then
-        timeout "$REVIEW_TIMEOUT_SEC" "${cmd[@]}" < "$DIFF_FILE" > "$output" 2>&1
+        timeout_cmd="timeout"
+    elif command -v gtimeout &>/dev/null; then
+        timeout_cmd="gtimeout"
+    fi
+
+    if [ -n "$timeout_cmd" ]; then
+        "$timeout_cmd" "$REVIEW_TIMEOUT_SEC" "${cmd[@]}" < "$DIFF_FILE" > "$output" 2>&1
     else
         echo -e "${YELLOW}Warning: 'timeout' command not found. No timeout protection.${NC}" >&2
         "${cmd[@]}" < "$DIFF_FILE" > "$output" 2>&1
@@ -64,8 +83,8 @@ invoke_cli() {
 }
 
 # Prepare diff (pass through any mode argument: --staged, --branch)
-prepare_diff "$@"
-rc=$?
+rc=0
+prepare_diff "$@" || rc=$?
 if [ "$rc" -eq 1 ]; then
     exit 0  # Nothing to review
 elif [ "$rc" -ne 0 ]; then

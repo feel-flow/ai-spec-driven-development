@@ -143,7 +143,15 @@ _check_diff_size() {
     diff_lines=$(wc -l < "$DIFF_FILE")
 
     if [ "$diff_lines" -gt "$MAX_DIFF_LINES" ]; then
-        echo -e "${YELLOW}Warning: Large diff ($diff_lines lines). Consider breaking into smaller commits.${NC}"
+        echo ""
+        echo -e "${RED}╔══════════════════════════════════════════════════════════╗${NC}"
+        echo -e "${RED}║  ⚠  LARGE DIFF WARNING: ${diff_lines} lines (max: ${MAX_DIFF_LINES})${NC}"
+        echo -e "${RED}║  Diff truncated to ${MAX_DIFF_LINES} lines for review.${NC}"
+        echo -e "${RED}║  Consider breaking into smaller commits for full coverage.${NC}"
+        echo -e "${RED}╚══════════════════════════════════════════════════════════╝${NC}"
+        echo ""
+        # Truncate diff to MAX_DIFF_LINES (use tmp file to avoid $() stripping trailing newlines)
+        head -n "$MAX_DIFF_LINES" "$DIFF_FILE" > "${DIFF_FILE}.tmp" && mv "${DIFF_FILE}.tmp" "$DIFF_FILE"
     fi
 }
 
@@ -189,21 +197,41 @@ run_all_reviewers() {
 }
 
 _run_single_reviewer() {
-    set -e
     local name=$1
     local output="$TEMP_DIR/${name}.md"
+    local stderr_file="$TEMP_DIR/${name}.stderr"
+    local verdict_file="$TEMP_DIR/${name}.verdict"
     local prompt
 
     if ! prompt=$(get_prompt "$name"); then
-        echo "ERROR" > "$TEMP_DIR/${name}.verdict"
+        echo "ERROR" > "$verdict_file"
         echo "Unknown reviewer: $name" > "$output"
         return
     fi
 
     local exit_status=0
-    invoke_cli "$prompt" "$output" || exit_status=$?
+    invoke_cli "$prompt" "$output" 2>"$stderr_file" || exit_status=$?
 
-    parse_verdict "$exit_status" "$output" "$TEMP_DIR/${name}.verdict"
+    # Detect timeout (exit code 124 from `timeout` command)
+    if [ "$exit_status" -eq 124 ]; then
+        echo "TIMEOUT" > "$verdict_file"
+        echo "Reviewer timed out after ${REVIEW_TIMEOUT_SEC:-600}s. Consider increasing REVIEW_TIMEOUT_SEC or reducing the diff." > "$output"
+        if [ -s "$stderr_file" ]; then
+            echo "" >> "$output"
+            echo "--- stderr ---" >> "$output"
+            cat "$stderr_file" >> "$output"
+        fi
+        return
+    fi
+
+    # Append stderr to output on failure for debugging
+    if [ "$exit_status" -ne 0 ] && [ -s "$stderr_file" ]; then
+        echo "" >> "$output"
+        echo "--- stderr ---" >> "$output"
+        cat "$stderr_file" >> "$output"
+    fi
+
+    parse_verdict "$exit_status" "$output" "$verdict_file" || true
 }
 
 # Display results table and return overall verdict
@@ -235,6 +263,8 @@ display_results() {
             verdict_text="✓ PASS"; verdict_color="$GREEN"
         elif [ "$verdict" = "FAIL" ]; then
             verdict_text="✗ FAIL"; verdict_color="$RED"; overall_pass=false
+        elif [ "$verdict" = "TIMEOUT" ]; then
+            verdict_text="⏱ TIMEOUT"; verdict_color="$YELLOW"; overall_pass=false
         else
             verdict_text="? ERROR"; verdict_color="$YELLOW"; overall_pass=false
         fi
@@ -265,7 +295,7 @@ display_results() {
 
         if [ -f "$verdict_file" ]; then
             local v=$(<"$verdict_file")
-            if [ "$v" = "FAIL" ] || [ "$v" = "ERROR" ]; then
+            if [ "$v" = "FAIL" ] || [ "$v" = "ERROR" ] || [ "$v" = "TIMEOUT" ]; then
                 echo -e "${RED}━━━ ${reviewer} Details ━━━${NC}"
                 if [ -f "$output_file" ]; then
                     cat "$output_file"
