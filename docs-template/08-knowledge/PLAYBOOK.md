@@ -1,11 +1,11 @@
 ---
 title: "PLAYBOOK"
-version: "1.0.0"
-status: "draft"
-created: "YYYY-MM-DD"
-updated: "YYYY-MM-DD"
-owner: "@your-github-handle"
-ace_entry_count: 0
+version: "1.1.0"
+status: "active"
+created: "2026-03-10"
+updated: "2026-03-10"
+owner: "@fffokazaki"
+ace_entry_count: 3
 tags: [ace, playbook, knowledge-management]
 references:
   - docs/ACE_FRAMEWORK.md
@@ -168,11 +168,72 @@ Playbook が 800 行を超えた場合、以下のように分割する：
 **Action**: 一覧取得時は `include` オプションで関連を一括取得する。`findMany({ include: { organization: true } })`
 -->
 
-（まだエントリはありません。最初の ACE サイクル実行後にここにエントリが追記されます。）
+### ACE-001: クロスモデルレビューは単一AIモデルでは検出できない問題を発見する
+
+| フィールド | 値 |
+|-----------|---|
+| Category | process |
+| Origin | PR #316 / PR #319 |
+| Date | 2026-03-10 |
+| Helpful | 0 |
+| Harmful | 0 |
+| Status | active |
+
+**Insight**: 異なるAIモデル（Claude/Codex/Gemini/CodeRabbit）は異なるカテゴリの問題を検出する。単一モデルのレビューでは見落とされる問題が、クロスモデルレビューで発見される。
+
+**Context**: PR #316（ドキュメント）では Claude がリンク切れ、Codex が実行可能性、Gemini Bot がパッケージスコープ、CodeRabbit が公式数値不一致を検出。PR #319（スクリプト）では Codex が CRITICAL_BLOCK 誤検出バグを発見し、Claude の silent-failure-hunter が stderr 握りつぶし問題を検出。いずれも単一モデルでは検出されなかった。
+
+**Action**: PR作成前のセルフレビューでは、`pr-review-toolkit`（Claude系サブエージェント）と `codex review --base develop`（GPT系クロスモデル）の両方を実行する。Bot系レビュー（Gemini Code Assist, CodeRabbit）がある場合はその指摘も確認する。
+
+---
+
+### ACE-002: CLIフラグは実機の --help 出力と照合が必須
+
+| フィールド | 値 |
+|-----------|---|
+| Category | tooling |
+| Origin | PR #316 / Issue #315 |
+| Date | 2026-03-10 |
+| Helpful | 0 |
+| Harmful | 0 |
+| Status | active |
+
+**Insight**: Web検索やAI生成の情報だけでは CLI フラグの正確性は保証されない。`codex -p` は存在せず `codex exec` が正解、Copilot `-s` は sandbox ではなく `--silent`、Cursor `-p` は boolean フラグでプロンプトは positional 引数など、実機確認しなければ分からない差異が多い。
+
+**Context**: Multi-CLI Review ドキュメント作成時に5つのAI CLIのフラグを調査。Web検索とAI生成の情報を信じてドキュメント化したが、セルフレビューと実機テストで複数の誤りが発覚。特に Codex CLI は `-p` フラグが存在しないにもかかわらず、Web上の古い情報では `-p` が使われていた。
+
+**Action**: CLI ツールのフラグを記述する際は、(1) `command --help` で実機確認、(2) 公式リポジトリの README/docs と照合、(3) 可能なら `--dry-run` 等で動作確認、の3ステップを必ず実施する。
+
+---
+
+### ACE-003: bash スクリプトは macOS デフォルト環境（bash 3.2）でテストする
+
+| フィールド | 値 |
+|-----------|---|
+| Category | devops |
+| Origin | PR #319 / Issue #317 |
+| Date | 2026-03-10 |
+| Helpful | 0 |
+| Harmful | 0 |
+| Status | active |
+
+**Insight**: macOS のデフォルト bash は 3.2（GPLv2 ライセンス制約）であり、`declare -A`（連想配列）、`head -n -1`（GNU拡張）、`timeout` コマンドなどが使えない。CI環境（Linux, bash 5.x）では動くが macOS では動かないスクリプトが生まれやすい。
+
+**Context**: `multi-review.sh` を連想配列ベースで実装したところ、macOS の bash 3.2 で `declare -A: invalid option` エラーが発生。関数ベースのルックアップに書き直し、`head -n -1` を `sed` に変更、`timeout` を kill ベースフォールバックに変更して解決。
+
+**Action**: bash スクリプトの移植性を確保するには、(1) 連想配列の代わりに case 文/関数ルックアップを使用、(2) GNU 拡張コマンドには POSIX 互換フォールバックを用意、(3) macOS のデフォルト環境で `--dry-run` テストを実施する。shebang は `#!/usr/bin/env bash` のまま、bash 3.2+ 互換コードを書く。
 
 ---
 
 ## Changelog
+
+### [1.1.0] - 2026-03-10
+
+#### 追加
+- ACE-001: クロスモデルレビューの検出パターン差異
+- ACE-002: CLIフラグの実機確認必須ルール
+- ACE-003: bash 3.2 macOS互換性の知見
+- GitHub Discussion #320 にナラティブ版を投稿
 
 ### [1.0.0] - YYYY-MM-DD
 
