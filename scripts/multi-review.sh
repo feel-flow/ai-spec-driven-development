@@ -5,6 +5,8 @@
 # Orchestrates 5 AI CLIs (Claude Code, Codex, Copilot, Gemini, Cursor)
 # as code reviewers using tool-agnostic perspectives.
 #
+# Compatible with bash 3.2+ (macOS default).
+#
 # Usage:
 #   bash scripts/multi-review.sh [options]
 #
@@ -20,6 +22,7 @@
 #   --base <branch>         Base branch for diff (default: develop)
 #   --delegate-toolkit      Delegate pr-review-toolkit perspectives
 #   --dry-run               Show plan without executing
+#   --timeout <seconds>     Timeout per CLI (default: 300)
 #   --help                  Show this help
 #
 # Entry Points:
@@ -36,6 +39,66 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 
+# ── All known CLI names ──
+ALL_CLIS="claude-code codex-cli copilot-cli gemini-cli cursor-cli"
+
+# ── Lookup Functions (bash 3.2 compatible — no associative arrays) ──
+
+get_cli_command() {
+  case "$1" in
+    claude-code) echo "claude" ;;
+    codex-cli)   echo "codex" ;;
+    copilot-cli) echo "copilot" ;;
+    gemini-cli)  echo "gemini" ;;
+    cursor-cli)  echo "cursor-agent" ;;
+    *) echo "" ;;
+  esac
+}
+
+get_cli_adapter() {
+  case "$1" in
+    claude-code) echo "${SCRIPT_DIR}/adapters/claude-code-adapter.sh" ;;
+    codex-cli)   echo "${SCRIPT_DIR}/adapters/codex-cli-adapter.sh" ;;
+    copilot-cli) echo "${SCRIPT_DIR}/adapters/copilot-cli-adapter.sh" ;;
+    gemini-cli)  echo "${SCRIPT_DIR}/adapters/gemini-cli-adapter.sh" ;;
+    cursor-cli)  echo "${SCRIPT_DIR}/adapters/cursor-cli-adapter.sh" ;;
+    *) echo "" ;;
+  esac
+}
+
+get_cli_perspectives() {
+  case "$1" in
+    claude-code) echo "type-design-analysis" ;;
+    codex-cli)   echo "code-review error-handler-hunt" ;;
+    copilot-cli) echo "test-analysis comment-analysis" ;;
+    gemini-cli)  echo "security-analysis" ;;
+    cursor-cli)  echo "code-simplification" ;;
+    *) echo "" ;;
+  esac
+}
+
+get_cli_fallback() {
+  case "$1" in
+    claude-code) echo "codex-cli" ;;
+    codex-cli)   echo "copilot-cli" ;;
+    copilot-cli) echo "codex-cli" ;;
+    gemini-cli)  echo "copilot-cli" ;;
+    cursor-cli)  echo "copilot-cli" ;;
+    *) echo "" ;;
+  esac
+}
+
+get_cli_cost_tier() {
+  case "$1" in
+    claude-code) echo "premium" ;;
+    codex-cli)   echo "standard" ;;
+    copilot-cli) echo "flat-rate" ;;
+    gemini-cli)  echo "free-tier" ;;
+    cursor-cli)  echo "flat-rate" ;;
+    *) echo "unknown" ;;
+  esac
+}
+
 # ── Defaults ──
 CONFIG_FILE="${SCRIPT_DIR}/review-config.yaml"
 MODE="distributed"
@@ -47,58 +110,29 @@ DELEGATE_TOOLKIT=false
 DRY_RUN=false
 TIMEOUT="${REVIEW_TIMEOUT:-300}"
 
-# Repeatable filter arrays
-declare -a CLI_FILTER=()
-declare -a PERSPECTIVE_FILTER=()
+# Space-separated filter lists (bash 3.2 compatible)
+CLI_FILTER=""
+PERSPECTIVE_FILTER=""
 
-# ── CLI-to-Adapter Mapping ──
-declare -A CLI_ADAPTERS=(
-  [claude-code]="${SCRIPT_DIR}/adapters/claude-code-adapter.sh"
-  [codex-cli]="${SCRIPT_DIR}/adapters/codex-cli-adapter.sh"
-  [copilot-cli]="${SCRIPT_DIR}/adapters/copilot-cli-adapter.sh"
-  [gemini-cli]="${SCRIPT_DIR}/adapters/gemini-cli-adapter.sh"
-  [cursor-cli]="${SCRIPT_DIR}/adapters/cursor-cli-adapter.sh"
-)
+# Detected available CLIs (space-separated)
+AVAILABLE_CLIS=""
 
-# ── CLI-to-Command Mapping ──
-declare -A CLI_COMMANDS=(
-  [claude-code]="claude"
-  [codex-cli]="codex"
-  [copilot-cli]="copilot"
-  [gemini-cli]="gemini"
-  [cursor-cli]="cursor-agent"
-)
+# Execution plan: CLI_NAME:PERSPECTIVE pairs (newline-separated)
+EXECUTION_PLAN=""
 
-# ── Default Perspective Assignments ──
-declare -A CLI_PERSPECTIVES=(
-  [claude-code]="type-design-analysis"
-  [codex-cli]="code-review error-handler-hunt"
-  [copilot-cli]="test-analysis comment-analysis"
-  [gemini-cli]="security-analysis"
-  [cursor-cli]="code-simplification"
-)
+# ── Utility ──
 
-# ── Fallback Chain ──
-declare -A FALLBACK=(
-  [claude-code]="codex-cli"
-  [codex-cli]="copilot-cli"
-  [copilot-cli]="codex-cli"
-  [gemini-cli]="copilot-cli"
-  [cursor-cli]="copilot-cli"
-)
-
-# ── Cost Tiers ──
-declare -A COST_TIERS=(
-  [claude-code]="premium"
-  [codex-cli]="standard"
-  [copilot-cli]="flat-rate"
-  [gemini-cli]="free-tier"
-  [cursor-cli]="flat-rate"
-)
+list_contains() {
+  local list="$1" item="$2"
+  for i in $list; do
+    [[ "$i" == "$item" ]] && return 0
+  done
+  return 1
+}
 
 # ── Usage ──
 show_help() {
-  sed -n '/^# Usage:/,/^# ──/p' "$0" | head -n -1 | sed 's/^# //' | sed 's/^#//'
+  sed -n '/^# Usage:/,/^# See:/p' "$0" | head -n -1 | sed 's/^# //' | sed 's/^#//'
   exit 0
 }
 
@@ -109,8 +143,8 @@ parse_args() {
       --config)      CONFIG_FILE="$2"; shift 2 ;;
       --mode)        MODE="$2"; shift 2 ;;
       --strategy)    STRATEGY="$2"; shift 2 ;;
-      --cli)         CLI_FILTER+=("$2"); shift 2 ;;
-      --perspective) PERSPECTIVE_FILTER+=("$2"); shift 2 ;;
+      --cli)         CLI_FILTER="${CLI_FILTER:+$CLI_FILTER }$2"; shift 2 ;;
+      --perspective) PERSPECTIVE_FILTER="${PERSPECTIVE_FILTER:+$PERSPECTIVE_FILTER }$2"; shift 2 ;;
       --parallel)    PARALLEL=true; shift ;;
       --sequential)  PARALLEL=false; shift ;;
       --output-dir)  OUTPUT_DIR="$2"; shift 2 ;;
@@ -128,49 +162,51 @@ parse_args() {
   done
 }
 
-# ── Config Loading (lightweight YAML parser) ──
+# ── Config Loading ──
 load_config() {
   if [[ ! -f "$CONFIG_FILE" ]]; then
     echo "⚠️  Config file not found: $CONFIG_FILE (using defaults)" >&2
     return 0
   fi
 
-  # Try yq first, fall back to grep/sed
   if command -v yq &>/dev/null; then
-    local cfg_mode cfg_parallel cfg_strategy cfg_timeout cfg_output
-    cfg_mode=$(yq -r '.mode // empty' "$CONFIG_FILE" 2>/dev/null || true)
-    cfg_parallel=$(yq -r '.parallel // empty' "$CONFIG_FILE" 2>/dev/null || true)
-    cfg_strategy=$(yq -r '.cost_strategy // empty' "$CONFIG_FILE" 2>/dev/null || true)
-    cfg_timeout=$(yq -r '.timeout // empty' "$CONFIG_FILE" 2>/dev/null || true)
-    cfg_output=$(yq -r '.output_dir // empty' "$CONFIG_FILE" 2>/dev/null || true)
+    local cfg_val
+    cfg_val=$(yq -r '.mode // empty' "$CONFIG_FILE" 2>/dev/null || true)
+    [[ -n "$cfg_val" ]] && MODE="$cfg_val"
 
-    [[ -n "$cfg_mode" ]] && MODE="$cfg_mode"
-    [[ "$cfg_parallel" == "true" ]] && PARALLEL=true
-    [[ "$cfg_parallel" == "false" ]] && PARALLEL=false
-    [[ -n "$cfg_strategy" ]] && STRATEGY="$cfg_strategy"
-    [[ -n "$cfg_timeout" ]] && TIMEOUT="$cfg_timeout"
-    [[ -n "$cfg_output" ]] && OUTPUT_DIR="${REPO_ROOT}/${cfg_output}"
+    cfg_val=$(yq -r '.parallel // empty' "$CONFIG_FILE" 2>/dev/null || true)
+    [[ "$cfg_val" == "true" ]] && PARALLEL=true
+    [[ "$cfg_val" == "false" ]] && PARALLEL=false
+
+    cfg_val=$(yq -r '.cost_strategy // empty' "$CONFIG_FILE" 2>/dev/null || true)
+    [[ -n "$cfg_val" ]] && STRATEGY="$cfg_val"
+
+    cfg_val=$(yq -r '.timeout // empty' "$CONFIG_FILE" 2>/dev/null || true)
+    [[ -n "$cfg_val" ]] && TIMEOUT="$cfg_val"
+
+    cfg_val=$(yq -r '.output_dir // empty' "$CONFIG_FILE" 2>/dev/null || true)
+    [[ -n "$cfg_val" ]] && OUTPUT_DIR="${REPO_ROOT}/${cfg_val}"
   else
-    echo "ℹ️  yq not found — using defaults from script. Install yq for config file support." >&2
+    echo "ℹ️  yq not found — using defaults. Install yq for config file support." >&2
   fi
 }
 
 # ── CLI Detection ──
 detect_available_clis() {
+  AVAILABLE_CLIS=""
   local cli_name cmd
-  declare -gA AVAILABLE_CLIS=()
 
-  for cli_name in "${!CLI_COMMANDS[@]}"; do
-    cmd="${CLI_COMMANDS[$cli_name]}"
+  for cli_name in $ALL_CLIS; do
+    cmd="$(get_cli_command "$cli_name")"
     if command -v "$cmd" &>/dev/null; then
-      AVAILABLE_CLIS[$cli_name]=1
+      AVAILABLE_CLIS="${AVAILABLE_CLIS:+$AVAILABLE_CLIS }$cli_name"
       echo "  ✅ ${cli_name} (${cmd})" >&2
     else
       echo "  ❌ ${cli_name} (${cmd}) — not installed" >&2
     fi
   done
 
-  if [[ ${#AVAILABLE_CLIS[@]} -eq 0 ]]; then
+  if [[ -z "$AVAILABLE_CLIS" ]]; then
     echo "" >&2
     echo "ERROR: No AI CLIs are installed. Install at least one:" >&2
     echo "  npm install -g @anthropic-ai/claude-code" >&2
@@ -180,93 +216,87 @@ detect_available_clis() {
   fi
 }
 
-# ── Fallback Redistribution ──
-redistribute_perspectives() {
-  local cli_name perspectives fallback_target
-  declare -gA EXECUTION_PLAN=()
+# ── Add to Execution Plan ──
+# Format: "cli_name:perspective" per line
+add_to_plan() {
+  local cli_name="$1" perspective="$2"
+  EXECUTION_PLAN="${EXECUTION_PLAN:+$EXECUTION_PLAN
+}${cli_name}:${perspective}"
+}
 
-  for cli_name in "${!CLI_PERSPECTIVES[@]}"; do
-    perspectives="${CLI_PERSPECTIVES[$cli_name]}"
+# ── Build Execution Plan (distributed mode) ──
+build_distributed_plan() {
+  EXECUTION_PLAN=""
+  local cli_name perspectives fallback_target
+
+  for cli_name in $ALL_CLIS; do
+    perspectives="$(get_cli_perspectives "$cli_name")"
 
     # Apply CLI filter
-    if [[ ${#CLI_FILTER[@]} -gt 0 ]]; then
-      local in_filter=false
-      for f in "${CLI_FILTER[@]}"; do
-        [[ "$f" == "$cli_name" ]] && in_filter=true
-      done
-      if [[ "$in_filter" == "false" ]]; then
-        continue
-      fi
+    if [[ -n "$CLI_FILTER" ]] && ! list_contains "$CLI_FILTER" "$cli_name"; then
+      continue
     fi
 
-    if [[ -n "${AVAILABLE_CLIS[$cli_name]+x}" ]]; then
-      # CLI is available — assign directly
-      EXECUTION_PLAN[$cli_name]="$perspectives"
+    if list_contains "$AVAILABLE_CLIS" "$cli_name"; then
+      # CLI available — assign directly
+      for p in $perspectives; do
+        # Apply perspective filter
+        if [[ -n "$PERSPECTIVE_FILTER" ]] && ! list_contains "$PERSPECTIVE_FILTER" "$p"; then
+          continue
+        fi
+        add_to_plan "$cli_name" "$p"
+      done
     else
       # CLI unavailable — redistribute to fallback
-      fallback_target="${FALLBACK[$cli_name]:-}"
-      if [[ -n "$fallback_target" && -n "${AVAILABLE_CLIS[$fallback_target]+x}" ]]; then
+      fallback_target="$(get_cli_fallback "$cli_name")"
+      if [[ -n "$fallback_target" ]] && list_contains "$AVAILABLE_CLIS" "$fallback_target"; then
         echo "  ↪ ${cli_name} → ${fallback_target} (fallback)" >&2
-        local existing="${EXECUTION_PLAN[$fallback_target]:-}"
-        EXECUTION_PLAN[$fallback_target]="${existing:+$existing }${perspectives}"
+        for p in $perspectives; do
+          if [[ -n "$PERSPECTIVE_FILTER" ]] && ! list_contains "$PERSPECTIVE_FILTER" "$p"; then
+            continue
+          fi
+          add_to_plan "$fallback_target" "$p"
+        done
       else
         echo "  ⚠️  ${cli_name}: No fallback available. Skipping: ${perspectives}" >&2
       fi
     fi
   done
 
-  # Apply perspective filter
-  if [[ ${#PERSPECTIVE_FILTER[@]} -gt 0 ]]; then
-    for cli_name in "${!EXECUTION_PLAN[@]}"; do
-      local filtered_perspectives=""
-      for p in ${EXECUTION_PLAN[$cli_name]}; do
-        for pf in "${PERSPECTIVE_FILTER[@]}"; do
-          if [[ "$p" == "$pf" ]]; then
-            filtered_perspectives="${filtered_perspectives:+$filtered_perspectives }${p}"
-          fi
-        done
-      done
-      if [[ -n "$filtered_perspectives" ]]; then
-        EXECUTION_PLAN[$cli_name]="$filtered_perspectives"
-      else
-        unset "EXECUTION_PLAN[$cli_name]"
-      fi
-    done
-  fi
-
-  # Apply cost strategy adjustments
+  # Apply cost strategy: minimize_cost moves premium → flat-rate
   if [[ "$STRATEGY" == "minimize_cost" ]]; then
-    # Move premium CLI perspectives to flat-rate/free-tier when possible
-    if [[ -n "${EXECUTION_PLAN[claude-code]+x}" && -n "${AVAILABLE_CLIS[copilot-cli]+x}" ]]; then
-      local claude_p="${EXECUTION_PLAN[claude-code]}"
-      local copilot_p="${EXECUTION_PLAN[copilot-cli]:-}"
-      EXECUTION_PLAN[copilot-cli]="${copilot_p:+$copilot_p }${claude_p}"
-      unset "EXECUTION_PLAN[claude-code]"
-      echo "  💰 minimize_cost: claude-code → copilot-cli" >&2
-    fi
+    local new_plan=""
+    while IFS= read -r entry; do
+      [[ -z "$entry" ]] && continue
+      local cli="${entry%%:*}"
+      local persp="${entry#*:}"
+      if [[ "$cli" == "claude-code" ]] && list_contains "$AVAILABLE_CLIS" "copilot-cli"; then
+        echo "  💰 minimize_cost: ${persp}: claude-code → copilot-cli" >&2
+        new_plan="${new_plan:+$new_plan
+}copilot-cli:${persp}"
+      else
+        new_plan="${new_plan:+$new_plan
+}${entry}"
+      fi
+    done <<< "$EXECUTION_PLAN"
+    EXECUTION_PLAN="$new_plan"
   fi
 }
 
-# ── Cross-Model Mode ──
-setup_cross_model() {
-  if [[ "$MODE" != "cross-model" ]]; then
-    return 0
-  fi
+# ── Build Execution Plan (cross-model mode) ──
+build_cross_model_plan() {
+  EXECUTION_PLAN=""
+  local perspective="${PERSPECTIVE_FILTER:-code-review}"
+  # Take first perspective if multiple specified
+  perspective="${perspective%% *}"
 
-  local perspective="${PERSPECTIVE_FILTER[0]:-code-review}"
   echo "  🔄 Cross-model mode: all CLIs run '${perspective}'" >&2
 
-  declare -gA EXECUTION_PLAN=()
-  for cli_name in "${!AVAILABLE_CLIS[@]}"; do
-    # Apply CLI filter
-    if [[ ${#CLI_FILTER[@]} -gt 0 ]]; then
-      local in_filter=false
-      for f in "${CLI_FILTER[@]}"; do
-        [[ "$f" == "$cli_name" ]] && in_filter=true
-      done
-      [[ "$in_filter" == "false" ]] && continue
+  for cli_name in $AVAILABLE_CLIS; do
+    if [[ -n "$CLI_FILTER" ]] && ! list_contains "$CLI_FILTER" "$cli_name"; then
+      continue
     fi
-    EXECUTION_PLAN[$cli_name]="$perspective"
+    add_to_plan "$cli_name" "$perspective"
   done
 }
 
@@ -281,18 +311,24 @@ show_plan() {
   echo "   Base branch: ${BASE_BRANCH}" >&2
   echo "" >&2
 
-  if [[ ${#EXECUTION_PLAN[@]} -eq 0 ]]; then
+  if [[ -z "$EXECUTION_PLAN" ]]; then
     echo "   ⚠️  No CLIs/perspectives to execute." >&2
     return
   fi
 
-  for cli_name in "${!EXECUTION_PLAN[@]}"; do
-    local tier="${COST_TIERS[$cli_name]:-unknown}"
-    echo "   ${cli_name} [${tier}]:" >&2
-    for p in ${EXECUTION_PLAN[$cli_name]}; do
-      echo "     - ${p}" >&2
-    done
-  done
+  local current_cli=""
+  while IFS= read -r entry; do
+    [[ -z "$entry" ]] && continue
+    local cli="${entry%%:*}"
+    local persp="${entry#*:}"
+    if [[ "$cli" != "$current_cli" ]]; then
+      current_cli="$cli"
+      local tier
+      tier="$(get_cli_cost_tier "$cli")"
+      echo "   ${cli} [${tier}]:" >&2
+    fi
+    echo "     - ${persp}" >&2
+  done <<< "$EXECUTION_PLAN"
   echo "" >&2
 }
 
@@ -301,7 +337,8 @@ run_single_review() {
   local cli_name="$1"
   local perspective="$2"
 
-  local adapter="${CLI_ADAPTERS[$cli_name]}"
+  local adapter
+  adapter="$(get_cli_adapter "$cli_name")"
   local perspective_file="${SCRIPT_DIR}/perspectives/${perspective}.md"
   local output_file="${OUTPUT_DIR}/${cli_name}/${perspective}.md"
 
@@ -322,42 +359,51 @@ run_single_review() {
 
 # ── Execute All Reviews ──
 execute_reviews() {
-  if [[ ${#EXECUTION_PLAN[@]} -eq 0 ]]; then
+  if [[ -z "$EXECUTION_PLAN" ]]; then
     echo "Nothing to execute." >&2
     return 0
   fi
 
   mkdir -p "$OUTPUT_DIR"
 
-  local pids=()
-  local tasks=()
+  local pids=""
+  local tasks=""
   local failed=0
+  local count=0
 
-  for cli_name in "${!EXECUTION_PLAN[@]}"; do
-    for perspective in ${EXECUTION_PLAN[$cli_name]}; do
-      if [[ "$PARALLEL" == "true" ]]; then
-        run_single_review "$cli_name" "$perspective" &
-        pids+=($!)
-        tasks+=("${cli_name}/${perspective}")
-      else
-        echo "▶ ${cli_name} → ${perspective}" >&2
-        if ! run_single_review "$cli_name" "$perspective"; then
-          ((failed++))
-          echo "  ❌ Failed: ${cli_name}/${perspective}" >&2
-        fi
+  while IFS= read -r entry; do
+    [[ -z "$entry" ]] && continue
+    local cli="${entry%%:*}"
+    local persp="${entry#*:}"
+
+    if [[ "$PARALLEL" == "true" ]]; then
+      run_single_review "$cli" "$persp" &
+      pids="${pids:+$pids }$!"
+      tasks="${tasks:+$tasks|}${cli}/${persp}"
+      count=$((count + 1))
+    else
+      echo "▶ ${cli} → ${persp}" >&2
+      if ! run_single_review "$cli" "$persp"; then
+        failed=$((failed + 1))
+        echo "  ❌ Failed: ${cli}/${persp}" >&2
       fi
-    done
-  done
+    fi
+  done <<< "$EXECUTION_PLAN"
 
   # Wait for parallel tasks
-  if [[ "$PARALLEL" == "true" && ${#pids[@]} -gt 0 ]]; then
-    echo "⏳ Waiting for ${#pids[@]} parallel reviews..." >&2
-    for i in "${!pids[@]}"; do
-      if ! wait "${pids[$i]}"; then
-        ((failed++))
-        echo "  ❌ Failed: ${tasks[$i]}" >&2
+  if [[ "$PARALLEL" == "true" && -n "$pids" ]]; then
+    echo "⏳ Waiting for ${count} parallel reviews..." >&2
+    local idx=0
+    for pid in $pids; do
+      idx=$((idx + 1))
+      # Extract task name by index
+      local task_name
+      task_name="$(echo "$tasks" | cut -d'|' -f"$idx")"
+      if wait "$pid"; then
+        echo "  ✅ Done: ${task_name}" >&2
       else
-        echo "  ✅ Done: ${tasks[$i]}" >&2
+        failed=$((failed + 1))
+        echo "  ❌ Failed: ${task_name}" >&2
       fi
     done
   fi
@@ -390,11 +436,9 @@ HEADER
 
   local has_results=false
 
-  for cli_name in "${!EXECUTION_PLAN[@]}"; do
+  for cli_name in $ALL_CLIS; do
     local cli_dir="${OUTPUT_DIR}/${cli_name}"
-    if [[ ! -d "$cli_dir" ]]; then
-      continue
-    fi
+    [[ -d "$cli_dir" ]] || continue
 
     for result_file in "${cli_dir}"/*.md; do
       [[ -f "$result_file" ]] || continue
@@ -402,17 +446,18 @@ HEADER
 
       local perspective_name
       perspective_name="$(basename "$result_file" .md)"
-      local tier="${COST_TIERS[$cli_name]:-unknown}"
+      local tier
+      tier="$(get_cli_cost_tier "$cli_name")"
 
-      cat >> "$report_file" <<SECTION
-
-## ${cli_name} — ${perspective_name} [${tier}]
-
-$(cat "$result_file")
-
----
-
-SECTION
+      {
+        echo ""
+        echo "## ${cli_name} — ${perspective_name} [${tier}]"
+        echo ""
+        cat "$result_file"
+        echo ""
+        echo "---"
+        echo ""
+      } >> "$report_file"
     done
   done
 
@@ -424,7 +469,7 @@ SECTION
   if grep -q "Critical" "$report_file" 2>/dev/null; then
     echo "" >> "$report_file"
     echo "<!-- CRITICAL_BLOCK -->" >> "$report_file"
-    echo "⚠️  Critical issues detected. Review before proceeding." >> "$report_file"
+    echo "Critical issues detected. Review before proceeding." >> "$report_file"
   fi
 
   echo "📄 Report: ${report_file}" >&2
@@ -446,9 +491,9 @@ main() {
   echo "📊 Building execution plan..." >&2
 
   if [[ "$MODE" == "cross-model" ]]; then
-    setup_cross_model
+    build_cross_model_plan
   else
-    redistribute_perspectives
+    build_distributed_plan
   fi
 
   show_plan
