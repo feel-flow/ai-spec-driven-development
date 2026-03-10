@@ -176,6 +176,8 @@ git commit -m "feat: 新機能を追加"
 5つのAI CLI（Claude Code、Codex、Copilot、Gemini、Cursor）を統一的にオーケストレーションし、各CLIの得意分野とコスト特性を活かした包括的レビューを実行できます。
 詳細は [Multi-CLI Review Orchestration](./multi-cli-review-orchestration.md) を参照してください。
 
+> **Note**: `scripts/multi-review.sh` は別Issueで実装予定です。以下は実装後に利用可能なコマンド例です。
+
 ```bash
 # デフォルト実行（全CLI、分散モード）
 bash scripts/multi-review.sh

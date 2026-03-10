@@ -252,8 +252,10 @@ agents:
 
 ### Husky pre-push フックとの統合
 
+> **Note**: 以下は設定例です。`.husky/pre-push` ファイルを手動で作成してください。`scripts/multi-review.sh` の実装後に利用可能です。
+
 ```bash
-# .husky/pre-push
+# .husky/pre-push（手動作成が必要）
 #!/bin/sh
 . "$(dirname "$0")/_/husky.sh"
 
