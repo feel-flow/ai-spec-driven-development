@@ -38,8 +38,8 @@ if ! command -v gemini &> /dev/null; then
         echo -e "${RED}ERROR: REQUIRE_GEMINI_REVIEW=1 but gemini not found${NC}" >&2
         exit 2
     fi
-    echo -e "${YELLOW}Warning: gemini CLI not found, skipping review${NC}"
-    echo -e "${YELLOW}Install: npm install -g @google/gemini-cli${NC}"
+    echo -e "${YELLOW}Warning: gemini CLI not found, skipping review${NC}" >&2
+    echo -e "${YELLOW}Install: npm install -g @google/gemini-cli${NC}" >&2
     exit 0
 fi
 

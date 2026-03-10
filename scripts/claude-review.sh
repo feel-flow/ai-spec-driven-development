@@ -44,8 +44,8 @@ if ! command -v claude &> /dev/null; then
         echo -e "${RED}ERROR: REQUIRE_CLAUDE_REVIEW=1 but claude not found${NC}" >&2
         exit 2
     fi
-    echo -e "${YELLOW}Warning: claude CLI not found, skipping review${NC}"
-    echo -e "${YELLOW}Install: https://docs.anthropic.com/en/docs/claude-code${NC}"
+    echo -e "${YELLOW}Warning: claude CLI not found, skipping review${NC}" >&2
+    echo -e "${YELLOW}Install: https://docs.anthropic.com/en/docs/claude-code${NC}" >&2
     exit 0
 fi
 

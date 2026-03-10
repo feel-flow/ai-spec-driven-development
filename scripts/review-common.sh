@@ -1,6 +1,6 @@
 #!/bin/bash
 # Shared Review Functions
-# Sourced by claude-review.sh, codex-review.sh, copilot-review.sh
+# Sourced by claude-review.sh, codex-review.sh, copilot-review.sh, gemini-review.sh, cursor-review.sh
 #
 # Provides: prepare_diff, run_all_reviewers, display_results, parse_verdict
 # Also sets globals: DIFF_FILE, REVIEW_FILES, TEMP_DIR, REVIEWERS
@@ -100,7 +100,7 @@ _prepare_staged_diff() {
         echo -e "${RED}ERROR: git diff --cached failed${NC}" >&2
         return 2
     fi
-    _check_diff_size
+    _check_diff_size || return $?
     return 0
 }
 
@@ -129,7 +129,7 @@ _prepare_branch_diff() {
         echo -e "${RED}ERROR: git diff against ${base_branch} failed${NC}" >&2
         return 2
     fi
-    _check_diff_size
+    _check_diff_size || return $?
     return 0
 }
 
