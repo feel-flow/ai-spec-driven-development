@@ -1,0 +1,77 @@
+#!/bin/bash
+# Cursor CLI Automated Review Script
+# Runs specialized reviewers in parallel using cursor-agent --print
+#
+# Env:
+#   SKIP_CURSOR_REVIEW=1             Skip review
+#   CURSOR_MODEL=auto                Override model (default: auto)
+#   REVIEW_BASE_BRANCH=main          Override base branch for --branch mode (default: develop)
+#   REVIEW_TIMEOUT_SEC=600           Max seconds per reviewer (default: 600)
+#
+# Cost tier: Flat-rate ($20/month subscription)
+#
+# ⚠️  Known issue: cursor-agent --print may hang in non-interactive mode.
+#     timeout is mandatory to prevent indefinite blocking.
+
+set -eo pipefail
+
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+for f in "$SCRIPT_DIR/review-prompts.sh" "$SCRIPT_DIR/review-common.sh"; do
+    if [ ! -f "$f" ]; then
+        echo "ERROR: Required file not found: $f" >&2
+        exit 1
+    fi
+done
+source "$SCRIPT_DIR/review-prompts.sh"
+source "$SCRIPT_DIR/review-common.sh"
+
+if [ "$SKIP_CURSOR_REVIEW" = "1" ]; then
+    echo -e "${YELLOW}Skipping Cursor review (SKIP_CURSOR_REVIEW=1)${NC}"
+    exit 0
+fi
+
+if ! command -v cursor-agent &> /dev/null; then
+    echo -e "${YELLOW}Warning: cursor-agent CLI not found, skipping review${NC}"
+    echo -e "${YELLOW}Install: Install Cursor IDE and enable CLI access${NC}"
+    exit 0
+fi
+
+# Configuration
+CURSOR_MODEL="${CURSOR_MODEL:-auto}"
+REVIEW_TIMEOUT_SEC="${REVIEW_TIMEOUT_SEC:-600}"
+
+# Resolve timeout command (GNU timeout or macOS gtimeout)
+TIMEOUT_CMD=""
+if command -v timeout &>/dev/null; then
+    TIMEOUT_CMD="timeout"
+elif command -v gtimeout &>/dev/null; then
+    TIMEOUT_CMD="gtimeout"
+fi
+
+# Define CLI invocation (called by run_all_reviewers)
+# Note: timeout is mandatory due to known hanging issue with cursor-agent --print
+invoke_cli() {
+    local prompt=$1
+    local output=$2
+
+    if [ -n "$TIMEOUT_CMD" ]; then
+        "$TIMEOUT_CMD" "$REVIEW_TIMEOUT_SEC" cursor-agent --print --model "$CURSOR_MODEL" "$prompt" \
+            < "$DIFF_FILE" > "$output" 2>&1
+    else
+        echo -e "${RED}ERROR: 'timeout' command not found. cursor-agent requires timeout protection due to known hanging issue.${NC}" >&2
+        echo -e "${YELLOW}Install coreutils: brew install coreutils${NC}" >&2
+        return 1
+    fi
+}
+
+# Prepare diff (pass through any mode argument: --staged, --branch)
+prepare_diff "$@"
+rc=$?
+if [ "$rc" -eq 1 ]; then
+    exit 0  # Nothing to review
+elif [ "$rc" -ne 0 ]; then
+    exit 1  # Error
+fi
+
+run_all_reviewers "Cursor Code Review (model: ${CURSOR_MODEL})"
+exit $?
