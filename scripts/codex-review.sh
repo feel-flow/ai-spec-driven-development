@@ -1,0 +1,66 @@
+#!/bin/bash
+# Codex CLI Automated Review Script
+# Runs specialized reviewers in parallel using codex exec
+#
+# Uses codex exec (not codex review) to send individual prompts per reviewer,
+# enabling parallel execution and avoiding timeouts on large diffs.
+#
+# Env:
+#   SKIP_CODEX_REVIEW=1              Skip review
+#   CODEX_MODEL=gpt-5.3-codex        Override model (default: gpt-5.3-codex)
+#   REVIEW_BASE_BRANCH=main          Override base branch for --branch mode (default: develop)
+#   REVIEW_TIMEOUT_SEC=600           Max seconds per reviewer (default: 600)
+
+set -eo pipefail
+
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+for f in "$SCRIPT_DIR/review-prompts.sh" "$SCRIPT_DIR/review-common.sh"; do
+    if [ ! -f "$f" ]; then
+        echo "ERROR: Required file not found: $f" >&2
+        exit 1
+    fi
+done
+source "$SCRIPT_DIR/review-prompts.sh"
+source "$SCRIPT_DIR/review-common.sh"
+
+if [ "$SKIP_CODEX_REVIEW" = "1" ]; then
+    echo -e "${YELLOW}Skipping Codex review (SKIP_CODEX_REVIEW=1)${NC}"
+    exit 0
+fi
+
+if ! command -v codex &> /dev/null; then
+    echo -e "${YELLOW}Warning: codex CLI not found, skipping review${NC}"
+    echo -e "${YELLOW}Install: https://developers.openai.com/codex/cli/${NC}"
+    exit 0
+fi
+
+# Configuration
+CODEX_MODEL="${CODEX_MODEL:-gpt-5.3-codex}"
+REVIEW_TIMEOUT_SEC="${REVIEW_TIMEOUT_SEC:-600}"
+
+# Define CLI invocation (called by run_all_reviewers)
+invoke_cli() {
+    local prompt=$1
+    local output=$2
+
+    if command -v timeout &>/dev/null; then
+        timeout "$REVIEW_TIMEOUT_SEC" codex exec -m "$CODEX_MODEL" "$prompt" \
+            < "$DIFF_FILE" > "$output" 2>&1
+    else
+        echo -e "${YELLOW}Warning: 'timeout' command not found. No timeout protection.${NC}" >&2
+        codex exec -m "$CODEX_MODEL" "$prompt" \
+            < "$DIFF_FILE" > "$output" 2>&1
+    fi
+}
+
+# Prepare diff (pass through any mode argument: --staged, --branch)
+prepare_diff "$@"
+rc=$?
+if [ "$rc" -eq 1 ]; then
+    exit 0  # Nothing to review
+elif [ "$rc" -ne 0 ]; then
+    exit 1  # Error
+fi
+
+run_all_reviewers "Codex Code Review (model: ${CODEX_MODEL})"
+exit $?
