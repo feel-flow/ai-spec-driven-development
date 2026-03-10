@@ -39,8 +39,8 @@ if ! command -v codex &> /dev/null; then
         echo -e "${RED}ERROR: REQUIRE_CODEX_REVIEW=1 but codex not found${NC}" >&2
         exit 2
     fi
-    echo -e "${YELLOW}Warning: codex CLI not found, skipping review${NC}"
-    echo -e "${YELLOW}Install: https://developers.openai.com/codex/cli/${NC}"
+    echo -e "${YELLOW}Warning: codex CLI not found, skipping review${NC}" >&2
+    echo -e "${YELLOW}Install: https://developers.openai.com/codex/cli/${NC}" >&2
     exit 0
 fi
 

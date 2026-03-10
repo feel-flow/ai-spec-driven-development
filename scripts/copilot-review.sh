@@ -36,8 +36,8 @@ if ! command -v copilot &> /dev/null; then
         echo -e "${RED}ERROR: REQUIRE_COPILOT_REVIEW=1 but copilot not found${NC}" >&2
         exit 2
     fi
-    echo -e "${YELLOW}Warning: copilot CLI not found, skipping review${NC}"
-    echo -e "${YELLOW}Install: https://docs.github.com/en/copilot/how-tos/use-copilot-agents/use-copilot-cli${NC}"
+    echo -e "${YELLOW}Warning: copilot CLI not found, skipping review${NC}" >&2
+    echo -e "${YELLOW}Install: https://docs.github.com/en/copilot/how-tos/use-copilot-agents/use-copilot-cli${NC}" >&2
     exit 0
 fi
 

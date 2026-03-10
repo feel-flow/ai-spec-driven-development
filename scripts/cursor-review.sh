@@ -41,8 +41,8 @@ if ! command -v cursor-agent &> /dev/null; then
         echo -e "${RED}ERROR: REQUIRE_CURSOR_REVIEW=1 but cursor-agent not found${NC}" >&2
         exit 2
     fi
-    echo -e "${YELLOW}Warning: cursor-agent CLI not found, skipping review${NC}"
-    echo -e "${YELLOW}Install: Install Cursor IDE and enable CLI access${NC}"
+    echo -e "${YELLOW}Warning: cursor-agent CLI not found, skipping review${NC}" >&2
+    echo -e "${YELLOW}Install: Install Cursor IDE and enable CLI access${NC}" >&2
     exit 0
 fi
 
