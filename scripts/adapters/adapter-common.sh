@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # ────────────────────────────────────────────────────────────
-# adapter-common.sh — Multi-CLI Review: Shared Utilities
+# adapter-common.sh — Multi-CLI Agent: Shared Utilities
 # ────────────────────────────────────────────────────────────
 # Usage: source this file from any CLI adapter
 #   source "$(dirname "$0")/adapter-common.sh"
@@ -71,40 +71,93 @@ load_perspective() {
 
 # ── Prompt Builder ──
 
-# Build a review prompt from perspective + diff
+# Build a prompt from perspective + context (task-type aware)
 # Usage: build_prompt "scripts/perspectives/code-review.md" "develop" "file1.ts file2.ts"
+# Task-type is read from TASK_TYPE variable (default: review)
+# Description is read from DESCRIPTION variable (for explore/implement)
 build_prompt() {
   local perspective_file="$1"
   local base_branch="${2:-develop}"
   local changed_files="${3:-}"
+  local task_type="${TASK_TYPE:-review}"
+  local description="${DESCRIPTION:-}"
 
   local perspective_content
   perspective_content="$(load_perspective "$perspective_file")"
 
-  local diff_content
-  diff_content="$(get_diff_content "$base_branch")"
+  # Task-type specific preamble and context
+  local preamble=""
+  local context_section=""
 
-  local files_section=""
-  if [[ -n "$changed_files" ]]; then
-    files_section="
+  case "$task_type" in
+    review)
+      preamble="You are a code review agent. Follow the perspective instructions below to analyze the code changes."
+
+      local diff_content
+      diff_content="$(get_diff_content "$base_branch")"
+
+      local files_section=""
+      if [[ -n "$changed_files" ]]; then
+        files_section="
 ## Changed Files
 ${changed_files}
 "
-  fi
+      fi
+
+      context_section="${files_section}
+## Code Changes (git diff)
+
+${diff_content}"
+      ;;
+
+    explore)
+      preamble="You are a codebase exploration agent. Follow the perspective instructions below to analyze the codebase. Do NOT modify any files — this is a read-only exploration task."
+
+      if [[ -n "$description" ]]; then
+        context_section="
+## Exploration Target
+
+${description}"
+      fi
+      ;;
+
+    implement)
+      preamble="You are an implementation agent. Follow the perspective instructions below to generate code. Output all generated files to the staging directory — do NOT write directly to the working tree."
+
+      if [[ -n "$description" ]]; then
+        context_section="
+## Task Description
+
+${description}"
+      fi
+
+      # Optionally include diff for implement tasks
+      if [[ "${INCLUDE_DIFF:-false}" == "true" ]]; then
+        local diff_content
+        diff_content="$(get_diff_content "$base_branch")"
+        context_section="${context_section}
+
+## Current Changes (git diff)
+
+${diff_content}"
+      fi
+      ;;
+
+    *)
+      preamble="You are an AI agent. Follow the perspective instructions below."
+      ;;
+  esac
 
   cat <<PROMPT
-You are a code review agent. Follow the perspective instructions below to analyze the code changes.
+${preamble}
 
 ${perspective_content}
 
-${files_section}
-## Code Changes (git diff)
-
-${diff_content}
+${context_section}
 
 ---
 
-Analyze the above changes according to your role and output your findings in the specified Output Template format.
+Analyze the above according to your role and output your findings in the specified Output Template format.
 PROMPT
 }
 
@@ -120,16 +173,22 @@ write_output() {
 
   mkdir -p "$(dirname "$output_file")"
 
+  local task_type="${TASK_TYPE:-review}"
+  # bash 3.2 compatible capitalization (no ${var^} operator)
+  local task_label
+  task_label="$(echo "$task_type" | awk '{print toupper(substr($0,1,1)) substr($0,2)}')"
+
   cat > "$output_file" <<OUTPUT
-<!-- Multi-CLI Review Result -->
+<!-- Multi-CLI ${task_label} Result -->
 <!-- CLI: ${cli_name} -->
 <!-- Perspective: ${perspective_name} -->
+<!-- Task Type: ${task_type} -->
 <!-- Generated: $(date -u +"%Y-%m-%dT%H:%M:%SZ") -->
 
 ${content}
 OUTPUT
 
-  echo "✅ Review saved: ${output_file}" >&2
+  echo "✅ ${task_label} saved: ${output_file}" >&2
 }
 
 # ── Timeout Wrapper ──
@@ -195,7 +254,8 @@ parse_severity_counts() {
 # ── Argument Parsing Helper ──
 
 # Parse common adapter arguments
-# Sets: PERSPECTIVE_FILE, OUTPUT_FILE, CHANGED_FILES, BASE_BRANCH, TIMEOUT
+# Sets: PERSPECTIVE_FILE, OUTPUT_FILE, CHANGED_FILES, BASE_BRANCH, TIMEOUT,
+#       TASK_TYPE, DESCRIPTION, INCLUDE_DIFF
 # Usage: parse_adapter_args "$@"
 parse_adapter_args() {
   PERSPECTIVE_FILE=""
@@ -203,6 +263,9 @@ parse_adapter_args() {
   CHANGED_FILES=""
   BASE_BRANCH="develop"
   TIMEOUT="${REVIEW_TIMEOUT:-300}"
+  TASK_TYPE="review"
+  DESCRIPTION=""
+  INCLUDE_DIFF="false"
 
   while [[ $# -gt 0 ]]; do
     case "$1" in
@@ -218,6 +281,18 @@ parse_adapter_args() {
         TIMEOUT="$2"
         shift 2
         ;;
+      --task-type)
+        TASK_TYPE="$2"
+        shift 2
+        ;;
+      --description)
+        DESCRIPTION="$2"
+        shift 2
+        ;;
+      --include-diff)
+        INCLUDE_DIFF="true"
+        shift
+        ;;
       *)
         if [[ -z "$PERSPECTIVE_FILE" ]]; then
           PERSPECTIVE_FILE="$1"
@@ -230,7 +305,7 @@ parse_adapter_args() {
   done
 
   if [[ -z "$PERSPECTIVE_FILE" || -z "$OUTPUT_FILE" ]]; then
-    echo "Usage: $(basename "$0") <perspective-file> <output-file> [--changed-files <files>] [--base <branch>] [--timeout <seconds>]" >&2
+    echo "Usage: $(basename "$0") <perspective-file> <output-file> [--changed-files <files>] [--base <branch>] [--timeout <seconds>] [--task-type <review|explore|implement>] [--description <text>]" >&2
     return 1
   fi
 }

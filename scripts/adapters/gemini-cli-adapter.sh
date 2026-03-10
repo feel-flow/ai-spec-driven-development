@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # ────────────────────────────────────────────────────────────
-# gemini-cli-adapter.sh — Multi-CLI Review: Gemini CLI Adapter
+# gemini-cli-adapter.sh — Multi-CLI Agent: Gemini CLI Adapter
 # ────────────────────────────────────────────────────────────
 # Usage: ./gemini-cli-adapter.sh <perspective-file> <output-file> [options]
 #
@@ -8,6 +8,8 @@
 #   --changed-files <files>   Comma-separated list of changed files
 #   --base <branch>           Base branch for diff (default: develop)
 #   --timeout <seconds>       Timeout in seconds (default: 300)
+#   --task-type <type>        review | explore | implement (default: review)
+#   --description <text>      Task description (for explore/implement)
 #
 # Requires: gemini (npm i -g @google/gemini-cli)
 # Cost tier: Free-tier (generous free quota)
@@ -39,18 +41,30 @@ parse_adapter_args "$@"
 
 prompt="$(build_prompt "$PERSPECTIVE_FILE" "$BASE_BRANCH" "$CHANGED_FILES")"
 
-# ── Execute Review ──
+# ── Execute Task ──
 
-echo "🔍 Running ${CLI_NAME} review..." >&2
+echo "🔍 Running ${CLI_NAME} ${TASK_TYPE:-review}..." >&2
 echo "   Perspective: $(basename "$PERSPECTIVE_FILE" .md)" >&2
+echo "   Task type: ${TASK_TYPE:-review}" >&2
 echo "   Timeout: ${TIMEOUT}s" >&2
 
-# Gemini CLI: -p for prompt, --sandbox for read-only, --output-format text
+# Gemini CLI: -p for prompt, --output-format text for parseable output
+# Task-type specific sandbox: review/explore use --sandbox (read-only),
+# implement omits --sandbox to allow output generation
+get_gemini_sandbox_flag() {
+  case "${TASK_TYPE:-review}" in
+    review|explore) echo "--sandbox" ;;
+    implement)      echo "" ;;
+    *)              echo "--sandbox" ;;
+  esac
+}
+
+sandbox_flag="$(get_gemini_sandbox_flag)"
 stderr_log="$(mktemp)"
 
 result=$(run_with_timeout "$TIMEOUT" \
   "$CLI_COMMAND" -p "$prompt" \
-    --sandbox \
+    $sandbox_flag \
     --output-format text \
   2>"$stderr_log") || {
     echo "ERROR: ${CLI_NAME} execution failed or timed out." >&2

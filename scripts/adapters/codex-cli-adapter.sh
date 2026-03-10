@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # ────────────────────────────────────────────────────────────
-# codex-cli-adapter.sh — Multi-CLI Review: Codex CLI Adapter
+# codex-cli-adapter.sh — Multi-CLI Agent: Codex CLI Adapter
 # ────────────────────────────────────────────────────────────
 # Usage: ./codex-cli-adapter.sh <perspective-file> <output-file> [options]
 #
@@ -8,6 +8,8 @@
 #   --changed-files <files>   Comma-separated list of changed files
 #   --base <branch>           Base branch for diff (default: develop)
 #   --timeout <seconds>       Timeout in seconds (default: 300)
+#   --task-type <type>        review | explore | implement (default: review)
+#   --description <text>      Task description (for explore/implement)
 #
 # Requires: codex (npm i -g @openai/codex)
 # Cost tier: Standard (token-based billing)
@@ -37,18 +39,30 @@ parse_adapter_args "$@"
 
 prompt="$(build_prompt "$PERSPECTIVE_FILE" "$BASE_BRANCH" "$CHANGED_FILES")"
 
-# ── Execute Review ──
+# ── Task-type specific sandbox ──
 
-echo "🔍 Running ${CLI_NAME} review..." >&2
+get_sandbox_mode() {
+  case "${TASK_TYPE:-review}" in
+    review)    echo "read-only" ;;
+    explore)   echo "read-only" ;;
+    implement) echo "network-off" ;;
+    *)         echo "read-only" ;;
+  esac
+}
+
+# ── Execute Task ──
+
+echo "🔍 Running ${CLI_NAME} ${TASK_TYPE:-review}..." >&2
 echo "   Perspective: $(basename "$PERSPECTIVE_FILE" .md)" >&2
+echo "   Task type: ${TASK_TYPE:-review}" >&2
 echo "   Timeout: ${TIMEOUT}s" >&2
 
-# Codex CLI uses `codex exec "prompt" --sandbox read-only`
+sandbox_mode="$(get_sandbox_mode)"
 stderr_log="$(mktemp)"
 
 result=$(run_with_timeout "$TIMEOUT" \
   "$CLI_COMMAND" exec "$prompt" \
-    --sandbox read-only \
+    --sandbox "$sandbox_mode" \
   2>"$stderr_log") || {
     echo "ERROR: ${CLI_NAME} execution failed or timed out." >&2
     if [[ -s "$stderr_log" ]]; then

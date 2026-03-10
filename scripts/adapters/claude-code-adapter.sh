@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # ────────────────────────────────────────────────────────────
-# claude-code-adapter.sh — Multi-CLI Review: Claude Code Adapter
+# claude-code-adapter.sh — Multi-CLI Agent: Claude Code Adapter
 # ────────────────────────────────────────────────────────────
 # Usage: ./claude-code-adapter.sh <perspective-file> <output-file> [options]
 #
@@ -8,6 +8,8 @@
 #   --changed-files <files>   Comma-separated list of changed files
 #   --base <branch>           Base branch for diff (default: develop)
 #   --timeout <seconds>       Timeout in seconds (default: 300)
+#   --task-type <type>        review | explore | implement (default: review)
+#   --description <text>      Task description (for explore/implement)
 #
 # Requires: claude (npm i -g @anthropic-ai/claude-code)
 # Cost tier: Premium (token-based billing)
@@ -37,17 +39,30 @@ parse_adapter_args "$@"
 
 prompt="$(build_prompt "$PERSPECTIVE_FILE" "$BASE_BRANCH" "$CHANGED_FILES")"
 
-# ── Execute Review ──
+# ── Task-type specific flags ──
 
-echo "🔍 Running ${CLI_NAME} review..." >&2
+get_allowed_tools() {
+  case "${TASK_TYPE:-review}" in
+    review)    echo 'Read,Grep,Glob,Bash(git diff*)' ;;
+    explore)   echo 'Read,Grep,Glob,Bash(git*),Bash(find*),Bash(ls*)' ;;
+    implement) echo 'Read,Grep,Glob,Edit,Write,Bash' ;;
+    *)         echo 'Read,Grep,Glob,Bash(git diff*)' ;;
+  esac
+}
+
+# ── Execute Task ──
+
+echo "🔍 Running ${CLI_NAME} ${TASK_TYPE:-review}..." >&2
 echo "   Perspective: $(basename "$PERSPECTIVE_FILE" .md)" >&2
+echo "   Task type: ${TASK_TYPE:-review}" >&2
 echo "   Timeout: ${TIMEOUT}s" >&2
 
+allowed_tools="$(get_allowed_tools)"
 stderr_log="$(mktemp)"
 
 result=$(run_with_timeout "$TIMEOUT" \
   "$CLI_COMMAND" -p "$prompt" \
-    --allowed-tools "Read,Grep,Glob,Bash(git diff*)" \
+    --allowed-tools "$allowed_tools" \
   2>"$stderr_log") || {
     echo "ERROR: ${CLI_NAME} execution failed or timed out." >&2
     if [[ -s "$stderr_log" ]]; then
