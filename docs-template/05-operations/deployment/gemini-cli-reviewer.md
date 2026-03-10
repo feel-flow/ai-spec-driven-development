@@ -1,0 +1,182 @@
+# Gemini CLI Reviewer Setup
+
+> **Parent**: [ai-tools-integration.md](./ai-tools-integration.md) | [multi-cli-review-orchestration.md](./multi-cli-review-orchestration.md)
+
+## 概要
+
+Google Gemini CLIをコードレビューエージェントとして利用するためのセットアップガイドです。Gemini CLIは大きな無料枠と長いコンテキストウィンドウを持ち、セキュリティ分析やドキュメント分析に特に適しています。
+
+**推奨パースペクティブ**: Security Analysis（無料枠を活用した広範囲セキュリティスキャン）
+
+---
+
+## 前提条件
+
+- Node.js 18以上
+- Google アカウント（Gemini API キー取得用）
+
+---
+
+## インストール
+
+### npm でインストール
+
+```bash
+npm install -g @anthropic/gemini-cli
+# or
+npm install -g @anthropic/gemini-cli@latest
+```
+
+### 動作確認
+
+```bash
+gemini --version
+gemini -p "Hello, this is a test."
+```
+
+### API キー設定
+
+```bash
+# Google AI Studio でAPIキーを取得
+# https://aistudio.google.com/apikey
+
+# 環境変数に設定
+export GEMINI_API_KEY="your-api-key-here"
+
+# またはログインベースの認証
+gemini auth login
+```
+
+---
+
+## CLI フラグリファレンス
+
+### レビューに必要なフラグ
+
+| フラグ | 説明 | 用途 |
+|-------|------|------|
+| `-p` / `--prompt` | 非インタラクティブモード（ヘッドレス） | プロンプト直接渡し |
+| `--sandbox` / `-s` | サンドボックスモード | ファイルシステム保護 |
+| `--output-format json` | JSON出力 | 構造化結果のパース |
+| `--output-format text` | テキスト出力（デフォルト） | 人間可読な結果 |
+| `--yolo` | ツール自動承認 | 非インタラクティブ実行時 |
+| `--debug` / `-d` | デバッグモード | トラブルシューティング |
+| `--resume` | 前回セッション再開 | 継続レビュー |
+
+### レビュー実行コマンド例
+
+```bash
+# 基本的なコードレビュー
+gemini -p "以下のdiffをセキュリティ観点でレビューしてください:
+$(git diff --cached)" --sandbox --output-format text
+
+# JSON出力でスクリプト連携
+gemini -p "Review the following code changes for security vulnerabilities:
+$(git diff --cached)" --sandbox --output-format json
+
+# パイプ入力
+git diff --cached | gemini -p "Analyze this diff for security issues:" --sandbox
+
+# ファイル入力
+gemini -p "Review this file for security vulnerabilities:" < src/auth/handler.ts --sandbox
+```
+
+---
+
+## Multi-CLI Orchestration での役割
+
+### デフォルト設定
+
+```yaml
+# review-config.yaml
+agents:
+  gemini-cli:
+    command: gemini
+    cost_tier: free-tier
+    default_perspectives: [security-analysis]
+```
+
+### 推奨パースペクティブ
+
+| パースペクティブ | 適合度 | 理由 |
+|----------------|--------|------|
+| **Security Analysis** | ⭐⭐⭐⭐⭐ | 無料枠で広範囲スキャン、長コンテキストで全体把握 |
+| Comment Analysis | ⭐⭐⭐⭐ | ドキュメント理解力が高い |
+| Code Review | ⭐⭐⭐ | 汎用レビューも可能 |
+
+### フォールバック時の動作
+
+Gemini CLIが利用不可の場合、`security-analysis` パースペクティブは `copilot-cli` にフォールバックします（固定料金でコスト増なし）。
+
+---
+
+## セキュリティ分析の設定
+
+### プロンプトテンプレート（perspectives/security-analysis.md）
+
+セキュリティ分析は以下の5観点をカバーします：
+
+1. **インジェクション攻撃** — SQL、XSS、コマンドインジェクション
+2. **認証・認可** — 認証バイパス、権限昇格
+3. **データ漏洩** — 機密情報のハードコーディング、ログへの出力
+4. **依存関係** — 既知の脆弱性を持つパッケージ
+5. **設定ミス** — CORS、CSP、セキュリティヘッダー
+
+### サンドボックスの重要性
+
+セキュリティ分析時は必ず `--sandbox` フラグを使用してください。レビュー対象のコードに悪意のあるコードが含まれている可能性があるため、ファイルシステムへの書き込みを防止します。
+
+---
+
+## コスト管理
+
+### 無料枠
+
+Gemini APIの無料枠（2026年3月時点）：
+- **Gemini 2.5 Flash**: 毎分15リクエスト、1日1500リクエスト
+- **Gemini 2.5 Pro**: 毎分5リクエスト、1日25リクエスト
+
+### レビューでの消費目安
+
+| 操作 | 推定トークン | 無料枠での回数/日 |
+|------|------------|-----------------|
+| セキュリティ分析（小PR） | ~5,000 | 100+ |
+| セキュリティ分析（大PR） | ~20,000 | 50+ |
+| フルレビュー（全パースペクティブ） | ~50,000 | 20+ |
+
+**推奨**: セキュリティ分析に特化し、無料枠内で頻繁に実行
+
+---
+
+## トラブルシューティング
+
+### API キーエラー
+
+```
+Error: GEMINI_API_KEY is not set
+```
+
+**対応**: 環境変数を設定するか、`gemini auth login` で認証
+
+### レート制限
+
+```
+Error: 429 Too Many Requests
+```
+
+**対応**: 無料枠の制限に達した場合、数分待つか、`minimize_cost` 戦略で他のCLIにフォールバック
+
+### 長いレスポンス時間
+
+大きなdiffを分析する場合、レスポンスに時間がかかることがあります。
+
+**対応**: `--changed-files` フラグで分析対象を絞る、またはタイムアウトを設定
+
+---
+
+## 関連ドキュメント
+
+- [multi-cli-review-orchestration.md](./multi-cli-review-orchestration.md) — オーケストレーション運用ガイド
+- [REVIEW-AGENT-CREATION-GUIDE.md](../../06-reference/REVIEW-AGENT-CREATION-GUIDE.md) — 汎用レビューエージェント作成ガイド
+- [ai-tools-integration.md](./ai-tools-integration.md) — AIツール統合・コスト比較
+- [cursor-cli-reviewer.md](./cursor-cli-reviewer.md) — Cursor CLI セットアップ
