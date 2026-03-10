@@ -46,12 +46,19 @@ your-project/
 │       ├── comment-analysis/SKILL.md
 │       └── code-simplification/SKILL.md
 └── scripts/
-    └── review.sh                        ← Copilot CLI 実行スクリプト
+    ├── copilot-review.sh                ← Copilot CLI レビュースクリプト
+    ├── claude-review.sh                 ← Claude Code CLI レビュースクリプト
+    ├── codex-review.sh                  ← Codex CLI レビュースクリプト
+    ├── gemini-review.sh                 ← Gemini CLI レビュースクリプト
+    ├── cursor-review.sh                 ← Cursor CLI レビュースクリプト
+    ├── review-common.sh                 ← 共通レビューロジック
+    ├── review-prompts.sh                ← レビュープロンプト定義
+    └── multi-agent.sh                   ← マルチCLIオーケストレーター
 ```
 
 ### モード1: Copilot CLI セッション分離（推奨）
 
-`scripts/review.sh` が各スキルを独立した `copilot -p` プロセスで実行。各スキルが独立した LLM セッションで動作するため、コンテキスト汚染がゼロです。
+`scripts/copilot-review.sh` が5つの専門レビュアーを並列で `copilot -p` 実行。`scripts/multi-agent.sh` を使えば、Claude/Codex/Copilot/Gemini/Cursor の5つのCLIで同時にクロスモデルレビューが可能です。
 
 ### モード2: 動的 `read_file` 読み込み（フォールバック）
 
