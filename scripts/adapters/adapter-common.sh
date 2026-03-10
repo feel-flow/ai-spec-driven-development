@@ -136,9 +136,24 @@ run_with_timeout() {
   if [[ -n "$timeout_cmd" ]]; then
     "$timeout_cmd" "$timeout_seconds" "$@"
   else
-    # No timeout command available — run directly with warning
-    echo "⚠️  timeout/gtimeout not found. Running without timeout limit." >&2
-    "$@"
+    # Fallback: background process + kill after timeout (bash 3.2 compatible)
+    echo "⚠️  timeout/gtimeout not found. Using kill-based fallback." >&2
+    "$@" &
+    local bg_pid=$!
+    (
+      sleep "$timeout_seconds"
+      kill "$bg_pid" 2>/dev/null
+    ) &
+    local watchdog_pid=$!
+    if wait "$bg_pid" 2>/dev/null; then
+      kill "$watchdog_pid" 2>/dev/null || true
+      wait "$watchdog_pid" 2>/dev/null || true
+      return 0
+    else
+      kill "$watchdog_pid" 2>/dev/null || true
+      wait "$watchdog_pid" 2>/dev/null || true
+      return 1
+    fi
   fi
 }
 
