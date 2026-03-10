@@ -16,17 +16,38 @@
 
 ## AIツール比較
 
-### 主要AIツールの特徴比較
+### 主要AIツールの特徴比較（5 CLI）
 
-| 特徴 | Claude Code | GitHub Copilot | Cursor |
-|---|---|---|---|
-| **Git統合度** | ⭐⭐⭐⭐⭐ | ⭐⭐⭐ | ⭐⭐⭐⭐ |
-| **カスタム設定** | CLAUDE.md, .claude/ | .vscode/settings.json | .cursorrules |
-| **PR自動化** | ネイティブサポート | VS Code Tasks必要 | 手動スクリプト実行 |
-| **ドキュメント参照** | 自動読み込み | 手動指定 | contextFiles設定 |
-| **無料版の充実度** | ⭐⭐⭐⭐ | ❌ | ⭐⭐⭐⭐ |
-| **コスト** | 無料/Pro $20 | $10/月 | 無料/Pro $20 |
-| **推奨ユースケース** | フルワークフロー自動化 | コード補完重視 | コード生成重視 |
+| 特徴 | Claude Code | Codex CLI | GitHub Copilot | Gemini CLI | Cursor |
+|---|---|---|---|---|---|
+| **Git統合度** | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐ | ⭐⭐⭐ | ⭐⭐⭐ | ⭐⭐⭐⭐ |
+| **カスタム設定** | CLAUDE.md, .claude/ | codex.md, AGENTS.md | .vscode/settings.json | settings.json | .cursorrules |
+| **CLI非インタラクティブ** | `claude -p` | `codex exec` | `copilot -p` | `gemini -p` | `cursor-agent --print` |
+| **安全性制御** | `--allowed-tools`（ツール制限） | `--sandbox read-only` | `--allow-tool`/`--deny-tool` | `--sandbox` | N/A |
+| **PR自動化** | ネイティブサポート | ネイティブサポート | VS Code Tasks必要 | 手動スクリプト実行 | 手動スクリプト実行 |
+| **ドキュメント参照** | 自動読み込み | 自動読み込み | 手動指定 | 自動読み込み | contextFiles設定 |
+| **無料版の充実度** | ⭐⭐⭐⭐ | ⭐⭐⭐ | ❌ | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐ |
+| **コスト** | 無料/Pro $20 | トークン課金 | $10/月 | 無料枠大 | 無料/Pro $20 |
+| **コストティア** | Premium | Standard | Flat-rate | Free-tier | Flat-rate |
+| **推奨レビュー用途** | 型設計・アーキテクチャ | コードレビュー・エラー検出 | テスト・コメント分析 | セキュリティスキャン | コード簡素化 |
+
+### AI消費分散（Multi-CLI Orchestration）
+
+5つのAI CLIをオーケストレーションし、各CLIの得意分野とコスト特性を活かした包括的レビューを実現します。
+詳細は [Multi-CLI Review Orchestration](./multi-cli-review-orchestration.md) を参照してください。
+
+```
+高コスト（Premium）                          低コスト（Free/Flat-rate）
+  ←───────────────────────────────────────────→
+  Claude      Codex      Copilot    Gemini    Cursor
+  型設計      コード      テスト     セキュリティ コード
+  アーキテクチャ レビュー   コメント   ドキュメント  簡素化
+```
+
+**分散戦略の使い分け**:
+- `balanced`: コストと品質のバランス（デフォルト）
+- `minimize_cost`: Copilot/Gemini/Cursorを優先（予算制約時）
+- `maximize_quality`: Claude/Codexに多く割当（リリース前）
 
 ### AI自動化の主要機能
 
@@ -300,14 +321,27 @@ npx husky init
 
 ### 機能別コスト
 
-| 機能 | 無料プラン | 有料プラン | 推奨 |
-|---|---|---|---|
-| **Claude Code** | 基本機能利用可 | Pro: $20/月 | 無料版で十分 |
-| **GitHub Copilot** | ❌ | $10/月（個人） | オプション |
-| **Cursor** | 基本機能利用可 | Pro: $20/月 | 無料版で十分 |
-| **GitHub Actions** | 2,000分/月（Private） | 超過分課金 | Huskyで代替 |
-| **GitHub CLI** | ✅ 完全無料 | - | 必須 |
-| **Git Hooks** | ✅ 完全無料 | - | 必須 |
+| 機能 | 無料プラン | 有料プラン | コストティア | 推奨 |
+|---|---|---|---|---|
+| **Claude Code** | 基本機能利用可 | Pro: $20/月 | Premium（トークン課金） | 型設計・アーキテクチャ |
+| **Codex CLI** | — | トークン課金 | Standard（トークン課金） | コードレビュー・エラー検出 |
+| **GitHub Copilot** | ❌ | $10/月（個人） | Flat-rate（月額固定） | テスト・コメント分析 |
+| **Gemini CLI** | 大きな無料枠 | 従量課金 | Free-tier（無料枠大） | セキュリティスキャン |
+| **Cursor** | 基本機能利用可 | Pro: $20/月 | Flat-rate（月額固定） | コード簡素化 |
+| **GitHub Actions** | 2,000分/月（Private） | 超過分課金 | — | Huskyで代替 |
+| **GitHub CLI** | ✅ 完全無料 | - | — | 必須 |
+| **Git Hooks** | ✅ 完全無料 | - | — | 必須 |
+
+### Multi-CLI レビューのコスト最適化
+
+| 戦略 | 月額目安 | 使用CLI | 適用場面 |
+|------|---------|---------|---------|
+| **完全無料** | $0 | Gemini（無料枠） | 個人開発・学習 |
+| **固定料金のみ** | $10-$30 | Copilot + Cursor | 予算固定の開発 |
+| **バランス** | $30-$50 | 全5 CLI | 通常のチーム開発 |
+| **品質最大化** | $50+ | Claude中心 + 全CLI | リリース前の品質保証 |
+
+詳細: [Multi-CLI Review Orchestration](./multi-cli-review-orchestration.md)
 
 ### GitHub Actionsの利用制限
 
@@ -414,7 +448,11 @@ branches:
 ## 関連ドキュメント
 
 - [DEPLOYMENT.md](../DEPLOYMENT.md) - デプロイメント戦略全体
+- [multi-cli-review-orchestration.md](./multi-cli-review-orchestration.md) - Multi-CLI レビューオーケストレーション
+- [REVIEW-AGENT-CREATION-GUIDE.md](../../06-reference/REVIEW-AGENT-CREATION-GUIDE.md) - 汎用レビューエージェント作成ガイド
 - [SETUP_CLAUDE_CODE.md](../../SETUP_CLAUDE_CODE.md) - Claude Code詳細設定
 - [SETUP_GITHUB_COPILOT.md](../../SETUP_GITHUB_COPILOT.md) - GitHub Copilot詳細設定
 - [SETUP_CURSOR.md](../../SETUP_CURSOR.md) - Cursor詳細設定
+- [gemini-cli-reviewer.md](./gemini-cli-reviewer.md) - Gemini CLI レビュワーセットアップ
+- [cursor-cli-reviewer.md](./cursor-cli-reviewer.md) - Cursor CLI レビュワーセットアップ
 - [../MASTER.md](../../MASTER.md) - プロジェクトマスター仕様

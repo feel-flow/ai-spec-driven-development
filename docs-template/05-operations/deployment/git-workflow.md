@@ -171,6 +171,24 @@ git commit -m "feat: 新機能を追加"
 # → Critical な問題があればコミットをブロック
 ```
 
+**Multi-CLI 分散レビュー（5 CLI統合）**:
+
+5つのAI CLI（Claude Code、Codex、Copilot、Gemini、Cursor）を統一的にオーケストレーションし、各CLIの得意分野とコスト特性を活かした包括的レビューを実行できます。
+詳細は [Multi-CLI Review Orchestration](./multi-cli-review-orchestration.md) を参照してください。
+
+> **Note**: `scripts/multi-review.sh` は別Issueで実装予定です。以下は実装後に利用可能なコマンド例です。
+
+```bash
+# デフォルト実行（全CLI、分散モード）
+bash scripts/multi-review.sh
+
+# コスト最小化（固定料金/無料CLIを優先）
+bash scripts/multi-review.sh --strategy minimize_cost
+
+# リリース前の品質最大化
+bash scripts/multi-review.sh --strategy maximize_quality
+```
+
 **ベストプラクティス**:
 - セルフレビューは15-30分程度で完了させる
 - 指摘事項は即座に修正
