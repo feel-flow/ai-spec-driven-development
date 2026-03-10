@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # ────────────────────────────────────────────────────────────
-# cursor-cli-adapter.sh — Multi-CLI Review: Cursor CLI Adapter
+# cursor-cli-adapter.sh — Multi-CLI Agent: Cursor CLI Adapter
 # ────────────────────────────────────────────────────────────
 # Usage: ./cursor-cli-adapter.sh <perspective-file> <output-file> [options]
 #
@@ -8,6 +8,8 @@
 #   --changed-files <files>   Comma-separated list of changed files
 #   --base <branch>           Base branch for diff (default: develop)
 #   --timeout <seconds>       Timeout in seconds (default: 120)
+#   --task-type <type>        review | explore | implement (default: review)
+#   --description <text>      Task description (for explore/implement)
 #
 # Requires: cursor-agent (Cursor IDE CLI)
 # Cost tier: Flat-rate ($20/month subscription)
@@ -50,13 +52,15 @@ fi
 
 prompt="$(build_prompt "$PERSPECTIVE_FILE" "$BASE_BRANCH" "$CHANGED_FILES")"
 
-# ── Execute Review ──
+# ── Execute Task ──
 
-echo "🔍 Running ${CLI_NAME} review..." >&2
+echo "🔍 Running ${CLI_NAME} ${TASK_TYPE:-review}..." >&2
 echo "   Perspective: $(basename "$PERSPECTIVE_FILE" .md)" >&2
+echo "   Task type: ${TASK_TYPE:-review}" >&2
 echo "   Timeout: ${TIMEOUT}s (capped for Cursor)" >&2
 
 # Cursor CLI: --print for non-interactive output, --model auto
+# Same flags for all task types (flat-rate, no sandbox granularity)
 stderr_log="$(mktemp)"
 
 result=$(run_with_timeout "$TIMEOUT" \

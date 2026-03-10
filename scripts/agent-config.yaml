@@ -1,0 +1,120 @@
+# Multi-CLI Agent Orchestration Configuration
+# See: docs-template/05-operations/deployment/multi-cli-review-orchestration.md
+
+version: "2.0"
+
+# ── Global Defaults ──
+mode: distributed  # distributed | cross-model
+parallel: true
+
+# ── Task-specific Settings ──
+tasks:
+  review:
+    cost_strategy: balanced  # balanced | minimize_cost | maximize_quality
+    output_dir: .review-results
+    timeout: 300
+  explore:
+    cost_strategy: minimize_cost
+    output_dir: .explore-results
+    timeout: 600
+  implement:
+    cost_strategy: maximize_quality
+    output_dir: .implement-results
+    timeout: 900
+
+# ── Agent Definitions ──
+agents:
+  claude-code:
+    command: claude
+    cost_tier: premium
+    perspectives:
+      review:
+        - type-design-analysis
+      explore:
+        - architecture-analysis
+      implement:
+        - feature-implementation
+    flags:
+      review: '-p "{prompt}" --allowed-tools "Read,Grep,Glob,Bash(git diff*)"'
+      explore: '-p "{prompt}" --allowed-tools "Read,Grep,Glob,Bash(git*),Bash(find*),Bash(ls*)"'
+      implement: '-p "{prompt}" --allowed-tools "Read,Grep,Glob,Edit,Write,Bash"'
+
+  codex-cli:
+    command: codex
+    cost_tier: standard
+    perspectives:
+      review:
+        - code-review
+        - error-handler-hunt
+      explore:
+        - dependency-mapping
+        - pattern-discovery
+      implement:
+        - refactoring
+    flags:
+      review: 'exec "{prompt}" --sandbox read-only'
+      explore: 'exec "{prompt}" --sandbox read-only'
+      implement: 'exec "{prompt}" --sandbox network-off'
+
+  copilot-cli:
+    command: copilot
+    cost_tier: flat-rate
+    perspectives:
+      review:
+        - test-analysis
+        - comment-analysis
+      explore:
+        - api-surface-analysis
+      implement:
+        - test-writing
+    flags:
+      review: '-p "{prompt}" --silent'
+      explore: '-p "{prompt}" --silent'
+      implement: '-p "{prompt}" --silent'
+
+  gemini-cli:
+    command: gemini
+    cost_tier: free-tier
+    perspectives:
+      review:
+        - security-analysis
+      explore:
+        - tech-debt-assessment
+      implement:
+        - documentation
+    flags:
+      review: '-p "{prompt}" --sandbox --output-format text'
+      explore: '-p "{prompt}" --sandbox --output-format text'
+      implement: '-p "{prompt}" --sandbox --output-format text'
+
+  cursor-cli:
+    command: cursor-agent
+    cost_tier: flat-rate
+    perspectives:
+      review:
+        - code-simplification
+      explore:
+        - pattern-discovery
+      implement:
+        - migration
+    flags:
+      review: '--print --model auto "{prompt}"'
+      explore: '--print --model auto "{prompt}"'
+      implement: '--print --model auto "{prompt}"'
+
+# ── Graceful Degradation ──
+fallback:
+  claude-code: codex-cli
+  codex-cli: copilot-cli
+  copilot-cli: codex-cli
+  gemini-cli: copilot-cli
+  cursor-cli: copilot-cli
+
+# ── pr-review-toolkit Delegation Mapping ──
+toolkit_delegation:
+  code-reviewer: codex-cli
+  silent-failure-hunter: codex-cli
+  type-design-analyzer: claude-code
+  pr-test-analyzer: copilot-cli
+  comment-analyzer: copilot-cli
+  code-simplifier: cursor-cli

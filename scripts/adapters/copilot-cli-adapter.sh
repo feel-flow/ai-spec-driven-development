@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # ────────────────────────────────────────────────────────────
-# copilot-cli-adapter.sh — Multi-CLI Review: Copilot CLI Adapter
+# copilot-cli-adapter.sh — Multi-CLI Agent: Copilot CLI Adapter
 # ────────────────────────────────────────────────────────────
 # Usage: ./copilot-cli-adapter.sh <perspective-file> <output-file> [options]
 #
@@ -8,6 +8,8 @@
 #   --changed-files <files>   Comma-separated list of changed files
 #   --base <branch>           Base branch for diff (default: develop)
 #   --timeout <seconds>       Timeout in seconds (default: 300)
+#   --task-type <type>        review | explore | implement (default: review)
+#   --description <text>      Task description (for explore/implement)
 #
 # Requires: copilot (VS Code GitHub Copilot CLI extension)
 # Cost tier: Flat-rate ($10/month subscription)
@@ -37,13 +39,15 @@ parse_adapter_args "$@"
 
 prompt="$(build_prompt "$PERSPECTIVE_FILE" "$BASE_BRANCH" "$CHANGED_FILES")"
 
-# ── Execute Review ──
+# ── Execute Task ──
 
-echo "🔍 Running ${CLI_NAME} review..." >&2
+echo "🔍 Running ${CLI_NAME} ${TASK_TYPE:-review}..." >&2
 echo "   Perspective: $(basename "$PERSPECTIVE_FILE" .md)" >&2
+echo "   Task type: ${TASK_TYPE:-review}" >&2
 echo "   Timeout: ${TIMEOUT}s" >&2
 
 # Copilot CLI: -p for prompt, --silent suppresses stats
+# Same flags for all task types (flat-rate, no sandbox granularity)
 stderr_log="$(mktemp)"
 
 result=$(run_with_timeout "$TIMEOUT" \
