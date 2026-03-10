@@ -465,8 +465,9 @@ HEADER
     echo "(No review results found.)" >> "$report_file"
   fi
 
-  # Check for CRITICAL_BLOCK markers
-  if grep -q "Critical" "$report_file" 2>/dev/null; then
+  # Check for actual critical issues (not just template headings)
+  # Match patterns like "- [file:line] ..." under Critical sections, or "CRITICAL:" prefix
+  if grep -qE '^\s*-\s*\[.*:.*\]|^CRITICAL:|Critical:\s*[1-9]' "$report_file" 2>/dev/null; then
     echo "" >> "$report_file"
     echo "<!-- CRITICAL_BLOCK -->" >> "$report_file"
     echo "Critical issues detected. Review before proceeding." >> "$report_file"
@@ -481,8 +482,17 @@ main() {
   echo "=================================" >&2
   echo "" >&2
 
-  parse_args "$@"
+  # Two-pass parsing: extract --config first, then load config, then full CLI args override
+  local prev_was_config=false
+  for arg in "$@"; do
+    if [[ "$prev_was_config" == "true" ]]; then
+      CONFIG_FILE="$arg"
+      break
+    fi
+    if [[ "$arg" == "--config" ]]; then prev_was_config=true; else prev_was_config=false; fi
+  done
   load_config
+  parse_args "$@"
 
   echo "🔎 Detecting available CLIs..." >&2
   detect_available_clis
