@@ -22,8 +22,8 @@
 |---|---|---|---|---|---|
 | **Git統合度** | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐ | ⭐⭐⭐ | ⭐⭐⭐ | ⭐⭐⭐⭐ |
 | **カスタム設定** | CLAUDE.md, .claude/ | codex.md, AGENTS.md | .vscode/settings.json | settings.json | .cursorrules |
-| **CLI非インタラクティブ** | `claude -p` | `codex -p` | `copilot -p` | `gemini -p` | `cursor-agent --print` |
-| **安全性制御** | `--allowedTools`（ツール制限） | `--sandbox read-only` | `-s` | `--sandbox` | N/A |
+| **CLI非インタラクティブ** | `claude -p` | `codex exec` | `copilot -p` | `gemini -p` | `cursor-agent --print` |
+| **安全性制御** | `--allowed-tools`（ツール制限） | `--sandbox read-only` | `--allow-tool`/`--deny-tool` | `--sandbox` | N/A |
 | **PR自動化** | ネイティブサポート | ネイティブサポート | VS Code Tasks必要 | 手動スクリプト実行 | 手動スクリプト実行 |
 | **ドキュメント参照** | 自動読み込み | 自動読み込み | 手動指定 | 自動読み込み | contextFiles設定 |
 | **無料版の充実度** | ⭐⭐⭐⭐ | ⭐⭐⭐ | ❌ | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐ |

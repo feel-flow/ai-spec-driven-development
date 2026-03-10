@@ -141,8 +141,8 @@ adapter-{cli}.sh <perspective-file> <output-file> [--changed-files <file-list>]
 | CLI | コマンド | 主要フラグ | 備考 |
 |-----|---------|-----------|------|
 | Claude Code | `claude` | `-p "..." --allowed-tools "Read,Grep,Glob,Bash(git diff*)"` | ツール制限で安全性確保 |
-| Codex CLI | `codex` | `-p "..." --sandbox read-only --approval-policy never` | 読み取り専用サンドボックス |
-| Copilot CLI | `copilot` | `-p "..." -s --allow-all-tools` | セッション分離 |
+| Codex CLI | `codex` | `exec "..." --sandbox read-only` | 読み取り専用サンドボックス |
+| Copilot CLI | `copilot` | `-p "..." --silent --allow-all-tools` | `--silent`でstats出力抑制 |
 | Gemini CLI | `gemini` | `-p "..." --sandbox --output-format json` | サンドボックス＋JSON出力 |
 | Cursor CLI | `cursor-agent` | `--print --model auto "prompt"` | ヘッドレスモード（プロンプトはpositional引数） |
 

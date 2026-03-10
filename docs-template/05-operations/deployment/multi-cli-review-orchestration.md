@@ -287,9 +287,13 @@ jobs:
       - uses: actions/checkout@v4
       - name: Install CLI tools
         run: |
-          # 必要なCLIをインストール（パッケージ名は最新ドキュメントで確認）
+          # 必要なCLIをインストール（各CLI公式ドキュメントで最新手順を確認）
+          # Claude Code: https://docs.anthropic.com/en/docs/claude-code
           npm install -g @anthropic-ai/claude-code
+          # Codex CLI: https://github.com/openai/codex
           npm install -g @openai/codex
+          # Gemini CLI: https://github.com/google-gemini/gemini-cli
+          npm install -g @google/gemini-cli
       - name: Run Multi-CLI Review
         run: bash scripts/multi-review.sh --strategy minimize_cost
       - name: Upload results
