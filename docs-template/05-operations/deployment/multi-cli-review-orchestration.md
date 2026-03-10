@@ -285,8 +285,8 @@ jobs:
       - uses: actions/checkout@v4
       - name: Install CLI tools
         run: |
-          # 必要なCLIをインストール
-          npm install -g @anthropic/claude-code
+          # 必要なCLIをインストール（パッケージ名は最新ドキュメントで確認）
+          npm install -g @anthropic-ai/claude-code
           npm install -g @openai/codex
       - name: Run Multi-CLI Review
         run: bash scripts/multi-review.sh --strategy minimize_cost

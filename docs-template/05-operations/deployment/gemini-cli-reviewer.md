@@ -19,13 +19,17 @@ Google Gemini CLIをコードレビューエージェントとして利用する
 
 ## インストール
 
-### npm でインストール
+### インストール
 
 ```bash
-npm install -g @anthropic/gemini-cli
-# or
-npm install -g @anthropic/gemini-cli@latest
+# npm でグローバルインストール
+npm install -g @anthropic-ai/gemini-cli
+
+# npx で直接実行（インストール不要）
+npx @anthropic-ai/gemini-cli
 ```
+
+> **Note**: パッケージ名は変更される可能性があります。最新のインストール方法は [Gemini CLI 公式リポジトリ](https://github.com/google-gemini/gemini-cli) を参照してください。
 
 ### 動作確認
 

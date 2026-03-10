@@ -144,7 +144,7 @@ adapter-{cli}.sh <perspective-file> <output-file> [--changed-files <file-list>]
 | Codex CLI | `codex` | `-p "..." --sandbox read-only --approval-policy never` | 読み取り専用サンドボックス |
 | Copilot CLI | `copilot` | `-p "..." -s --allow-all-tools` | セッション分離 |
 | Gemini CLI | `gemini` | `-p "..." --sandbox --output-format json` | サンドボックス＋JSON出力 |
-| Cursor CLI | `cursor-agent` | `-p "..." --print --model auto` | ヘッドレスモード（既知の安定性問題あり） |
+| Cursor CLI | `cursor-agent` | `--print "..." --model auto` | ヘッドレスモード（既知の安定性問題あり） |
 
 ### アダプター実装の骨格
 
@@ -187,7 +187,7 @@ Output in the standard review format."
 
 ## 4. Severity Classification Standard
 
-全アダプター共通の重大度分類です。[PR Review Response Policy](../../CLAUDE.md) と連携します。
+全アダプター共通の重大度分類です。プロジェクトルートの `CLAUDE.md` に定義された PR Review Response Policy と連携します。
 
 ### 重大度レベル
 
