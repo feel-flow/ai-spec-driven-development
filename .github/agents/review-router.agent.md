@@ -31,6 +31,8 @@ Copilot CLI を活用し、各レビュースキルを**独立したLLMセッシ
   # または他の CLI で実行:
   → run_in_terminal: bash scripts/codex-review.sh [--staged|--branch]
   → run_in_terminal: bash scripts/copilot-review.sh [--staged|--branch]
+  → run_in_terminal: bash scripts/gemini-review.sh [--staged|--branch]
+  → run_in_terminal: bash scripts/cursor-review.sh [--staged|--branch]
 ```
 
 ### モード2: 動的読み込み（フォールバック）
@@ -69,7 +71,9 @@ scripts/
 ├── review-prompts.sh                ← 5レビュアーのプロンプトテンプレート
 ├── claude-review.sh                 ← Claude Code CLI で実行
 ├── codex-review.sh                  ← Codex CLI で実行
-└── copilot-review.sh                ← Copilot CLI で実行
+├── copilot-review.sh                ← Copilot CLI で実行
+├── gemini-review.sh                 ← Gemini CLI で実行
+└── cursor-review.sh                 ← Cursor CLI で実行
 ```
 
 ## ワークフロー
@@ -86,6 +90,8 @@ scripts/
    - Claude CLI: `bash scripts/claude-review.sh --branch`
    - Codex CLI: `bash scripts/codex-review.sh --branch`
    - Copilot CLI: `bash scripts/copilot-review.sh --branch`
+   - Gemini CLI: `bash scripts/gemini-review.sh --branch`
+   - Cursor CLI: `bash scripts/cursor-review.sh --branch`
    - 全CLI: 上記を順次またはバックグラウンドで実行
 2. スクリプト完了後、結果テーブルと詳細レポートが端末に表示される
 3. 統合結果をユーザーに報告する
