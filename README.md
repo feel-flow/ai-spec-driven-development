@@ -63,6 +63,39 @@ npm install && npm run setup
 | `npm run check` | MCP サーバーの動作確認 |
 | `npm run build:mcp` | MCP サーバーのビルド |
 | `npm run setup:labels` | GitHub ラベルの自動セットアップ |
+| `bash scripts/setup-multi-review.sh` | Multi-CLI Review Agent のセットアップ |
+
+### Multi-CLI Review Agent
+
+5つのAI CLI を並列実行し、異なるモデルの観点からコードレビューを行うオーケストレーションシステム。
+
+```bash
+# セットアップ（yq インストール、CLI検出、動作確認）
+bash scripts/setup-multi-review.sh
+
+# レビュー実行
+bash scripts/multi-review.sh              # 全CLI並列（デフォルト）
+bash scripts/multi-review.sh --dry-run    # 実行プランのみ確認
+bash scripts/multi-review.sh --strategy minimize_cost  # コスト最小化モード
+```
+
+Claude Code からはスラッシュコマンドで実行できます:
+
+```
+/multi-review                              # デフォルト（全CLI並列）
+/multi-review --strategy minimize_cost     # コスト最小化
+/multi-review --cli codex-cli              # 特定CLIのみ
+```
+
+| CLI | コスト | デフォルト観点 |
+|-----|--------|---------------|
+| Claude Code | Premium | 型設計分析 |
+| Codex CLI | Standard | コードレビュー、エラーハンドリング |
+| Copilot CLI | Flat-rate | テスト分析、コメント分析 |
+| Gemini CLI | Free-tier | セキュリティ分析 |
+| Cursor Agent | Flat-rate | コード簡素化 |
+
+設定: [`scripts/review-config.yaml`](./scripts/review-config.yaml) | 詳細: [`multi-cli-review-orchestration.md`](./docs-template/05-operations/deployment/multi-cli-review-orchestration.md)
 
 ## 7文書構造（起点）
 
