@@ -43,13 +43,27 @@ echo "🔍 Running ${CLI_NAME} review..." >&2
 echo "   Perspective: $(basename "$PERSPECTIVE_FILE" .md)" >&2
 echo "   Timeout: ${TIMEOUT}s" >&2
 
+stderr_log="$(mktemp)"
+
 result=$(run_with_timeout "$TIMEOUT" \
   "$CLI_COMMAND" -p "$prompt" \
     --allowed-tools "Read,Grep,Glob,Bash(git diff*)" \
-  2>/dev/null) || {
+  2>"$stderr_log") || {
     echo "ERROR: ${CLI_NAME} execution failed or timed out." >&2
+    if [[ -s "$stderr_log" ]]; then
+      echo "--- CLI stderr ---" >&2
+      cat "$stderr_log" >&2
+      echo "--- end stderr ---" >&2
+    fi
+    rm -f "$stderr_log"
     exit 1
   }
+rm -f "$stderr_log"
+
+if [[ -z "$result" ]]; then
+  echo "ERROR: ${CLI_NAME} produced no output. The review may have failed silently." >&2
+  exit 1
+fi
 
 # ── Write Output ──
 

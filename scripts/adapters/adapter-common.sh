@@ -6,7 +6,9 @@
 #   source "$(dirname "$0")/adapter-common.sh"
 # ────────────────────────────────────────────────────────────
 
-set -euo pipefail
+# Note: Do NOT set -euo pipefail here. This file is source'd by adapters
+# which have their own set -euo pipefail. Setting it here would cause
+# return 1 in functions to kill the sourcing process under set -e.
 
 # ── Constants ──
 readonly SEVERITY_CRITICAL="Critical"
@@ -28,18 +30,30 @@ cli_available() {
 # Usage: get_changed_files "develop"
 get_changed_files() {
   local base_branch="${1:-develop}"
-  git diff --name-only "${base_branch}...HEAD" 2>/dev/null || \
-    git diff --name-only HEAD 2>/dev/null || \
-    echo ""
+  if git diff --name-only "${base_branch}...HEAD" 2>/dev/null; then
+    return 0
+  fi
+  echo "WARNING: Could not diff against '${base_branch}', falling back to HEAD diff." >&2
+  if git diff --name-only HEAD 2>/dev/null; then
+    return 0
+  fi
+  echo "ERROR: Failed to get changed files. Are you in a git repository with commits?" >&2
+  return 1
 }
 
 # Get the diff content for review
 # Usage: get_diff_content "develop"
 get_diff_content() {
   local base_branch="${1:-develop}"
-  git diff "${base_branch}...HEAD" 2>/dev/null || \
-    git diff HEAD 2>/dev/null || \
-    echo ""
+  if git diff "${base_branch}...HEAD" 2>/dev/null; then
+    return 0
+  fi
+  echo "WARNING: Could not diff against '${base_branch}', falling back to HEAD diff." >&2
+  if git diff HEAD 2>/dev/null; then
+    return 0
+  fi
+  echo "ERROR: Failed to get diff content. Are you in a git repository with commits?" >&2
+  return 1
 }
 
 # ── Perspective Loading ──

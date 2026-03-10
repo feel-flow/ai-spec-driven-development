@@ -132,7 +132,8 @@ list_contains() {
 
 # ── Usage ──
 show_help() {
-  sed -n '/^# Usage:/,/^# See:/p' "$0" | head -n -1 | sed 's/^# //' | sed 's/^#//'
+  # macOS-compatible (BSD head lacks -n -1)
+  sed -n '/^# Usage:/,/^# See:/{/^# See:/d; s/^# \{0,1\}//; p;}' "$0"
   exit 0
 }
 
@@ -170,6 +171,13 @@ load_config() {
   fi
 
   if command -v yq &>/dev/null; then
+    # Validate YAML syntax first
+    if ! yq '.' "$CONFIG_FILE" >/dev/null 2>&1; then
+      echo "⚠️  Config file could not be parsed by yq. Check YAML syntax or yq version (v4+ required)." >&2
+      echo "   Using defaults." >&2
+      return 0
+    fi
+
     local cfg_val
     cfg_val=$(yq -r '.mode // empty' "$CONFIG_FILE" 2>/dev/null || true)
     [[ -n "$cfg_val" ]] && MODE="$cfg_val"
@@ -250,6 +258,11 @@ build_distributed_plan() {
       # CLI unavailable — redistribute to fallback
       fallback_target="$(get_cli_fallback "$cli_name")"
       if [[ -n "$fallback_target" ]] && list_contains "$AVAILABLE_CLIS" "$fallback_target"; then
+        # Respect CLI filter for fallback target too
+        if [[ -n "$CLI_FILTER" ]] && ! list_contains "$CLI_FILTER" "$fallback_target"; then
+          echo "  ⚠️  ${cli_name}: fallback ${fallback_target} excluded by --cli filter. Skipping." >&2
+          continue
+        fi
         echo "  ↪ ${cli_name} → ${fallback_target} (fallback)" >&2
         for p in $perspectives; do
           if [[ -n "$PERSPECTIVE_FILTER" ]] && ! list_contains "$PERSPECTIVE_FILTER" "$p"; then
@@ -390,27 +403,32 @@ execute_reviews() {
     fi
   done <<< "$EXECUTION_PLAN"
 
-  # Wait for parallel tasks
+  # Wait for parallel tasks (set +e to prevent bash 3.2 from exiting on wait failure)
   if [[ "$PARALLEL" == "true" && -n "$pids" ]]; then
     echo "⏳ Waiting for ${count} parallel reviews..." >&2
     local idx=0
+    local exit_code
+    set +e
     for pid in $pids; do
       idx=$((idx + 1))
-      # Extract task name by index
       local task_name
       task_name="$(echo "$tasks" | cut -d'|' -f"$idx")"
-      if wait "$pid"; then
+      wait "$pid"
+      exit_code=$?
+      if [[ $exit_code -eq 0 ]]; then
         echo "  ✅ Done: ${task_name}" >&2
       else
         failed=$((failed + 1))
-        echo "  ❌ Failed: ${task_name}" >&2
+        echo "  ❌ Failed: ${task_name} (exit code: ${exit_code})" >&2
       fi
     done
+    set -e
   fi
 
   echo "" >&2
   if [[ $failed -gt 0 ]]; then
     echo "⚠️  ${failed} review(s) failed." >&2
+    return 1
   else
     echo "✅ All reviews completed successfully." >&2
   fi
@@ -508,17 +526,28 @@ main() {
 
   show_plan
 
+  # Validate TIMEOUT is a positive integer
+  if ! echo "$TIMEOUT" | grep -qE '^[0-9]+$' || [[ "$TIMEOUT" -eq 0 ]]; then
+    echo "ERROR: --timeout must be a positive integer, got: '${TIMEOUT}'" >&2
+    exit 1
+  fi
+
   if [[ "$DRY_RUN" == "true" ]]; then
     echo "🏁 Dry run complete. No reviews executed." >&2
     exit 0
   fi
 
-  execute_reviews
+  local review_failed=false
+  execute_reviews || review_failed=true
   generate_report
 
   echo "" >&2
   echo "🏁 Done! View results:" >&2
   echo "   cat ${OUTPUT_DIR}/integrated-report.md" >&2
+
+  if [[ "$review_failed" == "true" ]]; then
+    exit 1
+  fi
 }
 
 main "$@"
