@@ -179,20 +179,20 @@ load_config() {
     fi
 
     local cfg_val
-    cfg_val=$(yq -r '.mode // empty' "$CONFIG_FILE" 2>/dev/null || true)
+    cfg_val=$(yq -r '.mode // ""' "$CONFIG_FILE" 2>/dev/null || true)
     [[ -n "$cfg_val" ]] && MODE="$cfg_val"
 
-    cfg_val=$(yq -r '.parallel // empty' "$CONFIG_FILE" 2>/dev/null || true)
+    cfg_val=$(yq -r '.parallel // ""' "$CONFIG_FILE" 2>/dev/null || true)
     [[ "$cfg_val" == "true" ]] && PARALLEL=true
     [[ "$cfg_val" == "false" ]] && PARALLEL=false
 
-    cfg_val=$(yq -r '.cost_strategy // empty' "$CONFIG_FILE" 2>/dev/null || true)
+    cfg_val=$(yq -r '.cost_strategy // ""' "$CONFIG_FILE" 2>/dev/null || true)
     [[ -n "$cfg_val" ]] && STRATEGY="$cfg_val"
 
-    cfg_val=$(yq -r '.timeout // empty' "$CONFIG_FILE" 2>/dev/null || true)
+    cfg_val=$(yq -r '.timeout // ""' "$CONFIG_FILE" 2>/dev/null || true)
     [[ -n "$cfg_val" ]] && TIMEOUT="$cfg_val"
 
-    cfg_val=$(yq -r '.output_dir // empty' "$CONFIG_FILE" 2>/dev/null || true)
+    cfg_val=$(yq -r '.output_dir // ""' "$CONFIG_FILE" 2>/dev/null || true)
     [[ -n "$cfg_val" ]] && OUTPUT_DIR="${REPO_ROOT}/${cfg_val}"
   else
     echo "ℹ️  yq not found — using defaults. Install yq for config file support." >&2
