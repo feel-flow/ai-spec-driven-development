@@ -40,19 +40,27 @@ fi
 CURSOR_MODEL="${CURSOR_MODEL:-auto}"
 REVIEW_TIMEOUT_SEC="${REVIEW_TIMEOUT_SEC:-600}"
 
+# Resolve timeout command (GNU timeout or macOS gtimeout)
+TIMEOUT_CMD=""
+if command -v timeout &>/dev/null; then
+    TIMEOUT_CMD="timeout"
+elif command -v gtimeout &>/dev/null; then
+    TIMEOUT_CMD="gtimeout"
+fi
+
 # Define CLI invocation (called by run_all_reviewers)
 # Note: timeout is mandatory due to known hanging issue with cursor-agent --print
 invoke_cli() {
     local prompt=$1
     local output=$2
 
-    if command -v timeout &>/dev/null; then
-        timeout "$REVIEW_TIMEOUT_SEC" cursor-agent --print --model "$CURSOR_MODEL" "$prompt" \
+    if [ -n "$TIMEOUT_CMD" ]; then
+        "$TIMEOUT_CMD" "$REVIEW_TIMEOUT_SEC" cursor-agent --print --model "$CURSOR_MODEL" "$prompt" \
             < "$DIFF_FILE" > "$output" 2>&1
     else
-        echo -e "${YELLOW}Warning: 'timeout' command not found. cursor-agent may hang without it!${NC}" >&2
-        cursor-agent --print --model "$CURSOR_MODEL" "$prompt" \
-            < "$DIFF_FILE" > "$output" 2>&1
+        echo -e "${RED}ERROR: 'timeout' command not found. cursor-agent requires timeout protection due to known hanging issue.${NC}" >&2
+        echo -e "${YELLOW}Install coreutils: brew install coreutils${NC}" >&2
+        return 1
     fi
 }
 

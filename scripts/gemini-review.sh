@@ -36,10 +36,18 @@ fi
 # Configuration
 REVIEW_TIMEOUT_SEC="${REVIEW_TIMEOUT_SEC:-600}"
 
-# Build model flag (only if GEMINI_MODEL is set)
-GEMINI_MODEL_FLAG=""
+# Build model args array (only if GEMINI_MODEL is set)
+GEMINI_MODEL_ARGS=()
 if [ -n "${GEMINI_MODEL:-}" ]; then
-    GEMINI_MODEL_FLAG="--model $GEMINI_MODEL"
+    GEMINI_MODEL_ARGS=("--model" "$GEMINI_MODEL")
+fi
+
+# Resolve timeout command (GNU timeout or macOS gtimeout)
+TIMEOUT_CMD=""
+if command -v timeout &>/dev/null; then
+    TIMEOUT_CMD="timeout"
+elif command -v gtimeout &>/dev/null; then
+    TIMEOUT_CMD="gtimeout"
 fi
 
 # Define CLI invocation (called by run_all_reviewers)
@@ -47,14 +55,14 @@ invoke_cli() {
     local prompt=$1
     local output=$2
 
-    if command -v timeout &>/dev/null; then
-        timeout "$REVIEW_TIMEOUT_SEC" gemini -p "$prompt" \
-            --sandbox --output-format text $GEMINI_MODEL_FLAG \
+    if [ -n "$TIMEOUT_CMD" ]; then
+        "$TIMEOUT_CMD" "$REVIEW_TIMEOUT_SEC" gemini -p "$prompt" \
+            --sandbox --output-format text "${GEMINI_MODEL_ARGS[@]}" \
             < "$DIFF_FILE" > "$output" 2>&1
     else
         echo -e "${YELLOW}Warning: 'timeout' command not found. No timeout protection.${NC}" >&2
         gemini -p "$prompt" \
-            --sandbox --output-format text $GEMINI_MODEL_FLAG \
+            --sandbox --output-format text "${GEMINI_MODEL_ARGS[@]}" \
             < "$DIFF_FILE" > "$output" 2>&1
     fi
 }
