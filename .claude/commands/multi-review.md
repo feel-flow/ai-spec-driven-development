@@ -1,6 +1,14 @@
-# /multi-review — Multi-CLI Review Orchestrator
+# /multi-review — 複数AIによるクロスモデルレビュー実行
 
 5つのAI CLI（Claude Code / Codex / Copilot / Gemini / Cursor）を並列実行し、異なる観点からコードレビューを実行します。
+
+## 前提
+
+- git リポジトリで作業中であること
+- `scripts/multi-review.sh` が存在すること
+- 少なくとも1つのAI CLIがインストールされていること（`claude`, `codex`, `copilot`, `gemini`, `cursor-agent` のいずれか）
+- `yq` がインストールされていること（`brew install yq`）
+- 未コミットまたはブランチ上の変更が存在すること
 
 ## 引数
 
@@ -9,10 +17,11 @@
   - 例: `--strategy minimize_cost`（コスト最小化）
   - 例: `--perspective code-review`（特定パースペクティブのみ）
   - 例: `--mode cross-model --perspective code-review`（クロスモデル比較）
+  - 全オプションは `bash scripts/multi-review.sh --help` で確認できます
 
 ## 手順
 
-### Phase 1: プラン確認（--dry-run）
+### 1. プラン確認（--dry-run）
 
 まず実行プランを表示し、ユーザーに確認を求めます:
 
@@ -27,7 +36,7 @@ bash scripts/multi-review.sh --dry-run $ARGUMENTS
 
 ユーザーに「このプランで実行してよいか」を確認してください。
 
-### Phase 2: レビュー実行
+### 2. レビュー実行
 
 ユーザーが承認したら、実際のレビューを実行します:
 
@@ -35,34 +44,38 @@ bash scripts/multi-review.sh --dry-run $ARGUMENTS
 bash scripts/multi-review.sh $ARGUMENTS
 ```
 
-**注意**: 実行には各CLIのAPIコストが発生します。タイムアウトはデフォルト300秒/CLIです。
+**注意**: 実行には各CLIの利用コストが発生します（特に premium/standard ティアのCLI）。`--strategy minimize_cost` で固定料金/無料CLIを優先できます。タイムアウトはデフォルト300秒/CLIです。
 
 実行中は進捗状況を監視し、完了を待ちます。
 
-### Phase 3: 結果分析と修正提案
+### 3. 結果分析と修正提案
 
 レビュー結果は `.review-results/` ディレクトリに出力されます。
 
 #### 3-1. 結果ファイルの読み込み
 
+スクリプトが自動生成する統合レポートをまず読み込みます:
+
 ```bash
-# 出力ディレクトリの内容を確認
+# スクリプト生成の統合レポートを確認
+cat .review-results/integrated-report.md
+
+# 各CLIの個別結果も必要に応じて確認
 ls -la .review-results/
 ```
 
-各CLIの結果ファイルを読み込みます:
-- `.review-results/{cli-name}/{perspective}.md`
+個別結果ファイルのパス: `.review-results/{cli-name}/{perspective}.md`
 
 #### 3-2. 重大度別の分類
 
-全CLIの結果を統合し、以下の重大度で分類します:
+スクリプト生成レポートを基に、PR Review Response Policy に従って分類します:
 
 | 重大度 | 対応 |
 |--------|------|
-| **Critical** | 必ず修正（自動対応） |
-| **Warning** | 必ず修正（自動対応） |
-| **Suggestion** | 妥当なものは修正 |
-| **Info** | 報告のみ |
+| **Critical** | 必ず修正（確認不要で即対応） |
+| **Warning** | 必ず修正（確認不要で即対応） |
+| **Suggestion** | 実装が妥当なものは対応（確認不要） |
+| **Info/Good Practices** | 確認のみ（対応不要） |
 
 #### 3-3. 重複排除（デデュプリケーション）
 
@@ -98,22 +111,24 @@ ls -la .review-results/
 
 #### 3-5. 自動修正の実行
 
-PR Review Response Policy に従い、Critical と Warning を自動修正します:
+PR Review Response Policy に従い、Critical/Warning/妥当な Suggestion を自動修正します:
 
 1. Critical/Warning の修正対象をリストアップ
 2. 各問題に対して修正を実施
-3. 修正内容をユーザーに報告
-4. Suggestion は妥当なもののみ対応
+3. Suggestion は実装が妥当なものを対応（確認不要）
+4. 修正内容をユーザーに報告
 
 修正完了後:
 ```bash
 git diff  # 修正内容の確認
 ```
 
-## 注意事項
+## 重要ルール
 
-- 各CLIのAPI利用にはコストが発生します（特にClaude/Codexはトークン課金）
-- `--strategy minimize_cost` で固定料金/無料CLIを優先できます
+- ステップ1の dry-run 確認なしにステップ2を実行しないこと
+- Critical/Warning の自動修正はユーザー確認不要で実行すること（PR Review Response Policy準拠）
+- 妥当な Suggestion も確認不要で対応すること
+- Info は報告のみで修正しないこと
 - CLI未インストールの場合は fallback 設定に従って自動再分配されます
 - 結果は `.review-results/` に保存され、後から参照できます
 - `scripts/review-config.yaml` で設定をカスタマイズできます
