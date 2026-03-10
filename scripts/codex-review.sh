@@ -7,7 +7,8 @@
 #
 # Env:
 #   SKIP_CODEX_REVIEW=1              Skip review
-#   CODEX_MODEL=gpt-5.4        Override model (default: gpt-5.4)
+#   REQUIRE_CODEX_REVIEW=1           Hard fail if codex CLI not found (default: soft skip)
+#   CODEX_MODEL=gpt-5.4              Override model (default: gpt-5.4)
 #   REVIEW_BASE_BRANCH=main          Override base branch for --branch mode (default: develop)
 #   REVIEW_TIMEOUT_SEC=600           Max seconds per reviewer (default: 600)
 
@@ -23,39 +24,57 @@ done
 source "$SCRIPT_DIR/review-prompts.sh"
 source "$SCRIPT_DIR/review-common.sh"
 
+if [ "$SKIP_CODEX_REVIEW" = "1" ] && [ "${REQUIRE_CODEX_REVIEW:-0}" = "1" ]; then
+    echo -e "${RED}ERROR: SKIP_CODEX_REVIEW and REQUIRE_CODEX_REVIEW cannot both be set${NC}" >&2
+    exit 2
+fi
+
 if [ "$SKIP_CODEX_REVIEW" = "1" ]; then
     echo -e "${YELLOW}Skipping Codex review (SKIP_CODEX_REVIEW=1)${NC}"
     exit 0
 fi
 
 if ! command -v codex &> /dev/null; then
+    if [ "${REQUIRE_CODEX_REVIEW:-0}" = "1" ]; then
+        echo -e "${RED}ERROR: REQUIRE_CODEX_REVIEW=1 but codex not found${NC}" >&2
+        exit 2
+    fi
     echo -e "${YELLOW}Warning: codex CLI not found, skipping review${NC}"
     echo -e "${YELLOW}Install: https://developers.openai.com/codex/cli/${NC}"
     exit 0
 fi
 
+
 # Configuration
 CODEX_MODEL="${CODEX_MODEL:-gpt-5.4}"
 REVIEW_TIMEOUT_SEC="${REVIEW_TIMEOUT_SEC:-600}"
+
+# Resolve timeout command (GNU timeout or macOS gtimeout)
+TIMEOUT_CMD=""
+if command -v timeout &>/dev/null; then
+    TIMEOUT_CMD="timeout"
+elif command -v gtimeout &>/dev/null; then
+    TIMEOUT_CMD="gtimeout"
+fi
 
 # Define CLI invocation (called by run_all_reviewers)
 invoke_cli() {
     local prompt=$1
     local output=$2
 
-    if command -v timeout &>/dev/null; then
-        timeout "$REVIEW_TIMEOUT_SEC" codex exec -m "$CODEX_MODEL" "$prompt" \
-            < "$DIFF_FILE" > "$output" 2>&1
+    if [ -n "$TIMEOUT_CMD" ]; then
+        "$TIMEOUT_CMD" "$REVIEW_TIMEOUT_SEC" codex exec -m "$CODEX_MODEL" "$prompt" \
+            < "$DIFF_FILE" > "$output"
     else
         echo -e "${YELLOW}Warning: 'timeout' command not found. No timeout protection.${NC}" >&2
         codex exec -m "$CODEX_MODEL" "$prompt" \
-            < "$DIFF_FILE" > "$output" 2>&1
+            < "$DIFF_FILE" > "$output"
     fi
 }
 
 # Prepare diff (pass through any mode argument: --staged, --branch)
-prepare_diff "$@"
-rc=$?
+rc=0
+prepare_diff "$@" || rc=$?
 if [ "$rc" -eq 1 ]; then
     exit 0  # Nothing to review
 elif [ "$rc" -ne 0 ]; then

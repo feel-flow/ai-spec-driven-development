@@ -4,6 +4,7 @@
 #
 # Env:
 #   SKIP_CURSOR_REVIEW=1             Skip review
+#   REQUIRE_CURSOR_REVIEW=1          Hard fail if cursor-agent CLI not found (default: soft skip)
 #   CURSOR_MODEL=auto                Override model (default: auto)
 #   REVIEW_BASE_BRANCH=main          Override base branch for --branch mode (default: develop)
 #   REVIEW_TIMEOUT_SEC=600           Max seconds per reviewer (default: 600)
@@ -25,16 +26,26 @@ done
 source "$SCRIPT_DIR/review-prompts.sh"
 source "$SCRIPT_DIR/review-common.sh"
 
+if [ "$SKIP_CURSOR_REVIEW" = "1" ] && [ "${REQUIRE_CURSOR_REVIEW:-0}" = "1" ]; then
+    echo -e "${RED}ERROR: SKIP_CURSOR_REVIEW and REQUIRE_CURSOR_REVIEW cannot both be set${NC}" >&2
+    exit 2
+fi
+
 if [ "$SKIP_CURSOR_REVIEW" = "1" ]; then
     echo -e "${YELLOW}Skipping Cursor review (SKIP_CURSOR_REVIEW=1)${NC}"
     exit 0
 fi
 
 if ! command -v cursor-agent &> /dev/null; then
+    if [ "${REQUIRE_CURSOR_REVIEW:-0}" = "1" ]; then
+        echo -e "${RED}ERROR: REQUIRE_CURSOR_REVIEW=1 but cursor-agent not found${NC}" >&2
+        exit 2
+    fi
     echo -e "${YELLOW}Warning: cursor-agent CLI not found, skipping review${NC}"
     echo -e "${YELLOW}Install: Install Cursor IDE and enable CLI access${NC}"
     exit 0
 fi
+
 
 # Configuration
 CURSOR_MODEL="${CURSOR_MODEL:-auto}"
@@ -56,7 +67,7 @@ invoke_cli() {
 
     if [ -n "$TIMEOUT_CMD" ]; then
         "$TIMEOUT_CMD" "$REVIEW_TIMEOUT_SEC" cursor-agent --print --model "$CURSOR_MODEL" "$prompt" \
-            < "$DIFF_FILE" > "$output" 2>&1
+            < "$DIFF_FILE" > "$output"
     else
         echo -e "${RED}ERROR: 'timeout' command not found. cursor-agent requires timeout protection due to known hanging issue.${NC}" >&2
         echo -e "${YELLOW}Install coreutils: brew install coreutils${NC}" >&2
@@ -65,8 +76,8 @@ invoke_cli() {
 }
 
 # Prepare diff (pass through any mode argument: --staged, --branch)
-prepare_diff "$@"
-rc=$?
+rc=0
+prepare_diff "$@" || rc=$?
 if [ "$rc" -eq 1 ]; then
     exit 0  # Nothing to review
 elif [ "$rc" -ne 0 ]; then
