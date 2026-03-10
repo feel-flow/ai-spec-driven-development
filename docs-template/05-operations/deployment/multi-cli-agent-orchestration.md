@@ -51,9 +51,9 @@ multi-agent.sh --task review|explore|implement [options]
 |------------|-------------|------|
 | architecture-analysis | claude-code | アーキテクチャ構造分析 |
 | dependency-mapping | codex-cli | 依存関係マッピング |
-| pattern-discovery | codex-cli | パターン検出 |
 | api-surface-analysis | copilot-cli | API サーフェス分析 |
 | tech-debt-assessment | gemini-cli | 技術的負債評価 |
+| pattern-discovery | cursor-cli | パターン検出 |
 
 ### Implement（実装）
 

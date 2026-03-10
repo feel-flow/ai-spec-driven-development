@@ -131,4 +131,4 @@ git diff  # 修正内容の確認
 - Info は報告のみで修正しないこと
 - CLI未インストールの場合は fallback 設定に従って自動再分配されます
 - 結果は `.review-results/` に保存され、後から参照できます
-- `scripts/review-config.yaml` で設定をカスタマイズできます
+- `scripts/agent-config.yaml` で設定をカスタマイズできます

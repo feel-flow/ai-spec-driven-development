@@ -48,13 +48,23 @@ echo "   Perspective: $(basename "$PERSPECTIVE_FILE" .md)" >&2
 echo "   Task type: ${TASK_TYPE:-review}" >&2
 echo "   Timeout: ${TIMEOUT}s" >&2
 
-# Gemini CLI: -p for prompt, --sandbox for all task types (output only for implement)
-# --output-format text for parseable output
+# Gemini CLI: -p for prompt, --output-format text for parseable output
+# Task-type specific sandbox: review/explore use --sandbox (read-only),
+# implement omits --sandbox to allow output generation
+get_gemini_sandbox_flag() {
+  case "${TASK_TYPE:-review}" in
+    review|explore) echo "--sandbox" ;;
+    implement)      echo "" ;;
+    *)              echo "--sandbox" ;;
+  esac
+}
+
+sandbox_flag="$(get_gemini_sandbox_flag)"
 stderr_log="$(mktemp)"
 
 result=$(run_with_timeout "$TIMEOUT" \
   "$CLI_COMMAND" -p "$prompt" \
-    --sandbox \
+    $sandbox_flag \
     --output-format text \
   2>"$stderr_log") || {
     echo "ERROR: ${CLI_NAME} execution failed or timed out." >&2

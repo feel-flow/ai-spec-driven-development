@@ -84,7 +84,7 @@ get_cli_perspectives_review() {
 get_cli_perspectives_explore() {
   case "$1" in
     claude-code) echo "architecture-analysis" ;;
-    codex-cli)   echo "dependency-mapping pattern-discovery" ;;
+    codex-cli)   echo "dependency-mapping" ;;
     copilot-cli) echo "api-surface-analysis" ;;
     gemini-cli)  echo "tech-debt-assessment" ;;
     cursor-cli)  echo "pattern-discovery" ;;
@@ -511,19 +511,19 @@ run_single_task() {
     return 1
   fi
 
-  local extra_args=""
-  extra_args="--task-type $TASK_TYPE"
+  local extra_args=()
+  extra_args+=(--task-type "$TASK_TYPE")
   if [[ -n "$DESCRIPTION" ]]; then
-    extra_args="$extra_args --description $DESCRIPTION"
+    extra_args+=(--description "$DESCRIPTION")
   fi
   if [[ "$INCLUDE_DIFF" == "true" ]]; then
-    extra_args="$extra_args --include-diff"
+    extra_args+=(--include-diff)
   fi
 
   bash "$adapter" "$perspective_file" "$output_file" \
     --base "$BASE_BRANCH" \
     --timeout "$TIMEOUT" \
-    $extra_args
+    "${extra_args[@]}"
 }
 
 # ── Execute All Tasks ──

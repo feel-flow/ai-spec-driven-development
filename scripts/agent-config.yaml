@@ -48,7 +48,6 @@ agents:
         - error-handler-hunt
       explore:
         - dependency-mapping
-        - pattern-discovery
       implement:
         - refactoring
     flags:
