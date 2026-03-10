@@ -1,7 +1,7 @@
 ---
 title: "PLAYBOOK"
 version: "1.1.0"
-status: "active"
+status: "approved"
 created: "2026-03-10"
 updated: "2026-03-10"
 owner: "@fffokazaki"
