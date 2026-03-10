@@ -110,6 +110,8 @@ command -v cursor-agent && echo "✅ Cursor CLI" || echo "❌ Cursor CLI"
 
 ### Step 1: スクリプト配置
 
+> **Note**: `scripts/multi-review.sh`、`scripts/adapters/`、`scripts/review-config.yaml`、`scripts/perspectives/` は別Issueで実装予定です。以下は実装後の手順を記載しています。
+
 ```bash
 # リポジトリルートから
 chmod +x scripts/multi-review.sh

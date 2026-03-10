@@ -47,7 +47,7 @@ echo 'export PATH="$PATH:/Applications/Cursor.app/Contents/Resources/app/bin"' >
 
 | フラグ | 説明 | 用途 |
 |-------|------|------|
-| `-p` / `--print` | ヘッドレスモード（非インタラクティブ） | プロンプト直接渡し |
+| `-p` / `--print` | ヘッドレスモード（非インタラクティブ） | プロンプトはpositional引数として渡す |
 | `--model auto` | モデル自動選択 | 最適なモデルを自動選択 |
 | `--model <name>` | モデル指定 | 特定モデルを使用 |
 | `--output-format text` | テキスト出力 | 人間可読な結果 |
@@ -113,7 +113,11 @@ Cursor CLIが利用不可の場合、`code-simplification` パースペクティ
 
 1. **timeout コマンドでラップ**（推奨）:
 ```bash
+# Linux
 timeout 120 cursor-agent --print --model auto "prompt here"
+
+# macOS（coreutilsが必要: brew install coreutils）
+gtimeout 120 cursor-agent --print --model auto "prompt here"
 ```
 
 2. **アダプターでの対応**:

@@ -63,9 +63,10 @@ gemini auth login
 | `--sandbox` / `-s` | サンドボックスモード | ファイルシステム保護 |
 | `--output-format json` | JSON出力 | 構造化結果のパース |
 | `--output-format text` | テキスト出力（デフォルト） | 人間可読な結果 |
-| `--yolo` | ツール自動承認 | 非インタラクティブ実行時 |
+| `--yolo` | 全アクション自動承認 | 非インタラクティブ実行時 |
+| `--approval-mode <mode>` | 承認モード（`default`/`auto_edit`/`yolo`/`plan`） | `plan`でread-onlyレビュー |
 | `--debug` / `-d` | デバッグモード | トラブルシューティング |
-| `--resume` | 前回セッション再開 | 継続レビュー |
+| `--resume <latest\|N>` | 前回セッション再開（`latest`または番号指定） | 継続レビュー |
 
 ### レビュー実行コマンド例
 

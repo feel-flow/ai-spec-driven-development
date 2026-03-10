@@ -140,11 +140,11 @@ adapter-{cli}.sh <perspective-file> <output-file> [--changed-files <file-list>]
 
 | CLI | コマンド | 主要フラグ | 備考 |
 |-----|---------|-----------|------|
-| Claude Code | `claude` | `-p "..." --allowedTools "Read,Grep,Glob,Bash(git diff*)"` | ツール制限で安全性確保 |
+| Claude Code | `claude` | `-p "..." --allowed-tools "Read,Grep,Glob,Bash(git diff*)"` | ツール制限で安全性確保 |
 | Codex CLI | `codex` | `-p "..." --sandbox read-only --approval-policy never` | 読み取り専用サンドボックス |
 | Copilot CLI | `copilot` | `-p "..." -s --allow-all-tools` | セッション分離 |
 | Gemini CLI | `gemini` | `-p "..." --sandbox --output-format json` | サンドボックス＋JSON出力 |
-| Cursor CLI | `cursor-agent` | `--print "..." --model auto` | ヘッドレスモード（既知の安定性問題あり） |
+| Cursor CLI | `cursor-agent` | `--print --model auto "prompt"` | ヘッドレスモード（プロンプトはpositional引数） |
 
 ### アダプター実装の骨格
 
@@ -176,7 +176,10 @@ $DIFF_CONTENT
 Analyze the above changes according to the perspective.
 Output in the standard review format."
 
-# 3. CLI実行
+# 3. CLI実行（CLI別に分岐が必要）
+# 多くのCLIは -p でプロンプトを渡すが、Cursor CLIは --print + positional引数
+# 例: claude -p "$PROMPT" / codex -p "$PROMPT" / gemini -p "$PROMPT"
+# 例: cursor-agent --print --model auto "$PROMPT"
 {cli} -p "$PROMPT" {flags} > "$OUTPUT_FILE" 2>&1
 
 # 4. 出力パース（CLI固有の後処理）
