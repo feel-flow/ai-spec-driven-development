@@ -34,12 +34,12 @@ if [ "$SKIP_GEMINI_REVIEW" = "1" ]; then
 fi
 
 if ! command -v gemini &> /dev/null; then
-    echo -e "${YELLOW}Warning: gemini CLI not found, skipping review${NC}"
-    echo -e "${YELLOW}Install: npm install -g @google/gemini-cli${NC}"
     if [ "${REQUIRE_GEMINI_REVIEW:-0}" = "1" ]; then
         echo -e "${RED}ERROR: REQUIRE_GEMINI_REVIEW=1 but gemini not found${NC}" >&2
         exit 2
     fi
+    echo -e "${YELLOW}Warning: gemini CLI not found, skipping review${NC}"
+    echo -e "${YELLOW}Install: npm install -g @google/gemini-cli${NC}"
     exit 0
 fi
 
@@ -70,12 +70,12 @@ invoke_cli() {
     if [ -n "$TIMEOUT_CMD" ]; then
         "$TIMEOUT_CMD" "$REVIEW_TIMEOUT_SEC" gemini -p "$prompt" \
             --sandbox --output-format text "${GEMINI_MODEL_ARGS[@]}" \
-            < "$DIFF_FILE" > "$output" 2>&1
+            < "$DIFF_FILE" > "$output"
     else
         echo -e "${YELLOW}Warning: 'timeout' command not found. No timeout protection.${NC}" >&2
         gemini -p "$prompt" \
             --sandbox --output-format text "${GEMINI_MODEL_ARGS[@]}" \
-            < "$DIFF_FILE" > "$output" 2>&1
+            < "$DIFF_FILE" > "$output"
     fi
 }
 

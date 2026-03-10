@@ -35,12 +35,12 @@ if [ "$SKIP_CODEX_REVIEW" = "1" ]; then
 fi
 
 if ! command -v codex &> /dev/null; then
-    echo -e "${YELLOW}Warning: codex CLI not found, skipping review${NC}"
-    echo -e "${YELLOW}Install: https://developers.openai.com/codex/cli/${NC}"
     if [ "${REQUIRE_CODEX_REVIEW:-0}" = "1" ]; then
         echo -e "${RED}ERROR: REQUIRE_CODEX_REVIEW=1 but codex not found${NC}" >&2
         exit 2
     fi
+    echo -e "${YELLOW}Warning: codex CLI not found, skipping review${NC}"
+    echo -e "${YELLOW}Install: https://developers.openai.com/codex/cli/${NC}"
     exit 0
 fi
 
@@ -49,26 +49,26 @@ fi
 CODEX_MODEL="${CODEX_MODEL:-gpt-5.4}"
 REVIEW_TIMEOUT_SEC="${REVIEW_TIMEOUT_SEC:-600}"
 
+# Resolve timeout command (GNU timeout or macOS gtimeout)
+TIMEOUT_CMD=""
+if command -v timeout &>/dev/null; then
+    TIMEOUT_CMD="timeout"
+elif command -v gtimeout &>/dev/null; then
+    TIMEOUT_CMD="gtimeout"
+fi
+
 # Define CLI invocation (called by run_all_reviewers)
 invoke_cli() {
     local prompt=$1
     local output=$2
 
-    # Resolve timeout command (GNU timeout or macOS gtimeout)
-    local timeout_cmd=""
-    if command -v timeout &>/dev/null; then
-        timeout_cmd="timeout"
-    elif command -v gtimeout &>/dev/null; then
-        timeout_cmd="gtimeout"
-    fi
-
-    if [ -n "$timeout_cmd" ]; then
-        "$timeout_cmd" "$REVIEW_TIMEOUT_SEC" codex exec -m "$CODEX_MODEL" "$prompt" \
-            < "$DIFF_FILE" > "$output" 2>&1
+    if [ -n "$TIMEOUT_CMD" ]; then
+        "$TIMEOUT_CMD" "$REVIEW_TIMEOUT_SEC" codex exec -m "$CODEX_MODEL" "$prompt" \
+            < "$DIFF_FILE" > "$output"
     else
         echo -e "${YELLOW}Warning: 'timeout' command not found. No timeout protection.${NC}" >&2
         codex exec -m "$CODEX_MODEL" "$prompt" \
-            < "$DIFF_FILE" > "$output" 2>&1
+            < "$DIFF_FILE" > "$output"
     fi
 }
 

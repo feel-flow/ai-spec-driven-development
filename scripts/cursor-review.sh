@@ -37,12 +37,12 @@ if [ "$SKIP_CURSOR_REVIEW" = "1" ]; then
 fi
 
 if ! command -v cursor-agent &> /dev/null; then
-    echo -e "${YELLOW}Warning: cursor-agent CLI not found, skipping review${NC}"
-    echo -e "${YELLOW}Install: Install Cursor IDE and enable CLI access${NC}"
     if [ "${REQUIRE_CURSOR_REVIEW:-0}" = "1" ]; then
         echo -e "${RED}ERROR: REQUIRE_CURSOR_REVIEW=1 but cursor-agent not found${NC}" >&2
         exit 2
     fi
+    echo -e "${YELLOW}Warning: cursor-agent CLI not found, skipping review${NC}"
+    echo -e "${YELLOW}Install: Install Cursor IDE and enable CLI access${NC}"
     exit 0
 fi
 
@@ -67,7 +67,7 @@ invoke_cli() {
 
     if [ -n "$TIMEOUT_CMD" ]; then
         "$TIMEOUT_CMD" "$REVIEW_TIMEOUT_SEC" cursor-agent --print --model "$CURSOR_MODEL" "$prompt" \
-            < "$DIFF_FILE" > "$output" 2>&1
+            < "$DIFF_FILE" > "$output"
     else
         echo -e "${RED}ERROR: 'timeout' command not found. cursor-agent requires timeout protection due to known hanging issue.${NC}" >&2
         echo -e "${YELLOW}Install coreutils: brew install coreutils${NC}" >&2

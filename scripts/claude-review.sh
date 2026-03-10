@@ -40,12 +40,12 @@ if [ -n "${CLAUDECODE:-}" ]; then
 fi
 
 if ! command -v claude &> /dev/null; then
-    echo -e "${YELLOW}Warning: claude CLI not found, skipping review${NC}"
-    echo -e "${YELLOW}Install: https://docs.anthropic.com/en/docs/claude-code${NC}"
     if [ "${REQUIRE_CLAUDE_REVIEW:-0}" = "1" ]; then
         echo -e "${RED}ERROR: REQUIRE_CLAUDE_REVIEW=1 but claude not found${NC}" >&2
         exit 2
     fi
+    echo -e "${YELLOW}Warning: claude CLI not found, skipping review${NC}"
+    echo -e "${YELLOW}Install: https://docs.anthropic.com/en/docs/claude-code${NC}"
     exit 0
 fi
 
@@ -53,6 +53,14 @@ fi
 # Configuration
 CLAUDE_MODEL="${CLAUDE_MODEL:-}"
 REVIEW_TIMEOUT_SEC="${REVIEW_TIMEOUT_SEC:-600}"
+
+# Resolve timeout command (GNU timeout or macOS gtimeout)
+TIMEOUT_CMD=""
+if command -v timeout &>/dev/null; then
+    TIMEOUT_CMD="timeout"
+elif command -v gtimeout &>/dev/null; then
+    TIMEOUT_CMD="gtimeout"
+fi
 
 # Define CLI invocation (called by run_all_reviewers)
 invoke_cli() {
@@ -66,19 +74,11 @@ invoke_cli() {
         cmd=(claude -p "$prompt" --allowedTools "Read,Grep,Glob")
     fi
 
-    # Resolve timeout command (GNU timeout or macOS gtimeout)
-    local timeout_cmd=""
-    if command -v timeout &>/dev/null; then
-        timeout_cmd="timeout"
-    elif command -v gtimeout &>/dev/null; then
-        timeout_cmd="gtimeout"
-    fi
-
-    if [ -n "$timeout_cmd" ]; then
-        "$timeout_cmd" "$REVIEW_TIMEOUT_SEC" "${cmd[@]}" < "$DIFF_FILE" > "$output" 2>&1
+    if [ -n "$TIMEOUT_CMD" ]; then
+        "$TIMEOUT_CMD" "$REVIEW_TIMEOUT_SEC" "${cmd[@]}" < "$DIFF_FILE" > "$output"
     else
         echo -e "${YELLOW}Warning: 'timeout' command not found. No timeout protection.${NC}" >&2
-        "${cmd[@]}" < "$DIFF_FILE" > "$output" 2>&1
+        "${cmd[@]}" < "$DIFF_FILE" > "$output"
     fi
 }
 

@@ -32,12 +32,12 @@ if [ "$SKIP_COPILOT_REVIEW" = "1" ]; then
 fi
 
 if ! command -v copilot &> /dev/null; then
-    echo -e "${YELLOW}Warning: copilot CLI not found, skipping review${NC}"
-    echo -e "${YELLOW}Install: https://docs.github.com/en/copilot/how-tos/use-copilot-agents/use-copilot-cli${NC}"
     if [ "${REQUIRE_COPILOT_REVIEW:-0}" = "1" ]; then
         echo -e "${RED}ERROR: REQUIRE_COPILOT_REVIEW=1 but copilot not found${NC}" >&2
         exit 2
     fi
+    echo -e "${YELLOW}Warning: copilot CLI not found, skipping review${NC}"
+    echo -e "${YELLOW}Install: https://docs.github.com/en/copilot/how-tos/use-copilot-agents/use-copilot-cli${NC}"
     exit 0
 fi
 
@@ -46,26 +46,26 @@ fi
 COPILOT_MODEL="${COPILOT_MODEL:-claude-sonnet-4.5}"
 REVIEW_TIMEOUT_SEC="${REVIEW_TIMEOUT_SEC:-600}"
 
+# Resolve timeout command (GNU timeout or macOS gtimeout)
+TIMEOUT_CMD=""
+if command -v timeout &>/dev/null; then
+    TIMEOUT_CMD="timeout"
+elif command -v gtimeout &>/dev/null; then
+    TIMEOUT_CMD="gtimeout"
+fi
+
 # Define CLI invocation (called by run_all_reviewers)
 invoke_cli() {
     local prompt=$1
     local output=$2
 
-    # Resolve timeout command (GNU timeout or macOS gtimeout)
-    local timeout_cmd=""
-    if command -v timeout &>/dev/null; then
-        timeout_cmd="timeout"
-    elif command -v gtimeout &>/dev/null; then
-        timeout_cmd="gtimeout"
-    fi
-
-    if [ -n "$timeout_cmd" ]; then
-        "$timeout_cmd" "$REVIEW_TIMEOUT_SEC" copilot -p "$prompt" --model "$COPILOT_MODEL" \
-            < "$DIFF_FILE" > "$output" 2>&1
+    if [ -n "$TIMEOUT_CMD" ]; then
+        "$TIMEOUT_CMD" "$REVIEW_TIMEOUT_SEC" copilot -p "$prompt" --model "$COPILOT_MODEL" \
+            < "$DIFF_FILE" > "$output"
     else
         echo -e "${YELLOW}Warning: 'timeout' command not found. No timeout protection.${NC}" >&2
         copilot -p "$prompt" --model "$COPILOT_MODEL" \
-            < "$DIFF_FILE" > "$output" 2>&1
+            < "$DIFF_FILE" > "$output"
     fi
 }
 
