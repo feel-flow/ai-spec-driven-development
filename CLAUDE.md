@@ -169,6 +169,9 @@ node scripts/build-spec-index.mjs
 
 # GitHub labels setup
 bash scripts/setup-github-labels.sh
+
+# Multi-CLI Review Agent setup
+bash scripts/setup-multi-review.sh
 ```
 
 ### Working with This Repository
