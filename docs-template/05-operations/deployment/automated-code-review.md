@@ -9,6 +9,32 @@
 
 ### システム構成
 
+**方法1: 個別CLIアダプタ（setup-automated-review.sh）**
+
+```
+┌─────────────────┐     ┌──────────────────┐     ┌──────────────────────┐
+│   git commit    │────▶│  Husky Hook      │────▶│  最初に見つかった      │
+│                 │     │  (pre-commit)    │     │  CLI アダプタを実行    │
+└─────────────────┘     └──────────────────┘     └──────────┬───────────┘
+                                                            │
+                           CLI バイナリの存在を確認し          │
+                           優先順位で選択:                    │
+                           Claude > Codex > Copilot          │
+                           > Gemini > Cursor                 │
+                                                            ▼
+                                              ┌──────────────────────┐
+                                              │  5種並列レビュワー      │
+                                              │  (review-common.sh)  │
+                                              └──────────┬───────────┘
+                                                         ▼
+                                              ┌─────────────────────┐
+                                              │ APPROVED: コミット続行 │
+                                              │ REJECTED: コミット停止 │
+                                              └─────────────────────┘
+```
+
+**方法2: Multi-CLI オーケストレーター（setup-multi-review.sh）**
+
 ```
 ┌─────────────────┐     ┌──────────────────┐     ┌──────────────────────┐
 │   git commit    │────▶│  Husky Hook      │────▶│  multi-agent.sh      │
@@ -63,7 +89,7 @@ bash scripts/setup-automated-review.sh
 bash scripts/setup-multi-review.sh
 ```
 
-**方法1（setup-automated-review.sh）** は `git commit` 時に利用可能なAI CLIで自動レビューする基本構成です。Husky pre-commit フック、5つのCLIアダプタ、Claude Code `/code-review` コマンドをセットアップします。
+**方法1（setup-automated-review.sh）** は `git commit` 時に利用可能なAI CLIで自動レビューする基本構成です。Husky pre-commit フックと Claude Code `/code-review` コマンドを作成し、5つのCLIアダプタの存在を検証・有効化します。
 
 **方法2（setup-multi-review.sh）** は複数AI CLIを並列・分散実行するオーケストレーターです。コスト戦略やクロスモデル比較など高度な機能が利用できます。
 
@@ -121,7 +147,7 @@ project-root/
 ```bash
 git add .
 git commit -m "feat: 新機能を追加"
-# → Claude Codeが自動でレビューを実行
+# → 利用可能なAI CLIが自動でレビューを実行
 # → 問題がなければコミット完了
 # → 問題があればコミットをブロック
 ```
@@ -307,6 +333,7 @@ npx husky init
 | `npm run code-review:codex` | Codex CLIでレビュー |
 | `npm run code-review:copilot` | Copilot CLIでレビュー |
 | `npm run code-review:gemini` | Gemini CLIでレビュー |
+| `npm run code-review:cursor` | Cursor Agentでレビュー |
 | `git commit --no-verify` | レビューをスキップ |
 | `SKIP_CLAUDE_REVIEW=1 git commit` | 環境変数でスキップ |
 

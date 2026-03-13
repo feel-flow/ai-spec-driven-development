@@ -37,6 +37,9 @@
 
 set -euo pipefail
 
+# Inform user on unexpected failure (script is idempotent, safe to re-run)
+trap 'echo ""; echo -e "\033[0;31m  ✗ セットアップが途中で失敗しました\033[0m"; echo "    エラーを修正してからスクリプトを再実行してください（冪等なので安全に再実行可能）"' ERR
+
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 
@@ -132,7 +135,7 @@ AI CLI を使った自動コードレビューをセットアップします。
   .husky/pre-commit              Git pre-commit hook
   .claude/commands/code-review.md  スラッシュコマンド定義
 
-詳細: docs-template/05-operations/deployment/multi-cli-review-orchestration.md
+詳細: docs-template/05-operations/deployment/automated-code-review.md
 EOF
 }
 
@@ -187,13 +190,14 @@ Cursor Agent:cursor-agent"
     done <<< "$clis"
 
     if [ "$found" -eq 0 ]; then
-        print_warning "AI CLI が1つも見つかりません"
-        echo -e "    ${YELLOW}→ 以下のいずれかをインストールしてください:${NC}"
+        print_error "AI CLI が1つもインストールされていません。セットアップを中止します。"
+        echo -e "    ${RED}→ 以下のいずれかをインストールしてから再実行してください:${NC}"
         echo "      Claude Code:  npm install -g @anthropic-ai/claude-code"
         echo "      Codex CLI:    npm install -g @openai/codex"
         echo "      Copilot CLI:  gh extension install github/gh-copilot"
         echo "      Gemini CLI:   npm install -g @google/gemini-cli"
         echo "      Cursor Agent: https://docs.cursor.com/cli"
+        exit 1
     else
         print_success "${found}/5 の AI CLI が利用可能です"
     fi
@@ -262,6 +266,11 @@ create_directories() {
 create_pre_commit_hook() {
     print_step 4 "pre-commit hookを作成中..."
 
+    if [ -f "$REPO_ROOT/.husky/pre-commit" ]; then
+        cp "$REPO_ROOT/.husky/pre-commit" "$REPO_ROOT/.husky/pre-commit.backup"
+        print_warning "既存の .husky/pre-commit をバックアップしました → .husky/pre-commit.backup"
+    fi
+
     cat > "$REPO_ROOT/.husky/pre-commit" << 'PRE_COMMIT'
 #!/bin/sh
 
@@ -270,9 +279,9 @@ create_pre_commit_hook() {
 # AI CLI による自動コードレビューを実行
 # ============================================================================
 
-# Skip if environment variable is set
-if [ "$SKIP_CLAUDE_REVIEW" = "1" ]; then
-    echo "Skipping AI review (SKIP_CLAUDE_REVIEW=1)"
+# Skip if environment variable is set (legacy name preserved for backward compatibility)
+if [ "${SKIP_CLAUDE_REVIEW:-0}" = "1" ] || [ "${SKIP_AI_REVIEW:-0}" = "1" ]; then
+    echo "Skipping AI review (SKIP_CLAUDE_REVIEW or SKIP_AI_REVIEW is set)"
     exit 0
 fi
 
@@ -291,12 +300,15 @@ fi
 # Get project root
 PROJECT_ROOT="$(git rev-parse --show-toplevel)"
 
-# Run the first available AI CLI review script (in priority order)
+# Run the first available AI CLI review script (check CLI binary, not just file)
 # Priority: Claude > Codex > Copilot > Gemini > Cursor
-REVIEW_SCRIPTS="claude-review.sh codex-review.sh copilot-review.sh gemini-review.sh cursor-review.sh"
+CLI_ENTRIES="claude:claude-review.sh codex:codex-review.sh copilot:copilot-review.sh gemini:gemini-review.sh cursor-agent:cursor-review.sh"
 
-for script in $REVIEW_SCRIPTS; do
-    if [ -f "$PROJECT_ROOT/scripts/$script" ]; then
+for entry in $CLI_ENTRIES; do
+    cmd="${entry%%:*}"
+    script="${entry##*:}"
+
+    if command -v "$cmd" >/dev/null 2>&1 && [ -f "$PROJECT_ROOT/scripts/$script" ]; then
         "$PROJECT_ROOT/scripts/$script" --staged
         exit_code=$?
 
@@ -310,8 +322,8 @@ for script in $REVIEW_SCRIPTS; do
     fi
 done
 
-echo "Warning: No AI review scripts found at $PROJECT_ROOT/scripts/"
-echo "Run 'bash scripts/setup-automated-review.sh' to set up."
+echo "Warning: No AI CLI found. Install one of: claude, codex, copilot, gemini, cursor-agent"
+echo "To skip review: git commit --no-verify"
 exit 0
 PRE_COMMIT
 
@@ -406,7 +418,7 @@ setup_npm_scripts() {
 
     # Try to update package.json with jq if available
     if command -v jq > /dev/null 2>&1; then
-        jq '.scripts = (.scripts // {}) + {
+        if jq '.scripts = (.scripts // {}) + {
             "prepare": "husky",
             "code-review": "bash scripts/claude-review.sh --staged",
             "code-review:branch": "bash scripts/claude-review.sh --branch",
@@ -416,9 +428,16 @@ setup_npm_scripts() {
             "code-review:cursor": "bash scripts/cursor-review.sh --branch"
         } | .devDependencies = (.devDependencies // {}) + {
             "husky": "^9.1.7"
-        }' "$REPO_ROOT/package.json" > "$REPO_ROOT/package.json.tmp" \
-            && mv "$REPO_ROOT/package.json.tmp" "$REPO_ROOT/package.json"
-        print_success "package.json 更新完了"
+        }' "$REPO_ROOT/package.json" > "$REPO_ROOT/package.json.tmp"; then
+            mv "$REPO_ROOT/package.json.tmp" "$REPO_ROOT/package.json"
+            print_success "package.json 更新完了"
+        else
+            rm -f "$REPO_ROOT/package.json.tmp"
+            print_warning "package.json の自動更新に失敗しました（JSONが不正な可能性）"
+            echo -e "${YELLOW}  手動で以下を追加してください:${NC}"
+            echo '    "code-review": "bash scripts/claude-review.sh --staged"'
+            echo '    "code-review:branch": "bash scripts/claude-review.sh --branch"'
+        fi
     else
         print_warning "jq が見つかりません。package.json を手動で更新してください"
         echo ""
