@@ -11,13 +11,13 @@ metadata:
   version: "1.0.0"
   author: feel-flow
   tags: "error-handling, result-pattern, custom-errors, logging, silent-error"
-  references: "docs-template/03-implementation/PATTERNS.md, docs-template/MASTER.md"
+  references: "docs-template/03-implementation/PATTERNS.md, docs-template/03-implementation/FALLBACK.md, docs-template/MASTER.md"
 ---
 
 # エラーハンドリング基準
 
 サイレントエラーゼロトレランスを原則とし、すべてのエラーを適切に分類・処理・記録するためのスキル。
-PATTERNS.md のセクション 3, 9 で定義されたパターンを適用する。
+PATTERNS.md のセクション 3, 9 および FALLBACK.md で定義されたパターンを適用する。
 
 ## 1. サイレントエラーの禁止
 
@@ -227,6 +227,8 @@ logger.error('Failed to process user', error, {
 
 ## 8. AI生成コードのフォールバックアンチパターン
 
+> 包括的なフォールバック戦略（階層モデル・レイヤー別パターン含む）は [FALLBACK.md](../../03-implementation/FALLBACK.md) を参照。
+
 AI（Claude Code, Copilot, Cursor等）は `try-catch` + デフォルト値返却を自動挿入する傾向がある。
 このパターンは開発中のバグを隠蔽し、本番で初めて問題が発覚するリスクを生む。
 
@@ -256,7 +258,7 @@ const data = await fetchData().catch(() => defaultValue);
 フォールバックが必要な場合は、`fallbackInProdOnly()` ユーティリティ（推奨）または環境分岐を使用する：
 
 ```typescript
-// ✅ 環境別フォールバック（PATTERNS.md 準拠）
+// ✅ 環境別フォールバック（FALLBACK.md 準拠）
 try {
   return await fetchData();
 } catch (error) {
