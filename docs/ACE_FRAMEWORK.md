@@ -17,7 +17,7 @@ changeImpact: high
 # ACE (Agentic Context Engineering) フレームワーク
 
 > **関連文書**:
-> - [Playbook テンプレート](../docs-template/08-knowledge/PLAYBOOK.md) - ACE Playbook の実ファイル
+> - [Playbook テンプレート](../docs-template/08-knowledge/PLAYBOOK.md) - ACE Playbook のテンプレートファイル
 > - [ACE サイクル運用手順](../docs-template/05-operations/deployment/ace-cycle.md) - Generate → Reflect → Curate の具体手順
 > - [ナレッジ管理](../docs-template/05-operations/deployment/knowledge-management.md) - GitHub Discussions ベースのナレッジ管理
 
@@ -107,6 +107,7 @@ ACE サイクルは以下の3フェーズで構成される：
 - CI/CD のログ（ビルドやテストの結果）
 
 **AIへの指示例**:
+
 ```
 今回のPR #XXX のdiff、Issue内容、レビューコメントを分析し、
 将来の開発で役立つ知見を抽出してください。
