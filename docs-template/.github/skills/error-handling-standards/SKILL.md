@@ -244,21 +244,26 @@ try {
   console.log(e);
   return fallbackData;
 }
+
+// ❌ パターン4: Promise.catch() でサイレントフォールバック
+const data = await fetchData().catch(() => defaultValue);
 ```
 
 ### 修正パターン
 
-フォールバックが必要な場合は、`fallbackInProdOnly()` ユーティリティまたは `NODE_ENV` 分岐を使用する：
+フォールバックが必要な場合は、`fallbackInProdOnly()` ユーティリティ（推奨）または環境分岐を使用する：
 
 ```typescript
 // ✅ 環境別フォールバック（PATTERNS.md 準拠）
 try {
   return await fetchData();
 } catch (error) {
-  logger.error('Failed to fetch data', error as Error);
+  const normalizedError = error instanceof Error ? error : new Error(String(error));
+  logger.error('Failed to fetch data', normalizedError, { operation: 'fetchData' });
 
-  if (process.env.NODE_ENV !== 'production') {
-    throw error; // 開発時: バグを即座に検出
+  const env = process.env.NODE_ENV;
+  if (env === 'development' || env === 'test') {
+    throw normalizedError; // 開発時: バグを即座に検出
   }
 
   return defaultValue; // 本番時のみ: UX保護
@@ -270,6 +275,7 @@ try {
 | 状況 | 対応 |
 |------|------|
 | catch 内でデフォルト値を返している | 環境分岐を追加するよう指摘 |
-| 認証/認可/バリデーションエラーにフォールバック | 環境問わずスローに修正 |
-| 既に `fallbackInProdOnly()` または `NODE_ENV` 分岐あり | OK（ログ記録を確認） |
+| `.catch(() => default)` パターン | try-catch + 環境分岐に書き換え |
+| 認証/認可/バリデーション/データ整合性エラーにフォールバック | 環境問わずスローに修正 |
+| 既に `fallbackInProdOnly()` または環境分岐あり | OK（ログ記録・エラー正規化を確認） |
 | フォールバックが明示的にビジネス要件 | コメントで理由を明記させる |

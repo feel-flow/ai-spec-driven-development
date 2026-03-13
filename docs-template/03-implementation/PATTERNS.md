@@ -174,19 +174,26 @@ async function processUser(userId: string): Promise<Result<User>> {
 
 ```typescript
 /**
- * 本番環境でのみフォールバック値を返し、開発環境ではエラーをスローする。
+ * 本番環境でのみフォールバック値を返し、開発・テスト環境ではエラーをスローする。
  * AI生成コードのサイレントエラー防止に使用する。
+ *
+ * @throws {Error} development/test環境では元のエラーを再スローする。
  */
-function fallbackInProdOnly<T>(fallbackValue: T, error: Error, context?: Record<string, unknown>): T {
-  logger.error('Fallback activated', error, context);
+function fallbackInProdOnly<T>(fallbackValue: T, error: unknown, context?: Record<string, unknown>): T {
+  const normalizedError = error instanceof Error ? error : new Error(String(error));
+  logger.error('Fallback activated', normalizedError, context);
 
-  if (process.env.NODE_ENV !== 'production') {
-    throw error; // 開発時: バグを即座に検出
+  const env = process.env.NODE_ENV;
+  // ホワイトリスト方式: dev/testのみスロー。未定義・staging等は安全にフォールバック
+  if (env === 'development' || env === 'test') {
+    throw normalizedError;
   }
 
-  return fallbackValue; // 本番時: ユーザー体験を守る
+  return fallbackValue;
 }
 ```
+
+> **NODE_ENV未設定時の挙動**: ホワイトリスト方式を採用しているため、`NODE_ENV` が未定義やその他の値の場合はフォールバックが動作する（本番環境の安全性を優先）。staging環境でもfail-fastを有効にしたい場合は、別途 `APP_ENV` 等の環境変数で制御するか、staging環境の `NODE_ENV` を `development` に設定する。
 
 #### ❌ NG: AI生成コードによくあるパターン
 
@@ -194,7 +201,8 @@ function fallbackInProdOnly<T>(fallbackValue: T, error: Error, context?: Record<
 // AI が自動生成しがちなパターン — 開発でもバグが隠れる
 async function getUser(id: string): Promise<User> {
   try {
-    return await userRepository.findById(id);
+    // ※ findById は User | null を返すが、null処理は省略（フォールバック問題に焦点）
+    return await userRepository.findById(id) as User;
   } catch {
     return DEFAULT_USER; // バグがあっても気づけない
   }
@@ -212,24 +220,27 @@ async function getConfig(key: string): Promise<string> {
 #### ✅ OK: 環境別フォールバック戦略
 
 ```typescript
-// 方法1: ユーティリティ関数を使用
+// 方法1（推奨）: ユーティリティ関数を使用
 async function getUser(id: string): Promise<User> {
   try {
-    return await userRepository.findById(id);
+    // ※ null処理は省略（フォールバック問題に焦点）
+    return await userRepository.findById(id) as User;
   } catch (error) {
-    return fallbackInProdOnly(DEFAULT_USER, error as Error, { id });
+    return fallbackInProdOnly(DEFAULT_USER, error, { id });
   }
 }
 
-// 方法2: インラインで環境分岐
+// 方法2: インラインで環境分岐（カスタムログが必要な場合）
 async function getConfig(key: string): Promise<string> {
   try {
     return await configService.get(key);
   } catch (error) {
-    logger.error('Failed to fetch config', error as Error, { key });
+    const normalizedError = error instanceof Error ? error : new Error(String(error));
+    logger.error('Failed to fetch config', normalizedError, { key });
 
-    if (process.env.NODE_ENV !== 'production') {
-      throw error; // 開発時: 設定ミスを即座に検出
+    const env = process.env.NODE_ENV;
+    if (env === 'development' || env === 'test') {
+      throw normalizedError;
     }
 
     return ''; // 本番時のみ: デフォルト値で継続
@@ -246,8 +257,17 @@ async function getConfig(key: string): Promise<string> {
 | データ変換エラー | スロー（型不整合検出） | 安全なデフォルト + ログ |
 | 認証/認可エラー | スロー | スロー（環境問わず） |
 | バリデーションエラー | スロー | スロー（環境問わず） |
+| データ整合性エラー | スロー | スロー（環境問わず） |
+| セキュリティ関連エラー | スロー | スロー（環境問わず） |
 
-> **注意**: 認証・認可・バリデーションエラーは環境に関係なく常にスローする。フォールバックが許容されるのはUX保護が目的の場合のみ。
+> **原則**: データ整合性・セキュリティ・認証認可・バリデーションなど、フォールバックが安全性やデータの正確性を損なうエラーは環境に関係なく常にスローする。フォールバックが許容されるのはUX保護が目的の場合のみ。
+
+#### Result patternとの使い分け
+
+本ファイル Section 3 の Result pattern（`Result.ok` / `Result.fail`）とフォールバック戦略は併用できる。
+
+- **Result pattern**: ビジネスロジック層で使用。呼び出し元がエラーの種類に応じて処理を分岐する場合に適する
+- **`fallbackInProdOnly`**: UI境界層・APIレスポンス整形など、最終消費者にフォールバック値を返す場面で使用
 
 #### セルフレビュー時の確認ポイント
 
