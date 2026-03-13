@@ -1,6 +1,6 @@
 # セルフレビュー（PR作成前）
 
-> **Parent**: [DEPLOYMENT.md](../DEPLOYMENT.md) | **Workflow Step**: 2.5 | **Related**: [自動コードレビュー](./automated-code-review.md)
+> **Parent**: [DEPLOYMENT.md](../DEPLOYMENT.md) | **Workflow Step**: 5 | **Related**: [自動コードレビュー](./automated-code-review.md)
 
 ## 目的
 

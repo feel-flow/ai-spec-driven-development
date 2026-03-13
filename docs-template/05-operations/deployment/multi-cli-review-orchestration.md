@@ -235,17 +235,19 @@ agents:
 
 ### Git Workflow への組み込み
 
-[AI駆動Git Workflow](./git-workflow.md) のステップ2.5（セルフレビュー）に統合します：
+[AI駆動Git Workflow](./git-workflow.md) のステップ5（セルフレビュー）に統合します：
 
 ```
-ステップ2: 実装 & コミット
+ステップ3: 実装 & コミット（Implement）
     ↓
-ステップ2.5: セルフレビュー
-    ├── multi-review.sh（Multi-CLI分散レビュー）  ← NEW
+ステップ4: テスト・検証（Test）
+    ↓
+ステップ5: セルフレビュー（Self-Review）
+    ├── multi-review.sh（Multi-CLI分散レビュー）
     ├── pr-review-toolkit（Claude Code サブエージェント）
     └── codex review --base develop（Codex クロスモデルレビュー）
     ↓
-ステップ3: PR作成
+ステップ6: PR作成
 ```
 
 ### Husky pre-push フックとの統合

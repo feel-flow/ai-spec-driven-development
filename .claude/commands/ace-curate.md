@@ -1,12 +1,13 @@
 # /ace-curate — ACE サイクル実行（Playbook 増分更新）
 
-マージ済みPRから知見を抽出し、ACE Playbook に構造化エントリとして追記します。
+レビュー完了後・マージ前にPRから知見を抽出し、ACE Playbook に構造化エントリとして追記します。
 
 ## 前提
 
 - git リポジトリで作業中であること
-- マージ済みの PR が存在すること（直近のPRが対象）
+- レビュー完了済みの PR が存在すること（直近のPRが対象）
 - `docs-template/08-knowledge/PLAYBOOK.md` が存在すること
+- **実行タイミング**: レビュー完了後・マージ前（feature branchで実行）
 
 ## 引数
 
@@ -16,14 +17,15 @@
 
 ### 1. 対象PRの特定
 
-引数でPR番号が指定されていない場合、直近マージされたPRを自動検出します:
+引数でPR番号が指定されていない場合、現在のブランチに関連するPRを自動検出します:
 
 ```bash
-# 直近マージのPRを取得
-gh pr list --state merged --limit 1 --json number,title,body,url
+# 現在のブランチのPRを取得（マージ前なのでopen状態）
+gh pr list --head $(git branch --show-current) --state open --limit 1 --json number,title,body,url
 ```
 
 指定されている場合:
+
 ```bash
 gh pr view $ARGUMENTS --json number,title,body,url,comments,reviews
 ```

@@ -1,15 +1,21 @@
 # ACE サイクル運用手順（Generate → Reflect → Curate）
 
-> **Parent**: [DEPLOYMENT.md](../DEPLOYMENT.md) | **Workflow Step**: 5.5b
+> **Parent**: [DEPLOYMENT.md](../DEPLOYMENT.md) | **Workflow Step**: 8
 > **関連**: [knowledge-management.md](./knowledge-management.md) | [PLAYBOOK.md](../../08-knowledge/PLAYBOOK.md) | [ACE フレームワーク概念](../../../docs/ACE_FRAMEWORK.md)
 
 ## 概要
 
-ACE (Agentic Context Engineering) サイクルは、PRマージ後にAIツールと協力して知見を抽出・評価・記録する運用手順です。
+ACE (Agentic Context Engineering) サイクルは、レビュー完了後・マージ前にAIツールと協力して知見を抽出・評価・記録する運用手順です。
 
 **目的**: 開発で得た知見を構造化し、AIツールが次回タスクで自動参照できる Playbook エントリとして永続化する
 
-**実行タイミング**: PRマージ後、ブランチクリーンアップの前
+**実行タイミング**: レビュー完了後・マージ前（feature branchで実行）
+
+### 運用パターン
+
+**個人開発（推奨）**: レビュー完了後、feature branchでACEを実行 → PLAYBOOK.md更新もPRに含める → まとめてマージ
+
+**チーム開発（参考）**: PLAYBOOK.mdのコンフリクトリスクがあるため、ACE更新は別ブランチ/別PRで対応することも検討
 
 **所要時間**: 5〜15分（AIツール支援あり）
 
@@ -174,7 +180,7 @@ git commit -m "knowledge: ACE-006,ACE-007 [performance,testing] Prisma N+1防止
 
 ## 手動実行チェックリスト
 
-PRマージ後に以下のチェックリストで ACE サイクルを実行：
+レビュー完了後・マージ前に以下のチェックリストで ACE サイクルを実行：
 
 ```
 ## ACE サイクル チェックリスト（PR #___ / Issue #___）
@@ -208,13 +214,13 @@ PRマージ後に以下のチェックリストで ACE サイクルを実行：
 
 | 観点 | ACE Playbook | GitHub Discussions |
 |------|-------------|-------------------|
-| **いつ使う** | 毎回のマージ後（自動的） | 重要な知見のみ（選択的） |
+| **いつ使う** | 毎回のマージ前（レビュー完了後） | 重要な知見のみ（選択的） |
 | **何を書く** | 構造化された短い知見 | 詳細な解説・コード例・議論 |
 | **誰が読む** | AIツール（+ 人間） | チームメンバー（人間） |
 | **更新頻度** | 高（マージごと） | 低（重要な知見のみ） |
 | **フォーマット** | テーブル + 短文（固定形式） | 自由記述 |
 
-### 推奨フロー（マージ後）
+### 推奨フロー（レビュー完了後・マージ前）
 
 ```
 1. ACE サイクルを実行 → Playbook にエントリ追記
@@ -255,6 +261,7 @@ PRマージ後に以下のチェックリストで ACE サイクルを実行：
 
 **原因**: Playbook のエントリ数が増えて全体把握が困難
 **対応**: AIツールに照合を依頼する。カテゴリでフィルタリングすると効率的：
+
 ```
 「PLAYBOOK.md の Category: performance のエントリを列挙し、
 以下の知見候補と重複がないか確認してください」

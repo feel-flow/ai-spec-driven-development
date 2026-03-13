@@ -80,18 +80,18 @@ changeImpact: medium
     - [5.5 チーム導入のベストプラクティス](#55-チーム導入のベストプラクティス)
   - [6. GitHub Copilot Review Routerによるコードレビュー自動化](#6-github-copilot-review-routerによるコードレビュー自動化)
     - [6.1 背景と課題](#61-背景と課題)
-    - [6.2 Review Routerパターン](#62-review-routerパターン)
+    - [6.2 Review Router アーキテクチャ](#62-review-router-アーキテクチャ)
       - [ディレクトリ構造](#ディレクトリ構造)
-      - [アーキテクチャ](#アーキテクチャ)
+      - [アーキテクチャの進化](#アーキテクチャの進化)
       - [設計の要点](#設計の要点)
-      - [VS Code Extension API との違い](#vs-code-extension-api-との違い)
+      - [セッション分離アーキテクチャ（推奨）](#セッション分離アーキテクチャ推奨)
     - [6.3 スキル選択の自動化](#63-スキル選択の自動化)
       - [必須スキル（常に実行）](#必須スキル常に実行)
       - [条件付きスキル（変更内容に応じて実行）](#条件付きスキル変更内容に応じて実行)
       - [統合レポートの判定基準](#統合レポートの判定基準)
     - [6.4 使用方法](#64-使用方法)
-      - [基本的な使い方](#基本的な使い方)
-      - [特定スキルのみ実行](#特定スキルのみ実行)
+      - [方法1: VS Code Chat から実行（推奨）](#方法1-vs-code-chat-から実行推奨)
+      - [方法2: ターミナルから直接実行](#方法2-ターミナルから直接実行)
       - [Git Workflowへの統合](#git-workflowへの統合)
       - [セットアップ](#セットアップ)
     - [6.5 Claude Code pr-review-toolkit との比較](#65-claude-code-pr-review-toolkit-との比較)
@@ -705,10 +705,10 @@ copilot
 AI仕様駆動開発の Git Workflow に以下のステップとして統合されています：
 
 ```text
-Issue → Branch → Commit → Self-Review → PR → @review-router → Review → Merge
+Issue → Branch → Implement → Test → Self-Review → PR → @review-router → Review → ACE → Merge → Cleanup
 ```
 
-詳細は [git-workflow.md](../docs-template/05-operations/deployment/git-workflow.md) のステップ3.5を参照してください。
+詳細は [git-workflow.md](../docs-template/05-operations/deployment/git-workflow.md) のステップ7を参照してください。
 
 #### セットアップ
 

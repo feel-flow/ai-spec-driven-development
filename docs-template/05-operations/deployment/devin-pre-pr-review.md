@@ -1,6 +1,6 @@
 # Devin Pre-PR Review System
 
-> **Parent**: [DEPLOYMENT.md](../DEPLOYMENT.md) | **Workflow Step**: 2.5 (Self-Review) | **Related**: [セルフレビュー](./self-review.md)
+> **Parent**: [DEPLOYMENT.md](../DEPLOYMENT.md) | **Workflow Step**: 5 (Self-Review) | **Related**: [セルフレビュー](./self-review.md)
 
 ## 概要
 
