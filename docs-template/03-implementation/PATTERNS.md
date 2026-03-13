@@ -131,9 +131,26 @@ abstract class AppError extends Error {
 
 // 具体的なエラークラス
 class ValidationError extends AppError {
-  constructor(message: string, details: any[]) {
+  constructor(message: string, public details: any[]) {
     super(message, 'VALIDATION_ERROR', 400);
-    this.details = details;
+  }
+}
+
+class NotFoundError extends AppError {
+  constructor(message: string) {
+    super(message, 'NOT_FOUND', 404);
+  }
+}
+
+class ForbiddenError extends AppError {
+  constructor(message: string) {
+    super(message, 'FORBIDDEN', 403);
+  }
+}
+
+class ConflictError extends AppError {
+  constructor(message: string) {
+    super(message, 'CONFLICT', 409);
   }
 }
 ```
@@ -183,9 +200,11 @@ function fallbackInProdOnly<T>(fallbackValue: T, error: unknown, context?: Recor
   const normalizedError = error instanceof Error ? error : new Error(String(error));
 
   // 認証/認可/バリデーションエラーは環境に関係なく常にスロー
+  // ※ AppError のサブクラス（Section 3 参照）を必要に応じて追加
   if (
     normalizedError instanceof ValidationError ||
-    normalizedError instanceof ForbiddenError
+    normalizedError instanceof ForbiddenError ||
+    normalizedError instanceof ConflictError
   ) {
     throw normalizedError;
   }
@@ -202,7 +221,7 @@ function fallbackInProdOnly<T>(fallbackValue: T, error: unknown, context?: Recor
 }
 ```
 
-> **NODE_ENV未設定時の挙動**: ホワイトリスト方式を採用しているため、`NODE_ENV` が未定義やその他の値の場合はフォールバックが動作する（本番環境の安全性を優先）。staging環境でもfail-fastを有効にしたい場合は、別途 `APP_ENV` 等の環境変数で制御するか、staging環境の `NODE_ENV` を `development` に設定する。
+> **NODE_ENV未設定時の挙動**: ホワイトリスト方式を採用しているため、`NODE_ENV` が未定義やその他の値の場合はフォールバックが動作する（本番環境の安全性を優先）。staging環境でもfail-fastを有効にしたい場合は、`APP_ENV` 等の独立した環境変数で制御すること（`NODE_ENV=development` への変更はアプリ全体の挙動を変えるため非推奨）。
 
 #### ❌ NG: AI生成コードによくあるパターン
 
