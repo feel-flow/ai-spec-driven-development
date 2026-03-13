@@ -129,9 +129,16 @@ abstract class AppError extends Error {
   }
 }
 
+// バリデーション詳細の型定義
+interface ValidationDetail {
+  field: string;
+  message: string;
+  constraint?: string;
+}
+
 // 具体的なエラークラス
 class ValidationError extends AppError {
-  constructor(message: string, public details: any[]) {
+  constructor(message: string, public details: ValidationDetail[]) {
     super(message, 'VALIDATION_ERROR', 400);
   }
 }
@@ -170,9 +177,10 @@ async function processUser(userId: string): Promise<Result<User>> {
     return Result.ok(processed);
     
   } catch (error) {
-    logger.error('Failed to process user', { userId, error });
-    
-    if (error instanceof ValidationError) {
+    const normalizedError = error instanceof Error ? error : new Error(String(error));
+    logger.error('Failed to process user', normalizedError, { userId });
+
+    if (normalizedError instanceof ValidationError) {
       return Result.fail(error);
     }
     
@@ -523,10 +531,10 @@ function authMiddleware(req: Request, res: Response, next: NextFunction) {
 
 // 認可デコレーター
 function RequireRole(role: Role) {
-  return function(target: any, propertyKey: string, descriptor: PropertyDescriptor) {
-    const originalMethod = descriptor.value;
-    
-    descriptor.value = async function(...args: any[]) {
+  return function(_target: unknown, _propertyKey: string, descriptor: PropertyDescriptor) {
+    const originalMethod = descriptor.value as (...args: unknown[]) => Promise<unknown>;
+
+    descriptor.value = async function(...args: unknown[]) {
       const user = getCurrentUser();
       if (!user.hasRole(role)) {
         throw new ForbiddenError('Insufficient permissions');
@@ -544,11 +552,11 @@ function RequireRole(role: Role) {
 ```typescript
 // キャッシングデコレーター
 function Cacheable(ttl: number = 3600) {
-  return function(target: any, propertyKey: string, descriptor: PropertyDescriptor) {
-    const originalMethod = descriptor.value;
-    const cache = new Map();
-    
-    descriptor.value = async function(...args: any[]) {
+  return function(_target: unknown, _propertyKey: string, descriptor: PropertyDescriptor) {
+    const originalMethod = descriptor.value as (...args: unknown[]) => Promise<unknown>;
+    const cache = new Map<string, { value: unknown; timestamp: number }>();
+
+    descriptor.value = async function(...args: unknown[]) {
       const key = JSON.stringify(args);
       
       if (cache.has(key)) {
@@ -611,13 +619,13 @@ class BatchProcessor<T> {
 ```typescript
 // 構造化ログパターン
 class Logger {
-  private context: Record<string, any> = {};
-  
-  setContext(context: Record<string, any>): void {
+  private context: Record<string, unknown> = {};
+
+  setContext(context: Record<string, unknown>): void {
     this.context = { ...this.context, ...context };
   }
-  
-  info(message: string, meta?: Record<string, any>): void {
+
+  info(message: string, meta?: Record<string, unknown>): void {
     console.log(JSON.stringify({
       level: 'info',
       message,
@@ -626,8 +634,8 @@ class Logger {
       ...meta
     }));
   }
-  
-  error(message: string, error: Error, meta?: Record<string, any>): void {
+
+  error(message: string, error: Error, meta?: Record<string, unknown>): void {
     console.error(JSON.stringify({
       level: 'error',
       message,
