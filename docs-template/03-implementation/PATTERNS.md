@@ -164,70 +164,97 @@ async function processUser(userId: string): Promise<Result<User>> {
 }
 ```
 
-### フォールバック処理の原則（Fail-Fast in Development）
+### 環境別フォールバック戦略（Fail-Fast in Dev）
 
-AI生成コードはフォールバック処理（デフォルト値返却、空配列返却、エラー握りつぶし等）を過剰に組み込む傾向があり、開発時にバグが隠蔽されてデバッグが困難になる。
+**原則**: 開発環境ではフォールバック値を返さずエラーをスローし、バグを即座に検出する。本番環境でのみフォールバックを許可する。
 
-**原則**: フォールバック処理は本番環境のみで動作させ、開発環境ではエラーをそのまま伝播させる。
+**背景**: AI（Claude Code, Copilot, Cursor等）は「安全側」に倒す傾向があり、try-catch + フォールバック値を自動挿入しがち。これにより開発中にバグが隠蔽され、本番で初めて問題が発覚するリスクが高い。
 
-#### Bad: 全環境でフォールバック（エラーが隠蔽される）
+#### ユーティリティ関数
 
 ```typescript
-async function getProducts(): Promise<Product[]> {
+/**
+ * 本番環境でのみフォールバック値を返し、開発環境ではエラーをスローする。
+ * AI生成コードのサイレントエラー防止に使用する。
+ */
+function fallbackInProdOnly<T>(fallbackValue: T, error: Error, context?: Record<string, unknown>): T {
+  logger.error('Fallback activated', error, context);
+
+  if (process.env.NODE_ENV !== 'production') {
+    throw error; // 開発時: バグを即座に検出
+  }
+
+  return fallbackValue; // 本番時: ユーザー体験を守る
+}
+```
+
+#### ❌ NG: AI生成コードによくあるパターン
+
+```typescript
+// AI が自動生成しがちなパターン — 開発でもバグが隠れる
+async function getUser(id: string): Promise<User> {
   try {
-    return await productApi.fetchAll();
-  } catch (error) {
-    // 開発時もここに来るため、APIの不具合に気づけない
-    logger.warn('Failed to fetch products', { error });
-    return []; // 空配列を返して画面は正常に見える
+    return await userRepository.findById(id);
+  } catch {
+    return DEFAULT_USER; // バグがあっても気づけない
+  }
+}
+
+async function getConfig(key: string): Promise<string> {
+  try {
+    return await configService.get(key);
+  } catch {
+    return ''; // 設定ミスが本番まで検出されない
   }
 }
 ```
 
-#### Good: 開発時はエラーを伝播、本番のみフォールバック
+#### ✅ OK: 環境別フォールバック戦略
 
 ```typescript
-async function getProducts(): Promise<Product[]> {
+// 方法1: ユーティリティ関数を使用
+async function getUser(id: string): Promise<User> {
   try {
-    return await productApi.fetchAll();
+    return await userRepository.findById(id);
   } catch (error) {
-    logger.error('Failed to fetch products', { error });
+    return fallbackInProdOnly(DEFAULT_USER, error as Error, { id });
+  }
+}
+
+// 方法2: インラインで環境分岐
+async function getConfig(key: string): Promise<string> {
+  try {
+    return await configService.get(key);
+  } catch (error) {
+    logger.error('Failed to fetch config', error as Error, { key });
 
     if (process.env.NODE_ENV !== 'production') {
-      throw error; // 開発時はエラーを伝播して即座に検出
+      throw error; // 開発時: 設定ミスを即座に検出
     }
 
-    return []; // 本番のみフォールバック（UX維持）
+    return ''; // 本番時のみ: デフォルト値で継続
   }
 }
 ```
 
-#### ヘルパー関数パターン
+#### 適用判断ガイド
 
-```typescript
-function failFastInDev(error: unknown, fallback: () => unknown): unknown {
-  if (process.env.NODE_ENV !== 'production') {
-    throw error;
-  }
-  return fallback();
-}
+| シナリオ | 開発時 | 本番時 |
+|---------|--------|--------|
+| DB/API通信エラー | スロー（即座に検出） | フォールバック + ログ |
+| 設定値の取得失敗 | スロー（設定ミス検出） | デフォルト値 + アラート |
+| データ変換エラー | スロー（型不整合検出） | 安全なデフォルト + ログ |
+| 認証/認可エラー | スロー | スロー（環境問わず） |
+| バリデーションエラー | スロー | スロー（環境問わず） |
 
-// 使用例
-async function getUserProfile(id: string): Promise<UserProfile> {
-  try {
-    return await userApi.getProfile(id);
-  } catch (error) {
-    logger.error('Failed to fetch user profile', { id, error });
-    return failFastInDev(error, () => DEFAULT_PROFILE) as UserProfile;
-  }
-}
-```
+> **注意**: 認証・認可・バリデーションエラーは環境に関係なく常にスローする。フォールバックが許容されるのはUX保護が目的の場合のみ。
 
 #### セルフレビュー時の確認ポイント
 
 - [ ] try-catch ブロックでエラーを握りつぶしていないか
-- [ ] フォールバック値（空配列、デフォルトオブジェクト等）を返す箇所は開発時にエラーを伝播しているか
-- [ ] AI生成コードのcatch句が適切にエラーを区別しているか
+- [ ] フォールバック値（空配列、デフォルトオブジェクト等）を返す箇所に環境分岐があるか
+- [ ] AI生成コードのcatch句が `fallbackInProdOnly()` または `NODE_ENV` 分岐を使用しているか
+- [ ] 認証/認可/バリデーションエラーにフォールバックが入っていないか
 
 ## 4. 非同期処理パターン
 

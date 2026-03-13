@@ -220,3 +220,56 @@ logger.error('Failed to process user', error, {
 - [ ] 未知のエラーが `InternalError` でラップされているか
 - [ ] ログに個人情報が含まれていないか
 - [ ] ユーザー向けレスポンスにスタックトレースが露出していないか
+- [ ] フォールバック処理が環境分岐されているか（開発時スロー / 本番時フォールバック）
+- [ ] AI生成のtry-catch + デフォルト値返却パターンが残っていないか
+
+## 8. AI生成コードのフォールバックアンチパターン
+
+AI（Claude Code, Copilot, Cursor等）は `try-catch` + デフォルト値返却を自動挿入する傾向がある。
+このパターンは開発中のバグを隠蔽し、本番で初めて問題が発覚するリスクを生む。
+
+### 検出すべきアンチパターン
+
+```typescript
+// ❌ パターン1: 空 catch + デフォルト値
+try { return await fetchData(); } catch { return defaultValue; }
+
+// ❌ パターン2: エラー無視 + 空配列/空文字
+try { return await getItems(); } catch { return []; }
+
+// ❌ パターン3: catch 内で console.log のみ + フォールバック
+try {
+  return await getData();
+} catch (e) {
+  console.log(e);
+  return fallbackData;
+}
+```
+
+### 修正パターン
+
+フォールバックが必要な場合は、`fallbackInProdOnly()` ユーティリティまたは `NODE_ENV` 分岐を使用する：
+
+```typescript
+// ✅ 環境別フォールバック（PATTERNS.md 準拠）
+try {
+  return await fetchData();
+} catch (error) {
+  logger.error('Failed to fetch data', error as Error);
+
+  if (process.env.NODE_ENV !== 'production') {
+    throw error; // 開発時: バグを即座に検出
+  }
+
+  return defaultValue; // 本番時のみ: UX保護
+}
+```
+
+### レビュー時の判断基準
+
+| 状況 | 対応 |
+|------|------|
+| catch 内でデフォルト値を返している | 環境分岐を追加するよう指摘 |
+| 認証/認可/バリデーションエラーにフォールバック | 環境問わずスローに修正 |
+| 既に `fallbackInProdOnly()` または `NODE_ENV` 分岐あり | OK（ログ記録を確認） |
+| フォールバックが明示的にビジネス要件 | コメントで理由を明記させる |
