@@ -315,7 +315,7 @@ Closes #${ISSUE_NUM}
 
 **原則**: PR作成後、マージ前に `@review-router` エージェントで包括的なレビューを実施する
 
-> **定義**: `@review-router` は [`.github/agents/`](../../.github/agents/) 配下に定義された GitHub Copilot カスタムエージェントです。各レビュースキルの定義は同ディレクトリ内の `*.agent.md` ファイルを参照してください。
+> **動作**: `@review-router` は変更内容を分析し、[`.github/agents/`](../../.github/agents/) 配下に定義された個別レビューエージェント（`code-reviewer`、`error-handler-hunter` 等）に処理を振り分けます。各エージェントの定義は同ディレクトリ内の `*.agent.md` ファイルを参照してください。
 
 #### 実行方法
 
