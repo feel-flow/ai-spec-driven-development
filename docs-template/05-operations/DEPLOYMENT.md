@@ -20,7 +20,7 @@ updated: "YYYY-MM-DD"
 | [self-review.md](./deployment/self-review.md) | セルフレビュー詳細（PR作成前） | ⭐⭐⭐⭐ 2nd |
 | [devin-pre-pr-review.md](./deployment/devin-pre-pr-review.md) | Devin Pre-PRレビューシステム（5エージェント並列） | ⭐⭐⭐⭐ 2.5th |
 | [automated-code-review.md](./deployment/automated-code-review.md) | 自動コードレビュー（Claude Code + Husky） | ⭐⭐⭐⭐ - |
-| [knowledge-management.md](./deployment/knowledge-management.md) | ナレッジ体系化（マージ後） | ⭐⭐⭐⭐ 3rd |
+| [knowledge-management.md](./deployment/knowledge-management.md) | ナレッジ体系化（マージ前） | ⭐⭐⭐⭐ 3rd |
 | [ace-cycle.md](./deployment/ace-cycle.md) | ACEサイクル（Playbook増分更新） | ⭐⭐⭐⭐ 3.5th |
 | [ai-tools-integration.md](./deployment/ai-tools-integration.md) | AIツール統合設定 | ⭐⭐⭐ - |
 | [ci-cd.md](./deployment/ci-cd.md) | CI/CDパイプライン | ⭐⭐⭐ 4th |
@@ -32,7 +32,7 @@ updated: "YYYY-MM-DD"
 ### AI駆動開発の基本フロー
 
 ```
-Issue → Branch → Commit → Self-Review → PR → Review → Merge → Knowledge (ACE + Discussions) → Cleanup → Next Task
+Issue → Branch → Implement → Test → Self-Review → PR → Review → ACE → Merge → Cleanup → Next Task
 ```
 
 **詳細**: [deployment/git-workflow.md](./deployment/git-workflow.md)
@@ -59,7 +59,7 @@ gh discussion create --category "..." --title "..." --body-file knowledge.md
 ## 1. AI仕様駆動Git Workflow
 
 ### 概要
-Git Flowベースで、**セルフレビュー（PR前）** と **ナレッジ体系化（マージ後）** を組み込んだワークフロー。
+Git Flowベースで、**テスト・セルフレビュー（PR前）** と **ACEナレッジ体系化（マージ前）** を組み込んだワークフロー。
 
 ### 主要ステップ
 1. **Issue作成** - 作業の起点
@@ -214,7 +214,7 @@ PRマージ後のブランチ切り替え忘れを防ぐため、セッション
 | セルフレビュー方法 | [self-review.md](./deployment/self-review.md) | 全体 |
 | ナレッジ記録方法 | [knowledge-management.md](./deployment/knowledge-management.md) | 全体 |
 | ACE Playbook更新 | [ace-cycle.md](./deployment/ace-cycle.md) | 全体 |
-| PRレビュー対応 | [git-workflow.md](./deployment/git-workflow.md) | ステップ4 |
+| PRレビュー対応 | [git-workflow.md](./deployment/git-workflow.md) | ステップ7 |
 | CI/CD設定 | [ci-cd.md](./deployment/ci-cd.md) | GitHub Actions |
 | インフラ構成 | [infrastructure.md](./deployment/infrastructure.md) | Terraform |
 | モニタリング | [monitoring.md](./deployment/monitoring.md) | CloudWatch |

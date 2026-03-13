@@ -155,7 +155,7 @@ docs/
 ### 概念・ガイド
 
 - [AI Spec-Driven Development 概念と実践](./docs/AI_SPEC_DRIVEN_DEVELOPMENT.md) — 7文書から始めて段階的に拡張する戦略
-- [AI駆動 Git Workflow](./docs/AI_GIT_WORKFLOW.md) — AIに最適化された9ステップのワークフロー
+- [AI駆動 Git Workflow](./docs/AI_GIT_WORKFLOW.md) — AIに最適化された10ステップのワークフロー
 - [運用ガイド (AIエージェント向け)](./docs/OPERATIONAL_GUIDE.md) — AIエージェントの操作仕様書
 
 ### Quick Start

@@ -174,6 +174,30 @@ bash scripts/setup-github-labels.sh
 bash scripts/setup-multi-review.sh
 ```
 
+### Development Workflow（10ステップ）
+
+このプロジェクトでは以下の10ステップワークフローに従って開発を進めます：
+
+```
+1. Issue       ─ 作業の起点を明確化（/create-issue で作成）
+2. Branch      ─ feature/#<issue>-<description> で作業を分離
+3. Implement   ─ AI駆動で実装・コミット
+4. Test        ─ npm run lint / type-check / test -- --coverage
+5. Self-Review ─ 5観点チェック＋Review Toolkit（/pre-commit-check）
+6. PR          ─ develop ベースでPR作成
+7. Review      ─ @review-router＋レビュー対応（修正ループ）
+8. ACE         ─ ナレッジ体系化（マージ前に実行。/ace-curate）
+9. Merge       ─ Squash merge → ブランチ削除
+10. Cleanup    ─ develop pull → git fetch --prune
+```
+
+**重要ルール**:
+- 全作業はIssueから開始する
+- ブランチ命名: `feature/#<issue-number>-<description>`
+- マージ先: develop（Squash merge）
+- ACEはマージ前（レビュー完了後）にfeature branchで実行する
+- 詳細: [docs/AI_GIT_WORKFLOW.md](docs/AI_GIT_WORKFLOW.md)
+
 ### Working with This Repository
 
 When making changes:

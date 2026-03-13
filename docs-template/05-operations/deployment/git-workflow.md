@@ -6,7 +6,7 @@
 
 AI開発ツールに最適化されたGit Flowベースのワークフローです。Issue作成からマージ、ナレッジ体系化までをAIツールと協働で効率的に進めます。
 
-**コアサイクル**: Issue → Branch → Commit → Self-Review → PR → **@review-router** → Review → Merge → Knowledge → Cleanup
+**コアサイクル（10ステップ）**: Issue → Branch → Implement → Test → Self-Review → PR → Review → ACE → Merge → Cleanup
 
 ## ブランチ戦略
 
@@ -30,7 +30,7 @@ release/*     ← リリース準備ブランチ（developから分岐）
 
 ## ワークフローステップ
 
-### ステップ1: Issue作成とブランチ作成
+### ステップ1: Issue作成
 
 **原則**: 全ての作業は必ずIssueから開始する
 
@@ -49,7 +49,17 @@ ISSUE_URL=$(gh issue create \
 
 # Issue番号を抽出
 ISSUE_NUM=$(echo "$ISSUE_URL" | grep -oE '[0-9]+$')
+```
 
+**ポイント**:
+- Issue番号は自動抽出（競合回避）
+- 受入基準を明確にする
+
+### ステップ2: ブランチ作成
+
+**原則**: 必ずdevelopの最新から分岐する
+
+```bash
 # ブランチ作成
 git checkout develop
 git pull origin develop
@@ -57,11 +67,10 @@ git checkout -b "feature/${ISSUE_NUM}-user-auth"
 ```
 
 **ポイント**:
-- Issue番号は自動抽出（競合回避）
-- 必ずdevelopの最新から分岐
 - ブランチ名にIssue番号を含める
+- 必ずdevelopの最新から分岐
 
-### ステップ2: AI駆動開発とコミット
+### ステップ3: AI駆動実装とコミット（Implement）
 
 **原則**: MASTER.md、PATTERNS.md、TESTING.mdの仕様に従いAIツールで実装
 
@@ -91,7 +100,38 @@ Co-Authored-By: Claude <noreply@anthropic.com>"
 - Issue番号を含める（`Closes #123`）
 - AIツールの記載を含める
 
-### ステップ2.5: セルフレビュー（PR作成前）【重要】
+### ステップ4: テスト・検証（Test）
+
+**目的**: 実装の品質を客観的な指標で確認する
+
+#### 自動テストの実行
+
+```bash
+# Linter（静的解析）
+npm run lint
+
+# 型チェック
+npm run type-check
+
+# テスト実行+カバレッジ
+npm run test -- --coverage
+
+# セキュリティスキャン
+npm audit --audit-level=moderate
+```
+
+#### 合格基準
+
+| 項目 | 基準 |
+|------|------|
+| Linter | エラー0件 |
+| 型チェック | エラー0件 |
+| テストカバレッジ | 80%以上 |
+| セキュリティ | moderate以上の脆弱性0件 |
+
+**ポイント**: 全テスト通過後にセルフレビュー（ステップ5）へ進む
+
+### ステップ5: セルフレビュー（PR作成前）【重要】
 
 **目的**: PRレビュー時の単純な指摘を事前に防ぎ、レビュー品質を向上させる
 
@@ -146,15 +186,18 @@ Co-Authored-By: Claude <noreply@anthropic.com>"
 各観点について、問題点と改善提案を具体的に指摘してください。」
 ```
 
-**自動化チェック**:
+#### Review Toolkit（Claude Code サブエージェント）
 
-```bash
-# Linter、型チェック、テスト、セキュリティスキャンを実行
-npm run lint
-npm run type-check
-npm run test
-npm audit --audit-level=moderate
-```
+Claude Codeのpr-review-toolkitサブエージェントを活用した包括的なセルフレビューが可能です：
+
+| サブエージェント | 役割 | 主な検出対象 |
+|----------------|------|------------|
+| `code-reviewer` | コード品質の包括的レビュー | 設計問題、命名規則違反、コード重複 |
+| `silent-failure-hunter` | エラーハンドリング漏れ検出 | 未処理例外、空catch、暗黙的失敗 |
+| `type-design-analyzer` | 型設計の妥当性分析 | any型使用、型の粒度不足 |
+| `pr-test-analyzer` | テスト品質の分析 | カバレッジ不足、エッジケース欠落 |
+| `comment-analyzer` | コメント・ドキュメント品質 | 不正確なコメント、JSDoc欠落 |
+| `code-simplifier` | 複雑度の削減提案 | 長関数、深いネスト |
 
 **Claude Code + Husky 自動レビュー（推奨）**:
 
@@ -163,7 +206,7 @@ npm audit --audit-level=moderate
 
 ```bash
 # セットアップ（初回のみ）
-bash scripts/setup-automated-review.sh
+bash scripts/setup-multi-review.sh
 
 # 以降、git commit 時に自動でレビューが実行されます
 git commit -m "feat: 新機能を追加"
@@ -175,8 +218,6 @@ git commit -m "feat: 新機能を追加"
 
 5つのAI CLI（Claude Code、Codex、Copilot、Gemini、Cursor）を統一的にオーケストレーションし、各CLIの得意分野とコスト特性を活かした包括的レビューを実行できます。
 詳細は [Multi-CLI Review Orchestration](./multi-cli-review-orchestration.md) を参照してください。
-
-> **Note**: `scripts/multi-review.sh` は別Issueで実装予定です。以下は実装後に利用可能なコマンド例です。
 
 ```bash
 # デフォルト実行（全CLI、分散モード）
@@ -228,7 +269,7 @@ PR本文にセルフレビュー結果を含めることで、レビュワーに
 すべての必須項目をクリアしています。PR作成準備完了。
 ```
 
-### ステップ3: Pull Request作成
+### ステップ6: Pull Request作成
 
 **原則**: PRは自己完結型（レビュワーが全体像を把握できる情報を含める）
 
@@ -275,7 +316,9 @@ Closes #${ISSUE_NUM}
 - テスト結果を含める
 - セルフレビュー結果を含める
 
-### ステップ3.5: AIレビュールーターによるレビュー（PR作成後）
+### ステップ7: レビュー対応（Review）
+
+#### 7a. AIレビュールーターによるレビュー（PR作成後）
 
 **原則**: PR作成後、マージ前に `@review-router` エージェントで包括的なレビューを実施する
 
@@ -318,7 +361,7 @@ VS Code の Copilot Chat で以下を入力：
 @review-router エラーハンドリングを検査して
 ```
 
-### ステップ4: AI支援レビュー対応
+#### 7b. AI支援レビュー対応
 
 **原則**: レビュー指摘には**必ずスレッド形式で返信**し、修正内容を明確にする
 
@@ -469,33 +512,11 @@ mutation($body: String!) {
 - [ ] テストを追加した場合は言及
 - [ ] 再レビュー依頼のコマンドを含める
 
-### ステップ5: マージとクリーンアップ
-
-**原則**: Squash mergeでコミット履歴を整理し、ブランチは速やかに削除
-
-```bash
-# レビュー承認後、Squash mergeでマージ
-gh pr merge ${PR_NUMBER} \
-  --squash \
-  --delete-branch \
-  --body "All checks passed. Merging to develop."
-
-# developブランチに戻る
-git checkout develop
-git pull origin develop
-
-# ローカルブランチ削除（リモートは自動削除済み）
-git branch -d "feature/${ISSUE_NUM}-user-auth"
-```
-
-**マージの原則**:
-- Squash merge推奨（履歴を整理）
-- ブランチは必ず削除（リモート・ローカル両方）
-- developを最新に更新してから次の作業へ
-
-### ステップ5.5: ナレッジ体系化（マージ後）【重要】
+### ステップ8: ACE ナレッジ体系化（マージ前）【重要】
 
 **目的**: 開発プロセスで得た知見を体系的に整理し、チーム全体で共有可能な資産として蓄積する
+
+**実行タイミング**: レビュー完了後・マージ前（feature branchで実行）
 
 #### ナレッジ体系化の対象
 
@@ -562,7 +583,7 @@ GitHub Discussionsに登録すべきナレッジを抽出してください。
 
 **ナレッジテンプレート**:
 
-```markdown
+````markdown
 # [タイトル]: 簡潔で検索しやすい表現
 
 ## メタ情報
@@ -606,7 +627,7 @@ GitHub Discussionsに登録すべきナレッジを抽出してください。
 ## 検証方法
 [この解決方法が正しく機能することを確認する方法]
 
-```
+````
 
 #### GitHub Discussionsへの登録手順
 
@@ -646,6 +667,48 @@ GitHub Discussions への記録に加え、ACE Playbook への構造化記録を
 - **GitHub Discussions**: 人間向けナラティブ（物語的記録）
 - **ACE Playbook**: AIツール向け構造化知見（delta方式）
 
+#### 運用パターン
+
+**個人開発（推奨）**: レビュー完了後、feature branchでACEを実行 → PLAYBOOK.md更新もPRに含める → まとめてマージ
+
+**チーム開発（参考）**: PLAYBOOK.mdのコンフリクトリスクがあるため、ACE更新は別ブランチ/別PRで対応することも検討
+
+### ステップ9: マージ（Merge）
+
+**原則**: Squash mergeでコミット履歴を整理
+
+```bash
+# レビュー承認後、Squash mergeでマージ
+gh pr merge ${PR_NUMBER} \
+  --squash \
+  --delete-branch \
+  --body "All checks passed. Merging to develop."
+```
+
+**マージの原則**:
+- Squash merge推奨（履歴を整理）
+- `--delete-branch` でリモートブランチを自動削除
+
+### ステップ10: クリーンアップ（Cleanup）
+
+**原則**: ブランチは速やかに削除し、developを最新に更新
+
+```bash
+# developブランチに戻る
+git checkout develop
+git pull origin develop
+
+# ローカルブランチ削除（リモートは自動削除済み）
+git branch -d "feature/${ISSUE_NUM}-user-auth"
+
+# リモートで削除済みの追跡ブランチをローカルから一括削除
+git fetch --prune
+```
+
+**ポイント**:
+- ブランチは必ず削除（リモート・ローカル両方）
+- developを最新に更新してから次の作業へ
+
 ## ワークフロー全体のベストプラクティス
 
 ### 1. Issue駆動開発の徹底
@@ -669,7 +732,7 @@ GitHub Discussions への記録に加え、ACE Playbook への構造化記録を
 - 大きな変更は複数のIssue/PRに分割
 
 ### 5. ナレッジの継続的蓄積
-- マージ後は必ずナレッジ体系化を実施
+- マージ前にACEナレッジ体系化を実施
 - GitHub Discussionsを積極的に活用
 - 定期的にナレッジを見直し・更新
 
