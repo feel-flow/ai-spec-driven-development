@@ -39,6 +39,8 @@ throw new Error('Something went wrong');
 
 すべての catch ブロックは、エラーの**記録**、**再スロー**、または**Result.fail での返却**のいずれかを行うこと。
 
+> **例外**: 環境分岐付きフォールバック（セクション8参照）は本番環境のみで許容される。無条件のフォールバックは禁止。
+
 ## 2. カスタムエラークラス階層
 
 プロジェクトでは AppError を基底クラスとしたエラー階層を使用する：
@@ -220,3 +222,62 @@ logger.error('Failed to process user', error, {
 - [ ] 未知のエラーが `InternalError` でラップされているか
 - [ ] ログに個人情報が含まれていないか
 - [ ] ユーザー向けレスポンスにスタックトレースが露出していないか
+- [ ] フォールバック処理が環境分岐されているか（開発時スロー / 本番時フォールバック）
+- [ ] AI生成のtry-catch + デフォルト値返却パターンが残っていないか
+
+## 8. AI生成コードのフォールバックアンチパターン
+
+AI（Claude Code, Copilot, Cursor等）は `try-catch` + デフォルト値返却を自動挿入する傾向がある。
+このパターンは開発中のバグを隠蔽し、本番で初めて問題が発覚するリスクを生む。
+
+### 検出すべきアンチパターン
+
+```typescript
+// ❌ パターン1: 空 catch + デフォルト値
+try { return await fetchData(); } catch { return defaultValue; }
+
+// ❌ パターン2: エラー無視 + 空配列/空文字
+try { return await getItems(); } catch { return []; }
+
+// ❌ パターン3: catch 内で console.log のみ + フォールバック
+try {
+  return await getData();
+} catch (e) {
+  console.log(e);
+  return fallbackData;
+}
+
+// ❌ パターン4: Promise.catch() でサイレントフォールバック
+const data = await fetchData().catch(() => defaultValue);
+```
+
+### 修正パターン
+
+フォールバックが必要な場合は、`fallbackInProdOnly()` ユーティリティ（推奨）または環境分岐を使用する：
+
+```typescript
+// ✅ 環境別フォールバック（PATTERNS.md 準拠）
+try {
+  return await fetchData();
+} catch (error) {
+  const normalizedError = error instanceof Error ? error : new Error(String(error));
+  logger.error('Failed to fetch data', normalizedError, { operation: 'fetchData' });
+
+  const env = process.env.NODE_ENV;
+  if (env === 'development' || env === 'test') {
+    throw normalizedError; // 開発時: バグを即座に検出
+  }
+
+  return defaultValue; // 本番時のみ: UX保護
+}
+```
+
+### レビュー時の判断基準
+
+| 状況 | 対応 |
+|------|------|
+| catch 内でデフォルト値を返している | 環境分岐を追加するよう指摘 |
+| `.catch(() => default)` パターン | try-catch + 環境分岐に書き換え |
+| 認証/認可/バリデーション/データ整合性エラーにフォールバック | 環境問わずスローに修正 |
+| 既に `fallbackInProdOnly()` または環境分岐あり | OK（ログ記録・エラー正規化を確認） |
+| フォールバックが明示的にビジネス要件 | コメントで理由を明記させる |

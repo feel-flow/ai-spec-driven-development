@@ -131,9 +131,26 @@ abstract class AppError extends Error {
 
 // 具体的なエラークラス
 class ValidationError extends AppError {
-  constructor(message: string, details: any[]) {
+  constructor(message: string, public details: any[]) {
     super(message, 'VALIDATION_ERROR', 400);
-    this.details = details;
+  }
+}
+
+class NotFoundError extends AppError {
+  constructor(message: string) {
+    super(message, 'NOT_FOUND', 404);
+  }
+}
+
+class ForbiddenError extends AppError {
+  constructor(message: string) {
+    super(message, 'FORBIDDEN', 403);
+  }
+}
+
+class ConflictError extends AppError {
+  constructor(message: string) {
+    super(message, 'CONFLICT', 409);
   }
 }
 ```
@@ -163,6 +180,129 @@ async function processUser(userId: string): Promise<Result<User>> {
   }
 }
 ```
+
+### 環境別フォールバック戦略（Fail-Fast in Dev）
+
+**原則**: 開発環境ではフォールバック値を返さずエラーをスローし、バグを即座に検出する。本番環境でのみフォールバックを許可する。
+
+**背景**: AI（Claude Code, Copilot, Cursor等）は「安全側」に倒す傾向があり、try-catch + フォールバック値を自動挿入しがち。これにより開発中にバグが隠蔽され、本番で初めて問題が発覚するリスクが高い。
+
+#### ユーティリティ関数
+
+```typescript
+/**
+ * 本番環境でのみフォールバック値を返し、開発・テスト環境ではエラーをスローする。
+ * AI生成コードのサイレントエラー防止に使用する。
+ *
+ * @throws {Error} development/test環境では元のエラーを再スローする。
+ */
+function fallbackInProdOnly<T>(fallbackValue: T, error: unknown, context?: Record<string, unknown>): T {
+  const normalizedError = error instanceof Error ? error : new Error(String(error));
+
+  // 認証/認可/バリデーションエラーは環境に関係なく常にスロー
+  // ※ AppError のサブクラス（Section 3 参照）を必要に応じて追加
+  if (
+    normalizedError instanceof ValidationError ||
+    normalizedError instanceof ForbiddenError ||
+    normalizedError instanceof ConflictError
+  ) {
+    throw normalizedError;
+  }
+
+  logger.error('Fallback activated', normalizedError, context);
+
+  const env = process.env.NODE_ENV;
+  // ホワイトリスト方式: dev/testのみスロー。未定義・staging等は安全にフォールバック
+  if (env === 'development' || env === 'test') {
+    throw normalizedError;
+  }
+
+  return fallbackValue;
+}
+```
+
+> **NODE_ENV未設定時の挙動**: ホワイトリスト方式を採用しているため、`NODE_ENV` が未定義やその他の値の場合はフォールバックが動作する（本番環境の安全性を優先）。staging環境でもfail-fastを有効にしたい場合は、`APP_ENV` 等の独立した環境変数で制御すること（`NODE_ENV=development` への変更はアプリ全体の挙動を変えるため非推奨）。
+
+#### ❌ NG: AI生成コードによくあるパターン
+
+```typescript
+// AI が自動生成しがちなパターン — 開発でもバグが隠れる
+async function getUser(id: string): Promise<User> {
+  try {
+    // ※ findById は User | null を返すが、null処理は省略（フォールバック問題に焦点）
+    return await userRepository.findById(id) as User;
+  } catch {
+    return DEFAULT_USER; // バグがあっても気づけない
+  }
+}
+
+async function getConfig(key: string): Promise<string> {
+  try {
+    return await configService.get(key);
+  } catch {
+    return ''; // 設定ミスが本番まで検出されない
+  }
+}
+```
+
+#### ✅ OK: 環境別フォールバック戦略
+
+```typescript
+// 方法1（推奨）: ユーティリティ関数を使用
+async function getUser(id: string): Promise<User> {
+  try {
+    // ※ null処理は省略（フォールバック問題に焦点）
+    return await userRepository.findById(id) as User;
+  } catch (error) {
+    return fallbackInProdOnly(DEFAULT_USER, error, { id });
+  }
+}
+
+// 方法2: インラインで環境分岐（カスタムログが必要な場合）
+async function getConfig(key: string): Promise<string> {
+  try {
+    return await configService.get(key);
+  } catch (error) {
+    const normalizedError = error instanceof Error ? error : new Error(String(error));
+    logger.error('Failed to fetch config', normalizedError, { key });
+
+    const env = process.env.NODE_ENV;
+    if (env === 'development' || env === 'test') {
+      throw normalizedError;
+    }
+
+    return ''; // 本番時のみ: デフォルト値で継続
+  }
+}
+```
+
+#### 適用判断ガイド
+
+| シナリオ | 開発時 | 本番時 |
+|---------|--------|--------|
+| DB/API通信エラー | スロー（即座に検出） | フォールバック + ログ |
+| 設定値の取得失敗 | スロー（設定ミス検出） | デフォルト値 + アラート |
+| データ変換エラー | スロー（型不整合検出） | 安全なデフォルト + ログ |
+| 認証/認可エラー | スロー | スロー（環境問わず） |
+| バリデーションエラー | スロー | スロー（環境問わず） |
+| データ整合性エラー | スロー | スロー（環境問わず） |
+| セキュリティ関連エラー | スロー | スロー（環境問わず） |
+
+> **原則**: データ整合性・セキュリティ・認証認可・バリデーションなど、フォールバックが安全性やデータの正確性を損なうエラーは環境に関係なく常にスローする。フォールバックが許容されるのはUX保護が目的の場合のみ。
+
+#### Result patternとの使い分け
+
+本ファイル Section 3 の Result pattern（`Result.ok` / `Result.fail`）とフォールバック戦略は併用できる。
+
+- **Result pattern**: ビジネスロジック層で使用。呼び出し元がエラーの種類に応じて処理を分岐する場合に適する
+- **`fallbackInProdOnly`**: UI境界層・APIレスポンス整形など、最終消費者にフォールバック値を返す場面で使用
+
+#### セルフレビュー時の確認ポイント
+
+- [ ] try-catch ブロックでエラーを握りつぶしていないか
+- [ ] フォールバック値（空配列、デフォルトオブジェクト等）を返す箇所に環境分岐があるか
+- [ ] AI生成コードのcatch句が `fallbackInProdOnly()` または `NODE_ENV` 分岐を使用しているか
+- [ ] 認証/認可/バリデーションエラーにフォールバックが入っていないか
 
 ## 4. 非同期処理パターン
 
