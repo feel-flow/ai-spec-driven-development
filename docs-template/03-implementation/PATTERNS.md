@@ -181,6 +181,15 @@ async function processUser(userId: string): Promise<Result<User>> {
  */
 function fallbackInProdOnly<T>(fallbackValue: T, error: unknown, context?: Record<string, unknown>): T {
   const normalizedError = error instanceof Error ? error : new Error(String(error));
+
+  // 認証/認可/バリデーションエラーは環境に関係なく常にスロー
+  if (
+    normalizedError instanceof ValidationError ||
+    normalizedError instanceof ForbiddenError
+  ) {
+    throw normalizedError;
+  }
+
   logger.error('Fallback activated', normalizedError, context);
 
   const env = process.env.NODE_ENV;
