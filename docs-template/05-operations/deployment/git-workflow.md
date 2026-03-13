@@ -163,7 +163,7 @@ npm audit --audit-level=moderate
 
 ```bash
 # セットアップ（初回のみ）
-bash scripts/setup-automated-review.sh
+bash scripts/setup-multi-review.sh
 
 # 以降、git commit 時に自動でレビューが実行されます
 git commit -m "feat: 新機能を追加"
@@ -175,8 +175,6 @@ git commit -m "feat: 新機能を追加"
 
 5つのAI CLI（Claude Code、Codex、Copilot、Gemini、Cursor）を統一的にオーケストレーションし、各CLIの得意分野とコスト特性を活かした包括的レビューを実行できます。
 詳細は [Multi-CLI Review Orchestration](./multi-cli-review-orchestration.md) を参照してください。
-
-> **Note**: `scripts/multi-review.sh` は別Issueで実装予定です。以下は実装後に利用可能なコマンド例です。
 
 ```bash
 # デフォルト実行（全CLI、分散モード）
@@ -562,7 +560,7 @@ GitHub Discussionsに登録すべきナレッジを抽出してください。
 
 **ナレッジテンプレート**:
 
-```markdown
+````markdown
 # [タイトル]: 簡潔で検索しやすい表現
 
 ## メタ情報
@@ -606,7 +604,7 @@ GitHub Discussionsに登録すべきナレッジを抽出してください。
 ## 検証方法
 [この解決方法が正しく機能することを確認する方法]
 
-```
+````
 
 #### GitHub Discussionsへの登録手順
 
