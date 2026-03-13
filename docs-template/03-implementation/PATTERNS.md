@@ -164,6 +164,71 @@ async function processUser(userId: string): Promise<Result<User>> {
 }
 ```
 
+### フォールバック処理の原則（Fail-Fast in Development）
+
+AI生成コードはフォールバック処理（デフォルト値返却、空配列返却、エラー握りつぶし等）を過剰に組み込む傾向があり、開発時にバグが隠蔽されてデバッグが困難になる。
+
+**原則**: フォールバック処理は本番環境のみで動作させ、開発環境ではエラーをそのまま伝播させる。
+
+#### Bad: 全環境でフォールバック（エラーが隠蔽される）
+
+```typescript
+async function getProducts(): Promise<Product[]> {
+  try {
+    return await productApi.fetchAll();
+  } catch (error) {
+    // 開発時もここに来るため、APIの不具合に気づけない
+    logger.warn('Failed to fetch products', { error });
+    return []; // 空配列を返して画面は正常に見える
+  }
+}
+```
+
+#### Good: 開発時はエラーを伝播、本番のみフォールバック
+
+```typescript
+async function getProducts(): Promise<Product[]> {
+  try {
+    return await productApi.fetchAll();
+  } catch (error) {
+    logger.error('Failed to fetch products', { error });
+
+    if (process.env.NODE_ENV !== 'production') {
+      throw error; // 開発時はエラーを伝播して即座に検出
+    }
+
+    return []; // 本番のみフォールバック（UX維持）
+  }
+}
+```
+
+#### ヘルパー関数パターン
+
+```typescript
+function failFastInDev(error: unknown, fallback: () => unknown): unknown {
+  if (process.env.NODE_ENV !== 'production') {
+    throw error;
+  }
+  return fallback();
+}
+
+// 使用例
+async function getUserProfile(id: string): Promise<UserProfile> {
+  try {
+    return await userApi.getProfile(id);
+  } catch (error) {
+    logger.error('Failed to fetch user profile', { id, error });
+    return failFastInDev(error, () => DEFAULT_PROFILE) as UserProfile;
+  }
+}
+```
+
+#### セルフレビュー時の確認ポイント
+
+- [ ] try-catch ブロックでエラーを握りつぶしていないか
+- [ ] フォールバック値（空配列、デフォルトオブジェクト等）を返す箇所は開発時にエラーを伝播しているか
+- [ ] AI生成コードのcatch句が適切にエラーを区別しているか
+
 ## 4. 非同期処理パターン
 
 ### Promise Chain
