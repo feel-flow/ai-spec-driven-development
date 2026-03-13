@@ -129,7 +129,7 @@ abstract class AppError extends Error {
   }
 }
 
-// バリデーション詳細の型定義
+// バリデーション詳細の型定義（any[] の代わりに明示的な型を使用し型安全性を確保）
 interface ValidationDetail {
   field: string;
   message: string;
@@ -323,8 +323,9 @@ function fetchUserWithPosts(userId: string): Promise<UserWithPosts> {
     .then(user => fetchPosts(user.id)
       .then(posts => ({ ...user, posts }))
     )
-    .catch(error => {
-      logger.error('Failed to fetch user with posts', error);
+    .catch((error: unknown) => {
+      const normalizedError = error instanceof Error ? error : new Error(String(error));
+      logger.error('Failed to fetch user with posts', normalizedError);
       throw new DataFetchError('Could not load user data');
     });
 }
@@ -340,7 +341,8 @@ async function fetchUserWithPosts(userId: string): Promise<UserWithPosts> {
     const posts = await fetchPosts(user.id);
     return { ...user, posts };
   } catch (error) {
-    logger.error('Failed to fetch user with posts', error);
+    const normalizedError = error instanceof Error ? error : new Error(String(error));
+    logger.error('Failed to fetch user with posts', normalizedError);
     throw new DataFetchError('Could not load user data');
   }
 }
