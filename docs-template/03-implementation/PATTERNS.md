@@ -181,7 +181,7 @@ async function processUser(userId: string): Promise<Result<User>> {
     logger.error('Failed to process user', normalizedError, { userId });
 
     if (normalizedError instanceof ValidationError) {
-      return Result.fail(error);
+      return Result.fail(normalizedError);
     }
     
     return Result.fail(new InternalError('Processing failed'));
