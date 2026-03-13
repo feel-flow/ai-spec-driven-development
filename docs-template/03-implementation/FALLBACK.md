@@ -9,7 +9,7 @@ updated: "YYYY-MM-DD"
 
 # フォールバック戦略（Fail-Fast in Dev, Graceful in Prod）
 
-> **Parent**: [PATTERNS.md](./PATTERNS.md) セクション 3 | **Related**: [DEPLOYMENT.md](../05-operations/DEPLOYMENT.md)
+> **Origin**: [PATTERNS.md](./PATTERNS.md) セクション 3（エラーハンドリング） | **Related**: [DEPLOYMENT.md](../05-operations/DEPLOYMENT.md)
 
 ## 1. 基本原則
 
@@ -80,14 +80,14 @@ updated: "YYYY-MM-DD"
 
 ### 3.2 サービスレイヤー
 
-| パターン | 説明 | 設定例 |
-|---------|------|--------|
-| Circuit Breaker | 連続障害時にリクエストを遮断（Closed → Open → Half-Open） | 閾値: 5回失敗/30秒, Open期間: 60秒 |
-| リトライ | Exponential Backoff + Jitter で再試行 | 最大3回, 初期1秒, 最大30秒 |
-| セカンダリサービス | プライマリ障害時にバックアップサービスへ切替 | ヘルスチェック間隔: 10秒 |
-| タイムアウト | レスポンス待ち上限を設定 | API: 5秒, バッチ: 60秒 |
+| パターン | 説明 | 設定定数の例 |
+|---------|------|------------|
+| Circuit Breaker | 連続障害時にリクエストを遮断（Closed → Open → Half-Open） | `CIRCUIT_BREAKER_FAILURE_THRESHOLD`, `CIRCUIT_BREAKER_OPEN_DURATION_MS` |
+| リトライ | Exponential Backoff + Jitter で再試行 | `MAX_RETRY_COUNT`, `RETRY_INITIAL_DELAY_MS`, `RETRY_MAX_DELAY_MS` |
+| セカンダリサービス | プライマリ障害時にバックアップサービスへ切替 | `HEALTH_CHECK_INTERVAL_MS` |
+| タイムアウト | レスポンス待ち上限を設定 | `API_TIMEOUT_MS`, `BATCH_TIMEOUT_MS` |
 
-> Circuit Breaker の閾値・リトライ回数等は名前付き定数として定義すること（マジックナンバー禁止）。
+> これらの値は名前付き定数として定義すること（マジックナンバー禁止。詳細は [PATTERNS.md](./PATTERNS.md) Section 10 参照）。
 
 ### 3.3 フィーチャーレイヤー
 
@@ -122,8 +122,11 @@ updated: "YYYY-MM-DD"
 function fallbackInProdOnly<T>(fallbackValue: T, error: unknown, context?: Record<string, unknown>): T {
   const normalizedError = error instanceof Error ? error : new Error(String(error));
 
-  // 認証/認可/バリデーションエラーは環境に関係なく常にスロー
-  // ※ AppError のサブクラス（PATTERNS.md Section 3 参照）を必要に応じて追加
+  // フォールバック禁止カテゴリ（Section 1 参照）は環境に関係なく常にスロー
+  // ※ プロジェクトで定義した AppError サブクラスに合わせて追加すること:
+  //    認証: UnauthorizedError, 認可: ForbiddenError,
+  //    バリデーション: ValidationError, データ整合性: ConflictError
+  //    セキュリティ: SecurityError 等
   if (
     normalizedError instanceof ValidationError ||
     normalizedError instanceof ForbiddenError ||
