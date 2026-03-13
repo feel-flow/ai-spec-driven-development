@@ -56,18 +56,16 @@
 プロジェクトルートで以下を実行:
 
 ```bash
-# スクリプトをダウンロード（setup-multi-review.sh は symlink のため本体を取得）
-curl -sLO https://raw.githubusercontent.com/OWNER/REPO/main/scripts/setup-multi-agent.sh
+# 方法1: Husky pre-commit フック + 個別 CLI レビュー（シンプル）
+bash scripts/setup-automated-review.sh
 
-# スクリプトの内容を確認（推奨）
-less setup-multi-agent.sh
-
-# 確認後、実行（--task review でレビュー用セットアップ）
-bash setup-multi-agent.sh --task review
-
-# または、リポジトリにスクリプトがある場合
+# 方法2: Multi-CLI オーケストレーター（高度な分散レビュー）
 bash scripts/setup-multi-review.sh
 ```
+
+**方法1（setup-automated-review.sh）** は `git commit` 時に利用可能なAI CLIで自動レビューする基本構成です。Husky pre-commit フック、5つのCLIアダプタ、Claude Code `/code-review` コマンドをセットアップします。
+
+**方法2（setup-multi-review.sh）** は複数AI CLIを並列・分散実行するオーケストレーターです。コスト戦略やクロスモデル比較など高度な機能が利用できます。
 
 ### 手動セットアップ
 
@@ -92,28 +90,26 @@ chmod +x .husky/pre-commit scripts/review-common.sh scripts/review-prompts.sh sc
 ```
 project-root/
 ├── .husky/
-│   └── pre-commit              # Git pre-commit hook
+│   └── pre-commit                # Git pre-commit hook
 ├── scripts/
-│   ├── multi-agent.sh          # オーケストレーター本体
-│   ├── setup-multi-agent.sh    # セットアップスクリプト
-│   ├── setup-multi-review.sh   # レビュー用ラッパー（→ setup-multi-agent.sh）
-│   ├── agent-config.yaml       # CLI・タスク設定
-│   ├── review-config.yaml      # レビュー設定（→ agent-config.yaml）
-│   ├── review-common.sh        # 共通処理（差分取得、結果判定等）
-│   ├── review-prompts.sh       # レビュープロンプト定義
-│   ├── adapters/               # CLI アダプター
-│   │   ├── adapter-common.sh   # アダプター共通処理
-│   │   ├── claude-code-adapter.sh
-│   │   ├── codex-cli-adapter.sh
-│   │   ├── copilot-cli-adapter.sh
-│   │   ├── cursor-cli-adapter.sh
-│   │   └── gemini-cli-adapter.sh
-│   └── perspectives/           # レビュー観点定義
-│       └── review/             # レビュータスク用プロンプト
+│   ├── review-common.sh          # 共通基盤（並列実行・結果表示・差分取得）
+│   ├── review-prompts.sh         # 5種レビュワーのプロンプト定義
+│   ├── claude-review.sh          # Claude Code アダプタ
+│   ├── codex-review.sh           # Codex CLI アダプタ
+│   ├── copilot-review.sh         # Copilot CLI アダプタ
+│   ├── gemini-review.sh          # Gemini CLI アダプタ
+│   ├── cursor-review.sh          # Cursor Agent アダプタ
+│   ├── setup-automated-review.sh # セットアップスクリプト（Husky + CLI アダプタ）
+│   ├── multi-agent.sh            # Multi-CLI オーケストレーター（高度）
+│   ├── setup-multi-agent.sh      # オーケストレーター用セットアップ
+│   ├── setup-multi-review.sh     # レビュー用ラッパー（→ setup-multi-agent.sh）
+│   ├── agent-config.yaml         # CLI・タスク設定
+│   ├── adapters/                 # オーケストレーター用CLIアダプター
+│   └── perspectives/             # オーケストレーター用観点定義
 ├── .claude/
 │   └── commands/
-│       └── code-review.md      # スラッシュコマンド定義
-└── package.json                # npm scripts（オプション）
+│       └── code-review.md        # /code-review スラッシュコマンド
+└── package.json                  # npm scripts（オプション）
 ```
 
 ---
@@ -304,9 +300,13 @@ npx husky init
 
 | コマンド | 説明 |
 |----------|------|
-| `git commit` | 自動レビュー実行 |
+| `git commit` | 自動レビュー実行（pre-commit hook） |
 | `/code-review` | Claude Code内で手動レビュー |
-| `npm run code-review` | npm経由で手動レビュー |
+| `npm run code-review` | ステージ済み変更をClaude Codeでレビュー |
+| `npm run code-review:branch` | ブランチ全体をClaude Codeでレビュー |
+| `npm run code-review:codex` | Codex CLIでレビュー |
+| `npm run code-review:copilot` | Copilot CLIでレビュー |
+| `npm run code-review:gemini` | Gemini CLIでレビュー |
 | `git commit --no-verify` | レビューをスキップ |
 | `SKIP_CLAUDE_REVIEW=1 git commit` | 環境変数でスキップ |
 
