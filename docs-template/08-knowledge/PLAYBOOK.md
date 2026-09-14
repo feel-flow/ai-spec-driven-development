@@ -3,7 +3,7 @@ title: "PLAYBOOK"
 version: "1.45.0"
 status: "approved"
 created: "2026-03-10"
-updated: "2026-09-08"
+updated: "2026-09-14"
 owner: "@fffokazaki"
 changeImpact: "medium"
 ace_entry_count: 88
@@ -1950,7 +1950,7 @@ Toolkit comment-analyzer が Critical C1/C2 として独立検出、Copilot revi
 | Category   | tooling              |
 | Origin     | PR #484 / Issue #485 |
 | Date       | 2026-08-28           |
-| Helpful    | 1                    |
+| Helpful    | 2                    |
 | Harmful    | 0                    |
 | Status     | active               |
 
@@ -1969,7 +1969,7 @@ Toolkit comment-analyzer が Critical C1/C2 として独立検出、Copilot revi
 | Category   | testing              |
 | Origin     | PR #489 / Issue #488 |
 | Date       | 2026-08-28           |
-| Helpful    | 2                    |
+| Helpful    | 3                    |
 | Harmful    | 0                    |
 | Status     | active               |
 
@@ -2238,6 +2238,11 @@ Issue #517 の AC は `grep "Actions 非依存" docs/AI_GIT_WORKFLOW.md CLAUDE.m
 
 - ACE-526-1: 正本移管時に同期の所有対象も限定する（PR #526 / Issue #524）。
 - ACE-527-1: 計画の一致と現在の出力の一致を分離し、実ファイルで完了を確認する（PR #527 / Issue #525）。
+
+#### カウンター更新
+
+- ACE-484-3 (Helpful 1→2): PR #531 で prettier を `3.8.3` に固定し、`npm ci` 前提を README / 移行設計 §3.3 に書いた（Issue #485 の Action を実施）
+- ACE-489-1 (Helpful 2→3): PR #531 の `prettier-pin.test.ts` が caret/tilde の合成入力で検出器自体を固定した再適用
 
 ### [1.44.0] - 2026-09-07
 
