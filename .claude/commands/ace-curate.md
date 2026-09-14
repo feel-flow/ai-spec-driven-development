@@ -81,23 +81,19 @@ ID は **PRスコープ式** `ACE-<PR番号>-<連番>`（例 `ACE-438-1`、非PR
 ```markdown
 <a id="ace-XXX"></a>
 
-### ACE-XXX: [タイトル]
+### ACE-XXX: [検索可能な主張 1 文のタイトル]
 
-| フィールド | 値           |
-| ---------- | ------------ |
-| Category   | [カテゴリ]   |
-| Origin     | PR #[PR番号] |
-| Date       | [今日の日付] |
-| Helpful    | 0            |
-| Harmful    | 0            |
-| Status     | active       |
+| Category | [カテゴリ] | Origin | PR #[PR番号] |
+| Date | [今日の日付] |
+| Helpful | 0 | Harmful | 0 |
+| Status | active |
 
-**Insight**: [知見の本質]
+[本文 2〜4 文。1 文目 = 知見の本質。非自明な適用条件が 1 文。推奨アクションで締める。手順の列挙・叙述は書かない]
 
-**Context**: [発見した状況]
-
-**Action**: [推奨アクション]
+---
 ```
+
+メタ 4 行は各行の行頭に置く。旧テーブル形式（`| フィールド | 値 |` + Insight/Context/Action）は読み取り互換のみで、新規追記には使わない。
 
 **anchor 命名規則**: 見出し直前に `<a id="ace-XXX"></a>` を 1 行付与（エントリ ID を小文字化、例 `ace-438-1`）。詳細・根拠は SSOT である [PLAYBOOK.md 記述ガイドライン](../../docs-template/08-knowledge/PLAYBOOK.md#記述ガイドライン) を参照。
 
@@ -152,7 +148,7 @@ gh pr create --base develop --title "knowledge: ACE-<PR番号>-<連番> [categor
 
 ## 注意事項
 
-- エントリの追記は **末尾のみ**。既存エントリの本文（Insight/Context/Action）の書き換えは禁止
+- エントリの追記は **末尾のみ**。既存エントリの本文（新形式の散文 / 旧形式の Insight/Context/Action）の書き換えは禁止
 - 既存エントリの Helpful/Harmful カウンター更新と Status 変更（active → deprecated）は許可
 - カウンターの更新は **インクリメントのみ**（減算しない）
 - 知見が抽出されない場合（typo修正のみ等）は「知見なし」と報告して終了

@@ -60,9 +60,7 @@ ACE 知見コミットのマージ方針は **[git-workflow.md ステップ10 §
 各知見について以下を出力してください:
 - タイトル（簡潔で検索しやすい）
 - カテゴリ（coding/architecture/testing/security/performance/devops/process/tooling）
-- Insight（知見の本質 1-2文）
-- Context（発見した状況）
-- Action（推奨アクション）
+- 本文案（2〜4 文。1 文目 = 知見の本質、適用条件 1 文、推奨アクションで締める。`**Insight**` / `**Context**` / `**Action**` ラベルは付けない — 形式ゲートが旧形式と判定する）
 - 汎用性（汎用的 / プロジェクト固有）
 - 再現性（高 / 中 / 低）
 - 影響度（高 / 中 / 低）
@@ -74,9 +72,7 @@ ACE 知見コミットのマージ方針は **[git-workflow.md ステップ10 §
 ## 知見候補 1
 - タイトル: Prisma の findMany で関連を eager loading しないと N+1 になる
 - カテゴリ: performance
-- Insight: ユーザー一覧取得時に関連テーブルを include しないと N+1 クエリが発生
-- Context: PR #42 でユーザー一覧APIのレスポンスが3秒超に
-- Action: findMany 使用時は include オプションを必ず検討する
+- 本文案: ユーザー一覧取得時に関連テーブルを include しないと N+1 クエリが発生する。一覧 API のレスポンスが遅いときに疑う。findMany 使用時は include オプションを必ず検討する。
 - 汎用性: プロジェクト固有（Prisma使用時）
 - 再現性: 高
 - 影響度: 高
@@ -150,23 +146,19 @@ ID は **PRスコープ式**（`ACE-<PR番号>-<連番>`）。採番ルールの
 ```markdown
 <a id="ace-438-1"></a>
 
-### ACE-438-1: [タイトル]
+### ACE-438-1: [検索可能な主張 1 文のタイトル]
 
-| フィールド | 値               |
-| ---------- | ---------------- |
-| Category   | [カテゴリ]       |
-| Origin     | PR #${PR_NUMBER} |
-| Date       | YYYY-MM-DD       |
-| Helpful    | 0                |
-| Harmful    | 0                |
-| Status     | active           |
+| Category | [カテゴリ] | Origin | PR #${PR_NUMBER} |
+| Date | YYYY-MM-DD |
+| Helpful | 0 | Harmful | 0 |
+| Status | active |
 
-**Insight**: [知見の本質]
+[本文 2〜4 文。1 文目 = 知見の本質。非自明な適用条件が 1 文。推奨アクションで締める]
 
-**Context**: [発見した状況]
-
-**Action**: [推奨アクション]
+---
 ```
+
+メタ 4 行は各行の行頭に置く。旧テーブル形式（`| フィールド | 値 |` + Insight/Context/Action）は読み取り互換のみで、新規追記には使わない。
 
 **anchor 命名規則**: 見出し直前に `<a id="ace-XXX"></a>` を 1 行付与（エントリ ID を小文字化、例 `ace-438-1`）。詳細・根拠は SSOT である [PLAYBOOK.md 記述ガイドライン](../../08-knowledge/PLAYBOOK.md#記述ガイドライン) を参照。
 

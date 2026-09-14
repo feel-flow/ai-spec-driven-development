@@ -220,30 +220,28 @@ PLAYBOOK.md のエントリ一覧セクション末尾に新エントリを追�
 `ACE-XXX` の `XXX` は **PRスコープ式 ID** に置換する: `ACE-<PR番号>-<連番>`（例 `ACE-438-1`、非PR由来は `ACE-i<Issue番号>-<連番>` 例 `ACE-i425-1`）。採番は対象 PR の既存 `ACE-<PR番号>-*` の最大連番 +1（既存が無ければ連番 `1`、すなわち `ACE-438-1`）で、全体の最新 ID を読む必要がない（並行採番でも衝突しない）。anchor は ID を小文字化した `<a id="ace-438-1"></a>` を見出し直前に付与する。
 
 ```
-### ACE-XXX: [タイトル]
+<a id="ace-XXX"></a>
 
-| フィールド | 値 |
-|-----------|---|
-| Category | coding / architecture / testing / security / performance / devops / process / tooling |
-| Origin | PR #XXX / Issue #YYY |
+### ACE-XXX: [検索可能な主張 1 文のタイトル]
+
+| Category | [カテゴリ] | Origin | PR #XXX / Issue #YYY |
 | Date | YYYY-MM-DD |
-| Helpful | 0 |
-| Harmful | 0 |
+| Helpful | 0 | Harmful | 0 |
 | Status | active |
 
-**Insight**: [知見の本質を1-2文で記述]
+[本文 2〜4 文。1 文目 = 知見の本質。非自明な適用条件が 1 文。推奨アクションで締める]
 
-**Context**: [この知見が発見された状況・条件を記述]
-
-**Action**: [推奨する具体的なアクション]
+---
 ```
+
+メタ 4 行は各行の行頭に置く。旧テーブル形式（`| フィールド | 値 |` + Insight/Context/Action）は読み取り互換のみで、新規追記には使わない。
 
 ### 運用ルール
 
 #### 末尾追記ルール
 
 - エントリは常にファイル末尾（Changelog セクションの直前）に追記する
-- 既存エントリの本文（Insight/Context/Action）の書き換えは禁止
+- 既存エントリの本文（新形式の散文 / 旧形式の Insight/Context/Action）の書き換えは禁止
 - カウンター更新と Status 変更のみ許可
 
 #### カウンター運用ルール
