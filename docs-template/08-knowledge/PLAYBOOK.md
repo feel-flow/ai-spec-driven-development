@@ -1,12 +1,12 @@
 ---
 title: "PLAYBOOK"
-version: "1.46.0"
+version: "1.47.0"
 status: "approved"
 created: "2026-03-10"
 updated: "2026-09-14"
 owner: "@fffokazaki"
 changeImpact: "medium"
-ace_entry_count: 89
+ace_entry_count: 91
 tags: [ace, playbook, knowledge-management]
 references:
   - https://github.com/feel-flow/ai-spec-driven-development/blob/HEAD/docs/ACE_FRAMEWORK.md
@@ -180,7 +180,7 @@ Playbook が 800 行を超えた場合、以下のように分割する：
 | Category   | process           |
 | Origin     | PR #316 / PR #319 |
 | Date       | 2026-03-10        |
-| Helpful    | 8                 |
+| Helpful    | 9                 |
 | Harmful    | 0                 |
 | Status     | active            |
 
@@ -2234,7 +2234,44 @@ Issue #517 の AC は `grep "Actions 非依存" docs/AI_GIT_WORKFLOW.md CLAUDE.m
 
 ---
 
+<a id="ace-533-1"></a>
+
+### ACE-533-1: 探索順の契約テストは関数定義の出現位置ではなく、隔離環境でリゾルバを実行して検証する
+
+| Category | testing | Origin | PR #533 / Issue #491 |
+| Date | 2026-09-14 |
+| Helpful | 0 | Harmful | 0 |
+| Status | active |
+
+`indexOf("select_cache_toolkit")` が当たるのは関数定義であり、sidecar 解決より前に定義がある限り呼び出し順を逆転させても緑のまま残る。探索順を固定するなら HOME / CODEX_HOME を隔離し、cache と stale sidecar を並べて `--print-toolkit-root=kv` の `source=` を断言する。ソース文字列の前後関係だけを見るテストは、対象の機構を通っていない。
+
+---
+
+<a id="ace-533-2"></a>
+
+### ACE-533-2: 推奨入口と互換入口を同じコードフェンスに並べず、エラー案内は実出力の文言で書く
+
+| Category | process | Origin | PR #533 / Issue #491 |
+| Date | 2026-09-14 |
+| Helpful | 0 | Harmful | 0 |
+| Status | active |
+
+同じフェンスに `/multi-review` と `codex-review.sh --fresh` を並べると、上から実行したエージェントが推奨結果を直後に退避し課金も二重になる。clone 直後の実エラーは `setup-multi-agent.sh` と名前だけ出し、パス付きコマンドは版不一致のときだけ出る。コピー用フェンスは推奨入口 1 本にし、エラー案内は実出力を写し、リポジトリ直下の同名スクリプトと toolkit の setup を混同させない。
+
+---
+
 ## Changelog
+
+### [1.47.0] - 2026-09-14
+
+#### 追加
+
+- ACE-533-1: 探索順の契約テストは関数定義の出現位置ではなく、隔離環境でリゾルバを実行して検証する（Issue #491 / PR #533）
+- ACE-533-2: 推奨入口と互換入口を同じコードフェンスに並べず、エラー案内は実出力の文言で書く（Issue #491 / PR #533）
+
+#### カウンター更新
+
+- ACE-001: Helpful 8→9（PR #533 の Codex code-review が契約テストの偽グリーンを検出）
 
 ### [1.46.0] - 2026-09-14
 
