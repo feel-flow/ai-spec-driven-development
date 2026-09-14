@@ -3,24 +3,17 @@ import { spawnSync } from "node:child_process";
 import { mkdtempSync, writeFileSync, rmSync, mkdirSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, resolve, dirname } from "node:path";
+import { gitFixtureEnv } from "./git-fixture-env";
 
 // review-level.sh（Risk-Based Workflow のレベル判定、Issue #454）の境界値テスト。
-// フィクスチャ git は sanitizedGitEnv で GIT_* を遮断する（PR #459 の教訓:
-// git hook 経由の実行時に GIT_DIR を継承すると実リポジトリを破壊する）。
+// フィクスチャ git は gitFixtureEnv で継承 GIT_* を捨て、identity は専用 config と
+// AUTHOR/COMMITTER env に閉じる（PR #459 / Issue #529）。local user.name は書かない。
 
 const REPO_ROOT = resolve(__dirname, "..");
 const SCRIPT = join(REPO_ROOT, "scripts", "review-level.sh");
 
 function sanitizedGitEnv(): Record<string, string> {
-  const env: Record<string, string> = {};
-  for (const [key, value] of Object.entries(process.env)) {
-    if (value !== undefined && !key.startsWith("GIT_")) {
-      env[key] = value;
-    }
-  }
-  env.GIT_CONFIG_GLOBAL = "/dev/null";
-  env.GIT_CONFIG_SYSTEM = "/dev/null";
-  return env;
+  return gitFixtureEnv();
 }
 
 /**
@@ -38,8 +31,6 @@ function makeRepoWithChanges(
     if (r.status !== 0) throw new Error(`git ${args.join(" ")} failed: ${r.stderr}`);
   };
   git("init", "-b", "develop");
-  git("config", "user.email", "test@example.com");
-  git("config", "user.name", "test");
   writeFileSync(join(dir, "README.md"), "# base\n");
   for (const [path, content] of Object.entries(baseFiles)) {
     mkdirSync(dirname(join(dir, path)), { recursive: true });

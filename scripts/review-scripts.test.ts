@@ -3,6 +3,7 @@ import { spawnSync } from "node:child_process";
 import { mkdtempSync, writeFileSync, chmodSync, rmSync, mkdirSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
+import { gitFixtureEnv } from "./git-fixture-env";
 
 // 自前レビュー基盤（claude/copilot/gemini/cursor-review.sh + review-common.sh）の
 // 決定論的 smoke test（Issue #452）。
@@ -69,21 +70,11 @@ function makeStubDir(verdict: "PASS" | "FAIL"): string {
 }
 
 /**
- * フィクスチャ用の git 環境。ユーザーのグローバル設定（gpgsign / hooksPath 等）を遮断し、
- * さらに GIT_* 変数をすべて除去する — git hook（pre-push 等）経由でテストが実行されると
- * git が GIT_DIR 等を設定するため、これを継承するとフィクスチャの git init/commit が
- * 呼び出し元リポジトリを指してサイレントに失敗する（linked worktree からの push で実際に発生）。
+ * フィクスチャ用の git 環境。継承 GIT_* を捨て、identity は専用 config と
+ * AUTHOR/COMMITTER env に閉じる（Issue #529）。local user.name は書かない。
  */
 function sanitizedGitEnv(): Record<string, string> {
-  const env: Record<string, string> = {};
-  for (const [key, value] of Object.entries(process.env)) {
-    if (value !== undefined && !key.startsWith("GIT_")) {
-      env[key] = value;
-    }
-  }
-  env.GIT_CONFIG_GLOBAL = "/dev/null";
-  env.GIT_CONFIG_SYSTEM = "/dev/null";
-  return env;
+  return gitFixtureEnv();
 }
 
 function initGitRepo(dir: string): (...args: string[]) => void {
@@ -96,8 +87,6 @@ function initGitRepo(dir: string): (...args: string[]) => void {
     if (r.status !== 0) throw new Error(`git ${args.join(" ")} failed: ${r.stderr}`);
   };
   git("init", "-b", "develop");
-  git("config", "user.email", "test@example.com");
-  git("config", "user.name", "test");
   writeFileSync(join(dir, "base.txt"), "base\n");
   git("add", ".");
   git("commit", "-m", "init");
