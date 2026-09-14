@@ -1,12 +1,12 @@
 ---
 title: "PLAYBOOK"
-version: "1.50.0"
+version: "1.51.0"
 status: "approved"
 created: "2026-03-10"
 updated: "2026-09-14"
 owner: "@fffokazaki"
 changeImpact: "medium"
-ace_entry_count: 95
+ace_entry_count: 96
 tags: [ace, playbook, knowledge-management]
 references:
   - https://github.com/feel-flow/ai-spec-driven-development/blob/HEAD/docs/ACE_FRAMEWORK.md
@@ -2306,7 +2306,26 @@ hook の `GIT_DIR` を 1 spawn でも継承すると `git config user.name` は 
 
 ---
 
+<a id="ace-537-1"></a>
+
+### ACE-537-1: バックグラウンド実行では tail -n へパイプせず、出力は素のまま流して完了後に出力ファイルを絞る
+
+| Category | process | Origin | PR #537 / Issue #480 |
+| Date | 2026-09-14 |
+| Helpful | 0 | Harmful | 0 |
+| Status | active |
+
+長時間コマンドを `cmd | tail -n` でバックグラウンド起動すると、`tail -n` が末尾確定のため EOF を待ち、ホストの出力ファイルは終了まで空になる。途中失敗に気づけない。「パイプしない」という知識だけでは、長い出力を要約したい動機のほうが強く再発する。バックグラウンドではコマンドを素のまま起動し、絞り込みは完了後にホストが保存した出力ファイルへ対して行う。`grep` / `head` は EOF 待ちとは別挙動なので同じ「終了までバッファ」に畳まない。
+
+---
+
 ## Changelog
+
+### [1.51.0] - 2026-09-14
+
+#### 追加
+
+- ACE-537-1: バックグラウンド実行では tail -n へパイプせず、出力は素のまま流して完了後に出力ファイルを絞る（Issue #480 / PR #537）
 
 ### [1.50.0] - 2026-09-14
 
