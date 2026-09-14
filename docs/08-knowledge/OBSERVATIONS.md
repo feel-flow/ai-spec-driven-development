@@ -337,13 +337,14 @@ Review Response Policy の「失敗シナリオのない指摘は Suggestion」�
 
 ### OBS-022: `mcp` の spawnSync 系テストは `testTimeout` 未設定（既定 5 秒）で境界に張り付いており、pre-push ゲートが非決定的に赤くなって push を止める
 
-| Kind | problem | Count | 1 |
-| First | 2026-09-07 | Last | 2026-09-07 |
+| Kind | problem | Count | 2 |
+| First | 2026-09-07 | Last | 2026-09-14 |
 | Status | active | Issue | なし |
 
 `mcp/vitest.config.ts` は `include` だけを指定し `testTimeout` を持たないため既定 5000ms。`tests/validate-frontmatter.test.ts` は各ケースで `spawnSync` により `validate-docs.mjs` を起動するので 1 ケースが数秒に達し、実行ごとに落ちるケースが入れ替わる → 赤を見たら落ちたケース名を 2 回の実行で比較し、変わるなら flaky と判定して回帰と切り分ける（同じケースが落ちるなら回帰）。恒久対策は `testTimeout` の引き上げか spawn 回数の削減で、`SKIP_QUALITY_GATE=1` での迂回は #517 が Actions を第二のゲートに据えた前提そのものを崩すので使わない。同型の症状は internal リポジトリの Issue でも追跡されている。
 
 - 2026-09-07: PR #519 後続の `ci.yml` コメント 1 行追加で push が 2 回中止。1 回目 2 件・2 回目 1 件と落ちるケースが変わり flaky と確定（いずれも `Test timed out in 5000ms`）。コメント 1 行のためにゲートを迂回する価値がないと判断し、当該コミットを取り下げた（初回）
+- 2026-09-14: PR #539 のレビュー修正 push で root の `export-toolkit-templates.test.ts`（symlink CLI、git+node を複数回 spawn）が 5110〜6396ms で既定 5s 超過。単体再実行は 1.6s。`{ timeout: 15_000 }` を付けてゲートを通した（ACE-539-2）
 
 ---
 
@@ -366,12 +367,13 @@ Review Response Policy の「失敗シナリオのない指摘は Suggestion」�
 
 ### OBS-024: macOS で grok-cli の read-only sandbox が docker.sock symlink で拒否されるときは MULTI_AGENT_GROK_READONLY_PROFILE=ff-review-ro で完走できる
 
-| Kind | keep | Count | 1 |
+| Kind | keep | Count | 2 |
 | First | 2026-09-14 | Last | 2026-09-14 |
 | Status | active | Issue | なし |
 
 dry-run で grok-cli が `runtime-socket deny resolution failed` と出ても、プランから外さず `~/.grok/sandbox.toml` の `ff-review-ro`（`extends = "read-only"` / `restrict_network = false`）を環境変数で指定すると review が完走する。ホストが grok でも CLI 経路を残せる。
 
 - 2026-09-14: PR #538 の `/multi-review` で grok-cli が完走し、codex-cli と合わせてクロスモデルが成立した。claude-code は spend limit で INCOMPLETE（初回）
+- 2026-09-14: PR #539 でも同じプロファイルで grok-cli が完走。claude-code は週次 spend limit で再び INCOMPLETE（指摘なしではなく未確認）
 
 ---
