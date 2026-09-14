@@ -169,7 +169,12 @@ chmod +x scripts/adapters/*.sh
 version: "2.0"
 mode: distributed
 parallel: true
-cost_strategy: balanced
+
+tasks:
+  review:
+    cost_strategy: balanced
+    output_dir: .review-results
+    timeout: 300
 
 agents:
   claude-code:
@@ -253,7 +258,9 @@ bash scripts/multi-review.sh --cli codex-cli --perspective test-analysis
 #### 例1: Cursor + Gemini のみで運用（固定料金/無料）
 
 ```yaml
-cost_strategy: minimize_cost
+tasks:
+  review:
+    cost_strategy: minimize_cost
 agents:
   cursor-cli:
     command: cursor-agent

@@ -19,24 +19,49 @@ function listMarkdown(dir: string): string[] {
   return out;
 }
 
+function extractYamlFences(markdown: string): string[] {
+  const blocks: string[] = [];
+  const fence = /```yaml\n([\s\S]*?)```/g;
+  let match: RegExpExecArray | null = fence.exec(markdown);
+  while (match !== null) {
+    blocks.push(match[1]);
+    match = fence.exec(markdown);
+  }
+  return blocks;
+}
+
 describe("agent-config.yaml スニペットのキー実在 (Issue #506)", () => {
-  it("実ファイルは perspectives 入れ子を持ち、旧キーを持たない", () => {
+  it("実ファイルは perspectives.review 入れ子と tasks.review.cost_strategy を持ち、旧キーを持たない", () => {
     const yaml = readFileSync(AGENT_CONFIG, "utf8");
-    expect(yaml).toMatch(/^ {4}perspectives:$/m);
-    expect(yaml).toMatch(/^ {6}review:$/m);
+    expect(yaml).toMatch(/^ {4}perspectives:\n {6}review:/m);
+    expect(yaml).toMatch(/^tasks:\n {2}review:\n {4}cost_strategy:/m);
     expect(yaml).not.toMatch(new RegExp(`^\\s*${RETIRED_PERSPECTIVES_KEY}:`, "m"));
   });
 
-  it("docs-template の案内・スニペットに旧キーを残さない", () => {
-    const hits: string[] = [];
+  it("docs-template の案内・スニペットに旧キーを残さず、入れ子スキーマを維持する", () => {
+    const retiredHits: string[] = [];
+    const missingNest: string[] = [];
+    const v2TopLevelCost: string[] = [];
     for (const file of listMarkdown(TEMPLATE_ROOT)) {
-      const lines = readFileSync(file, "utf8").split("\n");
-      lines.forEach((line, index) => {
+      const rel = relative(REPO_ROOT, file);
+      const content = readFileSync(file, "utf8");
+      content.split("\n").forEach((line, index) => {
         if (line.includes(RETIRED_PERSPECTIVES_KEY)) {
-          hits.push(`${relative(REPO_ROOT, file)}:${index + 1}`);
+          retiredHits.push(`${rel}:${index + 1}`);
+        }
+      });
+      extractYamlFences(content).forEach((block, index) => {
+        const label = `${rel} yaml#${index + 1}`;
+        if (block.includes("perspectives:") && !/^ *perspectives:\n +review:/m.test(block)) {
+          missingNest.push(label);
+        }
+        if (/^version:\s*["']2\.0["']\s*$/m.test(block) && /^cost_strategy:/m.test(block)) {
+          v2TopLevelCost.push(label);
         }
       });
     }
-    expect(hits).toEqual([]);
+    expect(retiredHits).toEqual([]);
+    expect(missingNest).toEqual([]);
+    expect(v2TopLevelCost).toEqual([]);
   });
 });
