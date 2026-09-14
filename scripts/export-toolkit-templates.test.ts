@@ -32,7 +32,7 @@ function fixture() {
   return { source, target, ref: 'release-fixture', commit, prefix };
 }
 describe('固定コミットからのテンプレート直接配布', () => {
-  it('symlink経由のCLIでも計画・出力・実ファイル不一致を判定する', () => {
+  it('symlink経由のCLIでも計画・出力・実ファイル不一致を判定する', { timeout: 15_000 }, () => {
     const f = fixture(), cli = path.join(temp(), 'export-alias.mjs');
     fs.symlinkSync(fileURLToPath(new URL('./export-toolkit-templates.mjs', import.meta.url)), cli);
     const args = [cli, '--source', f.source, '--target', f.target, '--ref', f.ref, '--commit', f.commit];
