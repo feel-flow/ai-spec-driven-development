@@ -118,7 +118,7 @@ npm run lint:md
 - **ルート `package.json`**: `quality:local` は `bash scripts/quality-local.sh` を呼ぶ。チェーンは **3.2 と同順**だが、**`npm ci` および `npm --prefix mcp ci` を含まない**（日々の実行時間を抑える）。
 - **実行前の前提**: クローン直後・依存を揃えるとき・未変更ファイルが `format:md:check` で落ちたときは、先に `npm ci` と `npm --prefix mcp ci` を実行する（§3.2 冒頭の 2 ステップ）。`npm install` だと lockfile 以外のパッチが入り、prettier のような整形ツールでは**触っていない Markdown が赤くなる**（Issue #485）。prettier はキャレットなしの固定バージョン（`package.json` の `devDependencies.prettier`）なので、`npm ci` 後は lockfile の版だけが使われる。
 - **中身の順序**: `build:mcp` → `check` → `mcp test` → `test:ace-scripts` → `validate -- docs-template` → `build:spec-index` → `format:md:check` → `lint:md`。
-- **ゲート記録**（Issue #515）: チェーン成功後に ff-dev-toolkit の `record-gate-head.sh` 相当で `.git/ff-dev-toolkit/gate-record` へ `STATUS=pass` を書く。失敗時は `STATUS=fail` で前回の緑を無効化する。toolkit が解決できない環境（CI など）では記録をスキップし、ゲートの終了コードは変えない。`/close-issue` の鮮度照合はこの記録を読む。
+- **ゲート記録**（Issue #515）: チェーン終了後に toolkit の `record-gate-head.sh` を呼ぶ。記録先は `$(git rev-parse --absolute-git-dir)/ff-dev-toolkit/gate-record`（worktree では `.git/worktrees/<名>/` 配下）。成功なら `STATUS=pass`、失敗なら `STATUS=fail`（前回の緑を無効化）。開始時 HEAD を `--expect-head` に渡し、動いていたら pass は書かない。dirty な木でも pass は書くが照合は判定不能。toolkit が解決できない環境（CI など）では記録をスキップし、ゲートの終了コードは変えない。`/close-issue` の鮮度照合はこの記録を読む。
 - **合意事項**: 3.2 の意図を破壊的に変えない（意図的な手順変更を除く）。
 
 ### 3.4 markdownlint（補足）

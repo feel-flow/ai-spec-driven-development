@@ -185,6 +185,31 @@ describe("quality:local gate record (Issue #515)", () => {
     }
   });
 
+  it("FF_DEV_TOOLKIT_ROOT 未設定でも Codex cache の record-gate-head.sh で pass を書く", () => {
+    const dir = mkdtempSync(join(tmpdir(), "ql-cache-"));
+    const home = mkdtempSync(join(tmpdir(), "ql-home-"));
+    try {
+      const head = initRepo(dir);
+      const recDir = join(home, ".codex", "plugins", "cache", "mp", "ff-dev-toolkit", "9.9.9");
+      writeFixtureToolkit(recDir);
+      const r = spawnSync("bash", [RECORD_HELPER, "--status", "pass", "--expect-head", head], {
+        cwd: dir,
+        encoding: "utf8",
+        env: {
+          ...gitEnv(),
+          HOME: home,
+          CODEX_HOME: join(home, ".codex"),
+          CLAUDE_CONFIG_DIR: join(home, ".claude"),
+        },
+      });
+      expect(r.status, r.stderr).toBe(0);
+      expect(recordMap(join(dir, ".git", "ff-dev-toolkit", "gate-record")).STATUS).toBe("pass");
+    } finally {
+      rmSync(dir, { recursive: true, force: true });
+      rmSync(home, { recursive: true, force: true });
+    }
+  });
+
   it("toolkit が無いときは記録せず exit 0 のまま返す", () => {
     const dir = mkdtempSync(join(tmpdir(), "ql-skip-"));
     try {

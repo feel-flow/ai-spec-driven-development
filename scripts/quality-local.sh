@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
-# ローカル品質ゲート（Issue #515）。
-# チェーンは docs/NO_GITHUB_ACTIONS_MIGRATION_DESIGN.md §3.3 が正本。
-# 成功時は STATUS=pass、失敗時は STATUS=fail を gate-record へ書く
-# （失敗が前回の緑を無効化する。記録の失敗はゲートの終了コードを変えない）。
+# ローカル品質ゲート。チェーンの正本は docs/NO_GITHUB_ACTIONS_MIGRATION_DESIGN.md §3.3。
+# Issue #515: 終了後に開始時 HEAD を --expect-head へ渡して gate-record を書く。
+# 成功は STATUS=pass、失敗は STATUS=fail（前回の緑を無効化）。記録のスキップ・失敗は
+# ゲートの終了コードを変えない。HEAD が動いていたら pass は書かない。
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
