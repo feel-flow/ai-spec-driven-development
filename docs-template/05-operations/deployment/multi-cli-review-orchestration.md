@@ -166,36 +166,55 @@ chmod +x scripts/adapters/*.sh
 > **Note**: 現行の `multi-agent.sh` が config から読み込むのは `mode` / `parallel` / `tasks.*`（cost_strategy / timeout / output_dir）のみで、**パースペクティブ割り当てとフォールバックはスクリプト内（`get_cli_perspectives_review()` 等）にハードコード**されています。割り当てを変更する場合は YAML とスクリプトの両方を同期して編集してください。
 
 ```yaml
-version: "1.0"
+version: "2.0"
 mode: distributed
 parallel: true
-cost_strategy: balanced
+
+tasks:
+  review:
+    cost_strategy: balanced
+    output_dir: .review-results
+    timeout: 300
 
 agents:
   claude-code:
     command: claude
     cost_tier: premium
-    default_perspectives: [type-design-analysis]
+    perspectives:
+      review:
+        - type-design-analysis
 
   codex-cli:
     command: codex
     cost_tier: standard
-    default_perspectives: [code-review, error-handler-hunt, test-analysis]
+    perspectives:
+      review:
+        - code-review
+        - error-handler-hunt
+        - test-analysis
 
   copilot-cli:
     command: copilot
     cost_tier: metered # 従量課金 — 既定プランには載らない（--cli copilot-cli 明示時のみ実行）
-    default_perspectives: [test-analysis, comment-analysis]
+    perspectives:
+      review:
+        - test-analysis
+        - comment-analysis
 
   gemini-cli:
     command: gemini
     cost_tier: free-tier
-    default_perspectives: [security-analysis, comment-analysis]
+    perspectives:
+      review:
+        - security-analysis
+        - comment-analysis
 
   cursor-cli:
     command: cursor-agent
     cost_tier: flat-rate
-    default_perspectives: [code-simplification]
+    perspectives:
+      review:
+        - code-simplification
 
 fallback:
   claude-code: codex-cli
@@ -239,18 +258,27 @@ bash scripts/multi-review.sh --cli codex-cli --perspective test-analysis
 #### 例1: Cursor + Gemini のみで運用（固定料金/無料）
 
 ```yaml
-cost_strategy: minimize_cost
+tasks:
+  review:
+    cost_strategy: minimize_cost
 agents:
   cursor-cli:
     command: cursor-agent
     cost_tier: flat-rate
-    default_perspectives:
-      [code-review, test-analysis, comment-analysis, error-handler-hunt]
+    perspectives:
+      review:
+        - code-review
+        - test-analysis
+        - comment-analysis
+        - error-handler-hunt
   gemini-cli:
     command: gemini
     cost_tier: free-tier
-    default_perspectives:
-      [security-analysis, code-simplification, type-design-analysis]
+    perspectives:
+      review:
+        - security-analysis
+        - code-simplification
+        - type-design-analysis
 ```
 
 #### 例2: Claude + Codex のクロスモデル比較
@@ -261,11 +289,15 @@ agents:
   claude-code:
     command: claude
     cost_tier: premium
-    default_perspectives: [code-review]
+    perspectives:
+      review:
+        - code-review
   codex-cli:
     command: codex
     cost_tier: standard
-    default_perspectives: [code-review]
+    perspectives:
+      review:
+        - code-review
 ```
 
 ---

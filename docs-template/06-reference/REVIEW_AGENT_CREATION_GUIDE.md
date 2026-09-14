@@ -493,7 +493,7 @@ bash scripts/multi-review.sh --mode cross-model --perspective code-review
 
 - [ ] `scripts/agent-config.yaml` に新CLIエントリを追加
 - [ ] `cost_tier` を設定
-- [ ] `default_perspectives` を設定
+- [ ] `perspectives` を設定（`review` / `explore` / `implement` の入れ子。現行の `multi-agent.sh` は YAML からは読まないため、`get_cli_perspectives_*()` も同期する）
 - [ ] `fallback` マッピングを更新
 
 ### Step 4: ドキュメント更新

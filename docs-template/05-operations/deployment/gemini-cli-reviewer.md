@@ -98,8 +98,13 @@ agents:
   gemini-cli:
     command: gemini
     cost_tier: free-tier
-    default_perspectives: [security-analysis, comment-analysis]
+    perspectives:
+      review:
+        - security-analysis
+        - comment-analysis
 ```
+
+現行の `multi-agent.sh` は `perspectives` を YAML からは読まず、スクリプト内（`get_cli_perspectives_review()` 等）にハードコードしている。割り当てを変えるときは YAML とスクリプトを同期して編集する。
 
 ### 推奨パースペクティブ
 
