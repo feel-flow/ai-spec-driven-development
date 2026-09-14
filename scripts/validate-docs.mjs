@@ -8,9 +8,11 @@
  */
 import fs from 'fs';
 import path from 'path';
+import { pathToFileURL } from 'url';
 
 const DOCS_DIR = process.argv[2] || 'docs-template';
 const MINIMUM_LINES = 10;
+const TEMPLATE_DOCS_DIR_NAME = 'docs-template';
 
 // コア7文書の定義（最小構成 — フォルダ名の揺れに対応）
 const CORE_DOCS = [
@@ -62,6 +64,17 @@ const CORE_DOCS = [
 const REQUIRED_FRONTMATTER_FIELDS = ['title', 'version', 'status', 'owner', 'created', 'updated'];
 const VALID_STATUS_VALUES = ['draft', 'review', 'approved'];
 const SEMVER_PATTERN = /^\d+\.\d+\.\d+$/;
+
+/** /init-docs が推測で埋めず残す未確定値（Issue #507） */
+const DEFERRED_BRACKET_INNERS = new Set([
+  '金額',
+  'SLA値',
+  'x.x.x',
+  'x.x',
+  'YYYY-MM-DD / URL',
+  '注意点',
+  'Library',
+]);
 
 /**
  * Frontmatter を解析する（外部ライブラリ不要の簡易版パーサー）
@@ -134,6 +147,63 @@ function validateFrontMatter(meta, fileName) {
   return errors;
 }
 
+/**
+ * 閉じたコードフェンス・閉じた HTML コメント・同一行のインラインコードを空白化し、
+ * 閉じ忘れは除外区間にしない（閉じマーカーが無ければマッチしない）。
+ * @param {string} content
+ * @returns {string}
+ */
+export function maskExemptSpans(content) {
+  let masked = content.replace(/```[\s\S]*?```/g, (block) => ' '.repeat(block.length));
+  masked = masked.replace(/<!--[\s\S]*?-->/g, (block) => ' '.repeat(block.length));
+  masked = masked.replace(/`[^`\n]+`/g, (span) => ' '.repeat(span.length));
+  return masked;
+}
+
+function isDeferredBracketInner(inner) {
+  if (DEFERRED_BRACKET_INNERS.has(inner)) return true;
+  if (/^x(\.x)+$/.test(inner)) return true;
+  if (inner.includes('金額') || inner.includes('SLA')) return true;
+  return false;
+}
+
+function isTaskListMarker(inner) {
+  return inner === ' ' || inner === 'x' || inner === 'X';
+}
+
+function isChangelogVersion(inner) {
+  return /^\d+\.\d+\.\d+$/.test(inner);
+}
+
+function looksLikeCodeInner(inner) {
+  return /[=,"']/.test(inner);
+}
+
+/**
+ * マスク済み本文から角括弧プレースホルダーを拾う。
+ * Markdown リンク・タスクリスト・Changelog 版番号・コード風の中身は除外する。
+ * @param {string} masked
+ * @returns {{ raw: string, inner: string, deferred: boolean }[]}
+ */
+export function findBracketPlaceholders(masked) {
+  const hits = [];
+  const pattern = /\[([^\[\]]+)\]/g;
+  let match = pattern.exec(masked);
+  while (match !== null) {
+    const inner = match[1];
+    const after = masked[match.index + match[0].length];
+    if (after !== '(' && !isTaskListMarker(inner) && !isChangelogVersion(inner) && !looksLikeCodeInner(inner)) {
+      hits.push({ raw: match[0], inner, deferred: isDeferredBracketInner(inner) });
+    }
+    match = pattern.exec(masked);
+  }
+  return hits;
+}
+
+export function isTemplateDocsDir(docsDir) {
+  return path.basename(path.resolve(docsDir)) === TEMPLATE_DOCS_DIR_NAME;
+}
+
 // MASTER.md 必須セクション
 const MASTER_REQUIRED_SECTIONS = [
   { pattern: /プロジェクト|project\s*(name|識別)/i, label: 'プロジェクト識別情報' },
@@ -143,133 +213,168 @@ const MASTER_REQUIRED_SECTIONS = [
   { pattern: /索引|index|リンク|ドキュメント一覧/i, label: 'ドキュメント索引' },
 ];
 
-let exitCode = 0;
-const results = { files: [], master: [], quality: [], summary: {} };
+function runValidation(docsDir) {
+  let exitCode = 0;
+  const results = { files: [], master: [], quality: [], summary: {} };
+  const templateTree = isTemplateDocsDir(docsDir);
 
-// --- ファイル存在チェック ---
-console.log('\n== 必須ファイル ==\n');
-let foundCount = 0;
+  // --- ファイル存在チェック ---
+  console.log('\n== 必須ファイル ==\n');
+  let foundCount = 0;
 
-for (const doc of CORE_DOCS) {
-  let found = null;
-  for (const p of doc.paths) {
-    const fullPath = path.join(DOCS_DIR, p);
-    if (fs.existsSync(fullPath)) {
-      found = fullPath;
-      break;
+  for (const doc of CORE_DOCS) {
+    let found = null;
+    for (const p of doc.paths) {
+      const fullPath = path.join(docsDir, p);
+      if (fs.existsSync(fullPath)) {
+        found = fullPath;
+        break;
+      }
     }
-  }
-  if (found) {
-    const lines = fs.readFileSync(found, 'utf-8').split('\n').length;
-    console.log(`  ✅ ${doc.name} — ${found} (${lines}行)`);
-    results.files.push({ name: doc.name, status: 'ok', path: found, lines });
-    foundCount++;
-  } else {
-    console.log(`  ❌ ${doc.name} — 未作成 (${doc.description})`);
-    results.files.push({ name: doc.name, status: 'missing' });
-    if (doc.required) exitCode = 1;
-  }
-}
-
-// --- MASTER.md セクションチェック ---
-const masterPath = path.join(DOCS_DIR, 'MASTER.md');
-if (fs.existsSync(masterPath)) {
-  const masterContent = fs.readFileSync(masterPath, 'utf-8');
-  console.log('\n== MASTER.md セクション ==\n');
-  let sectionFound = 0;
-
-  for (const section of MASTER_REQUIRED_SECTIONS) {
-    if (section.pattern.test(masterContent)) {
-      console.log(`  ✅ ${section.label}`);
-      results.master.push({ label: section.label, status: 'ok' });
-      sectionFound++;
+    if (found) {
+      const lines = fs.readFileSync(found, 'utf-8').split('\n').length;
+      console.log(`  ✅ ${doc.name} — ${found} (${lines}行)`);
+      results.files.push({ name: doc.name, status: 'ok', path: found, lines });
+      foundCount++;
     } else {
-      console.log(`  ❌ ${section.label} — 見つかりません`);
-      results.master.push({ label: section.label, status: 'missing' });
+      console.log(`  ❌ ${doc.name} — 未作成 (${doc.description})`);
+      results.files.push({ name: doc.name, status: 'missing' });
+      if (doc.required) exitCode = 1;
     }
   }
+
+  // --- MASTER.md セクションチェック ---
+  const masterPath = path.join(docsDir, 'MASTER.md');
+  if (fs.existsSync(masterPath)) {
+    const masterContent = fs.readFileSync(masterPath, 'utf-8');
+    console.log('\n== MASTER.md セクション ==\n');
+
+    for (const section of MASTER_REQUIRED_SECTIONS) {
+      if (section.pattern.test(masterContent)) {
+        console.log(`  ✅ ${section.label}`);
+        results.master.push({ label: section.label, status: 'ok' });
+      } else {
+        console.log(`  ❌ ${section.label} — 見つかりません`);
+        results.master.push({ label: section.label, status: 'missing' });
+      }
+    }
+  }
+
+  // --- 内容品質チェック ---
+  console.log('\n== 内容品質 ==\n');
+  let qualityIssues = 0;
+
+  for (const file of results.files) {
+    if (file.status !== 'ok') continue;
+    const content = fs.readFileSync(file.path, 'utf-8');
+    const scanned = maskExemptSpans(content);
+
+    // 行数チェック
+    if (file.lines < MINIMUM_LINES) {
+      console.log(`  ⚠️  ${file.name} — 内容が少ない (${file.lines}行, 最低${MINIMUM_LINES}行推奨)`);
+      qualityIssues++;
+    }
+
+    // プレースホルダー残存チェック（{{…}} / 角括弧 / TODO・TBD）
+    const mustache = scanned.match(/\{\{[^}]+\}\}/g);
+    const brackets = findBracketPlaceholders(scanned);
+    const todos = scanned.match(/\bTODO\b|\bTBD\b/gi);
+    if (mustache) {
+      console.log(`  ⚠️  ${file.name} — プレースホルダー残存 (${mustache.length}箇所)`);
+      qualityIssues++;
+    }
+    if (brackets.length > 0) {
+      const samples = [...new Set(brackets.map((hit) => hit.raw))].slice(0, 3).join(' ');
+      if (templateTree) {
+        console.log(
+          `  ⚠️  ${file.name} — 未確定値プレースホルダー残存 (${brackets.length}箇所: ${samples})`,
+        );
+      } else {
+        const leftover = brackets.filter((hit) => !hit.deferred);
+        const deferred = brackets.filter((hit) => hit.deferred);
+        if (leftover.length > 0) {
+          const leftoverSamples = [...new Set(leftover.map((hit) => hit.raw))].slice(0, 3).join(' ');
+          console.log(
+            `  ⚠️  ${file.name} — プレースホルダー残存 (角括弧 ${leftover.length}箇所: ${leftoverSamples})`,
+          );
+        }
+        if (deferred.length > 0) {
+          const deferredSamples = [...new Set(deferred.map((hit) => hit.raw))].slice(0, 3).join(' ');
+          console.log(
+            `  ⚠️  ${file.name} — 未確定値プレースホルダー残存 (${deferred.length}箇所: ${deferredSamples})`,
+          );
+        }
+      }
+      qualityIssues++;
+    }
+    if (todos) {
+      console.log(`  ⚠️  ${file.name} — TODO/TBD残存 (${todos.length}箇所)`);
+      qualityIssues++;
+    }
+
+    // 見出し構造チェック
+    const headings = content.match(/^## .+/gm);
+    if (!headings || headings.length === 0) {
+      console.log(`  ⚠️  ${file.name} — ## レベルの見出しがありません`);
+      qualityIssues++;
+    }
+  }
+
+  if (qualityIssues === 0) {
+    console.log('  ✅ 品質上の問題は見つかりませんでした');
+  }
+
+  // --- Frontmatter バリデーション ---
+  console.log('\n== Frontmatter ==\n');
+  let frontmatterIssues = 0;
+
+  for (const file of results.files) {
+    if (file.status !== 'ok') continue;
+    const content = fs.readFileSync(file.path, 'utf-8');
+    const parsed = parseFrontMatter(content);
+
+    if (!parsed) {
+      console.log(`  ❌ ${file.name} — Frontmatter が見つかりません`);
+      frontmatterIssues++;
+      exitCode = 1;
+      continue;
+    }
+
+    // パース時の警告を表示
+    for (const warn of parsed.warnings) {
+      console.log(`  ⚠️  ${file.name}: ${warn}`);
+      frontmatterIssues++;
+    }
+
+    const errors = validateFrontMatter(parsed.meta, file.name);
+    for (const err of errors) {
+      console.log(`  ❌ ${err.message}`);
+      frontmatterIssues++;
+      exitCode = 1;
+    }
+  }
+
+  if (frontmatterIssues === 0) {
+    console.log('  ✅ Frontmatterに問題はありません');
+  }
+
+  // --- サマリー ---
+  const total = CORE_DOCS.length;
+  const score = Math.round((foundCount / total) * 100);
+  console.log('\n== サマリー ==\n');
+  console.log(`  必須ファイル: ${foundCount}/${total} ✅`);
+  console.log(`  品質警告: ${qualityIssues}件${qualityIssues === 0 ? ' ✅' : ' ⚠️'}`);
+  console.log(`  Frontmatter: ${frontmatterIssues}件${frontmatterIssues === 0 ? ' ✅' : ' ❌'}`);
+  console.log(`  全体スコア: ${score}%${score === 100 ? ' — 完璧！' : score >= 70 ? ' — 良好' : ' — 改善が必要'}`);
+  console.log('');
+
+  return exitCode;
 }
 
-// --- 内容品質チェック ---
-console.log('\n== 内容品質 ==\n');
-let qualityIssues = 0;
-
-for (const file of results.files) {
-  if (file.status !== 'ok') continue;
-  const content = fs.readFileSync(file.path, 'utf-8');
-
-  // 行数チェック
-  if (file.lines < MINIMUM_LINES) {
-    console.log(`  ⚠️  ${file.name} — 内容が少ない (${file.lines}行, 最低${MINIMUM_LINES}行推奨)`);
-    qualityIssues++;
-  }
-
-  // プレースホルダー残存チェック
-  const placeholders = content.match(/\{\{[^}]+\}\}/g);
-  const todos = content.match(/\bTODO\b|\bTBD\b/gi);
-  if (placeholders) {
-    console.log(`  ⚠️  ${file.name} — プレースホルダー残存 (${placeholders.length}箇所)`);
-    qualityIssues++;
-  }
-  if (todos) {
-    console.log(`  ⚠️  ${file.name} — TODO/TBD残存 (${todos.length}箇所)`);
-    qualityIssues++;
-  }
-
-  // 見出し構造チェック
-  const headings = content.match(/^## .+/gm);
-  if (!headings || headings.length === 0) {
-    console.log(`  ⚠️  ${file.name} — ## レベルの見出しがありません`);
-    qualityIssues++;
-  }
+const invokedDirectly =
+  Boolean(process.argv[1]) && import.meta.url === pathToFileURL(path.resolve(process.argv[1])).href;
+if (invokedDirectly) {
+  process.exit(runValidation(DOCS_DIR));
 }
 
-if (qualityIssues === 0) {
-  console.log('  ✅ 品質上の問題は見つかりませんでした');
-}
-
-// --- Frontmatter バリデーション ---
-console.log('\n== Frontmatter ==\n');
-let frontmatterIssues = 0;
-
-for (const file of results.files) {
-  if (file.status !== 'ok') continue;
-  const content = fs.readFileSync(file.path, 'utf-8');
-  const parsed = parseFrontMatter(content);
-
-  if (!parsed) {
-    console.log(`  ❌ ${file.name} — Frontmatter が見つかりません`);
-    frontmatterIssues++;
-    exitCode = 1;
-    continue;
-  }
-
-  // パース時の警告を表示
-  for (const warn of parsed.warnings) {
-    console.log(`  ⚠️  ${file.name}: ${warn}`);
-    frontmatterIssues++;
-  }
-
-  const errors = validateFrontMatter(parsed.meta, file.name);
-  for (const err of errors) {
-    console.log(`  ❌ ${err.message}`);
-    frontmatterIssues++;
-    exitCode = 1;
-  }
-}
-
-if (frontmatterIssues === 0) {
-  console.log('  ✅ Frontmatterに問題はありません');
-}
-
-// --- サマリー ---
-const total = CORE_DOCS.length;
-const score = Math.round((foundCount / total) * 100);
-console.log('\n== サマリー ==\n');
-console.log(`  必須ファイル: ${foundCount}/${total} ✅`);
-console.log(`  品質警告: ${qualityIssues}件${qualityIssues === 0 ? ' ✅' : ' ⚠️'}`);
-console.log(`  Frontmatter: ${frontmatterIssues}件${frontmatterIssues === 0 ? ' ✅' : ' ❌'}`);
-console.log(`  全体スコア: ${score}%${score === 100 ? ' — 完璧！' : score >= 70 ? ' — 良好' : ' — 改善が必要'}`);
-console.log('');
-
-process.exit(exitCode);
+export { runValidation };
