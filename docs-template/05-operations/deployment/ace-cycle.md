@@ -59,7 +59,7 @@ ACE 知見コミットのマージ方針は **[git-workflow.md ステップ10 §
 ## 出力形式
 各知見について以下を出力してください:
 - タイトル（簡潔で検索しやすい）
-- カテゴリ（coding/architecture/testing/security/performance/devops/process/tooling）
+- カテゴリ（[PLAYBOOK.md §カテゴリ一覧](../../08-knowledge/PLAYBOOK.md#カテゴリ一覧) から選ぶ。ここへ列挙を写さない）
 - 本文案（2〜4 文。1 文目 = 知見の本質、適用条件 1 文、推奨アクションで締める。`**Insight**` / `**Context**` / `**Action**` ラベルは付けない — 形式ゲートが旧形式と判定する）
 - 汎用性（汎用的 / プロジェクト固有）
 - 再現性（高 / 中 / 低）
@@ -272,9 +272,9 @@ git commit -m "knowledge: ACE-438-1,ACE-438-2 [performance,testing] Prisma N+1�
 以下の知見候補と重複がないか確認してください」
 ```
 
-### Playbook が 800 行を超えた
+### Playbook の行数警告（密度超過）が出た
 
-**対応**: [PLAYBOOK.md のファイル分割ルール](../../08-knowledge/PLAYBOOK.md#ファイル分割ルール) に従ってカテゴリ別に分割
+**対応**: [PLAYBOOK.md の行数・件数の方針](../../08-knowledge/PLAYBOOK.md#行数件数の方針) に従い、旧テーブル形式の正準化または `/ace-refine` で密度を下げる。固定 800 行での `playbook/` 分割はしない。
 
 ### 知見が「効いているか」わからない（再利用計測）
 

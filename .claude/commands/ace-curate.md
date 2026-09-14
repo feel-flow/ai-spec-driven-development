@@ -39,7 +39,7 @@ gh pr view $ARGUMENTS --json number,title,body,url,comments,reviews
 - `gh pr view $PR_NUMBER --json comments,reviews` でレビューコメントを確認
 - 関連 Issue の内容を確認
 
-収集した情報から、以下の観点で知見候補を抽出:
+収集した情報から、以下の観点で知見候補を抽出（分類カテゴリは [PLAYBOOK.md §カテゴリ一覧](../../docs-template/08-knowledge/PLAYBOOK.md#カテゴリ一覧) から選ぶ。列挙をここへ写さない）:
 
 1. **コーディングパターン**: 採用した設計判断とその理由
 2. **テスト戦略**: テストの書き方で得た教訓
@@ -152,4 +152,4 @@ gh pr create --base develop --title "knowledge: ACE-<PR番号>-<連番> [categor
 - 既存エントリの Helpful/Harmful カウンター更新と Status 変更（active → deprecated）は許可
 - カウンターの更新は **インクリメントのみ**（減算しない）
 - 知見が抽出されない場合（typo修正のみ等）は「知見なし」と報告して終了
-- PLAYBOOK.md の総行数は `npm run ace:check-playbook-categories`（`check-category-size.ts`）が報告する。`ACE_MAX_PLAYBOOK_LINES`（既定 800）を超えると警告が出る（**警告のみ・追記はブロックしない**）。超過時は分割・アーカイブを別 Issue で検討する
+- PLAYBOOK.md の行数は `npm run ace:check-playbook-categories`（`check-category-size.ts`）が報告する。未設定時の上限は件数から導出する。密度超過は警告のみ（追記はブロックしない）。対応は旧テーブル形式の正準化または `/ace-refine`。固定 800 行での `playbook/` 分割はしない
