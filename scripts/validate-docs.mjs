@@ -72,6 +72,8 @@ const DEFERRED_BRACKET_INNERS = new Set([
   'x.x.x',
   'x.x',
   'YYYY-MM-DD / URL',
+  'YYYY-MM-DD',
+  '日付',
   '注意点',
   'Library',
 ]);
@@ -155,6 +157,7 @@ function validateFrontMatter(meta, fileName) {
  */
 export function maskExemptSpans(content) {
   let masked = content.replace(/```[\s\S]*?```/g, (block) => ' '.repeat(block.length));
+  masked = masked.replace(/~~~[\s\S]*?~~~/g, (block) => ' '.repeat(block.length));
   masked = masked.replace(/<!--[\s\S]*?-->/g, (block) => ' '.repeat(block.length));
   masked = masked.replace(/`[^`\n]+`/g, (span) => ' '.repeat(span.length));
   return masked;
@@ -163,7 +166,6 @@ export function maskExemptSpans(content) {
 function isDeferredBracketInner(inner) {
   if (DEFERRED_BRACKET_INNERS.has(inner)) return true;
   if (/^x(\.x)+$/.test(inner)) return true;
-  if (inner.includes('金額') || inner.includes('SLA')) return true;
   return false;
 }
 
@@ -191,8 +193,18 @@ export function findBracketPlaceholders(masked) {
   let match = pattern.exec(masked);
   while (match !== null) {
     const inner = match[1];
-    const after = masked[match.index + match[0].length];
-    if (after !== '(' && !isTaskListMarker(inner) && !isChangelogVersion(inner) && !looksLikeCodeInner(inner)) {
+    const rest = masked.slice(match.index + match[0].length);
+    const after = rest[0];
+    const before = match.index > 0 ? masked[match.index - 1] : '';
+    if (
+      after !== '(' &&
+      after !== '[' &&
+      before !== ']' &&
+      !/^:\s+\S/.test(rest) &&
+      !isTaskListMarker(inner) &&
+      !isChangelogVersion(inner) &&
+      !looksLikeCodeInner(inner)
+    ) {
       hits.push({ raw: match[0], inner, deferred: isDeferredBracketInner(inner) });
     }
     match = pattern.exec(masked);
