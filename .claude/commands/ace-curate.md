@@ -148,7 +148,7 @@ gh pr create --base develop --title "knowledge: ACE-<PR番号>-<連番> [categor
 
 ## 注意事項
 
-- エントリの追記は **末尾のみ**。既存エントリの本文（Insight/Context/Action）の書き換えは禁止
+- エントリの追記は **末尾のみ**。既存エントリの本文（新形式の散文 / 旧形式の Insight/Context/Action）の書き換えは禁止
 - 既存エントリの Helpful/Harmful カウンター更新と Status 変更（active → deprecated）は許可
 - カウンターの更新は **インクリメントのみ**（減算しない）
 - 知見が抽出されない場合（typo修正のみ等）は「知見なし」と報告して終了

@@ -94,7 +94,7 @@ ACE エントリ ID は **PRスコープ式** を採用する（このセクシ�
 - **メタ 4 行は各行の行頭に置く**: `Category` / `Date` / `Helpful` / `Status` を行頭のパイプ区切りで書くことが、フィールドを読む集計スクリプトのパース互換条件。1 行に畳んだ `H:n | #PR` のような形式は集計から漏れる
 - **GitHub 上でテーブル描画されない**: ヘッダ行・区切り行を持たないため、パイプ行はプレーンテキストとして表示される。Playbook は AI が参照するための構造化文書であり、これは意図した仕様
 - **旧形式との共存**: 旧テーブル形式（`| フィールド | 値 |` ヘッダ + **Insight**/**Context**/**Action** ブロック）のエントリは読み取り互換として共存させる。新規追記には使わない
-- **形式は機械ゲートで強制される**: `check-entry-format.ts` が PLAYBOOK.md と同階層の `legacy-format-allowlist.txt` に無い旧形式エントリを見つけると exit 1 でブロックする（allowlist ファイルが無ければ旧形式は全て赤 = strict）。**新規追記のために allowlist へ ID を足さない**
+- **形式ゲート**: ff-dev-toolkit の `/ace-curate` 手順 4-f が実行する `check-entry-format.ts` が、PLAYBOOK.md と同階層の `legacy-format-allowlist.txt` に無い旧形式エントリを見つけると exit 1 でブロックする（allowlist 不在なら strict）。このリポジトリ同梱の `.claude/commands/ace-curate.md` には形式ゲート実行段は無い。**新規追記のために allowlist へ ID を足さない**
 
 ### 記述ガイドライン
 

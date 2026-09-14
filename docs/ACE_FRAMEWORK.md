@@ -230,14 +230,14 @@ Playbook は **AIツールが直接参照できる構造化ナレッジベース
 
 ### delta 方式のルール
 
-| 操作                                             | 許可 | 方法                                 |
-| ------------------------------------------------ | ---- | ------------------------------------ |
-| エントリ追加                                     | Yes  | 末尾に追記                           |
-| カウンター更新                                   | Yes  | 既存エントリの Helpful/Harmful を +1 |
-| ステータス変更                                   | Yes  | active → deprecated                  |
-| エントリ削除                                     | No   | deprecated にするのみ                |
-| エントリ本文の書き換え（Insight/Context/Action） | No   | 新エントリとして追記                 |
-| Frontmatter 更新                                 | Yes  | version, updated, ace_entry_count    |
+| 操作                                                                     | 許可 | 方法                                 |
+| ------------------------------------------------------------------------ | ---- | ------------------------------------ |
+| エントリ追加                                                             | Yes  | 末尾に追記                           |
+| カウンター更新                                                           | Yes  | 既存エントリの Helpful/Harmful を +1 |
+| ステータス変更                                                           | Yes  | active → deprecated                  |
+| エントリ削除                                                             | No   | deprecated にするのみ                |
+| エントリ本文の書き換え（新形式の散文 / 旧形式の Insight/Context/Action） | No   | 新エントリとして追記                 |
+| Frontmatter 更新                                                         | Yes  | version, updated, ace_entry_count    |
 
 ### ファイルサイズ管理
 
@@ -302,7 +302,7 @@ Issue → Branch → Commit → Self-Review → PR → Review → Merge
 ```markdown
 # Playbook → Discussions
 
-**Context**: 詳細は GitHub Discussion #45 を参照
+詳細は GitHub Discussion #45 を参照。
 
 # Discussions → Playbook
 
