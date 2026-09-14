@@ -39,7 +39,7 @@ gh pr view $ARGUMENTS --json number,title,body,url,comments,reviews
 - `gh pr view $PR_NUMBER --json comments,reviews` でレビューコメントを確認
 - 関連 Issue の内容を確認
 
-収集した情報から、以下の観点で知見候補を抽出:
+収集した情報から、以下の観点で知見候補を抽出（分類カテゴリは [PLAYBOOK.md §カテゴリ一覧](../../docs-template/08-knowledge/PLAYBOOK.md#カテゴリ一覧) から選ぶ。ここへ 8 種を写さない）:
 
 1. **コーディングパターン**: 採用した設計判断とその理由
 2. **テスト戦略**: テストの書き方で得た教訓

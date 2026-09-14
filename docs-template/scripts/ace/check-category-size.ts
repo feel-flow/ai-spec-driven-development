@@ -1,8 +1,10 @@
 /**
- * ACE Playbook の健全性チェック（Issue #367, #444）。
- * - Category ごとのエントリ件数を数え、閾値超過で終了コード 1 を返す（ゲート）。
- * - Playbook の総行数を報告し、閾値（ACE_MAX_PLAYBOOK_LINES、既定 800）超過時は
- *   警告のみ出力する（終了コードは変えない）。
+ * ACE Playbook の健全性チェック（Issue #367, #444, #487）。
+ * - Category ごとのエントリ件数を数え、refine 目安超過は警告のみ（exit 0）、
+ *   ブロック上限超過で終了コード 1。件数が主指標。
+ * - 総行数は既定で件数から導出する上限と比較し、超過時は警告のみ
+ *   （終了コードは変えない）。上限 = ヘッダ行数 + 件数 × 16。
+ *   `ACE_MAX_PLAYBOOK_LINES` を明示したときだけ固定上限（後方互換）。
  * 実行例: npx --yes tsx scripts/ace/check-category-size.ts path/to/PLAYBOOK.md
  */
 import * as fs from "node:fs";
@@ -12,8 +14,10 @@ const EXIT_OK = 0;
 const EXIT_THRESHOLD_EXCEEDED = 1;
 const EXIT_USAGE_ERROR = 2;
 
-const DEFAULT_MAX_ENTRIES_PER_CATEGORY = 130;
+export const DEFAULT_MAX_ENTRIES_PER_CATEGORY = 280;
+export const DEFAULT_WARN_ENTRIES_PER_CATEGORY = 130;
 const DEFAULT_MAX_PLAYBOOK_LINES = 800;
+export const DEFAULT_MAX_ENTRY_LINES = 15;
 /**
  * PLAYBOOK の ID 規則。旧 3 桁形式（ACE-001）と新 PRスコープ式（ACE-438-1 / ACE-i425-1）の両方に対応する。
  * 実 ID は必ず数字始まり（旧 3 桁・PR 番号）か `i` ＋数字（Issue 由来）で始まるため、
@@ -136,12 +140,32 @@ function parseMaxPerCategory(): number {
   );
 }
 
-function parseMaxPlaybookLines(): number {
+function parseMaxPlaybookLines(): number | undefined {
+  const raw = process.env.ACE_MAX_PLAYBOOK_LINES;
+  if (raw === undefined || raw.trim() === "") {
+    return undefined;
+  }
   return parsePositiveIntEnv(
-    process.env.ACE_MAX_PLAYBOOK_LINES,
+    raw,
     DEFAULT_MAX_PLAYBOOK_LINES,
     "ACE_MAX_PLAYBOOK_LINES",
   );
+}
+
+export function countHeaderLines(content: string): number {
+  const match = content.match(ACE_ENTRY_HEADER_PATTERN);
+  if (!match || match.index === undefined) {
+    return countPlaybookLines(content);
+  }
+  return countPlaybookLines(content.slice(0, match.index));
+}
+
+export function deriveMaxLines(
+  headerLines: number,
+  entryCount: number,
+  maxEntryLines: number = DEFAULT_MAX_ENTRY_LINES,
+): number {
+  return headerLines + entryCount * (maxEntryLines + 1);
 }
 
 function resolvePlaybookPath(argv: readonly string[]): string | undefined {
@@ -187,30 +211,66 @@ export function main(): number {
   }
 
   const maxAllowed = parseMaxPerCategory();
+  const warnAllowed = DEFAULT_WARN_ENTRIES_PER_CATEGORY;
   const overCategories: string[] = [];
+  const warnCategories: string[] = [];
 
   for (const [categoryKey, count] of Object.entries(analyzed.histogram)) {
     if (count > maxAllowed) {
       overCategories.push(`${categoryKey} (${String(count)} > ${String(maxAllowed)})`);
+    } else if (count > warnAllowed) {
+      warnCategories.push(
+        `${categoryKey} (${String(count)} > ${String(warnAllowed)} / ブロック上限 ${String(maxAllowed)})`,
+      );
     }
   }
 
   const lineCount = countPlaybookLines(content);
-  const maxLines = parseMaxPlaybookLines();
+  const headerLines = countHeaderLines(content);
+  const fixedMaxLines = parseMaxPlaybookLines();
+  const derivedMax = deriveMaxLines(headerLines, analyzed.totalEntries);
+  const maxLines = fixedMaxLines ?? derivedMax;
+  const breakdown = `ヘッダ ${String(headerLines)} + ${String(analyzed.totalEntries)} 件 × ${String(DEFAULT_MAX_ENTRY_LINES + 1)}`;
 
   console.log(`Playbook: ${playbookPath}`);
   console.log(`総エントリ数: ${String(analyzed.totalEntries)}`);
-  console.log(`総行数: ${String(lineCount)} (閾値 ${String(maxLines)})`);
-  if (isOverLineThreshold(lineCount, maxLines)) {
-    console.error(
-      `⚠ 行数が閾値を超過しています（${String(lineCount)} > ${String(maxLines)}）。分割・アーカイブを検討してください（別 Issue 起票を推奨）。`,
+  if (fixedMaxLines === undefined) {
+    console.log(
+      `総行数: ${String(lineCount)} (導出上限 ${String(derivedMax)} = ${breakdown})`,
     );
+  } else {
+    console.log(`総行数: ${String(lineCount)} (閾値 ${String(fixedMaxLines)})`);
+  }
+  if (isOverLineThreshold(lineCount, maxLines)) {
+    if (fixedMaxLines === undefined) {
+      const perEntry =
+        analyzed.totalEntries === 0
+          ? "n/a"
+          : ((lineCount - headerLines) / analyzed.totalEntries).toFixed(1);
+      console.error(
+        `⚠ エントリ密度が行数バジェットを超過しています（${String(lineCount)} 行 > 導出上限 ${String(derivedMax)} 行 = ${breakdown}）。実測 ${perEntry} 行/件（バジェット ${String(DEFAULT_MAX_ENTRY_LINES)} 行 + ブロック間の空行 1 行）。ファイル全体が大きいことではなく 1 エントリが太いことが原因なので、/ace-refine の圧縮・正準化で密度を下げてください（旧テーブル形式のエントリが残っていると 16〜19 行/件になります）。`,
+      );
+    } else {
+      console.error(
+        `⚠ 行数が閾値を超過しています（${String(lineCount)} > ${String(fixedMaxLines)}）。分割・アーカイブを検討してください（別 Issue 起票を推奨）。`,
+      );
+    }
   }
   console.log("カテゴリ別件数:\n" + formatHistogram(analyzed.histogram));
+  console.log(
+    `ブロック上限: ${String(maxAllowed)} 件/カテゴリ（refine 目安: ${String(warnAllowed)} 件/カテゴリ）`,
+  );
+
+  if (warnCategories.length > 0 && overCategories.length === 0) {
+    console.warn(
+      "refine 目安を超えたカテゴリがあります（警告のみ）:\n- " +
+        warnCategories.join("\n- "),
+    );
+  }
 
   if (overCategories.length > 0) {
     console.error(
-      "閾値超過カテゴリがあります。別 Issue で分割方針を起票してください:\n- " +
+      "ブロック上限を超えたカテゴリがあります:\n- " +
         overCategories.join("\n- "),
     );
     return EXIT_THRESHOLD_EXCEEDED;

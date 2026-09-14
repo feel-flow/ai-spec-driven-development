@@ -1,7 +1,9 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import {
   analyzePlaybookMarkdown,
+  countHeaderLines,
   countPlaybookLines,
+  deriveMaxLines,
   isOverLineThreshold,
   main,
   parsePositiveIntEnv,
@@ -142,6 +144,17 @@ describe("countPlaybookLines", () => {
   });
 });
 
+describe("countHeaderLines / deriveMaxLines", () => {
+  it("最初の ACE 見出しより前をヘッダ行数とする", () => {
+    const md = "a\nb\nc\n### ACE-1-1: t\n\n| Category | coding |\n";
+    expect(countHeaderLines(md)).toBe(3);
+  });
+
+  it("導出上限は ヘッダ + 件数 × 16", () => {
+    expect(deriveMaxLines(10, 2)).toBe(42);
+  });
+});
+
 describe("isOverLineThreshold", () => {
   it("閾値ちょうどは超過しない（境界は > 判定）", () => {
     expect(isOverLineThreshold(800, 800)).toBe(false);
@@ -225,6 +238,24 @@ describe("main（行数警告のみ・exit code 不変）", () => {
     expect(code).toBe(0);
     expect(log.mock.calls.flat().join("\n")).toContain("総行数:");
     expect(err.mock.calls.flat().join("\n")).toContain("行数が閾値を超過");
+  });
+
+  it("ACE_MAX_PLAYBOOK_LINES 未設定なら導出上限と密度警告を使う", () => {
+    const body =
+      "header\n### ACE-1-1: t\n\n| Category | coding |\n| Origin | PR #1 |\n" +
+      "x\n".repeat(40);
+    const file = writePlaybook(body);
+    process.argv = ["node", "check-category-size.ts", file];
+    const log = vi.spyOn(console, "log").mockImplementation(() => {});
+    const err = vi.spyOn(console, "error").mockImplementation(() => {});
+
+    const code = main();
+
+    expect(code).toBe(0);
+    const stdout = log.mock.calls.flat().join("\n");
+    expect(stdout).toContain("導出上限");
+    expect(stdout).toContain("ブロック上限: 280");
+    expect(err.mock.calls.flat().join("\n")).toContain("エントリ密度が行数バジェットを超過");
   });
 
   it("カテゴリ件数超過なら exit 1（既存ゲートは不変）", () => {
