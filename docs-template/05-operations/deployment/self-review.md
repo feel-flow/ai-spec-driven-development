@@ -130,9 +130,15 @@ PR Review Toolkit（Claude系）でのセルフレビューに加え、Codex CLI
 ### 実行方法
 
 ```bash
-# Toolkit レビュー後に実行
-bash scripts/codex-review.sh --base develop
+# 推奨入口（ff-dev-toolkit）
+/multi-review --mode cross-model --strategy minimize_cost --perspective code-review --base origin/develop
+
+# Codex 単体の互換入口。plugin cache から toolkit を自動解決する。
+# 前回の .review-results/ が残っているときは --fresh
+bash scripts/codex-review.sh --base origin/develop --fresh
 ```
+
+`scripts/.ff-dev-toolkit-root` はマシン固有のためコミットしません。plugin 未導入で解決できないときは、エラーが案内する `bash <toolkit>/scripts/setup-multi-agent.sh` を 1 回実行します。`.review-results/` は gitignore 済みの使い捨て成果物です。マージ後 cleanup 時に残っていれば `rm -rf .review-results/` して構いません。
 
 ### レビュー結果の対応
 

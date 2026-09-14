@@ -372,13 +372,17 @@ bash scripts/review-level.sh --base develop
 
 #### デュアルモデルレビュー（Claude + Codex）
 
-Toolkit レビュー後、Codex CLI でクロスモデルレビューを実行し、異なるAIモデルの観点でレビュー品質を向上させます：
+Toolkit レビュー後、別モデルでクロスレビューします。入口は `/multi-review`（ff-dev-toolkit）です。Codex 単体の互換入口は `scripts/codex-review.sh` で、ff-dev-toolkit が入っていれば Codex/Claude の plugin cache から自動解決します（`FF_DEV_TOOLKIT_ROOT` を手で渡す必要はない）。`scripts/.ff-dev-toolkit-root` はマシン固有のためコミットしません。plugin 未導入で解決できないときは、エラーが案内する `bash <toolkit>/scripts/setup-multi-agent.sh` を 1 回実行します。
 
 ```bash
-bash scripts/codex-review.sh --base develop
+# 推奨入口（ff-dev-toolkit）
+/multi-review --mode cross-model --strategy minimize_cost --perspective code-review --base origin/develop
+
+# Codex 単体の互換入口。前回の .review-results/ が残っているときは --fresh
+bash scripts/codex-review.sh --base origin/develop --fresh
 ```
 
-レビュー結果は [Review Response Policy](../docs-template/05-operations/deployment/review-response-policy.md) に従って対応（Critical/Warning は確認不要で即対応）。TodoWrite で対応項目を管理します。
+レビュー結果は [Review Response Policy](../docs-template/05-operations/deployment/review-response-policy.md) に従って対応（Critical/Warning は確認不要で即対応）。TodoWrite で対応項目を管理します。`.review-results/` は gitignore 済みの使い捨て成果物です。新しいレビューは `--fresh` で前回分を退避し、マージ後 cleanup 時に残っていれば `rm -rf .review-results/` して構いません。
 
 ### ステップ6: PR作成
 
@@ -458,6 +462,9 @@ git pull origin develop
 
 # リモートで削除済みの追跡ブランチをローカルから一括削除
 git fetch --prune
+
+# レビュー成果物は gitignore 済みの使い捨て。残っていれば消してよい
+rm -rf .review-results/
 ```
 
 **注**: ステップ8で `gh pr merge --delete-branch` を実行したため、リモートのフィーチャーブランチは自動的に削除されています。ローカルのフィーチャーブランチは、マージ前に `develop` へ切り替えているため、手動で `git branch -d feature/123-user-auth` を実行するか、`gh` コマンドのインタラクティブなプロンプトに従って削除する必要があります。`git fetch --prune` は、他の開発者がマージして削除したブランチなど、リモートで削除済みの追跡ブランチをローカルから一括で削除するために役立ちます。

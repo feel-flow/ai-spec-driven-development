@@ -293,9 +293,15 @@ Claude系（Toolkit）とGPT系（Codex CLI）で異なるモデルの観点か�
 詳細は [Multi-CLI Review Orchestration](./multi-cli-review-orchestration.md#クロスモデルレビュー推奨パターン) を参照してください。
 
 ```bash
-# Toolkit セルフレビュー後に実行
-bash scripts/codex-review.sh --base develop
+# 推奨入口（ff-dev-toolkit）
+/multi-review --mode cross-model --strategy minimize_cost --perspective code-review --base origin/develop
+
+# Codex 単体の互換入口。plugin cache から toolkit を自動解決する。
+# 前回の .review-results/ が残っているときは --fresh
+bash scripts/codex-review.sh --base origin/develop --fresh
 ```
+
+`scripts/.ff-dev-toolkit-root` はマシン固有のためコミットしません。plugin 未導入で解決できないときは、エラーが案内する `bash <toolkit>/scripts/setup-multi-agent.sh` を 1 回実行します。
 
 > **レビュー結果の対応**: 全てのレビュー結果は [PRレビュー対応ポリシー](./review-response-policy.md) に従って対応します。Critical/Warning は確認不要で即対応。
 
@@ -416,12 +422,12 @@ Closes #${ISSUE_NUM}
 #### 実行方法
 
 ```bash
-# 一次レビュー（Claude Code 内で実行）
-/pr-review-toolkit:review-pr
+# 推奨入口（ff-dev-toolkit）。基準は origin/<base>
+/multi-review --mode cross-model --strategy minimize_cost --perspective code-review --base origin/develop
 
-# クロスモデルレビュー（GPT系の観点、read-only）
-# 基準ブランチは REVIEW_BASE_BRANCH で上書き可（デフォルト: develop）
-bash scripts/codex-review.sh --base develop
+# Codex 単体の互換入口（plugin cache から toolkit を自動解決）
+# 前回の .review-results/ が残っているときは --fresh
+bash scripts/codex-review.sh --base origin/develop --fresh
 ```
 
 さらに多観点で確認したい場合は、Multi-CLI 分散レビュー（オプション）を併用します：
@@ -620,12 +626,16 @@ git branch -d "feature/${ISSUE_NUM}-user-auth"
 
 # リモートで削除済みの追跡ブランチをローカルから一括削除
 git fetch --prune
+
+# レビュー成果物は gitignore 済みの使い捨て。残っていれば消してよい
+rm -rf .review-results/
 ```
 
 **ポイント**:
 
 - ブランチは必ず削除（リモート・ローカル両方）
 - developを最新に更新してから次の作業へ
+- `.review-results/` は次のレビューで `--fresh` するか、ここで削除する
 
 ### ステップ10: ACE ナレッジ体系化（マージ後）【重要】
 

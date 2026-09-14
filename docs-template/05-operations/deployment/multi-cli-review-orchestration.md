@@ -41,8 +41,12 @@ Multi-CLI の全体オーケストレーションとは別に、**Claude系 + GP
 PR Review Toolkit（Claude系）でのセルフレビュー後に続けて実行します。CLAUDE.md のワークフロー指示に基づき、AIツールが Toolkit → Codex CLI の順で実行します。
 
 ```bash
-# Toolkit レビュー後に実行（codex exec ベース）
-bash scripts/codex-review.sh --base develop
+# 推奨入口（ff-dev-toolkit）
+/multi-review --mode cross-model --strategy minimize_cost --perspective code-review --base origin/develop
+
+# Codex 単体の互換入口。plugin cache から toolkit を自動解決する。
+# 前回の .review-results/ が残っているときは --fresh
+bash scripts/codex-review.sh --base origin/develop --fresh
 ```
 
 レビュー結果は [PRレビュー対応ポリシー](./review-response-policy.md) に従って対応します。
@@ -128,6 +132,7 @@ bash scripts/codex-review.sh --base develop
 - Bash 4.0以上
 - Git（diffの取得に使用）
 - 1つ以上のAI CLI
+- `scripts/codex-review.sh` を使う場合は ff-dev-toolkit プラグイン（Codex/Claude の plugin cache から自動解決）。`scripts/.ff-dev-toolkit-root` はマシン固有のためコミットしない。未導入ならエラーが案内する `bash <toolkit>/scripts/setup-multi-agent.sh` を 1 回実行する
 
 ### 推奨
 
