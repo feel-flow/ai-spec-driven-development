@@ -1,12 +1,12 @@
 ---
 title: "PLAYBOOK"
-version: "1.48.0"
+version: "1.49.0"
 status: "approved"
 created: "2026-03-10"
 updated: "2026-09-14"
 owner: "@fffokazaki"
 changeImpact: "medium"
-ace_entry_count: 92
+ace_entry_count: 93
 tags: [ace, playbook, knowledge-management]
 references:
   - https://github.com/feel-flow/ai-spec-driven-development/blob/HEAD/docs/ACE_FRAMEWORK.md
@@ -180,7 +180,7 @@ Playbook が 800 行を超えた場合、以下のように分割する：
 | Category   | process           |
 | Origin     | PR #316 / PR #319 |
 | Date       | 2026-03-10        |
-| Helpful    | 10                |
+| Helpful    | 11                |
 | Harmful    | 0                 |
 | Status     | active            |
 
@@ -1668,7 +1668,7 @@ Toolkit comment-analyzer が Critical C1/C2 として独立検出、Copilot revi
 | Origin     | PR #459 / Issue #453 |
 | Related    | ACE-449-1            |
 | Date       | 2026-07-02           |
-| Helpful    | 0                    |
+| Helpful    | 1                    |
 | Harmful    | 0                    |
 | Status     | active               |
 
@@ -2273,7 +2273,31 @@ Issue #517 の AC は `grep "Actions 非依存" docs/AI_GIT_WORKFLOW.md CLAUDE.m
 
 ---
 
+<a id="ace-535-1"></a>
+
+### ACE-535-1: Git fixture は local user.name を書かず、専用 config と AUTHOR/COMMITTER env に identity を閉じる
+
+| Category | testing | Origin | PR #535 / Issue #529 |
+| Date | 2026-09-14 |
+| Helpful | 0 | Harmful | 0 |
+| Status | active |
+
+hook の `GIT_DIR` を 1 spawn でも継承すると `git config user.name` は cwd より呼び出し元リポジトリを向く。継承 `GIT_*` を捨てたうえで local identity は書かず、プロセス固有の `GIT_CONFIG_GLOBAL` と `GIT_AUTHOR_*` / `GIT_COMMITTER_*` だけを渡す。helper の extra に `GIT_DIR` を戻さない。
+
+---
+
 ## Changelog
+
+### [1.49.0] - 2026-09-14
+
+#### 追加
+
+- ACE-535-1: Git fixture は local user.name を書かず、専用 config と AUTHOR/COMMITTER env に identity を閉じる（Issue #529 / PR #535）
+
+#### カウンター更新
+
+- ACE-459-1: Helpful 0→1（PR #535 の変更源が同じ GIT_DIR 継承）
+- ACE-001: Helpful 10→11（PR #535 の Codex が共有 /tmp 設定ファイルの競合を検出）
 
 ### [1.48.0] - 2026-09-14
 
