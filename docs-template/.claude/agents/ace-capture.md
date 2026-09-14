@@ -31,7 +31,7 @@ model: inherit
 ## 禁止事項
 
 - garden wall 外への変更、シークレットの出力、force push、履歴の書き換え。
-- Playbook の **物理削除** や既存エントリの Insight/Context/Action の **黙示的な全文置換**。
+- Playbook の **物理削除** や既存エントリ本文（新形式の散文 / 旧形式の Insight/Context/Action）の **黙示的な全文置換**。
 - カテゴリ肥大化の分割作業をこの subagent 内で完結させること（閾値超過時は `check-category-size.ts` の指針に従い、別 Issue 起票用のメモのみ残す）。
 
 ## 参照ドキュメント（テンプレート内パス）

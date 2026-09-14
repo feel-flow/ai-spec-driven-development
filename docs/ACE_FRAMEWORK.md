@@ -190,21 +190,21 @@ Playbook は **AIツールが直接参照できる構造化ナレッジベース
 各エントリは以下のフィールドで構成される：
 
 ```markdown
-### ACE-001: [タイトル]
+<a id="ace-XXX"></a>
 
-| フィールド | 値                                                                                    |
-| ---------- | ------------------------------------------------------------------------------------- |
-| Category   | coding / architecture / testing / security / performance / devops / process / tooling |
-| Origin     | PR #XXX / Issue #YYY                                                                  |
-| Date       | YYYY-MM-DD                                                                            |
-| Helpful    | 0                                                                                     |
-| Harmful    | 0                                                                                     |
-| Status     | active / deprecated                                                                   |
+### ACE-XXX: [検索可能な主張 1 文のタイトル]
 
-**Insight**: [知見の本質を1-2文で]
-**Context**: [発見した状況・条件]
-**Action**: [推奨する具体的なアクション]
+| Category | [カテゴリ] | Origin | PR #XXX / Issue #YYY |
+| Date | YYYY-MM-DD |
+| Helpful | 0 | Harmful | 0 |
+| Status | active |
+
+[本文 2〜4 文。1 文目 = 知見の本質。非自明な適用条件が 1 文。推奨アクションで締める]
+
+---
 ```
+
+メタ 4 行は各行の行頭に置く。旧テーブル形式（`| フィールド | 値 |` + Insight/Context/Action）は読み取り互換のみで、新規追記には使わない。
 
 ### helpful / harmful カウンター
 
