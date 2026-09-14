@@ -1,12 +1,12 @@
 ---
 title: "PLAYBOOK"
-version: "1.51.0"
+version: "1.52.0"
 status: "approved"
 created: "2026-03-10"
 updated: "2026-09-14"
 owner: "@fffokazaki"
 changeImpact: "medium"
-ace_entry_count: 96
+ace_entry_count: 98
 tags: [ace, playbook, knowledge-management]
 references:
   - https://github.com/feel-flow/ai-spec-driven-development/blob/HEAD/docs/ACE_FRAMEWORK.md
@@ -1954,7 +1954,7 @@ Toolkit comment-analyzer が Critical C1/C2 として独立検出、Copilot revi
 | Category   | testing              |
 | Origin     | PR #489 / Issue #488 |
 | Date       | 2026-08-28           |
-| Helpful    | 4                    |
+| Helpful    | 5                    |
 | Harmful    | 0                    |
 | Status     | active               |
 
@@ -2012,7 +2012,7 @@ Toolkit comment-analyzer が Critical C1/C2 として独立検出、Copilot revi
 | Category | documentation-quality | Origin | PR #505 / Issue #482 |
 | Related | ACE-484-1 |
 | Date | 2026-09-06 |
-| Helpful | 0 | Harmful | 0 |
+| Helpful | 1 | Harmful | 0 |
 | Status | active |
 
 同じ名前の配布物が複数実体に分岐している環境（ff-dev-toolkit 同梱 docs-template と公開リポの docs-template）で、一方の SKILL.md の規則文を他方のコマンド文書へ写すと、規則に埋め込まれた事実主張（「残存は `/validate-docs` が検出する」「初期セット全文書が Frontmatter を持つ」「変更履歴表の `[日付]` / `[名前]` を埋める」）が転記先では成り立たず、レビュアー 2 系統（Toolkit comment-analyzer / Codex）が独立に事実誤りとして指摘した。[ACE-484-1](#ace-484-1) が「直す先の実体を特定する」なら、本エントリは「転記する文の中の事実を転記先の実体で検証する」。規則文を写す前に、文中の各主張を転記先リポジトリのファイル・スクリプト（`head -1` で Frontmatter の有無、`grep` で検出正規表現、対象ファイルの存在）で個別に照合し、成り立たないものは転記先の実態に書き換えるか出典を「toolkit 版では」と限定する。
@@ -2319,7 +2319,45 @@ hook の `GIT_DIR` を 1 spawn でも継承すると `git config user.name` は 
 
 ---
 
+<a id="ace-539-1"></a>
+
+### ACE-539-1: テンプレートツリーの角括弧は未確定値警告に畳み、消費者ツリーだけ leftover と deferred を分岐する
+
+| Category | documentation-quality | Origin | PR #539 / Issue #507 |
+| Date | 2026-09-14 |
+| Helpful | 0 | Harmful | 0 |
+| Status | active |
+
+`/init-docs` が推測で埋めずに残す `[金額]` `[SLA値]` `[x.x.x]` と、消費者が埋めるべき `[プロジェクト名]` は同じ `[…]` でも失敗クラスが違う。basename が `docs-template` なら角括弧を未確定値警告にして exit 0 を保ち、消費者ツリーでは leftover と deferred を別文言で出す。deferred は inner の exact-set（と `x.x` 連なり）に限り、`includes('SLA')` は `[SLACK連携]` を誤分類する。閉じたフェンス・リンク・タスクリストはマスクし、閉じ忘れは検査対象に残す。
+
+---
+
+<a id="ace-539-2"></a>
+
+### ACE-539-2: git と node を複数回 spawn する vitest は既定 5s を超えうる — SKIP_QUALITY_GATE せず it の timeout を明示する
+
+| Category | tooling | Origin | PR #539 / Issue #507 |
+| Date | 2026-09-14 |
+| Helpful | 0 | Harmful | 0 |
+| Status | active |
+
+pre-push の `quality:local` で symlink CLI テストが 5.1〜6.4s になり vitest 既定 5s で落ち、レビュー修正の push が止まった。単体再実行は 1.6s で通るため「テストが壊れた」と誤診しやすい。プロセス spawn が複数ある `it` には `{ timeout: 15_000 }` を付け、ゲート自体は通す。
+
+---
+
 ## Changelog
+
+### [1.52.0] - 2026-09-14
+
+#### 追加
+
+- ACE-539-1: テンプレートツリーの角括弧は未確定値警告に畳み、消費者ツリーだけ leftover と deferred を分岐する（Issue #507 / PR #539）
+- ACE-539-2: git と node を複数回 spawn する vitest は既定 5s を超えうる — SKIP_QUALITY_GATE せず it の timeout を明示する（Issue #507 / PR #539）
+
+#### カウンター更新
+
+- ACE-489-1: Helpful 4→5（PR #539 の leftover / deferred / docs-template 報告文言を排他固定した再適用）
+- ACE-505-1: Helpful 0→1（PR #539 で「同梱 validate-docs は角括弧を検出しない」注記を検出する旨へ更新し、転記先の事実主張を実装に揃えた再適用）
 
 ### [1.51.0] - 2026-09-14
 
