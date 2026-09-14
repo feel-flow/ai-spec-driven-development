@@ -115,7 +115,8 @@ npm run lint:md
 
 ### 3.3 `quality:local` npm スクリプト（実装済み）
 
-- **ルート `package.json`**: `quality:local` は **3.2 と同順**だが、**`npm ci` および `npm --prefix mcp ci` を含まない**（日々の実行時間を抑える。ロックファイル厳密再現が必要なときは手動で 3.2 冒頭の 2 ステップを先に実行する）。
+- **ルート `package.json`**: `quality:local` は **3.2 と同順**だが、**`npm ci` および `npm --prefix mcp ci` を含まない**（日々の実行時間を抑える）。
+- **実行前の前提**: クローン直後・依存を揃えるとき・未変更ファイルが `format:md:check` で落ちたときは、先に `npm ci` と `npm --prefix mcp ci` を実行する（§3.2 冒頭の 2 ステップ）。`npm install` だと lockfile 以外のパッチが入り、prettier のような整形ツールでは**触っていない Markdown が赤くなる**（Issue #485）。prettier はキャレットなしの固定バージョン（`package.json` の `devDependencies.prettier`）なので、`npm ci` 後は lockfile の版だけが使われる。
 - **中身の順序**: `build:mcp` → `check` → `mcp test` → `test:ace-scripts` → `validate -- docs-template` → `build:spec-index` → `format:md:check` → `lint:md`。
 - **合意事項**: 3.2 の意図を破壊的に変えない（意図的な手順変更を除く）。
 
