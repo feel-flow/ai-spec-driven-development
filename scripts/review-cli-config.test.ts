@@ -1,6 +1,7 @@
 import { spawnSync } from "node:child_process";
 import {
   chmodSync,
+  copyFileSync,
   existsSync,
   mkdtempSync,
   mkdirSync,
@@ -45,11 +46,25 @@ function makeReviewRepo(): string {
   return dir;
 }
 
-function makeOrchestrator(): { root: string; log: string } {
+function makeOrchestrator(): { root: string; log: string; bin: string } {
   const root = mkdtempSync(join(tmpdir(), "codex-shim-orchestrator-"));
   const scripts = join(root, "scripts");
+  const templates = join(scripts, "templates");
+  const plugin = join(root, ".claude-plugin");
+  const bin = join(root, "bin");
   const log = join(root, "argv.log");
   mkdirSync(scripts);
+  mkdirSync(templates, { recursive: true });
+  mkdirSync(plugin);
+  mkdirSync(bin);
+  // 新シムは FF_DEV_TOOLKIT_ROOT の plugin.json / agent-config.yaml / 配置済み
+  // テンプレートが自分自身と一致しないと rc=2 で委譲しない。
+  writeFileSync(
+    join(plugin, "plugin.json"),
+    '{\n  "name": "ff-dev-toolkit",\n  "version": "9.9.9"\n}\n',
+  );
+  writeFileSync(join(scripts, "agent-config.yaml"), 'toolkit_version: "9.9.9"\n');
+  copyFileSync(CODEX_SHIM, join(templates, "codex-review.sh"));
   writeFileSync(
     join(scripts, "multi-agent.sh"),
     [
@@ -62,12 +77,16 @@ function makeOrchestrator(): { root: string; log: string } {
     ].join("\n"),
   );
   chmodSync(join(scripts, "multi-agent.sh"), 0o755);
-  return { root, log };
+  // 実行モードは PATH 上の codex を委譲前に確認する。不在だと rc=4 で止まって
+  // 委譲先の終了コードを検証できない。
+  writeFileSync(join(bin, "codex"), "#!/bin/sh\nexit 0\n");
+  chmodSync(join(bin, "codex"), 0o755);
+  return { root, log, bin };
 }
 
 function runShim(
   args: string[],
-  fixture: { root: string; log: string },
+  fixture: { root: string; log: string; bin: string },
   env: Record<string, string> = {},
 ) {
   const result = spawnSync("bash", [CODEX_SHIM, ...args], {
@@ -76,7 +95,7 @@ function runShim(
     env: {
       HOME: process.env.HOME,
       TMPDIR: process.env.TMPDIR,
-      PATH: BASE_PATH,
+      PATH: `${fixture.bin}:${BASE_PATH}`,
       FF_DEV_TOOLKIT_ROOT: fixture.root,
       ORCH_LOG: fixture.log,
       ...env,
@@ -98,6 +117,17 @@ describe("codex-review.sh の toolkit 委譲 — Issue #476", () => {
       expect(argv).toContain("codex-cli");
       expect(argv).toContain("--staged");
       expect(argv).not.toContain("--base");
+    } finally {
+      rmSync(fixture.root, { recursive: true, force: true });
+    }
+  });
+
+  it("--fresh を委譲先へそのまま渡す", () => {
+    const fixture = makeOrchestrator();
+    try {
+      const result = runShim(["--staged", "--dry-run", "--fresh"], fixture);
+      expect(result.status).toBe(0);
+      expect(readFileSync(fixture.log, "utf8").split("\n")).toContain("--fresh");
     } finally {
       rmSync(fixture.root, { recursive: true, force: true });
     }

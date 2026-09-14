@@ -370,15 +370,23 @@ bash scripts/review-level.sh --base develop
 | `comment-analyzer`      | コメント・ドキュメント品質 | 不正確なコメント、JSDoc欠落        |
 | `code-simplifier`       | 複雑度の削減提案           | 長関数、深いネスト                 |
 
-#### デュアルモデルレビュー（Claude + Codex）
+#### クロスモデルレビュー（推奨入口 `/multi-review`）
 
-Toolkit レビュー後、Codex CLI でクロスモデルレビューを実行し、異なるAIモデルの観点でレビュー品質を向上させます：
+入口は `/multi-review`（ff-dev-toolkit）1 本です。pr-review-toolkit や `scripts/codex-review.sh` を先に重ねません。`scripts/codex-review.sh` は Codex だけ欲しいときの互換入口です。
 
 ```bash
-bash scripts/codex-review.sh --base develop
+/multi-review --mode cross-model --strategy minimize_cost --perspective code-review --base origin/develop
 ```
 
-レビュー結果は [Review Response Policy](../docs-template/05-operations/deployment/review-response-policy.md) に従って対応（Critical/Warning は確認不要で即対応）。TodoWrite で対応項目を管理します。
+互換入口（Codex 単体。上と両方は実行しない）:
+
+```bash
+bash scripts/codex-review.sh --base origin/develop
+```
+
+ff-dev-toolkit が Codex または Claude に入っていれば plugin cache から自動解決します。`FF_DEV_TOOLKIT_ROOT` は未設定でよい（export した値が残っていると cache より先に勝ち、壊れていれば fail-close）。`scripts/.ff-dev-toolkit-root` はマシン固有のためコミットしません。plugin 未導入時のエラーは `setup-multi-agent.sh` と名前だけ出します（このリポジトリ直下の同名スクリプトは yq/CLI 検出用で、toolkit の setup ではありません）。版不一致のときだけエラーが `bash <root>/scripts/setup-multi-agent.sh` を印字します。
+
+レビュー結果は [Review Response Policy](../docs-template/05-operations/deployment/review-response-policy.md) に従って対応（Critical/Warning は確認不要で即対応）。TodoWrite で対応項目を管理します。`.review-results/` は gitignore 済みの使い捨て成果物です。マージ後 cleanup で `rm -rf .review-results/` します。`--fresh` はエラーが leftover で止まったときだけ使います（未読 Critical を退避するので、先にレポートを読む）。
 
 ### ステップ6: PR作成
 
@@ -458,6 +466,9 @@ git pull origin develop
 
 # リモートで削除済みの追跡ブランチをローカルから一括削除
 git fetch --prune
+
+# レビュー成果物は gitignore 済みの使い捨て。残っていれば消してよい
+rm -rf .review-results/
 ```
 
 **注**: ステップ8で `gh pr merge --delete-branch` を実行したため、リモートのフィーチャーブランチは自動的に削除されています。ローカルのフィーチャーブランチは、マージ前に `develop` へ切り替えているため、手動で `git branch -d feature/123-user-auth` を実行するか、`gh` コマンドのインタラクティブなプロンプトに従って削除する必要があります。`git fetch --prune` は、他の開発者がマージして削除したブランチなど、リモートで削除済みの追跡ブランチをローカルから一括で削除するために役立ちます。

@@ -347,6 +347,8 @@ Always reference MASTER.md for project-specific requirements.
 
 **基本フロー**: Issue作成 → Branch作成 → 実装 → セルフレビュー → テスト → Commit → PR作成 → **Claude Code + Codex クロスモデルレビュー** → マージ → cleanup → **ACE 知見体系化**
 
+クロスモデルレビューの入口は `/multi-review --mode cross-model --strategy minimize_cost --perspective code-review --base origin/develop` **1 本**。`scripts/codex-review.sh` は Codex だけ欲しいときの互換入口で、推奨入口の後に重ねない。シムは plugin cache から自動解決し（`FF_DEV_TOOLKIT_ROOT` は未設定でよい）、`scripts/.ff-dev-toolkit-root` はコミットしない。plugin 未導入時のエラーは `setup-multi-agent.sh` と名前だけ出す（このリポジトリ直下の同名スクリプトは別物）。`.review-results/` は gitignore 済みの使い捨て成果物で、マージ後に残っていれば削除する。`--fresh` はエラーが leftover で止まったときだけ使う。
+
 **ACE（知見体系化）**: マージ・cleanup 後に PR から知見を抽出し PLAYBOOK.md に追記する。エントリ ID は **PRスコープ式** `ACE-<PR番号>-<連番>`（並行採番でも衝突しない）。採番ルールの SSOT は [PLAYBOOK.md §エントリID規則](docs-template/08-knowledge/PLAYBOOK.md#エントリid規則)、運用ルール本体は [ACE_SETUP.md §4 テンプレート](docs/ACE_SETUP.md#ace-ops-template)。
 
 **ブランチ命名**: `feature/#{issue}-{description}` / `fix/#{issue}-{description}` / `chore/#{issue}-{description}`

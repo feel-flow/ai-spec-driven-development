@@ -215,6 +215,9 @@ npm run quality:local
 - マージ先: develop（Squash merge）
 - ACEはマージ後・cleanup後に develop で実行する（**既定（推奨）: develop 直マージ**＝知見追記を develop に直接 commit + push。大人数チーム/知見内容のレビューを残したい場合のみ `chore/ace-from-pr-<PR番号>` の小PRに切り替え）。エントリ ID は PRスコープ式（`ACE-<PR番号>-<連番>`）で衝突しない。詳細・ACE-012 との関係は [docs/AI_GIT_WORKFLOW.md ステップ10](docs/AI_GIT_WORKFLOW.md) 参照
 - 詳細: [docs/AI_GIT_WORKFLOW.md](docs/AI_GIT_WORKFLOW.md)
+- **クロスモデルレビュー**: 入口は `/multi-review --mode cross-model --strategy minimize_cost --perspective code-review --base origin/develop`（ff-dev-toolkit）**1 本**。`scripts/codex-review.sh` は Codex だけ欲しいときの互換入口であり、推奨入口の後に重ねない
+- **`scripts/codex-review.sh` の前提**: Codex または Claude に ff-dev-toolkit が入っていれば plugin cache から自動解決する（`FF_DEV_TOOLKIT_ROOT` は未設定でよい。export した値が残っていると cache より先に勝ち、壊れていれば fail-close）。`scripts/.ff-dev-toolkit-root` はマシン固有のためコミットしない。plugin 未導入時のエラーは `setup-multi-agent.sh` と名前だけ出す（パスは出ない）。このリポジトリ直下の同名スクリプトは yq/CLI 検出用で、toolkit の setup ではない。版不一致のときだけエラーが `bash <root>/scripts/setup-multi-agent.sh` を印字する
+- **`.review-results/`**: gitignore 済みの使い捨て成果物。マージ後 cleanup で `rm -rf .review-results/` する。`--fresh` はエラーが leftover で止まったときだけ使う（未読 Critical を退避するので、先にレポートを読む）
 
 ### Working with This Repository
 

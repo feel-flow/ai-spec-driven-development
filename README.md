@@ -111,10 +111,11 @@ bash scripts/multi-review.sh --strategy minimize_cost  # コスト最小化モ�
 Claude Code からはスラッシュコマンドで実行できます:
 
 ```
-/multi-review                              # デフォルト（全CLI並列）
-/multi-review --strategy minimize_cost     # コスト最小化
-/multi-review --cli codex-cli              # 特定CLIのみ
+/multi-review --mode cross-model --strategy minimize_cost --perspective code-review --base origin/develop
+/multi-review --cli codex-cli              # Codex だけ（推奨入口とは重ねない）
 ```
+
+Codex 単体の互換入口は `bash scripts/codex-review.sh --base origin/develop` です（推奨入口の後に実行しない）。ff-dev-toolkit が Codex または Claude に入っていれば plugin cache から自動解決します。`FF_DEV_TOOLKIT_ROOT` は未設定でよい（export した値が残っていると cache より先に勝つ）。`--fresh` はエラーが leftover で止まったときだけ付けます。
 
 | CLI          | コスト    | デフォルト観点                                              |
 | ------------ | --------- | ----------------------------------------------------------- |

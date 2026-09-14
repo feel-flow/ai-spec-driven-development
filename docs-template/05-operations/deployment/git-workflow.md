@@ -287,15 +287,15 @@ Claude Codeのpr-review-toolkitサブエージェントを活用した包括的�
 | `comment-analyzer`      | コメント・ドキュメント品質 | 不正確なコメント、JSDoc欠落        |
 | `code-simplifier`       | 複雑度の削減提案           | 長関数、深いネスト                 |
 
-**Codex CLI クロスモデルレビュー（推奨）**:
+**クロスモデルレビュー（推奨入口 `/multi-review`）**:
 
-Claude系（Toolkit）とGPT系（Codex CLI）で異なるモデルの観点からレビューし、品質を向上させます。
-詳細は [Multi-CLI Review Orchestration](./multi-cli-review-orchestration.md#クロスモデルレビュー推奨パターン) を参照してください。
+入口は `/multi-review` 1 本です。pr-review-toolkit や `scripts/codex-review.sh` を先に重ねません。詳細は [Multi-CLI Review Orchestration](./multi-cli-review-orchestration.md#クロスモデルレビュー推奨パターン) を参照してください。
 
 ```bash
-# Toolkit セルフレビュー後に実行
-bash scripts/codex-review.sh --base develop
+/multi-review --mode cross-model --strategy minimize_cost --perspective code-review --base origin/develop
 ```
+
+`scripts/codex-review.sh` は Codex だけ欲しいときの互換入口です（上と両方は実行しない）。ff-dev-toolkit が Codex または Claude に入っていれば plugin cache から自動解決します。`scripts/.ff-dev-toolkit-root` はマシン固有のためコミットしません。plugin 未導入時のエラーは `setup-multi-agent.sh` と名前だけ出します（リポジトリ直下の同名スクリプトは yq/CLI 検出用で、toolkit の setup ではありません）。`--fresh` はエラーが leftover で止まったときだけ使います。
 
 > **レビュー結果の対応**: 全てのレビュー結果は [PRレビュー対応ポリシー](./review-response-policy.md) に従って対応します。Critical/Warning は確認不要で即対応。
 
@@ -407,7 +407,7 @@ Closes #${ISSUE_NUM}
 
 #### 7a. クロスモデルレビュー（PR作成後）
 
-**原則**: PR作成後、マージ前に **Claude Code（pr-review-toolkit）+ Codex CLI** のクロスモデルレビューを実施する
+**原則**: PR作成後、マージ前に `/multi-review --mode cross-model` でクロスモデルレビューを実施する（pr-review-toolkit や `codex-review.sh` を先に重ねない）
 
 > **レビュー深度（Risk-Based Workflow）**: `bash scripts/review-level.sh --base develop` で変更の規模・種別から 3 段階（1: 軽量 = docs のみ ≤50行は Toolkit のみ / 2: 標準 = Toolkit + Codex / 3: 重点 = 400 行超・実行系ディレクトリ・`*.sh`・`package.json`・ルート直下設定ファイルは multi-review 併用推奨）を判定し、深度を変更のリスクに釣り合わせる。判定は推奨でありブロックしない。
 >
@@ -416,12 +416,7 @@ Closes #${ISSUE_NUM}
 #### 実行方法
 
 ```bash
-# 一次レビュー（Claude Code 内で実行）
-/pr-review-toolkit:review-pr
-
-# クロスモデルレビュー（GPT系の観点、read-only）
-# 基準ブランチは REVIEW_BASE_BRANCH で上書き可（デフォルト: develop）
-bash scripts/codex-review.sh --base develop
+/multi-review --mode cross-model --strategy minimize_cost --perspective code-review --base origin/develop
 ```
 
 さらに多観点で確認したい場合は、Multi-CLI 分散レビュー（オプション）を併用します：
@@ -620,12 +615,16 @@ git branch -d "feature/${ISSUE_NUM}-user-auth"
 
 # リモートで削除済みの追跡ブランチをローカルから一括削除
 git fetch --prune
+
+# レビュー成果物は gitignore 済みの使い捨て。残っていれば消してよい
+rm -rf .review-results/
 ```
 
 **ポイント**:
 
 - ブランチは必ず削除（リモート・ローカル両方）
 - developを最新に更新してから次の作業へ
+- `.review-results/` はここで削除する（`--fresh` はエラーが leftover で止まったときだけ）
 
 ### ステップ10: ACE ナレッジ体系化（マージ後）【重要】
 
