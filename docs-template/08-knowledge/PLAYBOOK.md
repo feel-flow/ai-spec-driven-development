@@ -1,12 +1,12 @@
 ---
 title: "PLAYBOOK"
-version: "1.45.0"
+version: "1.46.0"
 status: "approved"
 created: "2026-03-10"
 updated: "2026-09-14"
 owner: "@fffokazaki"
 changeImpact: "medium"
-ace_entry_count: 88
+ace_entry_count: 89
 tags: [ace, playbook, knowledge-management]
 references:
   - https://github.com/feel-flow/ai-spec-driven-development/blob/HEAD/docs/ACE_FRAMEWORK.md
@@ -159,22 +159,16 @@ Playbook が 800 行を超えた場合、以下のように分割する：
 <!-- 追記例:
 <a id="ace-XXX"></a>
 
-### ACE-XXX: N+1クエリの発生パターンと防止策
+### ACE-XXX: [検索可能な主張 1 文のタイトル]
 
-| フィールド | 値 |
-|-----------|---|
-| Category | performance |
-| Origin | PR #42 |
-| Date | 2026-03-15 |
-| Helpful | 0 |
-| Harmful | 0 |
+| Category | [カテゴリ] | Origin | PR #XXX |
+| Date | YYYY-MM-DD |
+| Helpful | 0 | Harmful | 0 |
 | Status | active |
 
-**Insight**: User モデルの関連を eager loading せずに一覧取得すると N+1 クエリが発生する。
+[本文 2〜4 文。1 文目 = 知見の本質。適用条件 1 文。推奨アクションで締める]
 
-**Context**: PR #42 のレビューで、ユーザー一覧APIのレスポンスタイムが3秒超になっていた。原因は各ユーザーの所属組織を個別クエリで取得していたこと。
-
-**Action**: 一覧取得時は `include` オプションで関連を一括取得する。`findMany({ include: { organization: true } })`
+---
 -->
 
 <a id="ace-001"></a>
@@ -2227,7 +2221,26 @@ Issue #517 の AC は `grep "Actions 非依存" docs/AI_GIT_WORKFLOW.md CLAUDE.m
 
 ---
 
+<a id="ace-532-1"></a>
+
+### ACE-532-1: 形式ゲートを入れるときは追記テンプレと Generate 出力ラベルも同時に正準フォーマットへ揃える
+
+| Category | process | Origin | PR #532 / Issue #478 |
+| Date | 2026-09-14 |
+| Helpful | 0 | Harmful | 0 |
+| Status | active |
+
+エントリ形式の機械ゲートだけ先に入れると、追記テンプレが旧形式のまま新規 ID を旧形式で書き続け、allowlist 初期化後もゲートが赤くなるか allowlist が肥える。Generate 出力が `**Insight**` ラベルだと、メタがコンパクトでも本文マーカーで旧形式判定される。ゲート・テンプレ・Phase 1 出力を同じ変更で揃える。
+
+---
+
 ## Changelog
+
+### [1.46.0] - 2026-09-14
+
+#### 追加
+
+- ACE-532-1: 形式ゲートを入れるときは追記テンプレと Generate 出力ラベルも同時に正準フォーマットへ揃える（Issue #478 / PR #532）
 
 ### [1.45.0] - 2026-09-08
 
