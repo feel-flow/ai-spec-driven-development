@@ -1,12 +1,12 @@
 ---
 title: "PLAYBOOK"
-version: "1.49.0"
+version: "1.50.0"
 status: "approved"
 created: "2026-03-10"
 updated: "2026-09-14"
 owner: "@fffokazaki"
 changeImpact: "medium"
-ace_entry_count: 93
+ace_entry_count: 95
 tags: [ace, playbook, knowledge-management]
 references:
   - https://github.com/feel-flow/ai-spec-driven-development/blob/HEAD/docs/ACE_FRAMEWORK.md
@@ -174,7 +174,7 @@ ACE エントリ ID は **PRスコープ式** を採用する（このセクシ�
 | Category   | process           |
 | Origin     | PR #316 / PR #319 |
 | Date       | 2026-03-10        |
-| Helpful    | 11                |
+| Helpful    | 12                |
 | Harmful    | 0                 |
 | Status     | active            |
 
@@ -2280,7 +2280,44 @@ hook の `GIT_DIR` を 1 spawn でも継承すると `git config user.name` は 
 
 ---
 
+<a id="ace-536-1"></a>
+
+### ACE-536-1: 分類カテゴリの列挙は PLAYBOOK 一覧が正本で、他文書へ写すと再乖離する
+
+| Category | documentation-quality | Origin | PR #536 / Issue #487 |
+| Date | 2026-09-14 |
+| Helpful | 0 | Harmful | 0 |
+| Status | active |
+
+`/ace-curate` と `ace-cycle` が 8 種を写していると、実態の `documentation-quality` が選択肢から落ちる。分類は PLAYBOOK のカテゴリ一覧を参照し、列挙を他文書へコピーしない。行数上限の式や件数ゲートもチェッカー説明と PLAYBOOK を同時に更新する。
+
+---
+
+<a id="ace-536-2"></a>
+
+### ACE-536-2: 件数導出のヘッダ行数は HTML コメントをマスクしてから最初の実見出しを探す
+
+| Category | tooling | Origin | PR #536 / Issue #487 |
+| Date | 2026-09-14 |
+| Helpful | 0 | Harmful | 0 |
+| Status | active |
+
+`analyzePlaybookMarkdown` は HTML コメントを除くが、ヘッダ行数を生本文の最初の `### ACE-<数字>` で切ると追記例が終端になる。導出上限が過小になり密度警告が偽陽性になる。コメントを同長スペースでマスクしてから実見出し位置を取り、原文の行数を数える。
+
+---
+
 ## Changelog
+
+### [1.50.0] - 2026-09-14
+
+#### 追加
+
+- ACE-536-1: 分類カテゴリの列挙は PLAYBOOK 一覧が正本で、他文書へ写すと再乖離する（Issue #487 / PR #536）
+- ACE-536-2: 件数導出のヘッダ行数は HTML コメントをマスクしてから最初の実見出しを探す（Issue #487 / PR #536）
+
+#### カウンター更新
+
+- ACE-001: Helpful 11→12（PR #536 の Codex がヘッダ誤認と旧 130/800 説明残を検出）
 
 ### [1.49.0] - 2026-09-14
 
