@@ -361,3 +361,17 @@ Review Response Policy の「失敗シナリオのない指摘は Suggestion」�
 - 2026-08-28: 起票した同一セッションで `pnpm check 2>&1 | tail -8` を再度バックグラウンド起動し、同じ症状。前景実行（timeout 付き）へ切り替えて解消（再発）
 
 ---
+
+<a id="obs-024"></a>
+
+### OBS-024: macOS で grok-cli の read-only sandbox が docker.sock symlink で拒否されるときは MULTI_AGENT_GROK_READONLY_PROFILE=ff-review-ro で完走できる
+
+| Kind | keep | Count | 1 |
+| First | 2026-09-14 | Last | 2026-09-14 |
+| Status | active | Issue | なし |
+
+dry-run で grok-cli が `runtime-socket deny resolution failed` と出ても、プランから外さず `~/.grok/sandbox.toml` の `ff-review-ro`（`extends = "read-only"` / `restrict_network = false`）を環境変数で指定すると review が完走する。ホストが grok でも CLI 経路を残せる。
+
+- 2026-09-14: PR #538 の `/multi-review` で grok-cli が完走し、codex-cli と合わせてクロスモデルが成立した。claude-code は spend limit で INCOMPLETE（初回）
+
+---
