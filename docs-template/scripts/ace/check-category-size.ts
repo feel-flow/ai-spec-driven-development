@@ -16,7 +16,6 @@ const EXIT_USAGE_ERROR = 2;
 
 export const DEFAULT_MAX_ENTRIES_PER_CATEGORY = 280;
 export const DEFAULT_WARN_ENTRIES_PER_CATEGORY = 130;
-const DEFAULT_MAX_PLAYBOOK_LINES = 800;
 export const DEFAULT_MAX_ENTRY_LINES = 15;
 /**
  * PLAYBOOK の ID 規則。旧 3 桁形式（ACE-001）と新 PRスコープ式（ACE-438-1 / ACE-i425-1）の両方に対応する。
@@ -145,15 +144,21 @@ function parseMaxPlaybookLines(): number | undefined {
   if (raw === undefined || raw.trim() === "") {
     return undefined;
   }
-  return parsePositiveIntEnv(
-    raw,
-    DEFAULT_MAX_PLAYBOOK_LINES,
-    "ACE_MAX_PLAYBOOK_LINES",
-  );
+  const trimmed = raw.trim();
+  if (!/^[0-9]+$/u.test(trimmed) || Number.parseInt(trimmed, 10) < 1) {
+    console.warn(
+      `ace-check: ACE_MAX_PLAYBOOK_LINES="${trimmed}" は無効のため、件数から上限を導出します。`,
+    );
+    return undefined;
+  }
+  return Number.parseInt(trimmed, 10);
 }
 
 export function countHeaderLines(content: string): number {
-  const match = content.match(ACE_ENTRY_HEADER_PATTERN);
+  const masked = content.replace(/<!--[\s\S]*?-->/gu, (block) =>
+    " ".repeat(block.length),
+  );
+  const match = masked.match(ACE_ENTRY_HEADER_PATTERN);
   if (!match || match.index === undefined) {
     return countPlaybookLines(content);
   }

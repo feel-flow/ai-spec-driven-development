@@ -153,6 +153,21 @@ describe("countHeaderLines / deriveMaxLines", () => {
   it("導出上限は ヘッダ + 件数 × 16", () => {
     expect(deriveMaxLines(10, 2)).toBe(42);
   });
+
+  it("HTML コメント内の ACE 見出しはヘッダ終端にしない", () => {
+    const md = [
+      "a",
+      "<!--",
+      "### ACE-001: コメント内の偽エントリ",
+      "-->",
+      "b",
+      "### ACE-1-1: 実エントリ",
+      "",
+      "| Category | coding |",
+      "",
+    ].join("\n");
+    expect(countHeaderLines(md)).toBe(5);
+  });
 });
 
 describe("isOverLineThreshold", () => {
@@ -258,7 +273,7 @@ describe("main（行数警告のみ・exit code 不変）", () => {
     expect(err.mock.calls.flat().join("\n")).toContain("エントリ密度が行数バジェットを超過");
   });
 
-  it("カテゴリ件数超過なら exit 1（既存ゲートは不変）", () => {
+  it("ACE_MAX_ENTRIES_PER_CATEGORY 超過なら exit 1", () => {
     const body =
       "### ACE-1-1: a\n\n| Category | coding |\n| Origin | PR #1 |\n" +
       "### ACE-1-2: b\n\n| Category | coding |\n| Origin | PR #1 |\n";

@@ -241,27 +241,7 @@ Playbook は **AIツールが直接参照できる構造化ナレッジベース
 
 ### ファイルサイズ管理
 
-Playbook が 800 行を超えた場合：
-
-```
-08-knowledge/
-├── PLAYBOOK.md           ← 索引 + 運用ルール（200行程度）
-└── playbook/
-    ├── coding.md         ← Category: coding のエントリ群
-    ├── architecture.md   ← Category: architecture のエントリ群
-    ├── testing.md        ← Category: testing のエントリ群
-    ├── security.md       ← Category: security のエントリ群
-    ├── performance.md    ← Category: performance のエントリ群
-    ├── devops.md         ← Category: devops のエントリ群
-    ├── process.md        ← Category: process のエントリ群
-    └── tooling.md        ← Category: tooling のエントリ群
-```
-
-分割時の移行ルール：
-
-1. PLAYBOOK.md から該当カテゴリのエントリをサブファイルに移動
-2. PLAYBOOK.md に索引（エントリID + タイトル + 参照先）を残す
-3. 新規追記は該当カテゴリのサブファイルに行う
+行数上限は件数から導出する（`ヘッダ行数 + 件数 × 16`）。超過は「1 エントリが太い」ので、第一対応は旧テーブル形式の正準化、次に `/ace-refine`。件数ゲートは refine 目安 130 件（警告） / ブロック上限 280 件（exit 1）。運用の正本は [PLAYBOOK.md §行数・件数の方針](../docs-template/08-knowledge/PLAYBOOK.md#行数件数の方針)。固定 800 行での `playbook/` 分割はしない。
 
 ---
 

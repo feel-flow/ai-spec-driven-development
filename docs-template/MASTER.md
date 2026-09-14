@@ -595,6 +595,8 @@ AI: DEPLOYMENT.md（索引）→ deployment/self-review.md を読み込み
 | 1200 行超 | **分割を必須** |
 
 > 親（索引）+ 子（詳細）への分割手順・分割しない判断・実例は organizational-rollout/document-splitting.md（初期セット外・`${CLAUDE_PLUGIN_ROOT}/docs-template/05-operations/organizational-rollout/document-splitting.md` からコピー）を SSOT とする。
+>
+> **例外**: ACE `PLAYBOOK.md`（`docs/08-knowledge/PLAYBOOK.md` の「行数・件数の方針」）は上表ではなく件数導出の密度指標を優先する。固定 800/1200 行での分割はしない。
 
 ### 簡潔化の原則
 
@@ -637,7 +639,7 @@ AI: DEPLOYMENT.md（索引）→ deployment/self-review.md を読み込み
 
 > **注**: `docs/specs/` 配下の仕様ファイルには Spec Kit 運用ガイドの Front Matter スキーマ（6ステータス: draft/review/approved/implementing/done/deprecated）を適用すること。上記 Frontmatter ルールはコア7文書および拡張文書に適用される。
 >
-> **例外**: `08-knowledge/OBSERVATIONS.md`（`/retrospective` の観測台帳）と `08-knowledge/playbook/**`（ACE Playbook の分割ファイル）は機械管理の蓄積ファイルであり、Frontmatter を付与しない（文書レベルのメタデータは索引側または運用スキル側が持つ）。
+> **例外**: `08-knowledge/OBSERVATIONS.md`（`/retrospective` の観測台帳）は Frontmatter を付与しない。ACE PLAYBOOK.md は Frontmatter を持つ（現行は単一ファイル）。将来 `playbook/**` へ分割した場合のカテゴリファイルは Frontmatter を付与しない。
 
 必須フィールド:
 

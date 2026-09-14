@@ -1022,7 +1022,7 @@ ACE Playbook で `Helpful >= 5` に達した知見を、`/ace-refine` が蒸留�
 
 [ルール本文 1〜3 行。実装前に読んで即適用できる命令形で書く]
 
-出典: [ACE-XXX](../08-knowledge/playbook/<category>.md#ace-xxx)
+出典: [ACE-XXX](../08-knowledge/PLAYBOOK.md#ace-xxx)
 -->
 
 - 該当なし（昇格発生後に追記）
