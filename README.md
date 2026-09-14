@@ -86,7 +86,7 @@ PR マージ後の `/ace-curate` 手動実行を、**別プロセスの subagent
 | `npm run setup:labels`               | GitHub ラベルの自動セットアップ                                                |
 | `bash scripts/setup-multi-review.sh` | Multi-CLI Review Agent のセットアップ                                          |
 
-`quality:local` は日々の実行時間のため `npm ci` をチェーンに含めない。クローン直後、または未変更ファイルが `format:md:check` で落ちるときは、先に `npm ci` と `npm --prefix mcp ci` で lockfile を再現する。prettier はキャレットなしの固定バージョン。実体チェーンは [`docs/NO_GITHUB_ACTIONS_MIGRATION_DESIGN.md` §3.3](./docs/NO_GITHUB_ACTIONS_MIGRATION_DESIGN.md#quality-local-detail) を参照。
+`quality:local` は日々の実行時間のため `npm ci` をチェーンに含めない。クローン直後、または未変更ファイルが `format:md:check` で落ちるときは、先に `npm ci` と `npm --prefix mcp ci` で lockfile を再現する。prettier はキャレットなしの固定バージョン。成功時は `.git/ff-dev-toolkit/gate-record` に通過記録を書く（`/close-issue` の鮮度照合用）。実体チェーンは [`docs/NO_GITHUB_ACTIONS_MIGRATION_DESIGN.md` §3.3](./docs/NO_GITHUB_ACTIONS_MIGRATION_DESIGN.md#quality-local-detail) を参照。
 
 品質ゲートの全体像・リリース手動フローは [docs/NO_GITHUB_ACTIONS_MIGRATION_DESIGN.md](./docs/NO_GITHUB_ACTIONS_MIGRATION_DESIGN.md) を参照してください。
 
