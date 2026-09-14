@@ -21,6 +21,7 @@ const BASE_PATH = "/usr/bin:/bin";
 
 function gitCheckIgnore(path: string): boolean {
   try {
+    // hook の GIT_DIR を継承すると check-ignore が別リポジトリを見る（Issue #529）。
     execFileSync("git", ["check-ignore", "-q", path], {
       cwd: REPO_ROOT,
       env: gitFixtureEnv(),

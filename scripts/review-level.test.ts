@@ -6,8 +6,8 @@ import { join, resolve, dirname } from "node:path";
 import { gitFixtureEnv } from "./git-fixture-env";
 
 // review-level.sh（Risk-Based Workflow のレベル判定、Issue #454）の境界値テスト。
-// フィクスチャ git は gitFixtureEnv で GIT_* を遮断する（PR #459 / Issue #529:
-// hook 経由の GIT_DIR 継承は実リポジトリの破壊と user.name 上書きの両方を起こす）。
+// フィクスチャ git は gitFixtureEnv で継承 GIT_* を捨て、identity は専用 config と
+// AUTHOR/COMMITTER env に閉じる（PR #459 / Issue #529）。local user.name は書かない。
 
 const REPO_ROOT = resolve(__dirname, "..");
 const SCRIPT = join(REPO_ROOT, "scripts", "review-level.sh");

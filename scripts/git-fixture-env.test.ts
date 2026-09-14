@@ -130,4 +130,17 @@ describe("Git fixture 環境の隔離（Issue #529）", () => {
     ).stdout.trim();
     expect(probeAuthor).toBe(`${PROBE_NAME} <${PROBE_EMAIL}>`);
   });
+
+  it("extra の GIT_DIR は採用せず、config パスはプロセス固有である", () => {
+    const env = gitFixtureEnv({
+      GIT_DIR: "/tmp/evil",
+      GIT_WORK_TREE: "/tmp/evil",
+    });
+    expect(env.GIT_DIR).toBeUndefined();
+    expect(env.GIT_WORK_TREE).toBeUndefined();
+    expect(env.GIT_CONFIG_GLOBAL).toContain("asdd-git-fixture-config-");
+    expect(env.GIT_CONFIG_GLOBAL).not.toBe(
+      join(tmpdir(), "asdd-git-fixture-config", "global.gitconfig"),
+    );
+  });
 });

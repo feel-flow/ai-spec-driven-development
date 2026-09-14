@@ -70,8 +70,8 @@ function makeStubDir(verdict: "PASS" | "FAIL"): string {
 }
 
 /**
- * フィクスチャ用の git 環境。GIT_* を遮断し、identity は fixture 専用 config / AUTHOR env
- * に閉じる（Issue #529）。hook 経由だと GIT_DIR 継承で実リポジトリの user.name が上書きされる。
+ * フィクスチャ用の git 環境。継承 GIT_* を捨て、identity は専用 config と
+ * AUTHOR/COMMITTER env に閉じる（Issue #529）。local user.name は書かない。
  */
 function sanitizedGitEnv(): Record<string, string> {
   return gitFixtureEnv();
