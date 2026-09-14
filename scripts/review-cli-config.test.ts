@@ -12,6 +12,7 @@ import {
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { describe, expect, it } from "vitest";
+import { gitFixtureEnv } from "./git-fixture-env";
 
 const REPO_ROOT = resolve(__dirname, "..");
 const CODEX_SHIM = join(REPO_ROOT, "scripts", "codex-review.sh");
@@ -23,19 +24,13 @@ function makeReviewRepo(): string {
     const result = spawnSync("git", args, {
       cwd: dir,
       encoding: "utf8",
-      env: {
-        PATH: BASE_PATH,
-        GIT_CONFIG_GLOBAL: "/dev/null",
-        GIT_CONFIG_SYSTEM: "/dev/null",
-      },
+      env: gitFixtureEnv({ PATH: BASE_PATH }),
     });
     if (result.status !== 0) {
       throw new Error(`git ${args.join(" ")} failed: ${result.stderr}`);
     }
   };
   git("init", "-b", "develop");
-  git("config", "user.email", "test@example.com");
-  git("config", "user.name", "test");
   writeFileSync(join(dir, "base.txt"), "base\n");
   git("add", ".");
   git("commit", "-m", "base");

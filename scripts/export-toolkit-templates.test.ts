@@ -4,19 +4,20 @@ import path from 'node:path';
 import os from 'node:os';
 import { execFileSync, spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
+import { gitFixtureEnv } from './git-fixture-env';
 // @ts-expect-error 検証対象はNode.jsで直接実行するESMスクリプト
 import { FILES, prepare, applyExport, verify } from './export-toolkit-templates.mjs';
 
 const roots: string[] = [];
 afterEach(() => { vi.restoreAllMocks(); vi.unstubAllEnvs(); for (const root of roots.splice(0)) fs.rmSync(root, { recursive: true, force: true }); });
 function temp() { const root = fs.mkdtempSync(path.join(os.tmpdir(), 'template-export-')); roots.push(root); return root; }
-const env = { ...Object.fromEntries(Object.entries(process.env).filter(([key]) => !key.startsWith('GIT_'))), GIT_CONFIG_GLOBAL: '/dev/null', GIT_CONFIG_SYSTEM: '/dev/null' };
+const env = gitFixtureEnv();
 const git = (root: string, ...args: string[]) => execFileSync('git', args, { cwd: root, encoding: 'utf8', env, stdio: ['ignore', 'pipe', 'pipe'] }).trim();
 function put(root: string, name: string, data: string) { const p = path.join(root, name); fs.mkdirSync(path.dirname(p), { recursive: true }); fs.writeFileSync(p, data); }
 function fixture() {
   const source = temp(), target = temp();
   for (const [root, repo] of [[source, 'feelflow-plugins'], [target, 'ai-spec-driven-development']]) {
-    git(root, 'init', '-b', 'test'); git(root, 'config', 'user.name', 'Test'); git(root, 'config', 'user.email', 'test@example.invalid');
+    git(root, 'init', '-b', 'test');
     git(root, 'remote', 'add', 'origin', `https://github.com/feel-flow/${repo}.git`);
   }
   const prefix = 'plugins/ff-dev-toolkit';

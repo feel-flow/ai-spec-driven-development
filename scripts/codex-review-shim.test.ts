@@ -12,6 +12,7 @@ import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
+import { gitFixtureEnv } from "./git-fixture-env";
 
 const REPO_ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const CODEX_SHIM = join(REPO_ROOT, "scripts/codex-review.sh");
@@ -20,7 +21,10 @@ const BASE_PATH = "/usr/bin:/bin";
 
 function gitCheckIgnore(path: string): boolean {
   try {
-    execFileSync("git", ["check-ignore", "-q", path], { cwd: REPO_ROOT });
+    execFileSync("git", ["check-ignore", "-q", path], {
+      cwd: REPO_ROOT,
+      env: gitFixtureEnv(),
+    });
     return true;
   } catch (error) {
     const code = (error as { status?: number }).status;

@@ -3,6 +3,7 @@ import { spawnSync } from "node:child_process";
 import { mkdtempSync, writeFileSync, mkdirSync, existsSync, readFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, resolve, dirname } from "node:path";
+import { gitFixtureEnv } from "./git-fixture-env";
 
 // sync-to-public.mjs（internal → public の一方向抽出同期、Issue #467）のテスト。
 // 設計原則:
@@ -17,15 +18,7 @@ const PUBLIC_URL = "https://github.com/feel-flow/ai-spec-driven-development.git"
 const INTERNAL_URL = "https://github.com/feel-flow/ai-spec-driven-development-internal.git";
 
 function sanitizedGitEnv(): Record<string, string> {
-  const env: Record<string, string> = {};
-  for (const [key, value] of Object.entries(process.env)) {
-    if (value !== undefined && !key.startsWith("GIT_")) {
-      env[key] = value;
-    }
-  }
-  env.GIT_CONFIG_GLOBAL = "/dev/null";
-  env.GIT_CONFIG_SYSTEM = "/dev/null";
-  return env;
+  return gitFixtureEnv();
 }
 
 function git(cwd: string, ...args: string[]): void {

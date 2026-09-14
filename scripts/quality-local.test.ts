@@ -12,6 +12,7 @@ import { homedir, tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
+import { gitFixtureEnv } from "./git-fixture-env";
 
 const REPO_ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const QUALITY_LOCAL = join(REPO_ROOT, "scripts", "quality-local.sh");
@@ -19,16 +20,11 @@ const RECORD_HELPER = join(REPO_ROOT, "scripts", "record-quality-gate.sh");
 const BASE_PATH = "/usr/bin:/bin";
 
 function gitEnv(): NodeJS.ProcessEnv {
-  const env: NodeJS.ProcessEnv = {};
-  for (const [key, value] of Object.entries(process.env)) {
-    if (value !== undefined && !key.startsWith("GIT_")) env[key] = value;
-  }
-  env.GIT_CONFIG_GLOBAL = "/dev/null";
-  env.GIT_CONFIG_SYSTEM = "/dev/null";
-  env.PATH = BASE_PATH;
-  delete env.FF_DEV_TOOLKIT_ROOT;
-  delete env.FF_GATE_RECORD_FILE;
-  return env;
+  return gitFixtureEnv({
+    PATH: BASE_PATH,
+    FF_DEV_TOOLKIT_ROOT: undefined,
+    FF_GATE_RECORD_FILE: undefined,
+  });
 }
 
 function resolveToolkit(): string | null {
@@ -105,8 +101,6 @@ function initRepo(dir: string): string {
     if (r.status !== 0) throw new Error(`git ${args.join(" ")}: ${r.stderr}`);
   };
   git("init", "-b", "develop");
-  git("config", "user.email", "test@example.com");
-  git("config", "user.name", "test");
   writeFileSync(join(dir, "README"), "ok\n");
   git("add", ".");
   git("commit", "-m", "init");
