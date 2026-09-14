@@ -1636,7 +1636,7 @@ Toolkit comment-analyzer が Critical C1/C2 として独立検出、Copilot revi
 | Category   | documentation-quality |
 | Origin     | PR #449 / Issue #448  |
 | Date       | 2026-07-02            |
-| Helpful    | 1                     |
+| Helpful    | 2                     |
 | Harmful    | 0                     |
 | Status     | active                |
 
@@ -1954,7 +1954,7 @@ Toolkit comment-analyzer が Critical C1/C2 として独立検出、Copilot revi
 | Category   | testing              |
 | Origin     | PR #489 / Issue #488 |
 | Date       | 2026-08-28           |
-| Helpful    | 3                    |
+| Helpful    | 4                    |
 | Harmful    | 0                    |
 | Status     | active               |
 
@@ -2326,6 +2326,11 @@ hook の `GIT_DIR` を 1 spawn でも継承すると `git config user.name` は 
 #### 追加
 
 - ACE-537-1: バックグラウンド実行では tail -n へパイプせず、出力は素のまま流して完了後に出力ファイルを絞る（Issue #480 / PR #537）
+
+#### カウンター更新
+
+- ACE-449-3: Helpful 1→2（PR #538 で YAML スニペットを実スキーマへ揃える際、v2 が読む `tasks.review.cost_strategy` まで確認した再適用）
+- ACE-489-1: Helpful 3→4（PR #538 の旧キー欠如テストを `perspectives.review` 連続入れ子と合成入力相当のフェンス検査へ強化した再適用）
 
 ### [1.50.0] - 2026-09-14
 
