@@ -1,12 +1,12 @@
 ---
 title: "PLAYBOOK"
-version: "1.47.0"
+version: "1.48.0"
 status: "approved"
 created: "2026-03-10"
 updated: "2026-09-14"
 owner: "@fffokazaki"
 changeImpact: "medium"
-ace_entry_count: 91
+ace_entry_count: 92
 tags: [ace, playbook, knowledge-management]
 references:
   - https://github.com/feel-flow/ai-spec-driven-development/blob/HEAD/docs/ACE_FRAMEWORK.md
@@ -180,7 +180,7 @@ Playbook が 800 行を超えた場合、以下のように分割する：
 | Category   | process           |
 | Origin     | PR #316 / PR #319 |
 | Date       | 2026-03-10        |
-| Helpful    | 9                 |
+| Helpful    | 10                |
 | Harmful    | 0                 |
 | Status     | active            |
 
@@ -2260,7 +2260,30 @@ Issue #517 の AC は `grep "Actions 非依存" docs/AI_GIT_WORKFLOW.md CLAUDE.m
 
 ---
 
+<a id="ace-534-1"></a>
+
+### ACE-534-1: ゲート記録器はレビューシムの版一致検査で解決せず、record-gate-head.sh の実在だけを見る
+
+| Category | tooling | Origin | PR #534 / Issue #515 |
+| Date | 2026-09-14 |
+| Helpful | 0 | Harmful | 0 |
+| Status | active |
+
+`--print-toolkit-root` は配置済みシムと toolkit テンプレートのバイト一致を要求する。同じ 0.108.0 でもホストの cache 実体が違うと identity が rc=2 になり、record-gate-head.sh はあるのに記録がスキップされる。ゲート補助スクリプトは cache glob / sidecar で実ファイルを探し、失敗理由を「cache が無い」に決め打ちしない。
+
+---
+
 ## Changelog
+
+### [1.48.0] - 2026-09-14
+
+#### 追加
+
+- ACE-534-1: ゲート記録器はレビューシムの版一致検査で解決せず、record-gate-head.sh の実在だけを見る（Issue #515 / PR #534）
+
+#### カウンター更新
+
+- ACE-001: Helpful 9→10（PR #534 の Toolkit code-reviewer が Codex 0 件のあと identity 経路の Critical を検出）
 
 ### [1.47.0] - 2026-09-14
 
