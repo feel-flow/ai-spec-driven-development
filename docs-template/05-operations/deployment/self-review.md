@@ -123,22 +123,17 @@ AIがレビュー結果を返したら、指摘事項があればその場で修
 
 ---
 
-## クロスモデルレビュー（Codex CLI）
+## クロスモデルレビュー（推奨入口 `/multi-review`）
 
-PR Review Toolkit（Claude系）でのセルフレビューに加え、Codex CLI（GPT系）でクロスモデルレビューを実行し、異なるAIモデルの観点からレビュー品質を向上させます。
+入口は `/multi-review` 1 本です。PR Review Toolkit や `scripts/codex-review.sh` を先に重ねません。
 
 ### 実行方法
 
 ```bash
-# 推奨入口（ff-dev-toolkit）
 /multi-review --mode cross-model --strategy minimize_cost --perspective code-review --base origin/develop
-
-# Codex 単体の互換入口。plugin cache から toolkit を自動解決する。
-# 前回の .review-results/ が残っているときは --fresh
-bash scripts/codex-review.sh --base origin/develop --fresh
 ```
 
-`scripts/.ff-dev-toolkit-root` はマシン固有のためコミットしません。plugin 未導入で解決できないときは、エラーが案内する `bash <toolkit>/scripts/setup-multi-agent.sh` を 1 回実行します。`.review-results/` は gitignore 済みの使い捨て成果物です。マージ後 cleanup 時に残っていれば `rm -rf .review-results/` して構いません。
+`scripts/codex-review.sh` は Codex だけ欲しいときの互換入口です（上と両方は実行しない）。ff-dev-toolkit が Codex または Claude に入っていれば plugin cache から自動解決します。`scripts/.ff-dev-toolkit-root` はマシン固有のためコミットしません。plugin 未導入時のエラーは `setup-multi-agent.sh` と名前だけ出します（リポジトリ直下の同名スクリプトは yq/CLI 検出用で、toolkit の setup ではありません）。`.review-results/` は gitignore 済みの使い捨て成果物です。マージ後 cleanup で `rm -rf .review-results/` します。`--fresh` はエラーが leftover で止まったときだけ使います。
 
 ### レビュー結果の対応
 

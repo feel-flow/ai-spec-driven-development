@@ -8,7 +8,7 @@
 
 **目的**: 各CLIの得意分野とコスト特性を活かし、高品質かつコスト効率の良いコードレビューを実現する
 
-> **標準レビュー体制**: 一次レビューは Claude Code（pr-review-toolkit）、クロスモデルレビューは Codex CLI の2本柱が標準です。GitHub Copilot（Copilot CLI / Copilot code review）は従量課金への移行に伴い**既定のレビューラインナップから除外**しました（アダプタは残置、`--cli copilot-cli` でオプトイン可能）。
+> **標準レビュー体制**: クロスモデルレビューの入口は `/multi-review --mode cross-model` 1 本です。GitHub Copilot（Copilot CLI / Copilot code review）は従量課金への移行に伴い**既定のレビューラインナップから除外**しました（アダプタは残置、`--cli copilot-cli` でオプトイン可能）。
 
 ---
 
@@ -26,28 +26,23 @@
 
 ## クロスモデルレビュー（推奨パターン）
 
-Multi-CLI の全体オーケストレーションとは別に、**Claude系 + GPT系のデュアルモデルレビュー**を軽量に実行するパターンです。異なるAIモデルの観点でレビュー品質を向上させます。
+入口は `/multi-review --mode cross-model` 1 本です。pr-review-toolkit や `scripts/codex-review.sh` を先に重ねません。
 
-### Codex CLI 3パターン
+### 3パターン
 
-| パターン                     | 実行タイミング       | 自動/提案        | 説明                                          |
-| ---------------------------- | -------------------- | ---------------- | --------------------------------------------- |
-| **Cross-Model Review**       | セルフレビュー時     | 必須（順次実行） | Claude Toolkit + Codex CLI でデュアルレビュー |
-| **Parallel Task Suggestion** | 独立サブタスク発見時 | ユーザーに提案   | 並列実行による効率化                          |
-| **Second Opinion**           | 設計判断の分岐点     | ユーザーに提案   | アーキテクチャ決定の第二意見                  |
+| パターン                     | 実行タイミング       | 自動/提案      | 説明                                    |
+| ---------------------------- | -------------------- | -------------- | --------------------------------------- |
+| **Cross-Model Review**       | セルフレビュー時     | 通常実施       | `/multi-review --mode cross-model` 1 本 |
+| **Parallel Task Suggestion** | 独立サブタスク発見時 | ユーザーに提案 | 並列実行による効率化                    |
+| **Second Opinion**           | 設計判断の分岐点     | ユーザーに提案 | アーキテクチャ決定の第二意見            |
 
-#### Pattern 1: Cross-Model Review（必須・順次実行）
-
-PR Review Toolkit（Claude系）でのセルフレビュー後に続けて実行します。CLAUDE.md のワークフロー指示に基づき、AIツールが Toolkit → Codex CLI の順で実行します。
+#### Pattern 1: Cross-Model Review（推奨入口 1 本）
 
 ```bash
-# 推奨入口（ff-dev-toolkit）
 /multi-review --mode cross-model --strategy minimize_cost --perspective code-review --base origin/develop
-
-# Codex 単体の互換入口。plugin cache から toolkit を自動解決する。
-# 前回の .review-results/ が残っているときは --fresh
-bash scripts/codex-review.sh --base origin/develop --fresh
 ```
+
+`scripts/codex-review.sh` は Codex だけ欲しいときの互換入口です（上と両方は実行しない）。`--fresh` はエラーが leftover で止まったときだけ使います。
 
 レビュー結果は [PRレビュー対応ポリシー](./review-response-policy.md) に従って対応します。
 
@@ -132,7 +127,7 @@ bash scripts/codex-review.sh --base origin/develop --fresh
 - Bash 4.0以上
 - Git（diffの取得に使用）
 - 1つ以上のAI CLI
-- `scripts/codex-review.sh` を使う場合は ff-dev-toolkit プラグイン（Codex/Claude の plugin cache から自動解決）。`scripts/.ff-dev-toolkit-root` はマシン固有のためコミットしない。未導入ならエラーが案内する `bash <toolkit>/scripts/setup-multi-agent.sh` を 1 回実行する
+- `scripts/codex-review.sh` を使う場合は Codex または Claude に ff-dev-toolkit が入っていること（plugin cache から自動解決。`FF_DEV_TOOLKIT_ROOT` は未設定でよい）。`scripts/.ff-dev-toolkit-root` はマシン固有のためコミットしない。未導入時のエラーは `setup-multi-agent.sh` と名前だけ出す（リポジトリ直下の同名スクリプトは yq/CLI 検出用で、toolkit の setup ではない）。版不一致のときだけエラーが `bash <root>/scripts/setup-multi-agent.sh` を印字する
 
 ### 推奨
 

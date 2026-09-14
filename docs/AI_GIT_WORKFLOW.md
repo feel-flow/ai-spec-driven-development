@@ -370,19 +370,23 @@ bash scripts/review-level.sh --base develop
 | `comment-analyzer`      | コメント・ドキュメント品質 | 不正確なコメント、JSDoc欠落        |
 | `code-simplifier`       | 複雑度の削減提案           | 長関数、深いネスト                 |
 
-#### デュアルモデルレビュー（Claude + Codex）
+#### クロスモデルレビュー（推奨入口 `/multi-review`）
 
-Toolkit レビュー後、別モデルでクロスレビューします。入口は `/multi-review`（ff-dev-toolkit）です。Codex 単体の互換入口は `scripts/codex-review.sh` で、ff-dev-toolkit が入っていれば Codex/Claude の plugin cache から自動解決します（`FF_DEV_TOOLKIT_ROOT` を手で渡す必要はない）。`scripts/.ff-dev-toolkit-root` はマシン固有のためコミットしません。plugin 未導入で解決できないときは、エラーが案内する `bash <toolkit>/scripts/setup-multi-agent.sh` を 1 回実行します。
+入口は `/multi-review`（ff-dev-toolkit）1 本です。pr-review-toolkit や `scripts/codex-review.sh` を先に重ねません。`scripts/codex-review.sh` は Codex だけ欲しいときの互換入口です。
 
 ```bash
-# 推奨入口（ff-dev-toolkit）
 /multi-review --mode cross-model --strategy minimize_cost --perspective code-review --base origin/develop
-
-# Codex 単体の互換入口。前回の .review-results/ が残っているときは --fresh
-bash scripts/codex-review.sh --base origin/develop --fresh
 ```
 
-レビュー結果は [Review Response Policy](../docs-template/05-operations/deployment/review-response-policy.md) に従って対応（Critical/Warning は確認不要で即対応）。TodoWrite で対応項目を管理します。`.review-results/` は gitignore 済みの使い捨て成果物です。新しいレビューは `--fresh` で前回分を退避し、マージ後 cleanup 時に残っていれば `rm -rf .review-results/` して構いません。
+互換入口（Codex 単体。上と両方は実行しない）:
+
+```bash
+bash scripts/codex-review.sh --base origin/develop
+```
+
+ff-dev-toolkit が Codex または Claude に入っていれば plugin cache から自動解決します。`FF_DEV_TOOLKIT_ROOT` は未設定でよい（export した値が残っていると cache より先に勝ち、壊れていれば fail-close）。`scripts/.ff-dev-toolkit-root` はマシン固有のためコミットしません。plugin 未導入時のエラーは `setup-multi-agent.sh` と名前だけ出します（このリポジトリ直下の同名スクリプトは yq/CLI 検出用で、toolkit の setup ではありません）。版不一致のときだけエラーが `bash <root>/scripts/setup-multi-agent.sh` を印字します。
+
+レビュー結果は [Review Response Policy](../docs-template/05-operations/deployment/review-response-policy.md) に従って対応（Critical/Warning は確認不要で即対応）。TodoWrite で対応項目を管理します。`.review-results/` は gitignore 済みの使い捨て成果物です。マージ後 cleanup で `rm -rf .review-results/` します。`--fresh` はエラーが leftover で止まったときだけ使います（未読 Critical を退避するので、先にレポートを読む）。
 
 ### ステップ6: PR作成
 

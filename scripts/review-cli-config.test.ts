@@ -122,6 +122,17 @@ describe("codex-review.sh の toolkit 委譲 — Issue #476", () => {
     }
   });
 
+  it("--fresh を委譲先へそのまま渡す", () => {
+    const fixture = makeOrchestrator();
+    try {
+      const result = runShim(["--staged", "--dry-run", "--fresh"], fixture);
+      expect(result.status).toBe(0);
+      expect(readFileSync(fixture.log, "utf8").split("\n")).toContain("--fresh");
+    } finally {
+      rmSync(fixture.root, { recursive: true, force: true });
+    }
+  });
+
   it("--staged と --base の同時指定を rc=2 で拒否し、委譲しない", () => {
     const fixture = makeOrchestrator();
     try {
