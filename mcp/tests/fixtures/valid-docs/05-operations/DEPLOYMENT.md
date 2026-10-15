@@ -1,7 +1,7 @@
 ---
 title: "DEPLOYMENT"
 version: "1.0.0"
-status: "draft"
+status: "deprecated"
 owner: "@test-user"
 created: "2025-01-01"
 updated: "2025-01-01"

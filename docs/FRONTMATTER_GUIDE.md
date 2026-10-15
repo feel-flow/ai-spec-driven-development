@@ -1,7 +1,7 @@
 ---
 id: frontmatter-guide
 title: Frontmatter ガイド - なぜ・どこで・何を書くか
-version: 1.6.0
+version: 1.7.0
 status: draft
 created: 2026-05-19
 updated: 2026-10-15
@@ -30,13 +30,13 @@ visibility: public
 
 - **Why**: frontmatter は AI / CI / 検索の **メタデータ唯一の正式ソース (SSOT)** にするため。本文に書くと参照が散らばり、機械的に処理できなくなる。
 - **3 系統スキーマがある**（`status` の値が系統ごとに違う）:
-  1. **コア7文書・拡張文書スキーマ** （本リポジトリ独自、3 ステータス `draft|review|approved`、`changeImpact`、SemVer）→ §5.1
+  1. **コア7文書・拡張文書スキーマ** （本リポジトリ独自、4 ステータス `draft|review|approved|deprecated`（`deprecated` は終端）、`changeImpact`、SemVer）→ §5.1
   2. **`docs/specs/` 配下スキーマ** （GitHub Spec Kit 由来、6 ステータスライフサイクル、`specId`、メトリクス）→ §5.2
   3. **`docs/` 方法論ガイドスキーマ** （本リポジトリ自身の方法論文書、3 ステータス `draft|active|deprecated`。採用者には不要）→ §5.6
 - **付ける場所**: コア 7 文書、拡張文書（GLOSSARY, DECISIONS, FAQ 等）、`docs/specs/**`、PLAYBOOK 等の運用文書。
 - **付けないテンプレ**: `GETTING_STARTED*.md`、`SETUP_*.md` のような「採用前に読む手順書」は本文置換のみで OK（[docs-template/README.md](../docs-template/README.md) の「frontmatter を持たないテンプレ」節）。
 - **検証**: `node scripts/validate-docs.mjs` でコア 7 文書（CORE_DOCS 固定）、`node scripts/build-spec-index.mjs` で spec を CI 検証。
-- **SSOT**: 各系統の `status` 値の正本は本ガイドの §5.1 / §5.2 / §5.6。コア 7 文書は `scripts/validate-docs.mjs` の `VALID_STATUS_VALUES` も同じ値で検証する。
+- **SSOT**: コア 7 文書・拡張文書と `docs/specs/` のスキーマの正本は [docs-template/MASTER.md](../docs-template/MASTER.md)（「文書運用ルール / Frontmatter」と「Spec Kit 運用ガイド」）。本ガイドの §5.1 / §5.2 はその写しと解説で、食い違ったら MASTER.md が勝つ。`docs/` 方法論ガイドスキーマは MASTER.md の対象外のため、本ガイド §5.6 が正本。コア 7 文書は `scripts/validate-docs.mjs` の `VALID_STATUS_VALUES` が MASTER.md と同じ値で検証する。
 - **ツール / 環境**: frontmatter スキーマと検証 Node スクリプトは **AI ツール非依存・OS 非依存**（Claude Code / Cursor / Copilot / Codex CLI どれでも、macOS / Linux / Windows どれでも使える）。`*.sh` スクリプトと `.husky/pre-commit` は Windows native では Git Bash か WSL2 が必要（sh + coreutils）。詳細は §7。
 
 ---
@@ -69,10 +69,10 @@ frontmatter の `title` / `tags` / `references` / `status` / `changeImpact` は�
 
 - frontmatter の有無
 - 必須フィールド (`title`, `version`, `status`, `owner`, `created`, `updated`) の存在
-- `status` 値が enum（`draft|review|approved`）に収まっているか
+- `status` 値が enum（`draft|review|approved|deprecated`）に収まっているか
 - `version` が SemVer に従っているか
 
-を検証し、エラー検出時は `exitCode = 1` をセット（[validate-docs.mjs:108-135 でエラー組み立て、243/257 で代入](../scripts/validate-docs.mjs)）、最終的に `process.exit(exitCode)` で CI を落とす（line 275）。
+を検証し、エラー検出時は `exitCode = 1` をセット（[validate-docs.mjs](../scripts/validate-docs.mjs) の `validateFrontMatter` でエラーを組み立て、`runValidation` で代入）、最終的に `process.exit(runValidation(DOCS_DIR))` で CI を落とす。
 
 ### 1.4 変更影響と Changelog を連動させるため
 
@@ -113,13 +113,13 @@ frontmatter に関するルールは以下に**分散**している。本ガイ�
 | -------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
 | [docs/OPERATIONAL_GUIDE.md §7 FRONTMATTER TEMPLATE](OPERATIONAL_GUIDE.md)              | **AI Agent 向け運用仕様**（フィールド説明の項目数が最も多い）。`docs/` 方法論ガイドスキーマ（§5.6）の実例 | 全フィールド一覧表、必須/任意区分、`changeImpact` 判断基準                                                             |
 | [docs/OPERATIONAL_GUIDE.md §8 UPDATE / CHANGE POLICY](OPERATIONAL_GUIDE.md)            | 更新フロー                                                                                                | `changeImpact` → version bump → Changelog 連動の手順                                                                   |
-| [docs-template/MASTER.md 「文書運用ルール / Frontmatter」](../docs-template/MASTER.md) | **コア 7 文書・拡張文書のスキーマ定義**（validate-docs.mjs の実装と整合）                                 | 必須/任意フィールド、ステータスワークフロー（`draft\|review\|approved`）、バージョニング                               |
+| [docs-template/MASTER.md 「文書運用ルール / Frontmatter」](../docs-template/MASTER.md) | **コア 7 文書・拡張文書のスキーマ定義**（validate-docs.mjs の実装と整合）                                 | 必須/任意フィールド、ステータスワークフロー（`draft\|review\|approved\|deprecated`）、バージョニング                   |
 | [docs-template/MASTER.md 「Spec Kit 運用ガイド」](../docs-template/MASTER.md)          | **`docs/specs/` 配下のスキーマ定義**                                                                      | `specId` 命名規約、6 ステータスライフサイクル、メトリクス                                                              |
 | [docs/specs/spec-template.md](specs/spec-template.md)                                  | spec の雛形ファイル                                                                                       | コピーして使う実物                                                                                                     |
 | [docs-template/README.md](../docs-template/README.md)                                  | テンプレ採用時の置換手順                                                                                  | 「frontmatter を持つ/持たないテンプレ」の区別                                                                          |
 | [docs-template/08-knowledge/PLAYBOOK.md](../docs-template/08-knowledge/PLAYBOOK.md)    | PLAYBOOK 固有ルール                                                                                       | `ace_entry_count` 等の追加フィールド管理、SAMPLE バナー付きテンプレファイルの取り扱い（採用時に frontmatter 書き換え） |
 
-> **SSOT 注意**: コア 7 文書スキーマの正本は本ガイド §5.1 と `scripts/validate-docs.mjs` の `VALID_STATUS_VALUES`（必須 6 フィールド + 3 値 enum）。OPERATIONAL_GUIDE.md §7 は `docs/` 方法論ガイドスキーマ（§5.6）を扱うため、コア 7 文書とは `status` 値が異なる。どちらも正しく、適用対象が別である。
+> **SSOT 注意**: コア 7 文書スキーマの正本は上表の [docs-template/MASTER.md 「文書運用ルール / Frontmatter」](../docs-template/MASTER.md)（必須 6 フィールド + 4 値 enum）。本ガイド §5.1 はその写しで、`scripts/validate-docs.mjs` の `VALID_STATUS_VALUES` が同じ値を検証する。OPERATIONAL_GUIDE.md §7 は `docs/` 方法論ガイドスキーマ（§5.6）を扱うため、コア 7 文書とは `status` 値が異なる。どちらも正しく、適用対象が別である。
 
 ---
 
@@ -171,7 +171,7 @@ frontmatter に関するルールは以下に**分散**している。本ガイ�
 ---
 title: My Document Title
 version: 0.1.0 # SemVer 必須
-status: draft # draft | review | approved の 3 値
+status: draft # draft | review | approved | deprecated の 4 値
 owner: "@your-github-handle" # team-name または @username
 created: 2026-05-19 # YYYY-MM-DD
 updated: 2026-05-19 # YYYY-MM-DD
@@ -204,13 +204,18 @@ changeImpact: medium
 draft → review → approved
   ↑__________________|
      （修正が必要な場合）
+
+任意の状態 → deprecated（終端: 廃止準備・アーカイブ。復活時は draft/approved へ戻す）
 ```
 
-| status     | 意味           | AI への扱い                  |
-| ---------- | -------------- | ---------------------------- |
-| `draft`    | 作成中・未確定 | 参考情報として扱う           |
-| `review`   | レビュー中     | ほぼ確定だが変更の可能性あり |
-| `approved` | 承認済み       | 正式な仕様として遵守         |
+| status       | 意味                     | AI への扱い                  |
+| ------------ | ------------------------ | ---------------------------- |
+| `draft`      | 作成中・未確定           | 参考情報として扱う           |
+| `review`     | レビュー中               | ほぼ確定だが変更の可能性あり |
+| `approved`   | 承認済み                 | 正式な仕様として遵守         |
+| `deprecated` | 廃止準備・アーカイブ済み | 新規実装の参照元に使用しない |
+
+`deprecated` は終端状態で、役目を終えた文書のアーカイブや、移動しない ADR をその場で陳腐化させるときに使う。`docs/specs/` の中間状態（`implementing` / `done`）は持たない。
 
 ### 5.2 `docs/specs/` 配下スキーマ（GitHub Spec Kit 由来）
 
@@ -272,12 +277,12 @@ metrics:
 
 #### 5.4.1 コア7と spec で命名が違うフィールドがある
 
-| 概念         | コア7文書                      | `docs/specs/`                        | `docs/` 方法論ガイド             |
-| ------------ | ------------------------------ | ------------------------------------ | -------------------------------- |
-| 最終更新日   | `updated`                      | `lastUpdated`                        | `updated`                        |
-| 一意 ID      | `id`                           | `specId`                             | `id`                             |
-| 所有者       | `owner` (文字列)               | `owners` (配列、GitHub ハンドル付き) | `owner` (文字列)                 |
-| ステータス値 | 3値（`draft/review/approved`） | 6値                                  | 3値（`draft/active/deprecated`） |
+| 概念         | コア7文書                                 | `docs/specs/`                        | `docs/` 方法論ガイド             |
+| ------------ | ----------------------------------------- | ------------------------------------ | -------------------------------- |
+| 最終更新日   | `updated`                                 | `lastUpdated`                        | `updated`                        |
+| 一意 ID      | `id`                                      | `specId`                             | `id`                             |
+| 所有者       | `owner` (文字列)                          | `owners` (配列、GitHub ハンドル付き) | `owner` (文字列)                 |
+| ステータス値 | 4値（`draft/review/approved/deprecated`） | 6値                                  | 3値（`draft/active/deprecated`） |
 
 → **同じ感覚でコピペすると検証で落ちる**。spec を書くときは必ず `docs/specs/spec-template.md` をコピーする。`docs/` 方法論ガイドの `status: active` をコア 7 文書へ持ち込むと、`validate-docs.mjs` が無効値として落とす。
 
@@ -468,7 +473,7 @@ frontmatter 管理（編集・検証・索引化）は Node スクリプトと�
 - [AI_SPEC_DRIVEN_DEVELOPMENT.md](AI_SPEC_DRIVEN_DEVELOPMENT.md) - 方法論の全体像
 - [OPERATIONAL_GUIDE.md](OPERATIONAL_GUIDE.md) - AI Agent 向け運用仕様（frontmatter 詳細はここ）
 - [PRACTICAL_GUIDE.md](PRACTICAL_GUIDE.md) - 各文書の詳細と実践的な活用法
-- [docs-template/MASTER.md](../docs-template/MASTER.md) - スキーマ定義の正本（コア7 + Spec Kit 両方）
+- [docs-template/MASTER.md](../docs-template/MASTER.md) - スキーマ定義の正本（コア7 + Spec Kit 両方。`docs/` 方法論ガイドスキーマは本ガイド §5.6 が正本）
 - [docs/specs/spec-template.md](specs/spec-template.md) - spec の雛形
 - [scripts/validate-docs.mjs](../scripts/validate-docs.mjs) - コア文書検証スクリプト
 - [scripts/build-spec-index.mjs](../scripts/build-spec-index.mjs) - spec 索引生成スクリプト
@@ -477,6 +482,14 @@ frontmatter 管理（編集・検証・索引化）は Node スクリプトと�
 ---
 
 ## Changelog
+
+### [1.7.0] - 2026-10-15
+
+#### 変更
+
+- コア 7 文書・拡張文書の `status` を 4 値（`draft | review | approved | deprecated`）に更新。MASTER.md 1.4.0 で上流から取り込んだ終端状態 `deprecated` に追従していなかったのを解消した（TL;DR、§1.3、§3 表と SSOT 注意、§5.1 の雛形・ワークフロー・表、§5.4.1 比較表）（[Issue #556](https://github.com/feel-flow/ai-spec-driven-development/issues/556)）
+- 正本の指し先を統一。コア 7 文書・拡張文書と `docs/specs/` の正本は MASTER.md、本ガイド §5.1 / §5.2 はその写しとし、`docs/` 方法論ガイドスキーマだけを本ガイド §5.6 の正本とした（TL;DR、§3 SSOT 注意、§8）
+- §1.3: 古くなっていた `validate-docs.mjs` の行番号参照を関数名（`validateFrontMatter` / `runValidation`）に置き換え
 
 ### [1.6.0] - 2026-10-15
 
