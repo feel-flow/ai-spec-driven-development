@@ -1,12 +1,12 @@
 ---
 title: "PLAYBOOK"
-version: "1.60.0"
+version: "1.61.0"
 status: "approved"
 created: "2026-03-10"
 updated: "2026-10-15"
 owner: "@fffokazaki"
 changeImpact: "medium"
-ace_entry_count: 107
+ace_entry_count: 108
 tags: [ace, playbook, knowledge-management]
 references:
   - https://github.com/feel-flow/ai-spec-driven-development/blob/HEAD/docs/ACE_FRAMEWORK.md
@@ -615,7 +615,7 @@ ACE エントリ ID は **PRスコープ式** を採用する（このセクシ�
 | Origin     | PR #397 / Issue #396 |
 | Related    | ACE-012（修正対象）  |
 | Date       | 2026-05-06           |
-| Helpful    | 1                    |
+| Helpful    | 2                    |
 | Harmful    | 0                    |
 | Status     | active               |
 
@@ -730,7 +730,7 @@ ACE エントリ ID は **PRスコープ式** を採用する（このセクシ�
 | Origin     | PR #405 / Issue #404  |
 | Related    | ACE-002 / ACE-018     |
 | Date       | 2026-05-07            |
-| Helpful    | 1                     |
+| Helpful    | 2                     |
 | Harmful    | 0                     |
 | Status     | active                |
 
@@ -1842,7 +1842,7 @@ Toolkit comment-analyzer が Critical C1/C2 として独立検出、Copilot revi
 | Origin     | PR #465    |
 | Related    | ACE-445-1  |
 | Date       | 2026-07-03 |
-| Helpful    | 0          |
+| Helpful    | 1          |
 | Harmful    | 0          |
 | Status     | active     |
 
@@ -2467,7 +2467,33 @@ PR #551 では PATTERNS.md §3 を新設の ERRORS.md へ移し、配布物リ�
 
 ---
 
+<a id="ace-553-1"></a>
+
+### ACE-553-1: 既存ルールに例外を新設する PR では、その PR 自身の差分を新しい例外の最初の適用例として条件に照らす
+
+| Category | process | Origin | PR #553 / Issue #406 |
+| Related | ACE-019 |
+| Date | 2026-10-15 |
+| Helpful | 0 | Harmful | 0 |
+| Status | active |
+
+例外や新ルールを足す PR は、そのルールの最初の適用例になる。しかし書き手は規則の文面に集中して自分の差分への当てはめを忘れやすく、レビューで自己違反（記録要件の欠落・許可範囲外の変更）として指摘される。正本の置き場所も同じで、既存の正本指定（AGENTS.md 等）を確かめずに書きやすい文書へ置くと、[ACE-019](#ace-019) で明示したはずの例外が別の分裂を生む。例外条件を書き終えたら、対象範囲・記録要件・正本の置き場所の各項目を自分の差分へ 1 つずつ当て、満たさない差分を直すか条件を広げてから push する。
+
+---
+
 ## Changelog
+
+### [1.61.0] - 2026-10-15
+
+#### 追加
+
+- ACE-553-1: 既存ルールに例外を新設する PR では、その PR 自身の差分を新しい例外の最初の適用例として条件に照らす（Issue #406 / PR #553）
+
+#### カウンター更新
+
+- ACE-019: Helpful 1→2（PR #553 で Changelog だけの例外宣言を Codex が暗黙の policy split として指摘し、(a) 例外の明示で運用ルールの正本へ定義した）
+- ACE-023: Helpful 1→2（PR #553 で PR #403 の additions / deletions / changed_files と `GET /pulls/311` の 404 を 1 次情報で照合してから訂正した）
+- ACE-465-2: Helpful 0→1（PR #553 で注釈削除を求めた cross-model の修正案が Issue の受け入れ条件と矛盾したため、指摘の核だけ採り、例外条件を広げる側の選択肢で対応した）
 
 ### [1.60.0] - 2026-10-15
 
