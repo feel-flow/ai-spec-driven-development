@@ -44,6 +44,8 @@ Issue作成 → ブランチ作成 → 実装 → テスト → セルフレビ�
 | 既存の open `bundle` へ追記 | 上の 4 条件のどれかに該当し、同じテーマの open `bundle` がある                                                                             | チェックリスト 1 行をコメントで追記する                                                                     |
 | `bundle` 単位で新規起票     | 上の 4 条件のどれかに該当し、統合先が無い                                                                                                  | 同じ PR から出た同テーマの発見を 1 つの `bundle` にまとめて起票する（カテゴリ Epic があればその sub-issue） |
 
+`bundle` ラベルが無いリポジトリでは、3・4 段目の「`bundle`」をテーマの合うカテゴリ Epic と読み替え、追記はその Epic へのコメント、起票はその sub-issue として行う。ラベル一覧や Issue 検索が失敗した（非 0 終了・認証エラーなど）ときは「候補なし」とみなさず、起票を止めて原因を報告する。
+
 迷ったときは、必要性を説明できなければ YAGNI、仕様判断の要否と別モジュールへの波及に確信が持てなければ Issue 側、それ以外（規模・局所性・検証の重さ）の迷いはインライン側へ倒す。セキュリティ・データ損失・法令違反の合理的なリスクは「現在の根拠」に含む。
 
 現在の diff が導入・悪化させた回帰、現 Issue の受け入れ条件、既存契約、必須品質ゲート、Critical / Warning の解消はスコープ外ではない。後続 Issue へ送らず、マージ前に現 PR で解消する。
@@ -68,6 +70,8 @@ Issue作成 → ブランチ作成 → 実装 → テスト → セルフレビ�
 ```bash
 # 必要性があり、独立した設計・検証が必要なリファクタリングを発見した場合
 repo="OWNER/REPO"
+# 0. bundle ラベルの実在を先に確かめる（無いリポジトリでは --label bundle の検索は常に空になり、起票も失敗する）
+gh label list --repo "$repo" --search bundle --json name
 # 1. 統合先の open bundle を探す（--limit を付けないと 30 件で打ち切られる）
 gh issue list --repo "$repo" --state open --label bundle --limit 200 --json number,title,url
 
@@ -76,6 +80,7 @@ gh issue comment <bundle番号> --repo "$repo" \
   --body "- [ ] UserService.createUser() のメソッド分割（発見元: Issue #123）"
 
 # 2b. 統合先が無いときだけ bundle として起票する
+#     bundle ラベルが無いリポジトリでは --label "bundle" を外し、テーマの合うカテゴリ Epic の sub-issue として紐付ける
 gh issue create \
   --repo "$repo" \
   --title "refactor: UserService のメソッド分割" \

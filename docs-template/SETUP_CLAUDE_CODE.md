@@ -359,7 +359,10 @@ PR作成前に以下を確認すること:
 3. **既存の open `bundle` へ追記** — 上のどれかに該当するなら、同じテーマの open `bundle` を探してチェックリスト 1 行をコメントで追記する
 4. **`bundle` 単位で新規起票** — 統合先が無いときだけ、同テーマの発見を 1 つの `bundle` にまとめて起票する
 
+`bundle` ラベルが無いリポジトリでは、`bundle` をテーマの合うカテゴリ Epic と読み替える（追記は Epic へのコメント、起票は Epic の sub-issue）。
+
 ```bash
+gh label list --search bundle --json name
 gh issue list --state open --label bundle --limit 200 --json number,title,url
 gh issue comment <bundle番号> --body "- [ ] 発見の要約（発見元: PR #NNN）"
 ```
