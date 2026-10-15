@@ -10,7 +10,7 @@ changeImpact: "MEDIUM"
 
 # フォールバック戦略（Fail-Fast in Dev, Graceful in Prod）
 
-> **Origin**: [PATTERNS.md](./PATTERNS.md) セクション 3（エラーハンドリング。エラー型の正典は [ERRORS.md](./ERRORS.md)） | **Related**: [DEPLOYMENT.md](../05-operations/DEPLOYMENT.md)
+> **Origin**: [PATTERNS.md](./PATTERNS.md) セクション 3（エラーハンドリング） | **Related**: [ERRORS.md](./ERRORS.md)（エラー型の正典） / [DEPLOYMENT.md](../05-operations/DEPLOYMENT.md)
 
 ## 1. 基本原則
 

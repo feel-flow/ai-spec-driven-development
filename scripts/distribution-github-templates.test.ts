@@ -38,6 +38,11 @@ const DIST_GITHUB = join(TEMPLATE_ROOT, ".github");
 
 // /init-docs が初期配置する 21 ファイル。出典は ff-dev-toolkit の
 // skills/init-docs/SKILL.md「2. ディレクトリ構造の作成」。
+// 03-implementation/ERRORS.md は Issue #550 で PATTERNS.md §3 から切り出して追加した。
+// 上流 SKILL.md（20 ファイル）と同梱 docs-template への反映は
+// feel-flow/feelflow-plugins#2137 で追跡しており、反映までは上流と 1 件ずれる。
+// 上流へ移植するときは PATTERNS.md 1.6.0 と ERRORS.md を必ず同時に入れること
+// （PATTERNS.md だけ入れると §3 が索引だけになり、エラー型の正典が展開先から消える）。
 // 00-planning/ と 08-knowledge/ は初期セットに含まれない（後者は /ace-setup が作成）。
 const INITIAL_SET = new Set([
   "docs/MASTER.md",

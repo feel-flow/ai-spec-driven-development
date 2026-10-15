@@ -324,4 +324,4 @@ async function processUser(userId: string): Promise<Result<User>> {
 
 ### [1.0.0] - 2026-10-15
 
-- PATTERNS.md 1.5.1 の §3「エラーハンドリング」を移設（Issue #550）。本文は変更していない
+- PATTERNS.md 1.5.1 の §3「エラーハンドリング」を移設（Issue #550）。コードと説明文は変更していない（見出しは番号付き h2 に再編）
