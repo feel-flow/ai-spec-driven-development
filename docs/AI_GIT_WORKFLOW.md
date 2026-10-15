@@ -96,12 +96,12 @@ release/*     ← リリース準備（developから分岐）
 
 本ワークフローは以下の原則に従って運用します。詳細は [workflow-principles.md](../docs-template/05-operations/deployment/workflow-principles.md) を参照してください。
 
-| 原則                         | 概要                                        |
-| ---------------------------- | ------------------------------------------- |
-| **ノンストップフロー**       | Issue作成〜PR作成まで不要確認なしで一気通貫 |
-| **スコープ外発見のIssue化**  | その場で修正せず新規Issue作成               |
-| **曖昧仕様の確認タイミング** | Issue着手前に確認、作業開始後は別Issue化    |
-| **TodoWrite タスク管理**     | 標準チェックリストで進捗を可視化            |
+| 原則                         | 概要                                           |
+| ---------------------------- | ---------------------------------------------- |
+| **ノンストップフロー**       | Issue作成〜PR作成まで不要確認なしで一気通貫    |
+| **スコープ外発見の4段判定**  | YAGNI → 同 PR 修正 → bundle 追記 → bundle 起票 |
+| **曖昧仕様の確認タイミング** | Issue着手前に確認、作業開始後は4段判定で扱う   |
+| **TodoWrite タスク管理**     | 標準チェックリストで進捗を可視化               |
 
 ---
 
@@ -196,7 +196,7 @@ git checkout -b "feature/123-user-auth"
 
 - **書くタイミングは「気付いた瞬間」**: 後で書こうとすると確実に忘れる（ACE-032 の発見経緯と同じ構造）
 - **粒度は 1〜3 行**: 「なぜ A ではなく B を選んだか」を短文で残す
-- **スコープ外発見は本ファイルではなく Issue 化**: implementation-notes は「現 PR の判断ログ」、Issue は「別タスクへの分岐」と役割を分ける（[ワークフロー運用原則 原則2](../docs-template/05-operations/deployment/workflow-principles.md)）
+- **スコープ外発見は本ファイルへ溜めず4段判定**: implementation-notes は「現 PR の判断ログ」であり、将来タスクの代替 backlog にはしない。発見は YAGNI → 同 PR 修正 → bundle 追記 → bundle 起票の順で振り分ける（[ワークフロー運用原則 原則2](../docs-template/05-operations/deployment/workflow-principles.md)）
 - **PR 作成時に PR description に転記**: ステップ6 でレビュアーが「なぜ」を読みやすくなる
 - **マージ前にファイルを削除する（推奨）**: 本リポは squash merge 標準のため、ファイルを残すと次 PR がルート直下で衝突する。pr-ready 直前に PR description へ転記 → `git rm implementation-notes.md` → 1 commit で削除。長期保存したい場合は `notes/<issue-num>.md` 形式で per-PR ファイル化する代替案あり（並行 PR で衝突しないが notes/ が累積するトレードオフ）
 

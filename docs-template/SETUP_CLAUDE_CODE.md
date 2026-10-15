@@ -352,18 +352,26 @@ PR作成前に以下を確認すること:
 
 ## スコープ外問題の取り扱い
 
-作業中にスコープ外の問題を発見した場合、**即座にGitHub Issueを作成**:
+作業中にスコープ外の問題を発見した場合、起票する前に **YAGNI → 同 PR でインライン修正 → 既存の open `bundle` へ追記 → `bundle` 単位で新規起票** の順で判定する（詳細: [ワークフロー運用原則 原則2](./05-operations/deployment/workflow-principles.md)）。
+
+1. **YAGNI** — 現在の根拠（再現例・利用者影響・運用上の痛み・レビュー根拠）も受け入れ条件も示せなければ、修正も起票もせず理由だけ報告する
+2. **同 PR でインライン修正** — 仕様判断・別モジュール波及・独立した検証・変更 10 行超のどれにも明確に該当しなければ、現 PR の fix commit に束ねる
+3. **既存の open `bundle` へ追記** — 上のどれかに該当するなら、同じテーマの open `bundle` を探してチェックリスト 1 行をコメントで追記する
+4. **`bundle` 単位で新規起票** — 統合先が無いときだけ、同テーマの発見を 1 つの `bundle` にまとめて起票する
+
+`bundle` ラベルが無いリポジトリでは、`bundle` をテーマの合うカテゴリ Epic と読み替える（追記は Epic へのコメント、起票は Epic の sub-issue）。
 
 ```bash
-gh issue create --title "fix: 問題の説明" --body "詳細..." --label "bug"
+gh label list --search bundle --json name
+gh issue list --state open --label bundle --limit 200 --json number,title,url
+gh issue comment <bundle番号> --body "- [ ] 発見の要約（発見元: PR #NNN）"
 ```
 
 報告形式:
 
 ```
-📋 スコープ外の問題を発見しました
-Issue #XXX を作成しました: [タイトル]
-優先度: Critical / High / Medium / Low
+📋 スコープ外の発見: [要約]
+判定: YAGNI（理由: …） / 同 PR で修正（commit abc1234） / bundle #XXX へ追記 / bundle #XXX を新規起票
 ```
 
 ## よくある問題
