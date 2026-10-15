@@ -1,10 +1,10 @@
 ---
 title: "MASTER"
-version: "1.8.0"
+version: "1.9.0"
 status: "draft"
 owner: "@your-github-handle"
 created: "YYYY-MM-DD"
-updated: "2026-09-08"
+updated: "2026-10-15"
 changeImpact: "medium"
 ---
 
@@ -541,6 +541,7 @@ metrics:
 
 - 04-quality/GUARDRAILS_THREE_LAYERS.md — ガードレール3層（仕様・自動チェック・人間レビュー）
 - 04-quality/SECURITY_REVIEW_CHECKLIST.md — セキュリティレビューチェックリスト（PR用）
+- 05-operations/deployment/sbom.md — SBOM の生成・保存・利用。SBOM 本体は依存関係から生成する成果物で手で編集しない（人が書くのはこの運用文書）。継続運用・外部公開で採用を検討する
 
 ### ナレッジベース（初期セット外・`/ace-setup` が作成）
 
@@ -717,6 +718,12 @@ Changelog エントリには以下のカテゴリを使用する（[Keep a Chang
 ## Changelog
 
 - 2026-09-08 追記: プラグイン変数がない直接利用でも取得できる公開配布元を明記（ai-spec-driven-development#525）。
+
+### [1.9.0] - 2026-10-15
+
+#### 追加
+
+- 「品質・セキュリティ」に SBOM 運用文書（`05-operations/deployment/sbom.md`）への参照を追加し、SBOM 本体は手で編集しない生成物であることを明記（Issue #540）
 
 ### [1.8.0] - 2026-09-08
 
