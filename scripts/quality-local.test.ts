@@ -268,6 +268,84 @@ describe("quality:local gate record (Issue #515)", () => {
     }
   });
 
+  describe("段ラベルと停止位置 (Issue #389)", () => {
+    const EXPECTED_ORDER = [
+      "run build:mcp",
+      "run check",
+      "--prefix mcp test",
+      "run test:ace-scripts",
+      "run validate -- docs-template",
+      "run build:spec-index",
+      "run format:md:check",
+      "run lint:md",
+    ];
+    const FAILING_STEP_RC = 7;
+
+    function runWithStub(failOn: string | null) {
+      const binDir = mkdtempSync(join(tmpdir(), "ql-steps-"));
+      const toolkit = mkdtempSync(join(tmpdir(), "ql-tk-"));
+      const log = join(binDir, "calls.log");
+      const failCase = failOn
+        ? `  "${failOn}") exit ${FAILING_STEP_RC} ;;\n`
+        : "";
+      writeFileSync(
+        join(binDir, "npm"),
+        `#!/bin/sh\necho "$*" >> "${log}"\ncase "$*" in\n${failCase}esac\nexit 0\n`,
+      );
+      chmodSync(join(binDir, "npm"), 0o755);
+      writeFixtureToolkit(toolkit);
+      try {
+        const r = spawnSync("bash", [QUALITY_LOCAL], {
+          cwd: REPO_ROOT,
+          encoding: "utf8",
+          env: {
+            ...gitEnv(),
+            PATH: `${binDir}:${BASE_PATH}`,
+            FF_DEV_TOOLKIT_ROOT: toolkit,
+            FF_GATE_RECORD_FILE: join(binDir, "gate-record"),
+          },
+        });
+        const calls = readFileSync(log, "utf8").trim().split("\n");
+        const status = recordMap(join(binDir, "gate-record")).STATUS;
+        return { r, calls, status };
+      } finally {
+        rmSync(binDir, { recursive: true, force: true });
+        rmSync(toolkit, { recursive: true, force: true });
+      }
+    }
+
+    it("成功時は 8 段を従来の順で呼び、各段の開始ラベルが実際の呼び出しと一致する", () => {
+      const { r, calls, status } = runWithStub(null);
+      expect(r.status, r.stderr).toBe(0);
+      expect(calls).toEqual(EXPECTED_ORDER);
+      const labels = r.stdout
+        .split("\n")
+        .filter((line) => line.startsWith("==> quality:local "));
+      expect(labels).toEqual(
+        EXPECTED_ORDER.map(
+          (args, i) => `==> quality:local [${i + 1}/${EXPECTED_ORDER.length}] npm ${args}`,
+        ),
+      );
+      expect(r.stdout).toContain("✓ quality:local: 全 8 段が通過しました");
+      expect(status).toBe("pass");
+    });
+
+    it.each([1, 4, 8])(
+      "%i 段目が落ちたらその段の終了コードを返し、段名を stderr に出して後続を呼ばない",
+      (stepNo) => {
+        const failing = EXPECTED_ORDER[stepNo - 1];
+        const { r, calls, status } = runWithStub(failing);
+        expect(r.status).toBe(FAILING_STEP_RC);
+        expect(calls).toEqual(EXPECTED_ORDER.slice(0, stepNo));
+        expect(r.stderr).toContain(
+          `[${stepNo}/8] npm ${failing} が失敗しました（exit ${FAILING_STEP_RC}）。この段だけ再実行: npm ${failing}`,
+        );
+        expect(r.stdout).not.toContain("全 8 段が通過しました");
+        expect(status).toBe("fail");
+      },
+    );
+  });
+
   it.skipIf(!TOOLKIT_ROOT)(
     "記録直後の check-merge-freshness.sh --remote-head は exit 0",
     () => {
