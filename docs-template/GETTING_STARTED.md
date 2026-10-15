@@ -130,7 +130,7 @@ docs/
 - （必要時）docs/01-business/DOMAIN.md
 
 要件: PROJECT.md の受け入れ基準を満たすこと。テストは 07-quality/TESTING.md のパターン・命名に従い同時生成。
-制約: マジックナンバー/ハードコード禁止（定数or設定から注入）。型安全/エラーパターンは 03-implementation/PATTERNS.md に準拠。
+制約: マジックナンバー/ハードコード禁止（定数or設定から注入）。型安全/エラーパターンは 03-implementation/PATTERNS.md（エラー型は ERRORS.md）に準拠。
 出力: 変更ファイル一覧→実装→テスト→要点サマリ。疑義は実装前に質問。
 ```
 

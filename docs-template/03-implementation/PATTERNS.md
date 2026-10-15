@@ -525,7 +525,7 @@ function describeShape(value: object): Record<string, unknown> {
   }
 }
 
-// Error を構造化する。cause を保持する規約（§3）と対で、cause をログに出す実装が要る —
+// Error を構造化する。cause を保持する規約（§3 / ERRORS.md）と対で、cause をログに出す実装が要る —
 // name / message / stack しか出さないと、ラップ時に保持した上流の失敗理由が
 // どこにも現れない
 function serializeError(error: unknown, depth = 0): Record<string, unknown> {
