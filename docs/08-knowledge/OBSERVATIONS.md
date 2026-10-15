@@ -254,14 +254,16 @@ Markdown 内コード例の編集を Python の厳密一致置換で当て、そ
 
 ### OBS-016: zsh では終了コード取得の bash イディオムがそのまま動かない — `PIPESTATUS` は小文字 1 始まり、`status` は読み取り専用のため、パイプ越しのゲート判定が黙って空振りする
 
-| Kind | problem | Count | 2 |
+| Kind | problem | Count | 3 |
 | First | 2026-09-07 | Last | 2026-10-15 |
-| Status | active | Issue | なし |
+| Status | mitigated | Issue | doc:plugins/ff-dev-toolkit/PUBLIC-SURFACE.md#2-1-契約hookshooksjson-が登録する入口 |
 
 長時間ゲートの結果をパイプで `tail` に流すと `${PIPESTATUS[0]}` が空になり（zsh は `pipestatus` で 1 始まり）、続けて `status=$?` で受けようとすると `read-only variable: status` で代入行から落ちる → ゲートはログファイルへリダイレクトし、次行で `rc=$?` を受けてから `grep` で中身を読む。
 
 - 2026-09-07: PR #519 で `npm run quality:local` の終了コードを 2 回取り損ね、確証のためゲートを 2 回追加実行した（1 回 40 秒前後）。3 回目にログ経由 + `rc=$?` で確定（初回）
 - 2026-10-15: PR #552 の precheck 実行で `${PIPESTATUS[0]}` を書き、ff-dev-toolkit の exit-code guard（`pipestatus` タグ）が実行前に止めた。ログへリダイレクト + `rc=$?` へ書き直す 1 回のやり直しで済んだ
+- 2026-10-15: PR #553 の merge-cleanup 実行で `${PIPESTATUS[0]}` を書き、exit-code guard（`pipestatus` タグ）が実行前に止めた。ログへリダイレクト + `rc=$?` へ書き直す 1 回のやり直しで済んだ
+- 2026-10-15: 状態移行（再発ではない）: Count 3 で閾値に到達したが、2 回目・3 回目とも ff-dev-toolkit の `hooks/guard-exit-code.sh` が実行前に阻止し、元の害（ゲート判定の空振り）は再発していないため昇格を見送り `mitigated` とした。対策の所在は feel-flow/feelflow-plugins の `plugins/ff-dev-toolkit/PUBLIC-SURFACE.md`「2-1. 契約」が登録する PreToolUse フック `hooks/guard-exit-code.sh`（ff-dev-toolkit 0.151.0 で実体を確認）
 
 ---
 
@@ -384,13 +386,14 @@ dry-run で grok-cli が `runtime-socket deny resolution failed` と出ても、
 
 ### OBS-025: 依存未導入のチェックアウトで `quality:local` を走らせると tsc の TS2688 で落ち、原因が「npm ci 未実行」だと読めない
 
-| Kind | problem | Count | 1 |
+| Kind | problem | Count | 2 |
 | First | 2026-10-15 | Last | 2026-10-15 |
 | Status | active | Issue | なし |
 
 `quality:local` は意図的に `npm ci` を含まないため、ルートと `mcp/` の `node_modules` が無いと最初の `build:mcp` が `Cannot find type definition file for 'node'` で落ち、型定義の不備に見えて 1 回ゲートを空費する → ゲート冒頭で `node_modules` の有無を検査し、無ければ `npm ci`（ルートと `mcp/`）を名指しして止めよ。
 
 - 2026-10-15: PR #543 の PR 前ゲートで TS2688 により exit 2。`node_modules` が両方とも不在だと確認し、`npm ci` を 2 か所で実行してから再実行で通過（初回）
+- 2026-10-15: Issue #406 / PR #553 の PR 前ゲートで、ルートの `node_modules` はあったが `mcp/node_modules` が無く TS2688 で exit 2。`npm --prefix mcp ci` 後の再実行で通過
 
 ---
 
@@ -492,5 +495,47 @@ ripgrep はパスを省略すると、stdin が TTY でない限り cwd では�
 `.husky/pre-push` が `npm run quality:local`（ゲート記録の書き込みを含む）を毎回実行するため、commit 直後に手動で回した結果は push の時点でそのまま再計測される → push する予定のコミットでは手動実行を省き、pre-push の実行をゲート実測と記録として扱う。手動実行は push しない段階の確認（commit 前の挙動確認）に限る。
 
 - 2026-10-15: Issue #389 / PR #552。3 回の push すべてで直前に手動実行しており、フルゲート 6 回のうち 3 回が同一 HEAD の重複だった（初回）
+
+---
+
+<a id="obs-033"></a>
+
+### OBS-033: Claude Code のクラウドセッションでは GitHub GraphQL が 403 で遮断され、`gh pr view` 等に依存する `finish.sh precheck` / `cleanup` / `knowledge-lookup` が判定不能で止まる
+
+| Kind | problem | Count | 1 |
+| First | 2026-10-15 | Last | 2026-10-15 |
+| Status | active | Issue | なし |
+
+クラウドセッションの `gh` は REST（`gh api repos/...`）と CCR 経路（`/pulls/{n}/ccr/review_threads` 等）しか通らないため、GraphQL 前提の固定手順は rc 2 / rc 1 で止まり、同じ検査を REST で手組みし直すことになる → 固定手順の gh 呼び出しを REST / CCR 経路へ寄せるか、GraphQL 不通を検出したら REST の同等手順へ自動で切り替える。
+
+- 2026-10-15: Issue #406 / PR #553。precheck（AC 照合ゲート）・merge-cleanup・knowledge-lookup の 3 箇所が GraphQL 403 で止まり、レビュースレッド・CI・リモート ref・ローカル OID の照合を REST と `git ls-remote` で手動実行した（初回）
+
+---
+
+<a id="obs-034"></a>
+
+### OBS-034: 新規 clone のクラウドセッションでは `origin/HEAD` が未設定で、`finish.sh knowledge-commit probe` が既定ブランチを解決できずに止まる
+
+| Kind | problem | Count | 1 |
+| First | 2026-10-15 | Last | 2026-10-15 |
+| Status | active | Issue | なし |
+
+clone 方式によっては `refs/remotes/origin/HEAD` が作られず、ACE / 観測台帳の書き込み口が最初の probe で rc 1 になり 1 回やり直す → セッション開始時（SessionStart hook 等）に `git remote set-head origin --auto` を済ませるか、書き込み口が未設定を検出したら自分で解決する。
+
+- 2026-10-15: Issue #406 / PR #553 の `/ace-curate` で probe が「origin/HEAD を解決できません」で停止。`git remote set-head origin --auto` 後の再実行で `protection=unknown` を得た（初回）
+
+---
+
+<a id="obs-035"></a>
+
+### OBS-035: Codex CLI が無い環境でも、リポジトリの Codex 自動レビュー（PR open 時と `@codex review`）を待てばクロスモデルの観点を確保できる
+
+| Kind | keep | Count | 1 |
+| First | 2026-10-15 | Last | 2026-10-15 |
+| Status | active | Issue | なし |
+
+`/multi-review` の fast 経路は Codex レーンを CLI 前提で組むため、CLI 未導入だと主担当の直読だけで完了扱いになるが、GitHub 側の Codex 自動レビューは同じ head に対して実指摘を返す → CLI 不在時は PR 上の Codex 自動レビューの完了を待ってからマージ判断し、修正が規則を組み替えた回は `@codex review` で 2 巡目を依頼する。
+
+- 2026-10-15: Issue #406 / PR #553。主担当の直読は指摘 0 件だったが、Codex 自動レビューが 1 巡目 2 件・2 巡目（`@codex review`）3 件の妥当な指摘を返し、すべてマージ前に解消した（初回）
 
 ---
