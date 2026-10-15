@@ -168,14 +168,15 @@ AC の grep を頭で組んで起票すると、検出式の穴（表記の必�
 
 ### OBS-010: ACE 系スキルは PLAYBOOK を `docs/08-knowledge/` 固定で参照するが、テンプレ配布リポジトリでは実体が `docs-template/08-knowledge/` にある
 
-| Kind | problem | Count | 2 |
-| First | 2026-09-06 | Last | 2026-09-07 |
-| Status | active | Issue | なし |
+| Kind | problem | Count | 3 |
+| First | 2026-09-06 | Last | 2026-10-15 |
+| Status | mitigated | Issue | feel-flow/feelflow-plugins@2ca0635 plugins/ff-dev-toolkit/skills/ace-curate/references/curate.md「配置先の解決」 |
 
 既定パスで grep・frontmatter 読みを組むと全コマンドが not found で空振りし、パスを直して再実行する往復が出る → 着手時に `package.json` の `ace:*` スクリプトが指すパスで実配置を確定してからコマンドを組む（`/retrospective` の「知見ストアの実配置を確定する」と同じ手順を curate 側にも置く余地）。
 
 - 2026-09-06: PR #502 の curate で最初の情報収集 1 ターンが全件 not found（初回）
 - 2026-09-07: PR #519 の curate で `docs/08-knowledge/` に OBSERVATIONS.md だけがあり PLAYBOOK は `docs-template/` 側という配置差を、実在確認 1 ターンで特定した（再発）
+- 2026-10-15: PR #547 の curate で `docs/08-knowledge/playbook/` を前提に組んだ grep が 3 回空振りし、直近 ACE コミットの `--stat` で実配置を特定した（再発・Count 3）。SSOT の curate.md は既に「配置先の解決（最初に実施）」で記録済み配置（本 repo では `docs/ACE_SETUP.md`）を読む手順を持っており、空振りは手順の読み飛ばしによるものだったため、起票せず mitigated とした
 
 ---
 
@@ -420,3 +421,18 @@ base を別 worktree が保持していると precheck は `--delete-branch` を
 
 - 2026-10-15: PR #546 のマージで MERGE_COMMAND が rc 1。`gh pr view` は MERGED、`git ls-remote` は該当 ref なし、`delete_branch_on_merge=true` を確認（初回）
 - 2026-10-15: toolkit 側の修正で構造的に解消できる種類のため、利用者の起票方針（actionable は承認待ちなしで起票）に従い閾値未達で feel-flow/feelflow-plugins#2135 へ起票
+
+---
+
+<a id="obs-028"></a>
+
+### OBS-028: Bash ツールから `rg` を検索パス無しで起動すると、非 TTY の stdin を読み続けて無言でハングする
+
+| Kind | problem | Count | 1 |
+| First | 2026-10-15 | Last | 2026-10-15 |
+| Status | promoted | Issue | feel-flow/feelflow-plugins#2136 |
+
+ripgrep はパスを省略すると、stdin が TTY でない限り cwd ではなく stdin を検索する。Bash ツールの stdin には EOF が来ないため、出力の無いまま 120 秒のタイムアウトまで待ち、同じ呼び出しで連結した別のコマンドを原因と誤認しやすい → `rg` には検索パス（`.`）を必ず付けるか `</dev/null` を付けよ（codex の stdin 待ちと同じ型）。
+
+- 2026-10-15: PR #547 で `rg ... -g '!node_modules'`（パス無し）が 2 回タイムアウトして exit 144。最初は連結していた `npx prettier` を疑い、切り分けに 1 往復かかった（初回）
+- 2026-10-15: toolkit の Bash ガードで構造的に防げる種類のため、利用者の起票方針（actionable は承認待ちなしで起票）に従い閾値未達で feel-flow/feelflow-plugins#2136 へ起票

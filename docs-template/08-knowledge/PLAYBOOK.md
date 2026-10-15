@@ -1,12 +1,12 @@
 ---
 title: "PLAYBOOK"
-version: "1.54.0"
+version: "1.55.0"
 status: "approved"
 created: "2026-03-10"
 updated: "2026-10-15"
 owner: "@fffokazaki"
 changeImpact: "medium"
-ace_entry_count: 102
+ace_entry_count: 103
 tags: [ace, playbook, knowledge-management]
 references:
   - https://github.com/feel-flow/ai-spec-driven-development/blob/HEAD/docs/ACE_FRAMEWORK.md
@@ -2398,7 +2398,27 @@ pre-push の `quality:local` で symlink CLI テストが 5.1〜6.4s になり v
 
 ---
 
+<a id="ace-547-1"></a>
+
+### ACE-547-1: 配布するテンプレートの手順例が配布元のリポジトリ設定（ラベル等）を前提にするなら、実在確認と不在時の代替経路を同じ例に併記する
+
+| Category | documentation-quality | Origin | PR #547 / Issue #545 |
+| Related | ACE-546-1 |
+| Date | 2026-10-15 |
+| Helpful | 0 | Harmful | 0 |
+| Status | active |
+
+テンプレートは下流のリポジトリへコピーされて使われるが、手順例が前提にするラベル・Epic・ブランチ保護などの設定は下流にあるとは限らない。前提の設定が無いと、検索は黙って空を返し、`--label` 付きの起票は失敗するため、読者は手順の途中で行き詰まる。PR #547 では起票例に `--label "bundle"` を必ず付けており、親による直読と Codex が同じ Warning として独立に検出した。設定を前提にするコマンド例を書くときは、実在を確かめる 1 行と、不在時の読み替え（例: カテゴリ Epic の sub-issue）を同じ例の中に置く。
+
+---
+
 ## Changelog
+
+### [1.55.0] - 2026-10-15
+
+#### 追加
+
+- ACE-547-1: 配布するテンプレートの手順例が配布元のリポジトリ設定（ラベル等）を前提にするなら、実在確認と不在時の代替経路を同じ例に併記する（Issue #545 / PR #547）
 
 ### [1.54.0] - 2026-10-15
 
