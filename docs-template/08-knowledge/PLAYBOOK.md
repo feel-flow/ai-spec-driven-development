@@ -1,12 +1,12 @@
 ---
 title: "PLAYBOOK"
-version: "1.63.0"
+version: "1.64.0"
 status: "approved"
 created: "2026-03-10"
 updated: "2026-10-15"
 owner: "@fffokazaki"
 changeImpact: "medium"
-ace_entry_count: 110
+ace_entry_count: 111
 tags: [ace, playbook, knowledge-management]
 references:
   - https://github.com/feel-flow/ai-spec-driven-development/blob/HEAD/docs/ACE_FRAMEWORK.md
@@ -2509,7 +2509,27 @@ PR #551 では PATTERNS.md §3 を新設の ERRORS.md へ移し、配布物リ�
 
 ---
 
+<a id="ace-559-1"></a>
+
+### ACE-559-1: 依存を外すために lockfile を再生成するときは、CI と同じ Node に同梱の npm で再生成し、追加行を含む差分全体が対象エントリの削除だけかを確かめる
+
+| Category | tooling | Origin | PR #559 / Issue #418 |
+| Related | ACE-484-3 |
+| Date | 2026-10-15 |
+| Helpful | 0 | Harmful | 0 |
+| Status | active |
+
+開発環境の npm が CI より古いメジャーだと、`npm uninstall` は新しい npm が記録したフィールド（`libc` など）を書き出せずに黙って落とし、無関係なエントリの制約まで消す。`libc` が消えたネイティブ依存は「制限なし」として扱われ、Linux で GNU・musl 両方の tarball を取得し得るが、`npm ci` もテストも通るため品質ゲートでは見つからない。lockfile v3 は生成元の npm 版を記録しないので、版は CI の `setup-node` の `node-version`（`engines.node` と揃えたもの）に同梱の npm から決め、`npx npm@<その版>` で再生成する（Node 24 なら npm 11）。再生成後は削除行だけでなく追加行も含む差分全体を見て、対象パッケージと推移依存のエントリの削除以外に何も動いていないことを確かめてからコミットする。
+
+---
+
 ## Changelog
+
+### [1.64.0] - 2026-10-15
+
+#### 追加
+
+- ACE-559-1: 依存を外すために lockfile を再生成するときは、CI と同じ Node に同梱の npm で再生成し、追加行を含む差分全体が対象エントリの削除だけかを確かめる（Issue #418 / PR #559）
 
 ### [1.63.0] - 2026-10-15
 
