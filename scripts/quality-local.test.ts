@@ -314,24 +314,36 @@ describe("quality:local gate record (Issue #515)", () => {
       }
     }
 
-    it("成功時は 8 段を従来の順で呼び、各段の開始ラベルを出す", () => {
+    it("成功時は 8 段を従来の順で呼び、各段の開始ラベルが実際の呼び出しと一致する", () => {
       const { r, calls, status } = runWithStub(null);
       expect(r.status, r.stderr).toBe(0);
       expect(calls).toEqual(EXPECTED_ORDER);
-      expect(r.stdout).toContain("==> quality:local [1/8] npm run build:mcp");
-      expect(r.stdout).toContain("==> quality:local [8/8] npm run lint:md");
+      const labels = r.stdout
+        .split("\n")
+        .filter((line) => line.startsWith("==> quality:local "));
+      expect(labels).toEqual(
+        EXPECTED_ORDER.map(
+          (args, i) => `==> quality:local [${i + 1}/${EXPECTED_ORDER.length}] npm ${args}`,
+        ),
+      );
+      expect(r.stdout).toContain("✓ quality:local: 全 8 段が通過しました");
       expect(status).toBe("pass");
     });
 
-    it("途中の段が落ちたらその段の終了コードを返し、段名を stderr に出して後続を呼ばない", () => {
-      const { r, calls, status } = runWithStub("run test:ace-scripts");
-      expect(r.status).toBe(FAILING_STEP_RC);
-      expect(calls).toEqual(EXPECTED_ORDER.slice(0, 4));
-      expect(r.stderr).toContain(
-        `[4/8] npm run test:ace-scripts が失敗しました（exit ${FAILING_STEP_RC}）`,
-      );
-      expect(status).toBe("fail");
-    });
+    it.each([1, 4, 8])(
+      "%i 段目が落ちたらその段の終了コードを返し、段名を stderr に出して後続を呼ばない",
+      (stepNo) => {
+        const failing = EXPECTED_ORDER[stepNo - 1];
+        const { r, calls, status } = runWithStub(failing);
+        expect(r.status).toBe(FAILING_STEP_RC);
+        expect(calls).toEqual(EXPECTED_ORDER.slice(0, stepNo));
+        expect(r.stderr).toContain(
+          `[${stepNo}/8] npm ${failing} が失敗しました（exit ${FAILING_STEP_RC}）。この段だけ再実行: npm ${failing}`,
+        );
+        expect(r.stdout).not.toContain("全 8 段が通過しました");
+        expect(status).toBe("fail");
+      },
+    );
   });
 
   it.skipIf(!TOOLKIT_ROOT)(

@@ -13,41 +13,31 @@ cd "$ROOT"
 
 START_HEAD="$(git rev-parse HEAD 2>/dev/null || true)"
 
-# 段の表示名。run_step の case と同じ順・同じ数で並べる。順序を変えるときは §3.3 も更新する。
-STEP_LABELS=(
-  "npm run build:mcp"
-  "npm run check"
-  "npm --prefix mcp test"
-  "npm run test:ace-scripts"
-  "npm run validate -- docs-template"
-  "npm run build:spec-index"
-  "npm run format:md:check"
-  "npm run lint:md"
+# 各段の npm 引数。表示ラベルと実行コマンドはどちらもこの 1 か所から作る（対応がずれないように）。
+# 引数は空白区切りで分割するので、空白や glob 文字を含む引数は置かない。
+# 順序を変えるときは docs/NO_GITHUB_ACTIONS_MIGRATION_DESIGN.md §3.3 と
+# scripts/quality-local.test.ts の EXPECTED_ORDER も更新する（§3.2 は旧 ci.yml の記録なので追従しない）。
+STEPS=(
+  "run build:mcp"
+  "run check"
+  "--prefix mcp test"
+  "run test:ace-scripts"
+  "run validate -- docs-template"
+  "run build:spec-index"
+  "run format:md:check"
+  "run lint:md"
 )
 
-run_step() {
-  case "$1" in
-    0) npm run build:mcp ;;
-    1) npm run check ;;
-    2) npm --prefix mcp test ;;
-    3) npm run test:ace-scripts ;;
-    4) npm run validate -- docs-template ;;
-    5) npm run build:spec-index ;;
-    6) npm run format:md:check ;;
-    7) npm run lint:md ;;
-    *) echo "quality:local: 未定義の段 ${1}" >&2; return 2 ;;
-  esac
-}
-
-STEP_COUNT=${#STEP_LABELS[@]}
+STEP_COUNT=${#STEPS[@]}
 GATE_RC=0
 i=0
 while [ "$i" -lt "$STEP_COUNT" ]; do
-  label="${STEP_LABELS[$i]}"
+  read -r -a step_args <<< "${STEPS[$i]}"
+  label="npm ${STEPS[$i]}"
   step_no=$((i + 1))
   echo "==> quality:local [${step_no}/${STEP_COUNT}] ${label}"
   step_rc=0
-  run_step "$i" || step_rc=$?
+  npm "${step_args[@]}" || step_rc=$?
   if [ "$step_rc" -ne 0 ]; then
     GATE_RC=$step_rc
     echo "✗ quality:local: [${step_no}/${STEP_COUNT}] ${label} が失敗しました（exit ${step_rc}）。この段だけ再実行: ${label}" >&2
