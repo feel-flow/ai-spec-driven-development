@@ -223,7 +223,26 @@ docs/
 
 ## ライセンス
 
-[MIT License](./LICENSE)
+このリポジトリは、ファイルによってライセンスが異なります。
+
+| 対象                                                                      | ライセンス                                               |
+| ------------------------------------------------------------------------- | -------------------------------------------------------- |
+| `docs-template/` のコア7文書（下記）                                      | [Apache License 2.0](./docs-template/SOURCE_LICENSE.txt) |
+| 上記以外のすべてのファイル（`docs-template/` 内の拡張文書・ガイドを含む） | [MIT License](./LICENSE)                                 |
+
+Apache License 2.0 が適用されるコア7文書:
+
+- [`docs-template/MASTER.md`](./docs-template/MASTER.md)
+- [`docs-template/01-context/PROJECT.md`](./docs-template/01-context/PROJECT.md)
+- [`docs-template/02-design/ARCHITECTURE.md`](./docs-template/02-design/ARCHITECTURE.md)
+- [`docs-template/02-design/DOMAIN.md`](./docs-template/02-design/DOMAIN.md)
+- [`docs-template/03-implementation/PATTERNS.md`](./docs-template/03-implementation/PATTERNS.md)
+- [`docs-template/04-quality/TESTING.md`](./docs-template/04-quality/TESTING.md)
+- [`docs-template/05-operations/DEPLOYMENT.md`](./docs-template/05-operations/DEPLOYMENT.md)
+
+これらは ff-dev-toolkit（`feel-flow/feelflow-plugins`）から取り込んだ文書です。出所のリポジトリ・コミット・版・各ファイルのハッシュは [`docs-template/.template-source.json`](./docs-template/.template-source.json) に記録しています。どのファイルが対象かは `.template-source.json` の `files` が正本で、上の一覧はそれを写したものです。
+
+コア7文書をコピーして使う場合は、[`SOURCE_LICENSE.txt`](./docs-template/SOURCE_LICENSE.txt) を同梱し、出所の記録を残してください。改変したファイルには、改変した旨の表示が必要です（条件の詳細は `SOURCE_LICENSE.txt` の第4条）。取り込みと配布の手順は [テンプレート直接配布ガイド](./docs/TEMPLATE_EXPORT.md) を参照してください。
 
 ## リリース
 
