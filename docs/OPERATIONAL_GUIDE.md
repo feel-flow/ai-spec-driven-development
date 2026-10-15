@@ -13,7 +13,7 @@ references:
   - docs-template/02-design/ARCHITECTURE.md
   - AI_SPEC_DRIVEN_DEVELOPMENT.md
   - docs/FRONTMATTER_GUIDE.md
-changeImpact: medium
+changeImpact: low
 visibility: public
 ---
 
