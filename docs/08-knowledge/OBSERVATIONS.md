@@ -398,11 +398,25 @@ dry-run で grok-cli が `runtime-socket deny resolution failed` と出ても、
 
 | Kind | problem | Count | 1 |
 | First | 2026-10-15 | Last | 2026-10-15 |
-| Status | promoted | Issue | feel-flow/ai-spec-driven-development#544 |
+| Status | mitigated | Issue | feel-flow/ai-spec-driven-development#544 / doc:AGENTS.md#スコープ外問題の取り扱い |
 
 入口文書が「発見 = 起票」のままだと、AGENTS.md を読む CLI（Codex など）は YAGNI → 同 PR インライン → 既存 bundle 追記 → bundle 単位で起票の 4 段判定を経ずに Issue を量産する → AGENTS.md の該当節を 4 段判定へ書き換え、CLAUDE.md とのパリティを workflow-doctor で確認せよ。
 
 - 2026-10-15: PR #543 後の振り返り冒頭で `workflow-doctor.sh --offline` が `AGENTS.md:427` を FAIL（fail=1 warn=1）（初回）
 - 2026-10-15: 実害（Issue 量産の誘導）が入口文書に常駐する種類のため、利用者の起票方針（actionable は承認待ちなしで起票）に従い閾値未達で #544 へ起票
+- 2026-10-15: 状態移行（再発ではない）promoted → mitigated。#544 は PR #546（squash 78d9da3）で closed。`AGENTS.md`「スコープ外問題の取り扱い」を 4 段判定へ書き換え、`CLAUDE.md` にも同じ節を置いたことを develop 78d9da3 で確認。`workflow-doctor.sh --offline` は fail=0 warn=0。同じ旧文言が残る他 6 ファイルは #545（Epic #530 配下）で追跡中
 
 ---
+
+<a id="obs-027"></a>
+
+### OBS-027: `finish.sh precheck` が separate-push で生成する MERGE_COMMAND は、`delete_branch_on_merge=true` のリポジトリでは head 削除 push が `cannot lock ref` で落ち、マージ成功でも rc 1 を返す
+
+| Kind | problem | Count | 1 |
+| First | 2026-10-15 | Last | 2026-10-15 |
+| Status | promoted | Issue | feel-flow/feelflow-plugins#2135 |
+
+base を別 worktree が保持していると precheck は `--delete-branch` を外し、lease 付きの削除 push を `&&` で連結する。GitHub がマージ時に head を消すリポジトリでは、この削除が必ず失敗する。その結果マージ成否の判別に `gh pr view` / `ls-remote` での実測が 1 回余計に要る → precheck は削除の生成前にリポジトリ設定か ref の実在を確かめ、ref が無ければ削除をスキップして成功扱いにせよ。
+
+- 2026-10-15: PR #546 のマージで MERGE_COMMAND が rc 1。`gh pr view` は MERGED、`git ls-remote` は該当 ref なし、`delete_branch_on_merge=true` を確認（初回）
+- 2026-10-15: toolkit 側の修正で構造的に解消できる種類のため、利用者の起票方針（actionable は承認待ちなしで起票）に従い閾値未達で feel-flow/feelflow-plugins#2135 へ起票

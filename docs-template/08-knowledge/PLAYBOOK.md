@@ -1,12 +1,12 @@
 ---
 title: "PLAYBOOK"
-version: "1.53.0"
+version: "1.54.0"
 status: "approved"
 created: "2026-03-10"
 updated: "2026-10-15"
 owner: "@fffokazaki"
 changeImpact: "medium"
-ace_entry_count: 100
+ace_entry_count: 102
 tags: [ace, playbook, knowledge-management]
 references:
   - https://github.com/feel-flow/ai-spec-driven-development/blob/HEAD/docs/ACE_FRAMEWORK.md
@@ -2026,7 +2026,7 @@ Toolkit comment-analyzer が Critical C1/C2 として独立検出、Copilot revi
 | Category | process | Origin | PR #505 / Issue #466 |
 | Related | ACE-010 / ACE-043 |
 | Date | 2026-09-06 |
-| Helpful | 0 | Harmful | 0 |
+| Helpful | 1 | Harmful | 0 |
 | Status | active |
 
 `review-config.yaml` → `agent-config.yaml` の統一で `docs-template/` と `README.md` は grep して直したが、`format:md` / `lint:md` の glob（`docs/**` `docs-template/**` `*.md`）に含まれない `.claude/commands/setup-ai-config.md` の案内文が残り、Toolkit code-reviewer の Warning になった。同ディレクトリは pre-commit の変更ファイル lint でしか検査されないため、既存の MD060 違反も同時に露出した。名称・パス・既定値を統一する PR では、grep の起点を「品質ゲートが見る範囲」ではなく「リポジトリ全体から node_modules / .git を除いた範囲」（`git grep -n '<旧名>'`）にし、ヒット先が現役の案内文か履歴記録（PLAYBOOK・Changelog）かを分類してから直す。
@@ -2371,7 +2371,45 @@ pre-push の `quality:local` で symlink CLI テストが 5.1〜6.4s になり v
 
 ---
 
+<a id="ace-546-1"></a>
+
+### ACE-546-1: 入口文書の規則が参照する正本を読者が開けないなら、ポインタで済ませず判定条件を本文に自足させる
+
+| Category | documentation | Origin | PR #546 / Issue #544 |
+| Related | ACE-014 |
+| Date | 2026-10-15 |
+| Helpful | 0 | Harmful | 0 |
+| Status | active |
+
+`AGENTS.md` は Codex など、プラグインのスキルを持たない CLI も読む。そのため「正本は `/out-of-scope-issue` を参照」というポインタだけでは、読者が判定の条件にたどり着けない。[ACE-014](#ace-014) の「索引は SSOT へのポインタに留める」が成り立つのは、ポインタ先が読者の環境で開ける場合に限られる。入口文書へ規則を書くときは、正本がプラグインや別リポジトリにあるかを確かめる。読者が開けない場所にあるなら、判定順・境界条件・迷ったときの倒し方を本文に書き、正本は出典として併記する。
+
+---
+
+<a id="ace-546-2"></a>
+
+### ACE-546-2: 文書に載せる一覧取得コマンドは、既定の件数上限で黙って打ち切られないよう各行に上限を明示する
+
+| Category | documentation-quality | Origin | PR #546 / Issue #544 |
+| Date | 2026-10-15 |
+| Helpful | 0 | Harmful | 0 |
+| Status | active |
+
+`gh issue list` は既定で 30 件しか返さず、打ち切ったことも知らせない。「既存の統合先を探してから起票する」手順の検索がここで欠けると、候補が無いと誤って判断され、重複起票につながる。PR #546 では 1 行目にだけ `--limit 200` を付け、2 行目の主要語検索には付け忘れた。ブロック先頭のコメントが「全行に効いている」と読ませたため、レビュー（error-handler-hunt）まで残った。手順書のコード例では、一覧・検索の各行に `--limit` を付ける。注意書きのコメントは、それが効く行の直上に置く。
+
+---
+
 ## Changelog
+
+### [1.54.0] - 2026-10-15
+
+#### 追加
+
+- ACE-546-1: 入口文書の規則が参照する正本を読者が開けないなら、ポインタで済ませず判定条件を本文に自足させる（Issue #544 / PR #546）
+- ACE-546-2: 文書に載せる一覧取得コマンドは、既定の件数上限で黙って打ち切られないよう各行に上限を明示する（Issue #544 / PR #546）
+
+#### カウンター更新
+
+- ACE-505-2: Helpful 0→1（PR #546 で、workflow-doctor の検査対象 4 ファイル外にある同じ旧文言 6 箇所をリポジトリ全体の grep で洗い出し、follow-up #545 へ切り出した再適用）
 
 ### [1.53.0] - 2026-10-15
 
