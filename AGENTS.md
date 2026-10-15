@@ -424,7 +424,7 @@ Always reference MASTER.md for project-specific requirements.
 
 ## スコープ外問題の取り扱い
 
-作業中にスコープ外の問題を見つけたら、起票する前に **YAGNI → 同 PR でインライン修正 → 既存の open `bundle` へ追記 → `bundle` 単位で新規起票** の順で判定する。一律に Issue 化せず、一律に「ついで対応」もしない。判定の正本は ff-dev-toolkit 同梱の `docs-template/05-operations/deployment/git-workflow.md`「bundle（子を全件 1 PR で束ねる着手単位）」節と `/out-of-scope-issue` スキル（§1.2〜§3.1）。スキルを読めない環境でも、以下の手順だけで判定できる。
+作業中にスコープ外の問題を見つけたら、起票する前に **YAGNI → 同 PR でインライン修正 → 既存の open `bundle` へ追記 → `bundle` 単位で新規起票** の順で判定する。一律に Issue 化せず、一律に「ついで対応」もしない。判定の正本は ff-dev-toolkit 同梱の `docs-template/05-operations/deployment/git-workflow.md`「bundle（子を全件 1 PR で束ねる着手単位）」節と `/out-of-scope-issue` スキル（§1.2〜§3.1b）。スキルを読めない環境でも、以下の手順だけで判定できる。
 
 ### 先に除外するもの（スコープ外ではない）
 
@@ -451,9 +451,11 @@ Always reference MASTER.md for project-specific requirements.
 
 ```bash
 repo="OWNER/REPO"
-# 統合先の候補を先に列挙する（--limit を付けないと 30 件で打ち切られる）
+# bundle ラベルの実在を先に確かめる（無いリポジトリでは --label bundle の検索は常に空になる）
+gh label list --repo "$repo" --search bundle --json name
+# 統合先の候補を列挙する（どちらも --limit を付けないと 30 件で打ち切られる）
 gh issue list --repo "$repo" --state open --label bundle --limit 200 --json number,title,url
-gh issue list --repo "$repo" --state open --search "{主要語} in:title,body" --json number,title,url
+gh issue list --repo "$repo" --state open --search "{主要語} in:title,body" --limit 200 --json number,title,url
 
 # 3. 同テーマの bundle があればコメントで追記する
 gh issue comment <bundle番号> --repo "$repo" --body "- [ ] 発見の要約（発見元: PR #NNN）"
