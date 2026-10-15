@@ -1,12 +1,12 @@
 ---
 title: "PLAYBOOK"
-version: "1.56.0"
+version: "1.57.0"
 status: "approved"
 created: "2026-03-10"
 updated: "2026-10-15"
 owner: "@fffokazaki"
 changeImpact: "medium"
-ace_entry_count: 104
+ace_entry_count: 105
 tags: [ace, playbook, knowledge-management]
 references:
   - https://github.com/feel-flow/ai-spec-driven-development/blob/HEAD/docs/ACE_FRAMEWORK.md
@@ -2425,7 +2425,26 @@ SBOM などの生成物は「生成できた」時点で完了と報告されや
 
 ---
 
+<a id="ace-549-1"></a>
+
+### ACE-549-1: follow-up Issue に書かれた行数などの実測値は起票時点の値として扱い、着手時に測り直して計画した変更量で受け入れ条件を満たせるかを先に計算する
+
+| Category | documentation-quality | Origin | PR #549 / Issue #511 |
+| Date | 2026-10-15 |
+| Helpful | 0 | Harmful | 0 |
+| Status | active |
+
+レビューから分離した follow-up Issue は、起票後も元の PR の修正が続くため、本文の数値（行数・件数など）が着手時には古くなっている。Issue #511 は 862 行の前提で「§1 を分離すれば 700 行前後」と見積もっていたが、着手時の実測は 980 行で、その案だけでは約 817 行となり 800 行以下という AC を満たせなかった。着手時に対象を実測し、計画した移設量・削減量で AC の閾値を下回るかを実装前に計算する。足りなければ追加の移設先を選び、その理由を PR 本文に書く。
+
+---
+
 ## Changelog
+
+### [1.57.0] - 2026-10-15
+
+#### 追加
+
+- ACE-549-1: follow-up Issue に書かれた行数などの実測値は起票時点の値として扱い、着手時に測り直して計画した変更量で受け入れ条件を満たせるかを先に計算する（Issue #511 / PR #549）
 
 ### [1.56.0] - 2026-10-15
 
