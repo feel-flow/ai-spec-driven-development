@@ -424,26 +424,50 @@ Always reference MASTER.md for project-specific requirements.
 
 ## スコープ外問題の取り扱い
 
-作業中にスコープ外の問題を発見した場合、**即座にGitHub Issueを作成**し、現在のタスクに集中すること。
+作業中にスコープ外の問題を見つけたら、起票する前に **YAGNI → 同 PR でインライン修正 → 既存の open `bundle` へ追記 → `bundle` 単位で新規起票** の順で判定する。一律に Issue 化せず、一律に「ついで対応」もしない。判定の正本は ff-dev-toolkit 同梱の `docs-template/05-operations/deployment/git-workflow.md`「bundle（子を全件 1 PR で束ねる着手単位）」節と `/out-of-scope-issue` スキル（§1.2〜§3.1b）。スキルを読めない環境でも、以下の手順だけで判定できる。
 
-### 手順
+### 先に除外するもの（スコープ外ではない）
 
-1. **スコープを拡大しない** — 現在のIssueに集中
-2. **GitHub Issueを即座に作成**:
+次は後続 Issue へ送らず、マージ前に現 PR で解消する。
 
-   ```bash
-   gh issue create --title "fix: 問題の説明" --body "詳細..." --label "bug"
-   ```
+- 現在の diff が導入・悪化させた回帰
+- 現 Issue の受け入れ条件・既存契約・必須品質ゲートを満たすために必要な修正
+- レビューの Critical / Warning
 
-3. **PRに関連Issueを記載**（ブロッキングでない場合）
-4. **現在の作業を続行**
+### 判定（順序を変えない）
+
+1. **YAGNI** — 現在の根拠（再現例・利用者影響・運用上の痛み・レビュー根拠）も、検証できる受け入れ条件も示せないなら、修正せず Issue も作らない。理由を 1 行だけ報告する。セキュリティ・データ損失・法令違反の合理的なリスクは「現在の根拠」に含む
+2. **同 PR でインライン修正** — 次のどれにも明確に該当しなければ、現 PR の fix commit に束ねる（現在触っているファイルに限らず、近傍の設定・隣接ドキュメントの小変更を含む）
+   - 仕様判断が必要
+   - 別モジュールへ波及する
+   - 独立した受け入れ条件・検証環境が要る
+   - 実装・本文の変更が 10 行を超える見込み（テスト・fixture は数えない）
+3. **既存の open `bundle` へ追記** — 上のどれかに該当するなら、新規作成より先に同じテーマの open `bundle` を探し、あればチェックリスト 1 行をコメントで追記する（独立した再現手順を持つ発見だけ、その `bundle` の sub-issue として起票する）
+4. **`bundle` 単位で新規起票** — 統合先が無いときだけ、同じ PR から出た同テーマの発見を 1 つの `bundle` にまとめて起票する。カテゴリ Epic があれば、その sub-issue として紐付ける
+
+迷ったときは、必要性を説明できなければ YAGNI、仕様判断の要否と別モジュールへの波及に確信が持てなければ Issue 側、それ以外（規模・局所性・検証の重さ）の迷いはインライン側へ倒す。
+
+### 手順（3・4 の場合）
+
+```bash
+repo="OWNER/REPO"
+# bundle ラベルの実在を先に確かめる（無いリポジトリでは --label bundle の検索は常に空になる）
+gh label list --repo "$repo" --search bundle --json name
+# 統合先の候補を列挙する（どちらも --limit を付けないと 30 件で打ち切られる）
+gh issue list --repo "$repo" --state open --label bundle --limit 200 --json number,title,url
+gh issue list --repo "$repo" --state open --search "{主要語} in:title,body" --limit 200 --json number,title,url
+
+# 3. 同テーマの bundle があればコメントで追記する
+gh issue comment <bundle番号> --repo "$repo" --body "- [ ] 発見の要約（発見元: PR #NNN）"
+```
+
+統合先が無い場合は `/create-issue --bundle`（カテゴリ Epic があれば `--parent <Epic番号>`）で起票する。type・priority・`follow-up` / `bundle` ラベルは実在を確認してから付け、親無しの単独 Issue を既定で作らない。`bundle` ラベルが無いリポジトリでは、テーマの合うカテゴリ Epic の sub-issue として起票する。検索が失敗した（非 0 終了・認証エラーなど）ときは「候補なし」とみなさず、起票を止めて原因を報告する。
 
 ### 報告形式
 
 ```text
-📋 スコープ外の問題を発見しました
-Issue #XXX を作成しました: [タイトル]
-優先度: Critical / High / Medium / Low
+📋 スコープ外の発見: [要約]
+判定: YAGNI（理由: …） / 同 PR で修正（commit abc1234） / bundle #XXX へ追記 / bundle #XXX を新規起票
 ```
 
 ---

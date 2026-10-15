@@ -229,6 +229,17 @@ When making changes:
 4. Ensure MCP server builds successfully after doc changes (`cd mcp && npm run check`)
 5. Keep magic number prohibition guidelines updated
 
+## スコープ外の発見の扱い
+
+作業中・レビュー中のスコープ外の発見は、起票する前に **YAGNI → 同 PR でインライン修正 → 既存の open `bundle` へ追記 → `bundle` 単位で新規起票** の順で判定し、実行は `/out-of-scope-issue` に委ねる。
+
+- 現 diff が導入した回帰・現 Issue の受け入れ条件・Critical / Warning の解消はスコープ外ではない。現 PR で直す
+- 根拠（再現例・利用者影響・運用上の痛み・レビュー根拠）も受け入れ条件も示せなければ YAGNI として理由だけ記録し、Issue は作らない。セキュリティ・データ損失・法令違反の合理的なリスクは根拠に含む
+- 仕様判断・別モジュールへの波及・独立した検証・10 行超の変更のどれにも明確に該当しなければ、同 PR で直す
+- 該当するなら同じテーマの open `bundle` へ追記し、統合先が無いときだけ `bundle` 単位で起票する。親無しの単独 Issue を既定で作らない（このリポジトリに `bundle` ラベルが無い間は、テーマの合うカテゴリ Epic の sub-issue にする）
+
+判定条件と手順の詳細は [AGENTS.md「スコープ外問題の取り扱い」](AGENTS.md#スコープ外問題の取り扱い) を参照。
+
 ## Special Considerations
 
 - **Version control** — All changes should maintain the integrity of the core document system and its extensions
