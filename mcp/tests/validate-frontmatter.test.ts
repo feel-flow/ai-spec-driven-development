@@ -1,8 +1,10 @@
 import { describe, it, expect } from 'vitest';
 import { execFileSync } from 'child_process';
+import { readdirSync, readFileSync } from 'fs';
 import path from 'path';
 
 const SCRIPT: string = path.resolve(__dirname, '../../scripts/validate-docs.mjs');
+const MASTER_TEMPLATE: string = path.resolve(__dirname, '../../docs-template/MASTER.md');
 const VALID_DOCS: string = path.resolve(__dirname, 'fixtures/valid-docs');
 const INVALID_DOCS: string = path.resolve(__dirname, 'fixtures/invalid-docs');
 const NO_FRONTMATTER_DOCS: string = path.resolve(__dirname, 'fixtures/no-frontmatter-docs');
@@ -10,6 +12,15 @@ const NO_FRONTMATTER_DOCS: string = path.resolve(__dirname, 'fixtures/no-frontma
 const EXIT_SUCCESS = 0;
 const EXIT_FAILURE = 1;
 const EXPECTED_INVALID_ERRORS = 4;
+const CORE_STATUS_VALUES = ['draft', 'review', 'approved', 'deprecated'];
+
+/** fixture 配下の全 .md から frontmatter の status 値を集める */
+function collectStatuses(docsDir: string): string[] {
+  return readdirSync(docsDir, { recursive: true, encoding: 'utf-8' })
+    .filter((name) => name.endsWith('.md'))
+    .map((name) => readFileSync(path.join(docsDir, name), 'utf-8').match(/^status:\s*"?([a-z]+)"?\s*$/m)?.[1])
+    .filter((status): status is string => status !== undefined);
+}
 
 /** execFileSync のエラーが子プロセスの終了コードエラーかを判定する型ガード */
 const isExecError = (value: unknown): value is { stdout: string; stderr: string; status: number } =>
@@ -39,11 +50,27 @@ describe('validate-docs.mjs Frontmatter バリデーション', () => {
     });
 
     it('status の 4 値（draft / review / approved / deprecated）をすべて受理する', () => {
-      // fixture は 4 値を 1 文書以上ずつ使う。deprecated は MASTER.md の終端状態（Issue #556）
+      // deprecated は MASTER.md の終端状態（Issue #556）。fixture が値を失うと検証範囲が黙って狭まるため、先に集合を確かめる
+      expect(new Set(collectStatuses(VALID_DOCS))).toEqual(new Set(CORE_STATUS_VALUES));
+
       const { stdout, exitCode } = run(VALID_DOCS);
 
       expect(exitCode).toBe(EXIT_SUCCESS);
       expect(stdout).not.toContain('は無効です');
+    });
+
+    it('VALID_STATUS_VALUES が正本 MASTER.md の有効値と一致する', () => {
+      // 正本（MASTER.md）だけが更新されて検証側が追従しないずれ（Issue #556）を検出する
+      const master = readFileSync(MASTER_TEMPLATE, 'utf-8');
+      const masterRow = master.split('\n').find((line) => line.includes('| status') && line.includes('有効値:'));
+      const masterValues = [...(masterRow ?? '').matchAll(/`([a-z]+)`/g)].map((match) => match[1]);
+
+      const script = readFileSync(SCRIPT, 'utf-8');
+      const constLine = script.split('\n').find((line) => line.startsWith('const VALID_STATUS_VALUES'));
+      const scriptValues = [...(constLine ?? '').matchAll(/'([a-z]+)'/g)].map((match) => match[1]);
+
+      expect(masterValues).toEqual(CORE_STATUS_VALUES);
+      expect(scriptValues).toEqual(CORE_STATUS_VALUES);
     });
   });
 

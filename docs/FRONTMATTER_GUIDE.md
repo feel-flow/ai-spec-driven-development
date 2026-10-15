@@ -72,7 +72,7 @@ frontmatter の `title` / `tags` / `references` / `status` / `changeImpact` は�
 - `status` 値が enum（`draft|review|approved|deprecated`）に収まっているか
 - `version` が SemVer に従っているか
 
-を検証し、エラー検出時は `exitCode = 1` をセット（[validate-docs.mjs:108-135 でエラー組み立て、243/257 で代入](../scripts/validate-docs.mjs)）、最終的に `process.exit(exitCode)` で CI を落とす（line 275）。
+を検証し、エラー検出時は `exitCode = 1` をセット（[validate-docs.mjs](../scripts/validate-docs.mjs) の `validateFrontMatter` でエラーを組み立て、`runValidation` で代入）、最終的に `process.exit(runValidation(DOCS_DIR))` で CI を落とす。
 
 ### 1.4 変更影響と Changelog を連動させるため
 
@@ -489,6 +489,7 @@ frontmatter 管理（編集・検証・索引化）は Node スクリプトと�
 
 - コア 7 文書・拡張文書の `status` を 4 値（`draft | review | approved | deprecated`）に更新。MASTER.md 1.4.0 で上流から取り込んだ終端状態 `deprecated` に追従していなかったのを解消した（TL;DR、§1.3、§3 表と SSOT 注意、§5.1 の雛形・ワークフロー・表、§5.4.1 比較表）（[Issue #556](https://github.com/feel-flow/ai-spec-driven-development/issues/556)）
 - 正本の指し先を統一。コア 7 文書・拡張文書と `docs/specs/` の正本は MASTER.md、本ガイド §5.1 / §5.2 はその写しとし、`docs/` 方法論ガイドスキーマだけを本ガイド §5.6 の正本とした（TL;DR、§3 SSOT 注意、§8）
+- §1.3: 古くなっていた `validate-docs.mjs` の行番号参照を関数名（`validateFrontMatter` / `runValidation`）に置き換え
 
 ### [1.6.0] - 2026-10-15
 
