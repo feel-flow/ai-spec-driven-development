@@ -256,14 +256,14 @@ Markdown 内コード例の編集を Python の厳密一致置換で当て、そ
 
 | Kind | problem | Count | 3 |
 | First | 2026-09-07 | Last | 2026-10-15 |
-| Status | mitigated | Issue | feel-flow/feelflow-plugins plugins/ff-dev-toolkit/hooks/guard-exit-code.sh |
+| Status | mitigated | Issue | doc:plugins/ff-dev-toolkit/PUBLIC-SURFACE.md#2-1-契約hookshooksjson-が登録する入口 |
 
 長時間ゲートの結果をパイプで `tail` に流すと `${PIPESTATUS[0]}` が空になり（zsh は `pipestatus` で 1 始まり）、続けて `status=$?` で受けようとすると `read-only variable: status` で代入行から落ちる → ゲートはログファイルへリダイレクトし、次行で `rc=$?` を受けてから `grep` で中身を読む。
 
 - 2026-09-07: PR #519 で `npm run quality:local` の終了コードを 2 回取り損ね、確証のためゲートを 2 回追加実行した（1 回 40 秒前後）。3 回目にログ経由 + `rc=$?` で確定（初回）
 - 2026-10-15: PR #552 の precheck 実行で `${PIPESTATUS[0]}` を書き、ff-dev-toolkit の exit-code guard（`pipestatus` タグ）が実行前に止めた。ログへリダイレクト + `rc=$?` へ書き直す 1 回のやり直しで済んだ
 - 2026-10-15: PR #553 の merge-cleanup 実行で `${PIPESTATUS[0]}` を書き、exit-code guard（`pipestatus` タグ）が実行前に止めた。ログへリダイレクト + `rc=$?` へ書き直す 1 回のやり直しで済んだ
-- 2026-10-15: 状態移行（再発ではない）: Count 3 で閾値に到達したが、2 回目・3 回目とも ff-dev-toolkit の `hooks/guard-exit-code.sh` が実行前に阻止し、元の害（ゲート判定の空振り）は再発していないため昇格を見送り `mitigated` とした（ff-dev-toolkit 0.151.0 でフック実体を確認）
+- 2026-10-15: 状態移行（再発ではない）: Count 3 で閾値に到達したが、2 回目・3 回目とも ff-dev-toolkit の `hooks/guard-exit-code.sh` が実行前に阻止し、元の害（ゲート判定の空振り）は再発していないため昇格を見送り `mitigated` とした。対策の所在は feel-flow/feelflow-plugins の `plugins/ff-dev-toolkit/PUBLIC-SURFACE.md`「2-1. 契約」が登録する PreToolUse フック `hooks/guard-exit-code.sh`（ff-dev-toolkit 0.151.0 で実体を確認）
 
 ---
 
