@@ -1,6 +1,6 @@
 ---
 title: "PLAYBOOK"
-version: "1.59.0"
+version: "1.60.0"
 status: "approved"
 created: "2026-03-10"
 updated: "2026-10-15"
@@ -27,14 +27,15 @@ GitHub Discussions が「人間が読むためのナラティブ（物語的記�
 
 ### 運用ルール
 
-| ルール                             | 説明                                                                                                                                                   |
-| ---------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| **末尾追記のみ**                   | エントリは常にファイル末尾に追記。既存エントリの本文（新形式の散文 / 旧形式の Insight/Context/Action）書き換えは禁止。カウンター更新・Status変更は許可 |
-| **カウンターはインクリメントのみ** | Helpful/Harmful は +1 のみ。減算・リセットはしない                                                                                                     |
-| **削除禁止**                       | エントリを物理的に削除しない。不要な場合は `Status: deprecated` に変更                                                                                 |
-| **密度超過時は正準化 → refine**    | 行数上限は件数から導出する（詳細は [行数・件数の方針](#行数件数の方針)）                                                                               |
-| **Frontmatter更新**                | エントリ追加時に `version`, `updated`, `ace_entry_count` を更新                                                                                        |
-| **コミット規則**                   | `knowledge: ACE-XXX [category] [summary]` 形式で記録                                                                                                   |
+| ルール                             | 説明                                                                                                                                                                                                                                                          |
+| ---------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **末尾追記のみ**                   | エントリは常にファイル末尾に追記。既存エントリの本文（新形式の散文 / 旧形式の Insight/Context/Action）書き換えは禁止（唯一の例外は次行の「事実訂正の例外」）。カウンター更新・Status変更は許可                                                                |
+| **事実訂正の例外**                 | 1 次情報で誤りを示せる事実主張（PR / Issue 番号・コミットハッシュ・数値）の訂正に限る限定例外。条件の正本は [ACE_SETUP.md §4](https://github.com/feel-flow/ai-spec-driven-development/blob/HEAD/docs/ACE_SETUP.md#ace-ops-template)（ここに条件を複製しない） |
+| **カウンターはインクリメントのみ** | Helpful/Harmful は +1 のみ。減算・リセットはしない                                                                                                                                                                                                            |
+| **削除禁止**                       | エントリを物理的に削除しない。不要な場合は `Status: deprecated` に変更                                                                                                                                                                                        |
+| **密度超過時は正準化 → refine**    | 行数上限は件数から導出する（詳細は [行数・件数の方針](#行数件数の方針)）                                                                                                                                                                                      |
+| **Frontmatter更新**                | エントリ追加時に `version`, `updated`, `ace_entry_count` を更新                                                                                                                                                                                               |
+| **コミット規則**                   | `knowledge: ACE-XXX [category] [summary]` 形式で記録                                                                                                                                                                                                          |
 
 ### エントリID規則
 
@@ -651,7 +652,7 @@ ACE エントリ ID は **PRスコープ式** を採用する（このセクシ�
 
 **Insight**: セクションヘッダーを目印にしてファイル末尾を書き換える自動生成ツール（backlinks 自動更新、TOC 自動生成、auto-changelog 等）は、**そのマーカー文字列を本文中に説明として書いているドキュメントを破壊する**。マーカーが「セクション開始位置」と「本文の説明文」の両方の意味で出現するため、ツールは説明文の途中をセクション開始と誤認し、それ以降を全削除する。`tsc` や `npm test` では検出できない（ファイルは valid な markdown のまま）。問題はランタイムにのみ顕在化し、被害は破壊されたファイルが PR に紛れ込んだ後に気づく。
 
-**Context**: 2026-02-12 commit `6ea43f8` (PR #311) で導入された `scripts/obsidian-sync.mjs` は各 markdown 末尾に `## Linked from` セクションを自動生成する設計だった。しかし `docs-template/08-knowledge/OBSIDIAN_GUIDE.md` 自身が「`## Linked from` セクションを自動生成する」と本文で説明しており、自動生成スクリプトはその文字列を section header と誤認して **OBSIDIAN_GUIDE.md を 379 行 → 26 行に破壊**（"各ドキュメント末尾に「" の途中で文章切断）。バグは 2026-05-07 の PR #400 マージ時に post-merge hook 経由で実行されて発覚し、Obsidian 統合全体の撤退判断（PR #403）の決定打となった。約 3 ヶ月間 silent に存在していた。
+**Context**: 2026-02-12 commit `6ea43f8`（Issue #311 を参照し PR を経ず develop へ直 commit）で導入された `scripts/obsidian-sync.mjs` は各 markdown 末尾に `## Linked from` セクションを自動生成する設計だった。しかし `docs-template/08-knowledge/OBSIDIAN_GUIDE.md` 自身が「`## Linked from` セクションを自動生成する」と本文で説明しており、自動生成スクリプトはその文字列を section header と誤認して **OBSIDIAN_GUIDE.md を 379 行 → 26 行に破壊**（"各ドキュメント末尾に「" の途中で文章切断）。バグは 2026-05-07 の PR #400 マージ時に post-merge hook 経由で実行されて発覚し、Obsidian 統合全体の撤退判断（PR #403）の決定打となった。約 3 ヶ月間 silent に存在していた。
 
 **Action**: 自動コンテンツ生成ツールを設計する際:
 
@@ -679,7 +680,7 @@ ACE エントリ ID は **PRスコープ式** を採用する（このセクシ�
 
 **Insight**: 「リポジトリ自身が動くプロジェクトでもあり、かつ他者がコピーするテンプレートでもある」二重用途のリポでは、**配布対象ディレクトリ（例: `docs-template/`）にリポ自身の運用インフラを置くと、テンプレ利用者にもノイズが伝播する**。リポメンテナの利便（自分のドキュメント管理を Obsidian でやりたい等）と、テンプレ利用者の最小構成（URL 参照だけで使い始めたい）は本質的に競合する。物理的な分離（別ディレクトリ）でしか解決できず、`.gitignore` や条件分岐では足りない（テンプレを clone する人は `.gitignore` 込みで受け取る）。
 
-**Context**: 本リポは AI 仕様駆動開発の **テンプレートを配布する** ことが第一目的で、利用者は `docs-template/` をコピーして 7 文書ベースで使い始めることを想定している。しかし PR #311 で Obsidian 統合を `docs-template/.obsidian/`、`docs-template/08-knowledge/OBSIDIAN_GUIDE.md`、`docs-template/08-knowledge/OBSIDIAN_EVALUATION.md` 等に配置したことで、**テンプレ利用者にも Obsidian 前提のインフラが付随**するようになった。さらに自動 backlinks 生成が `docs-template/` 配下の全 .md に `## Linked from` セクションを付与する設計だったため、利用者がコピーした瞬間「Obsidian で開く前提のテンプレ」になる。利用者が Obsidian を使わない場合これらは全部ノイズで、AI に読ませた際のトークン消費にも直結する。PR #403 で全削除に至った最大の構造的理由がこれ。
+**Context**: 本リポは AI 仕様駆動開発の **テンプレートを配布する** ことが第一目的で、利用者は `docs-template/` をコピーして 7 文書ベースで使い始めることを想定している。しかし Issue #311 / commit `6ea43f8`（develop 直 commit）で Obsidian 統合を `docs-template/.obsidian/`、`docs-template/08-knowledge/OBSIDIAN_GUIDE.md`、`docs-template/08-knowledge/OBSIDIAN_EVALUATION.md` 等に配置したことで、**テンプレ利用者にも Obsidian 前提のインフラが付随**するようになった。さらに自動 backlinks 生成が `docs-template/` 配下の全 .md に `## Linked from` セクションを付与する設計だったため、利用者がコピーした瞬間「Obsidian で開く前提のテンプレ」になる。利用者が Obsidian を使わない場合これらは全部ノイズで、AI に読ませた際のトークン消費にも直結する。PR #403 で全削除に至った最大の構造的理由がこれ。
 
 **Action**: 二重用途リポを設計する際:
 
@@ -687,7 +688,7 @@ ACE エントリ ID は **PRスコープ式** を採用する（このセクシ�
 2. **リポ自身の運用インフラは配布ディレクトリ外に置く**: Obsidian/Notion/Hugo など特定ツールに依存する設定・スクリプト・ドキュメントは `docs-template/` の外（リポルート直下や `.repo/`、`tools/` 等）に置く。配布対象に入れるのはツール非依存の素の Markdown だけにする。
 3. **配布物の Markdown には自動生成セクションを書き込まない**: backlinks/TOC/メタ情報は配布物本体の中ではなく、別ファイル（`backlinks.json` など）として生成し、それを使いたい利用者が opt-in で参照する形にする。利用者の本文を mutate しない。
 4. **PR レビュー時に「これは配布されるファイルか？」を必ず問う**: `docs-template/` 配下の変更は **テンプレ利用者の受け取りに影響する変更** である。コードレビューチェックリストに「テンプレ利用者は Obsidian/特定ツールがなくても使えるか？」を含める。
-5. **撤退コストの試算を導入時に行う**: 「もし採用しないことになったら何ファイル消すことになるか？」を導入 PR の段階で試算する（PR #403 では 13 ファイル削除 + 7 ファイル編集、+7/-1842 行）。撤退コストが大きすぎる導入は、配布境界外でまず試行するか、採用判断を先延ばしにする。
+5. **撤退コストの試算を導入時に行う**: 「もし採用しないことになったら何ファイル消すことになるか？」を導入 PR の段階で試算する（PR #403 では 13 ファイル削除 + 8 ファイル編集、+7/-1859 行）。撤退コストが大きすぎる導入は、配布境界外でまず試行するか、採用判断を先延ばしにする。
 
 ---
 
@@ -707,7 +708,7 @@ ACE エントリ ID は **PRスコープ式** を採用する（このセクシ�
 
 **Insight**: 機能を削除する PR では、**機能本体ディレクトリ削除 → consumer 編集 → ビルド OK** で完了したように見えるが、**TypeScript の `tsc` は未使用 export を warning しない**ため、その機能のためだけに作られた定数・型・ユーティリティが他モジュールに孤立して残る。`npm run build` も `npm run check` も pass するので CI では検出されない。手動 grep を「機能名 / 機能専用識別子」で実行しないと dead code として静かに残り続ける。
 
-**Context**: PR #403 で `mcp/src/obsidian/` 配下 5 ソース + `scripts/obsidian-sync.mjs` 等 13 ファイル削除 + 7 ファイル編集を実施。`git grep -i obsidian` で「Obsidian」文字列の取り残しはゼロを確認、`mcp build`/`mcp check`/`quality:local` も全 pass。しかし Toolkit code-reviewer が `mcp/src/constants.ts:21-36` の `BACKLINKS_SECTION_HEADER` と `BACKLINKS_SECTION_TEMPLATE` を **dead code として検出**。これらは削除済み `mcp/src/obsidian/backlinks.ts` でだけ使われていた定数で、ビルドは通るが「完全排除」を謳う PR タイトル・CHANGELOG と矛盾する状態だった。fix commit `8628140` で対応。レビューが無ければ silent regression として残った。
+**Context**: PR #403 で `mcp/src/obsidian/` 配下 5 ソース + `scripts/obsidian-sync.mjs` 等 13 ファイル削除と 7 ファイル編集を実施（最終的に下記 fix commit で `mcp/src/constants.ts` が加わり 8 ファイル編集、計 +7/-1859 行）。`git grep -i obsidian` で「Obsidian」文字列の取り残しはゼロを確認、`mcp build`/`mcp check`/`quality:local` も全 pass。しかし Toolkit code-reviewer が `mcp/src/constants.ts:21-36` の `BACKLINKS_SECTION_HEADER` と `BACKLINKS_SECTION_TEMPLATE` を **dead code として検出**。これらは削除済み `mcp/src/obsidian/backlinks.ts` でだけ使われていた定数で、ビルドは通るが「完全排除」を謳う PR タイトル・CHANGELOG と矛盾する状態だった。fix commit `8628140` で対応。レビューが無ければ silent regression として残った。
 
 **Action**: 機能削除 PR を作る際:
 
@@ -736,6 +737,8 @@ ACE エントリ ID は **PRスコープ式** を採用する（このセクシ�
 **Insight**: ドキュメント中で具体的な PR 番号・コミットハッシュ・数値を書くとき、**記憶や類推で書いた値は高確率で誤りを含む**。執筆中に `gh` / `git` で照合する習慣を持つ。`#N` 表記は Issue 番号・PR 番号の両方で commit メッセージに登場し混同しやすい。
 
 **Context**: PR #405 で「PR #311 (2026-02-12)」を 4 箇所に書いたが `gh pr view 311` → 404、実態は **Issue #311 を参照する commit `6ea43f8`（PR を経ず develop へ直 commit）**。撤退コスト数値「13 削除 + 7 編集、+7/-1842 行」も実態は「13 削除 + 8 編集、+7/-1859 行」（`gh pr view 403 --json additions,deletions,changedFiles` で取得可能）。Toolkit code-reviewer が両方 Critical 検出 → fix commit `b4b5191`。ACE-002（CLI フラグ実機照合）を事実関係全般に拡張した位置付け。
+
+<!-- 意図的な歴史的記述: 上記「-1842」「7 編集」は PR #405 で誤記した値の引用であり訂正対象ではない（Issue #406）。実値は 13 削除 + 8 編集、+7/-1859 行 -->
 
 **Action**:
 
@@ -2466,6 +2469,18 @@ PR #551 では PATTERNS.md §3 を新設の ERRORS.md へ移し、配布物リ�
 
 ## Changelog
 
+### [1.60.0] - 2026-10-15
+
+#### 追加
+
+- 運用ルールに「事実訂正の例外」を追加: 1 次情報で誤りを示せる事実主張（PR / Issue 番号・コミットハッシュ・数値）の訂正に限る限定例外。ACE-019 に従い「末尾追記のみ」の例外を運用ルール上で明示する。条件の正本は `docs/ACE_SETUP.md` §4（Issue #406 / PR #553）
+
+#### 変更
+
+- ACE-020 / ACE-021 / ACE-022 / ACE-023: 運用ルール「事実訂正の例外」に基づき本文の事実誤認を訂正。ACE-021 / ACE-022: PR #403 の撤退コストを「削除 13 + 編集 7、+7/-1842 行」→「13 ファイル削除 + 8 ファイル編集、+7/-1859 行」に訂正。ACE-020 / ACE-021: Obsidian 統合の導入元を「PR #311」（実在しない）→「Issue #311 / commit `6ea43f8`（develop 直 commit）」に訂正。ACE-023 と Changelog `[1.11.0]`: 誤記の引用（-1842）は残し、意図的な引用である旨の HTML コメント注釈だけを添えた。値は PR #403 の additions / deletions / changed_files で照合し、`docs/DESIGN_PRINCIPLES.md` と一致させた（Issue #406）
+
+<!-- 意図的な歴史的記述: 上記「-1842 行」は訂正前の旧値の記録であり訂正対象ではない（Issue #406） -->
+
 ### [1.59.0] - 2026-10-15
 
 #### 追加
@@ -2970,6 +2985,8 @@ PR #551 では PATTERNS.md §3 を新設の ERRORS.md へ移し、配布物リ�
 #### 追加
 
 - ACE-023: ドキュメント中の事実主張（PR/Issue 番号・ハッシュ・数値）は執筆時に 1 次情報で照合する — PR #405 で「PR #311」「-1842 行」と書いた値が実態と乖離（実態: Issue #311 / commit 6ea43f8 直 commit、-1859 行）し Toolkit が Critical 検出。ACE-002 を「事実関係全般」に拡張
+
+<!-- 意図的な歴史的記述: 上記「-1842 行」は PR #405 で誤記した値の引用であり訂正対象ではない（Issue #406） -->
 
 ### [1.10.0] - 2026-05-07
 
