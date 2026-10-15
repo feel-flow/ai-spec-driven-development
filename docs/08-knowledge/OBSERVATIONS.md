@@ -254,13 +254,14 @@ Markdown 内コード例の編集を Python の厳密一致置換で当て、そ
 
 ### OBS-016: zsh では終了コード取得の bash イディオムがそのまま動かない — `PIPESTATUS` は小文字 1 始まり、`status` は読み取り専用のため、パイプ越しのゲート判定が黙って空振りする
 
-| Kind | problem | Count | 1 |
-| First | 2026-09-07 | Last | 2026-09-07 |
+| Kind | problem | Count | 2 |
+| First | 2026-09-07 | Last | 2026-10-15 |
 | Status | active | Issue | なし |
 
 長時間ゲートの結果をパイプで `tail` に流すと `${PIPESTATUS[0]}` が空になり（zsh は `pipestatus` で 1 始まり）、続けて `status=$?` で受けようとすると `read-only variable: status` で代入行から落ちる → ゲートはログファイルへリダイレクトし、次行で `rc=$?` を受けてから `grep` で中身を読む。
 
 - 2026-09-07: PR #519 で `npm run quality:local` の終了コードを 2 回取り損ね、確証のためゲートを 2 回追加実行した（1 回 40 秒前後）。3 回目にログ経由 + `rc=$?` で確定（初回）
+- 2026-10-15: PR #552 の precheck 実行で `${PIPESTATUS[0]}` を書き、ff-dev-toolkit の exit-code guard（`pipestatus` タグ）が実行前に止めた。ログへリダイレクト + `rc=$?` へ書き直す 1 回のやり直しで済んだ
 
 ---
 
@@ -477,5 +478,19 @@ ripgrep はパスを省略すると、stdin が TTY でない限り cwd では�
 移設した節を指す表記は「PATTERNS.md「エラーハンドリング」」の形だけでなく、「エラーパターンは PATTERNS.md に準拠」（語順が逆）、移設元に残った「（§3）」、「docs/PATTERNS.md:145」（行番号）の形でも現れ、一方向の正規表現はこれらを拾わない → 移設前の洗い出しでは、両方の語順・移設元ファイル内の `§N` / `セクション N`・`<file>:<行番号>` の 3 形を別々に grep せよ。
 
 - 2026-10-15: Issue #550 / PR #551。一方向 grep で 13 箇所を張り替えた後、マージ前の確認で 3 箇所（PATTERNS.md §9 コメント・GETTING_STARTED.md・git-workflow.md の例示）が見つかり、3 本目のコミットになった（初回）
+
+---
+
+<a id="obs-032"></a>
+
+### OBS-032: pre-push がフル品質ゲートを実行するリポジトリで、push の直前に同じゲートを手動実行すると同一 HEAD でゲートが 2 回走る
+
+| Kind | problem | Count | 1 |
+| First | 2026-10-15 | Last | 2026-10-15 |
+| Status | active | Issue | なし |
+
+`.husky/pre-push` が `npm run quality:local`（ゲート記録の書き込みを含む）を毎回実行するため、commit 直後に手動で回した結果は push の時点でそのまま再計測される → push する予定のコミットでは手動実行を省き、pre-push の実行をゲート実測と記録として扱う。手動実行は push しない段階の確認（commit 前の挙動確認）に限る。
+
+- 2026-10-15: Issue #389 / PR #552。3 回の push すべてで直前に手動実行しており、フルゲート 6 回のうち 3 回が同一 HEAD の重複だった（初回）
 
 ---

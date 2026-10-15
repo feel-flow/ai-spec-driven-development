@@ -1,12 +1,12 @@
 ---
 title: "PLAYBOOK"
-version: "1.58.0"
+version: "1.59.0"
 status: "approved"
 created: "2026-03-10"
 updated: "2026-10-15"
 owner: "@fffokazaki"
 changeImpact: "medium"
-ace_entry_count: 106
+ace_entry_count: 107
 tags: [ace, playbook, knowledge-management]
 references:
   - https://github.com/feel-flow/ai-spec-driven-development/blob/HEAD/docs/ACE_FRAMEWORK.md
@@ -2451,7 +2451,26 @@ PR #551 では PATTERNS.md §3 を新設の ERRORS.md へ移し、配布物リ�
 
 ---
 
+<a id="ace-552-1"></a>
+
+### ACE-552-1: 通過記録を書く品質ゲートには部分実行オプションを設けず、個別段は各段のスクリプトを直接呼ぶ形で提供する
+
+| Category | tooling | Origin | PR #552 / Issue #389 |
+| Date | 2026-10-15 |
+| Helpful | 0 | Harmful | 0 |
+| Status | active |
+
+ゲートが通過時に HEAD 付きの pass 記録を残し、マージ前の鮮度照合がそれを読む構成では、`--only` のような部分実行で pass を書くと全段の通過と区別できず、照合が偽の緑を返す。部分実行を足すなら記録のスキップ規則まで設計し直す必要があるため、各段がすでに独立したスクリプトであればオプションは足さない。失敗時の出力に段番号と再実行コマンドを載せ、個別実行への導線はそこで満たす。
+
+---
+
 ## Changelog
+
+### [1.59.0] - 2026-10-15
+
+#### 追加
+
+- ACE-552-1: 通過記録を書く品質ゲートには部分実行オプションを設けず、個別段は各段のスクリプトを直接呼ぶ形で提供する（Issue #389 / PR #552）
 
 ### [1.58.0] - 2026-10-15
 
