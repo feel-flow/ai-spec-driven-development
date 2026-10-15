@@ -168,15 +168,17 @@ AC の grep を頭で組んで起票すると、検出式の穴（表記の必�
 
 ### OBS-010: ACE 系スキルは PLAYBOOK を `docs/08-knowledge/` 固定で参照するが、テンプレ配布リポジトリでは実体が `docs-template/08-knowledge/` にある
 
-| Kind | problem | Count | 3 |
+| Kind | problem | Count | 4 |
 | First | 2026-09-06 | Last | 2026-10-15 |
-| Status | mitigated | Issue | feel-flow/feelflow-plugins@2ca0635 plugins/ff-dev-toolkit/skills/ace-curate/references/curate.md「配置先の解決」 |
+| Status | promoted | Issue | feel-flow/feelflow-plugins#2142 |
 
 既定パスで grep・frontmatter 読みを組むと全コマンドが not found で空振りし、パスを直して再実行する往復が出る → 着手時に `package.json` の `ace:*` スクリプトが指すパスで実配置を確定してからコマンドを組む（`/retrospective` の「知見ストアの実配置を確定する」と同じ手順を curate 側にも置く余地）。
 
 - 2026-09-06: PR #502 の curate で最初の情報収集 1 ターンが全件 not found（初回）
 - 2026-09-07: PR #519 の curate で `docs/08-knowledge/` に OBSERVATIONS.md だけがあり PLAYBOOK は `docs-template/` 側という配置差を、実在確認 1 ターンで特定した（再発）
 - 2026-10-15: PR #547 の curate で `docs/08-knowledge/playbook/` を前提に組んだ grep が 3 回空振りし、直近 ACE コミットの `--stat` で実配置を特定した（再発・Count 3）。SSOT の curate.md は既に「配置先の解決（最初に実施）」で記録済み配置（本 repo では `docs/ACE_SETUP.md`）を読む手順を持っており、空振りは手順の読み飛ばしによるものだったため、起票せず mitigated とした
+- 2026-10-15: Issue #418 / PR #559 の着手前参照で、`knowledge-lookup.sh` が既定パスと `docs-template` を除いた探索だけで解決し「Playbook なし — ACE 未導入」と報告。`--playbook docs-template/08-knowledge/PLAYBOOK.md` を付けて再実行するまで 1 往復（再発・Count 4）
+- 2026-10-15: 状態移行: mitigated の対策（ace-curate の「配置先の解決」）が knowledge-lookup に及んでいない＝対策が効いていない（promotion.md 復帰条件 b）ため active へ戻し、Count 4 で昇格。SSOT develop `2ca0635` の `scripts/knowledge-lookup.sh` `resolve_store` が `ACE_PLAYBOOK_PATH`・記録済み配置を読まないことを照合して feel-flow/feelflow-plugins#2142 を起票。旧所在は feel-flow/feelflow-plugins@2ca0635 の curate.md「配置先の解決」
 
 ---
 
@@ -532,13 +534,14 @@ clone 方式によっては `refs/remotes/origin/HEAD` が作られず、ACE / �
 
 ### OBS-035: Codex CLI が無い環境でも、リポジトリの Codex 自動レビュー（PR open 時と `@codex review`）を待てばクロスモデルの観点を確保できる
 
-| Kind | keep | Count | 1 |
+| Kind | keep | Count | 2 |
 | First | 2026-10-15 | Last | 2026-10-15 |
 | Status | active | Issue | なし |
 
 `/multi-review` の fast 経路は Codex レーンを CLI 前提で組むため、CLI 未導入だと主担当の直読だけで完了扱いになるが、GitHub 側の Codex 自動レビューは同じ head に対して実指摘を返す → CLI 不在時は PR 上の Codex 自動レビューの完了を待ってからマージ判断し、修正が規則を組み替えた回は `@codex review` で 2 巡目を依頼する。
 
 - 2026-10-15: Issue #406 / PR #553。主担当の直読は指摘 0 件だったが、Codex 自動レビューが 1 巡目 2 件・2 巡目（`@codex review`）3 件の妥当な指摘を返し、すべてマージ前に解消した（初回）
+- 2026-10-15: Issue #418 / PR #559。主担当の直読と品質ゲートが通した lockfile 再生成について、Codex 自動レビューが npm 10 による `libc` 制約 10 件の消失を検出し、npm 11 で再生成して解消した
 
 ---
 
