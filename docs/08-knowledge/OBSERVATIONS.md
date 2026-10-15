@@ -488,13 +488,14 @@ ripgrep はパスを省略すると、stdin が TTY でない限り cwd では�
 
 ### OBS-032: pre-push がフル品質ゲートを実行するリポジトリで、push の直前に同じゲートを手動実行すると同一 HEAD でゲートが 2 回走る
 
-| Kind | problem | Count | 1 |
+| Kind | problem | Count | 2 |
 | First | 2026-10-15 | Last | 2026-10-15 |
 | Status | active | Issue | なし |
 
 `.husky/pre-push` が `npm run quality:local`（ゲート記録の書き込みを含む）を毎回実行するため、commit 直後に手動で回した結果は push の時点でそのまま再計測される → push する予定のコミットでは手動実行を省き、pre-push の実行をゲート実測と記録として扱う。手動実行は push しない段階の確認（commit 前の挙動確認）に限る。
 
 - 2026-10-15: Issue #389 / PR #552。3 回の push すべてで直前に手動実行しており、フルゲート 6 回のうち 3 回が同一 HEAD の重複だった（初回）
+- 2026-10-15: Issue #412 / PR #555。初回 commit 前と fix commit 前の 2 回とも手動実行し、続く 2 回の push の pre-push が同じ内容で再実行した（4 回中 2 回が重複）
 
 ---
 
@@ -537,5 +538,19 @@ clone 方式によっては `refs/remotes/origin/HEAD` が作られず、ACE / �
 `/multi-review` の fast 経路は Codex レーンを CLI 前提で組むため、CLI 未導入だと主担当の直読だけで完了扱いになるが、GitHub 側の Codex 自動レビューは同じ head に対して実指摘を返す → CLI 不在時は PR 上の Codex 自動レビューの完了を待ってからマージ判断し、修正が規則を組み替えた回は `@codex review` で 2 巡目を依頼する。
 
 - 2026-10-15: Issue #406 / PR #553。主担当の直読は指摘 0 件だったが、Codex 自動レビューが 1 巡目 2 件・2 巡目（`@codex review`）3 件の妥当な指摘を返し、すべてマージ前に解消した（初回）
+
+---
+
+<a id="obs-036"></a>
+
+### OBS-036: `npm run -s <script>` は登録されていない script でも「Missing script」を出さずに rc 1 で終わるため、ゲートの失敗と script の不在を見分けられない
+
+| Kind | problem | Count | 1 |
+| First | 2026-10-15 | Last | 2026-10-15 |
+| Status | active | Issue | なし |
+
+`/ace-curate` の同期検証は「npm script 登録済みなら npm run」を第 1 候補とするが、`-s` を付けて叩くと未登録でも空ログ・rc 1 になり、同期検証が赤と読める → 候補を選ぶ前に `grep -n '"<script>"' package.json` で登録を確かめ、未登録なら同梱の `ace-run-ts.sh` 経路を使う。
+
+- 2026-10-15: Issue #412 / PR #555。`ace:check-playbook-frontmatter` が未登録のまま `npm run -s` で叩いて rc 1・空ログになり、ログを読み直して不在と気づくまでに 1 往復かかった（初回）
 
 ---

@@ -1,12 +1,12 @@
 ---
 title: "PLAYBOOK"
-version: "1.61.0"
+version: "1.62.0"
 status: "approved"
 created: "2026-03-10"
 updated: "2026-10-15"
 owner: "@fffokazaki"
 changeImpact: "medium"
-ace_entry_count: 108
+ace_entry_count: 109
 tags: [ace, playbook, knowledge-management]
 references:
   - https://github.com/feel-flow/ai-spec-driven-development/blob/HEAD/docs/ACE_FRAMEWORK.md
@@ -2434,7 +2434,7 @@ SBOM などの生成物は「生成できた」時点で完了と報告されや
 
 | Category | documentation-quality | Origin | PR #549 / Issue #511 |
 | Date | 2026-10-15 |
-| Helpful | 1 | Harmful | 0 |
+| Helpful | 2 | Harmful | 0 |
 | Status | active |
 
 レビューから分離した follow-up Issue は、起票後も元の PR の修正が続くため、本文の数値（行数・件数など）が着手時には古くなっている。Issue #511 は 862 行の前提で「§1 を分離すれば 700 行前後」と見積もっていたが、着手時の実測は 980 行で、その案だけでは約 817 行となり 800 行以下という AC を満たせなかった。着手時に対象を実測し、計画した移設量・削減量で AC の閾値を下回るかを実装前に計算する。足りなければ追加の移設先を選び、その理由を PR 本文に書く。
@@ -2481,7 +2481,31 @@ PR #551 では PATTERNS.md §3 を新設の ERRORS.md へ移し、配布物リ�
 
 ---
 
+<a id="ace-555-1"></a>
+
+### ACE-555-1: 「すべての X は」と書かれた規範の適用範囲を狭めるときは、狭めた範囲の実ファイルで必須条件を実測してから書く
+
+| Category | documentation-quality | Origin | PR #555 / Issue #412 |
+| Related | ACE-549-1 |
+| Date | 2026-10-15 |
+| Helpful | 0 | Harmful | 0 |
+| Status | active |
+
+全称で書かれた規範は対象が曖昧なため、誰も守っていなくても矛盾として表に出ない。範囲を特定の集合へ狭めた時点で検証可能な主張に変わり、元の文言を引き継ぐと実態と食い違う。PR #555 では OPERATIONAL_GUIDE §7 の「すべての Markdown は以下を含む必要がある」を `docs/` 方法論ガイドへ限定した。しかし実測すると、`status` を持たない frontmatter が 4 件、`phase` の無い文書が 6 件あり、別ガイドの「`visibility` のみも許容」とも矛盾していた。範囲を狭める差分では、その節が「必須」とする各項目を狭めた範囲の実ファイルに当てて件数を数え、満たさないものがあれば文言を「付ける場合の形式」へ弱めるか、実ファイル側を揃える。
+
+---
+
 ## Changelog
+
+### [1.62.0] - 2026-10-15
+
+#### 追加
+
+- ACE-555-1: 「すべての X は」と書かれた規範の適用範囲を狭めるときは、狭めた範囲の実ファイルで必須条件を実測してから書く（Issue #412 / PR #555）
+
+#### カウンター更新
+
+- ACE-549-1: Helpful 1→2（PR #555 で Issue 本文の推奨 Option A を着手時に実測で確かめ、`docs/` の `active` 15 件と ASDD 2.0 正本との衝突から後続コメントの Option B を採り、AC を書き換えてから実装した再適用）
 
 ### [1.61.0] - 2026-10-15
 
