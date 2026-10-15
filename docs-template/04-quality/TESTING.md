@@ -1,10 +1,10 @@
 ---
 title: "TESTING"
-version: "1.2.0"
+version: "1.3.0"
 status: "draft"
 owner: "@your-github-handle"
 created: "YYYY-MM-DD"
-updated: "2026-09-08"
+updated: "2026-10-15"
 changeImpact: "medium"
 ---
 
@@ -243,6 +243,50 @@ describe("UserRepository Integration", () => {
       const user = await repository.findByEmail("notfound@example.com");
       expect(user).toBeNull();
     });
+  });
+});
+```
+
+### 外部サービス統合テスト（モック注入）
+
+決済・メール等の外部サービス（`docs/03-implementation/INTEGRATIONS.md`）は、DI コンテナでモック実装に差し替えて結合を検証する。
+
+```typescript
+// モックサービス
+class MockPaymentService implements IPaymentService {
+  async createPaymentIntent(amount: number): Promise<PaymentIntent> {
+    return {
+      id: "pi_test_123",
+      amount,
+      status: "succeeded",
+    };
+  }
+}
+
+// 統合テスト
+describe("Payment Integration", () => {
+  let app: Application;
+
+  beforeAll(async () => {
+    // テスト環境でモックサービスを注入
+    container.register("PaymentService", {
+      useClass:
+        process.env.NODE_ENV === "test" ? MockPaymentService : PaymentService,
+    });
+
+    app = await createApp();
+  });
+
+  it("should process payment successfully", async () => {
+    const response = await request(app)
+      .post("/payments")
+      .send({
+        amount: 1000,
+        currency: "usd",
+      })
+      .expect(200);
+
+    expect(response.body).toHaveProperty("paymentIntentId");
   });
 });
 ```
@@ -685,6 +729,12 @@ echo "変異適用: OK"       # 報告には検査結果と並べてこの成否
 ## Changelog
 
 - 2026-09-08 追記: プラグイン変数がない直接利用でも取得できる公開配布元を明記（ai-spec-driven-development#525）。
+
+### [1.3.0] - 2026-10-15
+
+#### 追加
+
+- §3 に「外部サービス統合テスト（モック注入）」節を追加（INTEGRATIONS.md の「統合テスト」節を移設。Issue #511）
 
 ### [1.2.0] - 2026-09-08
 
