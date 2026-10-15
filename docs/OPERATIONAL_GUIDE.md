@@ -1,10 +1,10 @@
 ---
 id: operational-guide
 title: AI Spec Driven Development Operational Guide
-version: 2.0.1
+version: 2.1.0
 status: active
 created: 2025-10-17
-updated: 2026-09-08
+updated: 2026-10-15
 owner: feel-flow
 phase: mvp
 tags: [docs, structure, ai-agent, operations]
@@ -12,7 +12,8 @@ references:
   - docs-template/MASTER.md
   - docs-template/02-design/ARCHITECTURE.md
   - AI_SPEC_DRIVEN_DEVELOPMENT.md
-changeImpact: low
+  - docs/FRONTMATTER_GUIDE.md
+changeImpact: medium
 visibility: public
 ---
 
@@ -276,14 +277,16 @@ docs-template/
 
 ## 7. FRONTMATTER TEMPLATE（統一メタデータ）
 
-すべてのMarkdownファイルは、以下のFrontmatterを含む必要があります:
+本リポジトリの `docs/` 配下の方法論ガイド（`docs/specs/` を除く）は、以下のFrontmatterを含む必要があります。
+
+> **適用範囲**: `status` の値は文書の系統ごとに異なる。コア7文書・拡張文書は `draft | review | approved`（`scripts/validate-docs.mjs` が検証）、`docs/specs/` は Spec Kit の 6 値、`docs/` 方法論ガイドは下記の `draft | active | deprecated`。各系統の正本は [FRONTMATTER_GUIDE.md](FRONTMATTER_GUIDE.md) の §5.1 / §5.2 / §5.6 を参照する。
 
 ```yaml
 ---
 id: unique-identifier # ファイルの一意識別子 (kebab-case)
 title: Human-readable Title # 人間が読める形式のタイトル
 version: 1.0.0 # セマンティックバージョニング
-status: draft | active | deprecated # 文書の状態
+status: draft | active | deprecated # docs/ 方法論ガイドの状態（他系統は上記の適用範囲を参照）
 created: YYYY-MM-DD # 作成日
 updated: YYYY-MM-DD # 最終更新日
 owner: team-name # 責任者/チーム名
@@ -298,19 +301,19 @@ changeImpact: low | medium | high # 変更の影響度
 
 **各フィールドの説明**:
 
-| フィールド   | 必須 | 説明                                      | 例                          |
-| ------------ | ---- | ----------------------------------------- | --------------------------- |
-| id           | ✅   | ファイルの一意識別子                      | `project-overview`          |
-| title        | ✅   | 人間が読める形式のタイトル                | `Project Overview`          |
-| version      | ✅   | セマンティックバージョニング              | `1.2.3`                     |
-| status       | ✅   | draft / active / deprecated               | `active`                    |
-| created      | ✅   | 作成日 (YYYY-MM-DD)                       | `2025-01-01`                |
-| updated      | ✅   | 最終更新日 (YYYY-MM-DD)                   | `2025-11-07`                |
-| owner        | ✅   | 責任者/チーム名                           | `platform-team`             |
-| phase        | ✅   | planning / mvp / extension / optimization | `mvp`                       |
-| tags         | ⭕   | タグのリスト                              | `[frontend, react, ui]`     |
-| references   | ⭕   | 参照先文書のリスト                        | `- docs-template/MASTER.md` |
-| changeImpact | ✅   | low / medium / high                       | `high`                      |
+| フィールド   | 必須 | 説明                                                | 例                          |
+| ------------ | ---- | --------------------------------------------------- | --------------------------- |
+| id           | ✅   | ファイルの一意識別子                                | `project-overview`          |
+| title        | ✅   | 人間が読める形式のタイトル                          | `Project Overview`          |
+| version      | ✅   | セマンティックバージョニング                        | `1.2.3`                     |
+| status       | ✅   | draft / active / deprecated（`docs/` 方法論ガイド） | `active`                    |
+| created      | ✅   | 作成日 (YYYY-MM-DD)                                 | `2025-01-01`                |
+| updated      | ✅   | 最終更新日 (YYYY-MM-DD)                             | `2025-11-07`                |
+| owner        | ✅   | 責任者/チーム名                                     | `platform-team`             |
+| phase        | ✅   | planning / mvp / extension / optimization           | `mvp`                       |
+| tags         | ⭕   | タグのリスト                                        | `[frontend, react, ui]`     |
+| references   | ⭕   | 参照先文書のリスト                                  | `- docs-template/MASTER.md` |
+| changeImpact | ✅   | low / medium / high                                 | `high`                      |
 
 **changeImpact の判断基準**:
 
@@ -795,6 +798,10 @@ MUST: コミット前に最終チェックリストをすべてPASSさせる。
 本書は構造運用専用です。ビジネス/設計/実装/品質の詳細は上記参照文書を確認してください。
 
 ## Changelog（2.0移行案内）
+
+### [2.1.0] - 2026-10-15
+
+- 変更: §7 の適用範囲を `docs/` 方法論ガイドに限定し、系統別の `status` 値の正本を FRONTMATTER_GUIDE.md に寄せた（[Issue #412](https://github.com/feel-flow/ai-spec-driven-development/issues/412)）。
 
 ### [2.0.1] - 2026-09-08
 
