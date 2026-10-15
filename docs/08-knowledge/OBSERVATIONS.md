@@ -436,3 +436,32 @@ ripgrep はパスを省略すると、stdin が TTY でない限り cwd では�
 
 - 2026-10-15: PR #547 で `rg ... -g '!node_modules'`（パス無し）が 2 回タイムアウトして exit 144。最初は連結していた `npx prettier` を疑い、切り分けに 1 往復かかった（初回）
 - 2026-10-15: toolkit の Bash ガードで構造的に防げる種類のため、利用者の起票方針（actionable は承認待ちなしで起票）に従い閾値未達で feel-flow/feelflow-plugins#2136 へ起票
+
+<a id="obs-029"></a>
+
+### OBS-029: 先行試行で生成・保存・取得の実測が揃った docs-only Issue にレビュー対応を実装と同額で見込むと、乖離率 0.25 の過大見積もりになる
+
+| Kind | problem | Count | 1 |
+| First | 2026-10-15 | Last | 2026-10-15 |
+| Status | active | Issue | なし |
+
+「共通運用の設計判断を含む」ことを理由に、レビュー対応を実装と同額で見込んだ。しかし設計判断の材料となる実測は、Issue コメントの先行試行ですでに揃っており、作業は文書化だけで済んだ → 見積もりの前に、Issue コメントに判断材料の実測が揃っているかを確かめる。揃っていれば、docs-only の fast 経路を前提にレビュー対応を小さく見積もれ。
+
+- 2026-10-15: Issue #540 / PR #548。AI 予定 4.0h → 実績 1.0h（最小値、wallclock 0.1h）、fast 経路で Codex 指摘 0 件・fix 1 行（初回）
+
+---
+
+<a id="obs-030"></a>
+
+### OBS-030: zsh の Bash ツールで `gh api` の URL 引数に未引用の `?ref=` を書くと NOMATCH で落ち、zsh-glob ガードはこの位置引数の形を検出しない
+
+| Kind | problem | Count | 1 |
+| First | 2026-10-15 | Last | 2026-10-15 |
+| Status | promoted | Issue | feel-flow/feelflow-plugins#2138 |
+
+ガードが検出するのは、`-` で始まる語の `=` より右側にある glob 文字だけだった。そのため、位置引数の URL に含まれる `?` は素通りし、実行時に `no matches found` で呼び出しが落ちる → `gh api` に渡すクエリ付きパスは必ず引用せよ。
+
+- 2026-10-15: PR #548 の調査で、サイト側の文書を `gh api repos/.../contents/...?ref=develop` で取得しようとして失敗した。引用して再実行し、1 往復を失った（初回）
+- 2026-10-15: toolkit の Bash ガードで構造的に防げる種類のため、利用者の起票方針に従い閾値未達で feel-flow/feelflow-plugins#2138 へ起票
+
+---

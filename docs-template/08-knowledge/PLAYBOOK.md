@@ -1,12 +1,12 @@
 ---
 title: "PLAYBOOK"
-version: "1.55.0"
+version: "1.56.0"
 status: "approved"
 created: "2026-03-10"
 updated: "2026-10-15"
 owner: "@fffokazaki"
 changeImpact: "medium"
-ace_entry_count: 103
+ace_entry_count: 104
 tags: [ace, playbook, knowledge-management]
 references:
   - https://github.com/feel-flow/ai-spec-driven-development/blob/HEAD/docs/ACE_FRAMEWORK.md
@@ -2412,7 +2412,26 @@ pre-push の `quality:local` で symlink CLI テストが 5.1〜6.4s になり v
 
 ---
 
+<a id="ace-548-1"></a>
+
+### ACE-548-1: 生成物の運用手順では「生成成功・CI 成功・取得照合・長期保管」を別々の記録項目として定義し、前段の成功を後段の完了に読み替えさせない
+
+| Category | documentation-quality | Origin | PR #548 / Issue #540 |
+| Date | 2026-10-15 |
+| Helpful | 0 | Harmful | 0 |
+| Status | active |
+
+SBOM などの生成物は「生成できた」時点で完了と報告されやすい。しかし、保存先から取得してハッシュ・SHA を照合できるか、期限付き artifact を長期保管先へ移したかは別の事実である。PR #548 の先行試行でも、CI 成功の後に artifact を実際に取得し、照合して初めて対応を確認できた。CI を使えない環境でのローカル生成も、自動実行済みとは区別して記録する必要があった。生成物の運用文書を書くときは、各段の成功を別の記録欄として表に分ける。手順の末尾には、取得後の照合手順を置く。
+
+---
+
 ## Changelog
+
+### [1.56.0] - 2026-10-15
+
+#### 追加
+
+- ACE-548-1: 生成物の運用手順では「生成成功・CI 成功・取得照合・長期保管」を別々の記録項目として定義し、前段の成功を後段の完了に読み替えさせない（Issue #540 / PR #548）
 
 ### [1.55.0] - 2026-10-15
 
