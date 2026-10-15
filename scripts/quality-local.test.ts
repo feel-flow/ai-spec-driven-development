@@ -268,6 +268,72 @@ describe("quality:local gate record (Issue #515)", () => {
     }
   });
 
+  describe("段ラベルと停止位置 (Issue #389)", () => {
+    const EXPECTED_ORDER = [
+      "run build:mcp",
+      "run check",
+      "--prefix mcp test",
+      "run test:ace-scripts",
+      "run validate -- docs-template",
+      "run build:spec-index",
+      "run format:md:check",
+      "run lint:md",
+    ];
+    const FAILING_STEP_RC = 7;
+
+    function runWithStub(failOn: string | null) {
+      const binDir = mkdtempSync(join(tmpdir(), "ql-steps-"));
+      const toolkit = mkdtempSync(join(tmpdir(), "ql-tk-"));
+      const log = join(binDir, "calls.log");
+      const failCase = failOn
+        ? `  "${failOn}") exit ${FAILING_STEP_RC} ;;\n`
+        : "";
+      writeFileSync(
+        join(binDir, "npm"),
+        `#!/bin/sh\necho "$*" >> "${log}"\ncase "$*" in\n${failCase}esac\nexit 0\n`,
+      );
+      chmodSync(join(binDir, "npm"), 0o755);
+      writeFixtureToolkit(toolkit);
+      try {
+        const r = spawnSync("bash", [QUALITY_LOCAL], {
+          cwd: REPO_ROOT,
+          encoding: "utf8",
+          env: {
+            ...gitEnv(),
+            PATH: `${binDir}:${BASE_PATH}`,
+            FF_DEV_TOOLKIT_ROOT: toolkit,
+            FF_GATE_RECORD_FILE: join(binDir, "gate-record"),
+          },
+        });
+        const calls = readFileSync(log, "utf8").trim().split("\n");
+        const status = recordMap(join(binDir, "gate-record")).STATUS;
+        return { r, calls, status };
+      } finally {
+        rmSync(binDir, { recursive: true, force: true });
+        rmSync(toolkit, { recursive: true, force: true });
+      }
+    }
+
+    it("成功時は 8 段を従来の順で呼び、各段の開始ラベルを出す", () => {
+      const { r, calls, status } = runWithStub(null);
+      expect(r.status, r.stderr).toBe(0);
+      expect(calls).toEqual(EXPECTED_ORDER);
+      expect(r.stdout).toContain("==> quality:local [1/8] npm run build:mcp");
+      expect(r.stdout).toContain("==> quality:local [8/8] npm run lint:md");
+      expect(status).toBe("pass");
+    });
+
+    it("途中の段が落ちたらその段の終了コードを返し、段名を stderr に出して後続を呼ばない", () => {
+      const { r, calls, status } = runWithStub("run test:ace-scripts");
+      expect(r.status).toBe(FAILING_STEP_RC);
+      expect(calls).toEqual(EXPECTED_ORDER.slice(0, 4));
+      expect(r.stderr).toContain(
+        `[4/8] npm run test:ace-scripts が失敗しました（exit ${FAILING_STEP_RC}）`,
+      );
+      expect(status).toBe("fail");
+    });
+  });
+
   it.skipIf(!TOOLKIT_ROOT)(
     "記録直後の check-merge-freshness.sh --remote-head は exit 0",
     () => {
