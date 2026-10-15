@@ -8,7 +8,7 @@ AI開発ツールに最適化されたGit Flowベースのワークフローで�
 
 **コアサイクル（10ステップ）**: Issue → Branch → Implement → Test → Self-Review → PR → Review → Merge → Cleanup → ACE
 
-> **運用原則**: 本ワークフローは [ワークフロー運用原則](./workflow-principles.md)（ノンストップフロー・スコープ外Issue化・曖昧仕様確認タイミング）に従って運用します。
+> **運用原則**: 本ワークフローは [ワークフロー運用原則](./workflow-principles.md)（ノンストップフロー・スコープ外発見の4段判定（YAGNI → 同 PR 修正 → bundle 追記 → bundle 起票）・曖昧仕様確認タイミング）に従って運用します。
 
 ## 日々の開発フロー（AIにタスクを渡す前）
 

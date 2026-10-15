@@ -109,7 +109,7 @@ AskUserQuestion を使用して、どのツール向けの設定を生成する�
 
 ## Out-of-Scope Issues
 
-- スコープ外の問題は即座に Issue を起票し、現行タスクは継続する（スコープ拡大はしない）
+- スコープ外の問題は YAGNI → 同 PR でインライン修正 → 既存の open `bundle` へ追記 → `bundle` 単位で新規起票の順で判定し、現行タスクは継続する（一律に Issue 化しない）
 
 ## Important Rules
 
