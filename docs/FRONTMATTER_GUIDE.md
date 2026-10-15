@@ -378,6 +378,7 @@ visibility: public # §5.5
 | `deprecated` | 後継文書へ置き換え済み   | 新規作業の根拠にしない。後継文書を探して参照する |
 
 - **コア 7 文書との違い**: 方法論ガイドは「レビューを経て承認される仕様」ではなく「継続的に改訂される運用文書」なので、`review` / `approved` の段階を持たない。`approved` に寄せると ASDD 2.0 正本（[docs/ASDD_2_0.md](ASDD_2_0.md) ほか、すでに `status: active`）と衝突するため、別系統として維持する（[Issue #412](https://github.com/feel-flow/ai-spec-driven-development/issues/412)）。
+- **必須フィールド**: OPERATIONAL_GUIDE §7 の表が必須（✅）とするフィールドは目安で、既存文書には `phase` を持たないもの（ASDD 2.0 系など）や、`status` を持たず `visibility` だけのもの（§4.1）がある。frontmatter を付けるなら、`status` には上表の 3 値のどれかを使う。
 - **CI 検証**: 現状は無い（§4.1）。`validate-docs.mjs` の `CORE_DOCS` はコア 7 文書だけを列挙しているため、`docs/` 方法論ガイドに `active` を書いても検証では落ちない。逆に、コア 7 文書へ `active` を持ち込むと落ちる。
 
 ---

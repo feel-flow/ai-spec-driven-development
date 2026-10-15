@@ -277,7 +277,7 @@ docs-template/
 
 ## 7. FRONTMATTER TEMPLATE（統一メタデータ）
 
-本リポジトリの `docs/` 配下の方法論ガイド（`docs/specs/` を除く）は、以下のFrontmatterを含む必要があります。
+本リポジトリの `docs/` 配下の方法論ガイド（`docs/specs/` を除く）に Frontmatter を付ける場合は、以下の形式に従います（`visibility` のみの最小 Frontmatter も許容。[FRONTMATTER_GUIDE.md](FRONTMATTER_GUIDE.md) §4.1）。
 
 > **適用範囲**: `status` の値は文書の系統ごとに異なる。コア7文書・拡張文書は `draft | review | approved`（`scripts/validate-docs.mjs` が検証）、`docs/specs/` は Spec Kit の 6 値、`docs/` 方法論ガイドは下記の `draft | active | deprecated`。各系統の正本は [FRONTMATTER_GUIDE.md](FRONTMATTER_GUIDE.md) の §5.1 / §5.2 / §5.6 を参照する。
 
