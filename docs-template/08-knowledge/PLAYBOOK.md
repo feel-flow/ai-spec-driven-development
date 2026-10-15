@@ -1,12 +1,12 @@
 ---
 title: "PLAYBOOK"
-version: "1.52.0"
+version: "1.53.0"
 status: "approved"
 created: "2026-03-10"
-updated: "2026-09-14"
+updated: "2026-10-15"
 owner: "@fffokazaki"
 changeImpact: "medium"
-ace_entry_count: 98
+ace_entry_count: 100
 tags: [ace, playbook, knowledge-management]
 references:
   - https://github.com/feel-flow/ai-spec-driven-development/blob/HEAD/docs/ACE_FRAMEWORK.md
@@ -2345,7 +2345,40 @@ pre-push の `quality:local` で symlink CLI テストが 5.1〜6.4s になり v
 
 ---
 
+<a id="ace-543-1"></a>
+
+### ACE-543-1: ファイル単位でライセンスが分かれる取り込みは、README のライセンス節に対象パスを列挙し、一覧の正本を由来マニフェストに置く
+
+| Category | documentation | Origin | PR #543 / Issue #542 |
+| Date | 2026-10-15 |
+| Helpful | 0 | Harmful | 0 |
+| Status | active |
+
+取り込み元のライセンス全文と由来マニフェストを同梱しても、利用者が最初に読むのは README のライセンス節で、そこが単一ライセンスの 1 行だと全体がそのライセンスだと受け取られる。別ライセンスの実体を取り込む PR と、取り込み対象を増やす PR が該当する。README に「対象パス → ライセンス」と「それ以外の扱い」を書き、対象一覧の正本はマニフェストの `files` だと明記して写しの陳腐化を辿れるようにし、コピー時に残すもの（ライセンス全文・出所記録・改変表示）も同じ節に置く。
+
+---
+
+<a id="ace-543-2"></a>
+
+### ACE-543-2: 公開リポジトリの文書から別リポジトリへリンクする前に visibility を確かめ、private ならリンクにせず名前で書く
+
+| Category | documentation-quality | Origin | PR #543 / Issue #542 |
+| Date | 2026-10-15 |
+| Helpful | 0 | Harmful | 0 |
+| Status | active |
+
+同じ org の別リポジトリは書き手には開けても、公開リポジトリの読者には 404 になり、出所の案内がそのまま壊れたリンクになる。書き手の権限ではクリック確認が通るため、手元の目視やリンク到達確認では検出できない。公開文書に別リポジトリの URL を書くときは `gh repo view <owner/repo> --json visibility` で PUBLIC を確かめ、PRIVATE ならリンクにせずリポジトリ名だけを書く。
+
+---
+
 ## Changelog
+
+### [1.53.0] - 2026-10-15
+
+#### 追加
+
+- ACE-543-1: ファイル単位でライセンスが分かれる取り込みは、README のライセンス節に対象パスを列挙し、一覧の正本を由来マニフェストに置く（Issue #542 / PR #543）
+- ACE-543-2: 公開リポジトリの文書から別リポジトリへリンクする前に visibility を確かめ、private ならリンクにせず名前で書く（Issue #542 / PR #543）
 
 ### [1.52.0] - 2026-09-14
 

@@ -377,3 +377,32 @@ dry-run で grok-cli が `runtime-socket deny resolution failed` と出ても、
 - 2026-09-14: PR #539 でも同じプロファイルで grok-cli が完走。claude-code は週次 spend limit で再び INCOMPLETE（指摘なしではなく未確認）
 
 ---
+
+<a id="obs-025"></a>
+
+### OBS-025: 依存未導入のチェックアウトで `quality:local` を走らせると tsc の TS2688 で落ち、原因が「npm ci 未実行」だと読めない
+
+| Kind | problem | Count | 1 |
+| First | 2026-10-15 | Last | 2026-10-15 |
+| Status | active | Issue | なし |
+
+`quality:local` は意図的に `npm ci` を含まないため、ルートと `mcp/` の `node_modules` が無いと最初の `build:mcp` が `Cannot find type definition file for 'node'` で落ち、型定義の不備に見えて 1 回ゲートを空費する → ゲート冒頭で `node_modules` の有無を検査し、無ければ `npm ci`（ルートと `mcp/`）を名指しして止めよ。
+
+- 2026-10-15: PR #543 の PR 前ゲートで TS2688 により exit 2。`node_modules` が両方とも不在だと確認し、`npm ci` を 2 か所で実行してから再実行で通過（初回）
+
+---
+
+<a id="obs-026"></a>
+
+### OBS-026: AGENTS.md の「スコープ外の問題」節が「即座に GitHub Issue を作成」の旧文言のままで、workflow-doctor が FAIL を出す
+
+| Kind | problem | Count | 1 |
+| First | 2026-10-15 | Last | 2026-10-15 |
+| Status | promoted | Issue | feel-flow/ai-spec-driven-development#544 |
+
+入口文書が「発見 = 起票」のままだと、AGENTS.md を読む CLI（Codex など）は YAGNI → 同 PR インライン → 既存 bundle 追記 → bundle 単位で起票の 4 段判定を経ずに Issue を量産する → AGENTS.md の該当節を 4 段判定へ書き換え、CLAUDE.md とのパリティを workflow-doctor で確認せよ。
+
+- 2026-10-15: PR #543 後の振り返り冒頭で `workflow-doctor.sh --offline` が `AGENTS.md:427` を FAIL（fail=1 warn=1）（初回）
+- 2026-10-15: 実害（Issue 量産の誘導）が入口文書に常駐する種類のため、利用者の起票方針（actionable は承認待ちなしで起票）に従い閾値未達で #544 へ起票
+
+---
