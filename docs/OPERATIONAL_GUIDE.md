@@ -1,7 +1,7 @@
 ---
 id: operational-guide
 title: AI Spec Driven Development Operational Guide
-version: 2.1.0
+version: 2.1.1
 status: active
 created: 2025-10-17
 updated: 2026-10-15
@@ -279,7 +279,7 @@ docs-template/
 
 本リポジトリの `docs/` 配下の方法論ガイド（`docs/specs/` を除く）に Frontmatter を付ける場合は、以下の形式に従います（`visibility` のみの最小 Frontmatter も許容。[FRONTMATTER_GUIDE.md](FRONTMATTER_GUIDE.md) §4.1）。
 
-> **適用範囲**: `status` の値は文書の系統ごとに異なる。コア7文書・拡張文書は `draft | review | approved`（`scripts/validate-docs.mjs` が検証）、`docs/specs/` は Spec Kit の 6 値、`docs/` 方法論ガイドは下記の `draft | active | deprecated`。各系統の正本は [FRONTMATTER_GUIDE.md](FRONTMATTER_GUIDE.md) の §5.1 / §5.2 / §5.6 を参照する。
+> **適用範囲**: `status` の値は文書の系統ごとに異なる。コア7文書・拡張文書は `draft | review | approved | deprecated`（`deprecated` は終端。`scripts/validate-docs.mjs` が検証）、`docs/specs/` は Spec Kit の 6 値、`docs/` 方法論ガイドは下記の `draft | active | deprecated`。コア7文書・拡張文書と `docs/specs/` の正本は [docs-template/MASTER.md](../docs-template/MASTER.md)、`docs/` 方法論ガイドの正本は [FRONTMATTER_GUIDE.md](FRONTMATTER_GUIDE.md) §5.6（系統の早見は同ガイドの TL;DR）。
 
 ```yaml
 ---
@@ -798,6 +798,10 @@ MUST: コミット前に最終チェックリストをすべてPASSさせる。
 本書は構造運用専用です。ビジネス/設計/実装/品質の詳細は上記参照文書を確認してください。
 
 ## Changelog（2.0移行案内）
+
+### [2.1.1] - 2026-10-15
+
+- 修正: §7 の適用範囲注記で、コア7文書・拡張文書の `status` を MASTER.md と同じ 4 値（`deprecated` を含む）に訂正し、正本の指し先を MASTER.md / FRONTMATTER_GUIDE.md §5.6 に分けて明記した（[Issue #556](https://github.com/feel-flow/ai-spec-driven-development/issues/556)）。
 
 ### [2.1.0] - 2026-10-15
 

@@ -54,7 +54,7 @@ MASTER.md に記載されたルールと照合します:
 変更されたドキュメントファイル（`.md`）に対して Frontmatter を検証します:
 
 - [ ] **必須フィールド**: title, version, status, owner, created, updated が存在するか
-- [ ] **status 値**: draft / review / approved のいずれかであるか
+- [ ] **status 値**: draft / review / approved / deprecated のいずれかであるか（正本は MASTER.md「文書運用ルール / Frontmatter」）
 - [ ] **version 形式**: SemVer 形式（X.Y.Z）であるか
 - [ ] **updated 日付**: 今回の変更で updated が更新されているか
 

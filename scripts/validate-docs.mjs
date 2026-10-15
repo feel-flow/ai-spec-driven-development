@@ -62,7 +62,8 @@ const CORE_DOCS = [
 
 // Frontmatter バリデーション定数
 const REQUIRED_FRONTMATTER_FIELDS = ['title', 'version', 'status', 'owner', 'created', 'updated'];
-const VALID_STATUS_VALUES = ['draft', 'review', 'approved'];
+// 正本は docs-template/MASTER.md「文書運用ルール / Frontmatter」。deprecated は終端状態（Issue #556）
+const VALID_STATUS_VALUES = ['draft', 'review', 'approved', 'deprecated'];
 const SEMVER_PATTERN = /^\d+\.\d+\.\d+$/;
 
 /** /init-docs が推測で埋めず残す未確定値（Issue #507） */

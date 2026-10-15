@@ -37,6 +37,14 @@ describe('validate-docs.mjs Frontmatter バリデーション', () => {
       expect(stdout).toContain('Frontmatterに問題はありません');
       expect(stdout).toContain('Frontmatter: 0件');
     });
+
+    it('status の 4 値（draft / review / approved / deprecated）をすべて受理する', () => {
+      // fixture は 4 値を 1 文書以上ずつ使う。deprecated は MASTER.md の終端状態（Issue #556）
+      const { stdout, exitCode } = run(VALID_DOCS);
+
+      expect(exitCode).toBe(EXIT_SUCCESS);
+      expect(stdout).not.toContain('は無効です');
+    });
   });
 
   describe('不正な Frontmatter', () => {
