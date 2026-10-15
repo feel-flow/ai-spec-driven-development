@@ -61,7 +61,7 @@ function validateUserRegistration(data: unknown) {
     return { success: true, data: validatedData };
   } catch (error) {
     if (error instanceof z.ZodError) {
-      // ValidationDetail は PATTERNS.md「エラーハンドリング」の定義を import する（`./errors`）
+      // ValidationDetail は ERRORS.md の定義を import する（`./errors`）
       const details: ValidationDetail[] = error.errors.map((e) => ({
         field: e.path.join("."),
         message: e.message,
@@ -523,7 +523,7 @@ interface ValidationReport {
     failed: number;
     warnings: number;
   };
-  // 運用チェック結果の型。入力検証の ValidationDetail（PATTERNS.md「エラーハンドリング」、
+  // 運用チェック結果の型。入力検証の ValidationDetail（ERRORS.md、
   // field / message / constraint）とは別物で、名前も分ける（同名・別形状の並立を避ける）
   details: ValidationCheckDetail[];
 }

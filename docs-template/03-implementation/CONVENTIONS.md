@@ -317,7 +317,7 @@ async function fetchDashboard(userId: string): Promise<Dashboard> {
 ### エラーハンドリング
 
 ```typescript
-// エラークラスは PATTERNS.md「エラーハンドリング」の AppError 階層を正典とする。
+// エラークラスは ERRORS.md の AppError 階層を正典とする。
 // ここで別定義を作らない（同名・別形状のクラスが並立すると、どちらが正か
 // 判断できなくなる）。ValidationError.details は ValidationDetail[]
 // （field / message / constraint?）で、any は使わない。

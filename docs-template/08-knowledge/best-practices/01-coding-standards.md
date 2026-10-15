@@ -79,7 +79,7 @@ async function createUser(userData: CreateUserRequest): Promise<Result<User>> {
 **カスタムエラークラスの利用**:
 
 ```typescript
-// エラークラスは PATTERNS.md「エラーハンドリング」の AppError 階層を正典とする。
+// エラークラスは ERRORS.md の AppError 階層を正典とする。
 // ここで別形状の ValidationError を定義しない（同名・別形状が並立すると
 // どちらが正か判断できなくなる）。details は ValidationDetail[]（field / message / constraint?）
 import { ValidationError } from "./errors";

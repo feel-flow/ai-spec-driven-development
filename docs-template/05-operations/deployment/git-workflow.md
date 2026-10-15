@@ -167,7 +167,7 @@ git commit -m "feat: ユーザー認証機能を実装
 
 参照:
 - docs/MASTER.md:29 (認証方式)
-- docs/PATTERNS.md:145 (エラーハンドリング)
+- docs/03-implementation/ERRORS.md (エラーハンドリング)
 
 Closes #${ISSUE_NUM}
 
