@@ -488,14 +488,15 @@ ripgrep はパスを省略すると、stdin が TTY でない限り cwd では�
 
 ### OBS-032: pre-push がフル品質ゲートを実行するリポジトリで、push の直前に同じゲートを手動実行すると同一 HEAD でゲートが 2 回走る
 
-| Kind | problem | Count | 2 |
+| Kind | problem | Count | 3 |
 | First | 2026-10-15 | Last | 2026-10-15 |
-| Status | active | Issue | なし |
+| Status | promoted | Issue | feel-flow/ai-spec-driven-development#558 |
 
 `.husky/pre-push` が `npm run quality:local`（ゲート記録の書き込みを含む）を毎回実行するため、commit 直後に手動で回した結果は push の時点でそのまま再計測される → push する予定のコミットでは手動実行を省き、pre-push の実行をゲート実測と記録として扱う。手動実行は push しない段階の確認（commit 前の挙動確認）に限る。
 
 - 2026-10-15: Issue #389 / PR #552。3 回の push すべてで直前に手動実行しており、フルゲート 6 回のうち 3 回が同一 HEAD の重複だった（初回）
 - 2026-10-15: Issue #412 / PR #555。初回 commit 前と fix commit 前の 2 回とも手動実行し、続く 2 回の push の pre-push が同じ内容で再実行した（4 回中 2 回が重複）
+- 2026-10-15: Issue #556 / PR #557。fix commit 前に手動で回したゲートを、直後の push の pre-push が同じ内容で再実行した。Count 3 で #558 へ昇格（Epic #496 の sub-issue）
 
 ---
 
@@ -552,5 +553,33 @@ clone 方式によっては `refs/remotes/origin/HEAD` が作られず、ACE / �
 `/ace-curate` の同期検証は「npm script 登録済みなら npm run」を第 1 候補とするが、`-s` を付けて叩くと未登録でも空ログ・rc 1 になり、同期検証が赤と読める → 候補を選ぶ前に `grep -n '"<script>"' package.json` で登録を確かめ、未登録なら同梱の `ace-run-ts.sh` 経路を使う。
 
 - 2026-10-15: Issue #412 / PR #555。`ace:check-playbook-frontmatter` が未登録のまま `npm run -s` で叩いて rc 1・空ログになり、ログを読み直して不在と気づくまでに 1 往復かかった（初回）
+
+---
+
+<a id="obs-037"></a>
+
+### OBS-037: 文書の version を上げるとき frontmatter の `changeImpact` を前回の値のまま残すと、bump の段（patch / minor）と食い違い、レビューで差し戻される
+
+| Kind | problem | Count | 1 |
+| First | 2026-10-15 | Last | 2026-10-15 |
+| Status | active | Issue | なし |
+
+`version` を手で上げると、同じ frontmatter にある `changeImpact` が前回の変更の値のまま残りやすく、文書自身の更新規則（low → patch / medium → minor）と矛盾する → version を上げる編集では、`changeImpact` を今回の変更の影響度から決め直し、bump の段と同じ編集で揃える。
+
+- 2026-10-15: Issue #556 / PR #557。OPERATIONAL_GUIDE を 2.1.1（patch）に上げたが `changeImpact: medium` のまま残し、Codex の GitHub レビューが P2 で指摘した。fix commit と pre-push ゲートが 1 回ずつ増えた（初回）
+
+---
+
+<a id="obs-038"></a>
+
+### OBS-038: `/multi-review` の統合レポートは、型付き verdict 行の書式が崩れたレーンの指摘を `stray-token` として黙って落とすため、統合レポートだけを読むと Suggestion を取りこぼしうる
+
+| Kind | problem | Count | 1 |
+| First | 2026-10-15 | Last | 2026-10-15 |
+| Status | active | Issue | なし |
+
+レビュアーが `- verdict: suggestion failure_scenario=no ...` のように、重大度を `severity=` キーを付けずに位置で書くと、typed-verdict のパーサーがその行を拒否する。統合レポートには載らず、生成ログに 1 行出るだけになる → 統合レポートに加えて、各レーンのレポート本文（`.review-results/<cli>/<perspective>.md`）を直接読み、ログの `rejected` 行が指す指摘を拾い直す。
+
+- 2026-10-15: Issue #556 / PR #557。claude-code の test-analysis が出した Suggestion 1 件（MASTER.md と VALID_STATUS_VALUES の一致テスト）について、統合レポートの生成ログに `rejected (stray-token)` が出た。統合レポート本体での欠落は確かめていない。レーンのレポート本文を読んで拾い、対応した（初回）
 
 ---

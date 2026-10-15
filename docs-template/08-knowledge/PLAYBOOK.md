@@ -1,12 +1,12 @@
 ---
 title: "PLAYBOOK"
-version: "1.62.0"
+version: "1.63.0"
 status: "approved"
 created: "2026-03-10"
 updated: "2026-10-15"
 owner: "@fffokazaki"
 changeImpact: "medium"
-ace_entry_count: 109
+ace_entry_count: 110
 tags: [ace, playbook, knowledge-management]
 references:
   - https://github.com/feel-flow/ai-spec-driven-development/blob/HEAD/docs/ACE_FRAMEWORK.md
@@ -582,7 +582,7 @@ ACE エントリ ID は **PRスコープ式** を採用する（このセクシ�
 | Origin     | PR #397 / Issue #396  |
 | Related    | ACE-014 / ACE-015     |
 | Date       | 2026-05-06            |
-| Helpful    | 4                     |
+| Helpful    | 5                     |
 | Harmful    | 0                     |
 | Status     | active                |
 
@@ -2495,7 +2495,31 @@ PR #551 では PATTERNS.md §3 を新設の ERRORS.md へ移し、配布物リ�
 
 ---
 
+<a id="ace-557-1"></a>
+
+### ACE-557-1: 上流の変更を受け取るテンプレートと検証コードが同じ値集合を持つなら、テンプレートを正本と宣言し、両者を読み比べるテストで固定する
+
+| Category | testing | Origin | PR #557 / Issue #556 |
+| Related | ACE-551-1 / ACE-014 |
+| Date | 2026-10-15 |
+| Helpful | 0 | Harmful | 0 |
+| Status | active |
+
+上流から変更が届くテンプレートの enum を、検証スクリプトの定数や解説ガイドにも書くと、更新はテンプレートにだけ入り、残りは黙って古いまま残る。PR #557 では MASTER.md が上流から `deprecated` を取り込んで 4 値になっていたが、`validate-docs.mjs` とガイドは 3 値のままだった。しかもガイドが自分を正本と名乗っていたため、追従すべきだと誰も気づかなかった。同じ値を複数の場所に持つ必要があるなら、上流を受け取る側を正本と明記し、正本の該当行と定数行を実ファイルから抜き出して突き合わせるテストを置く。こうすれば、次に上流が変わったときに CI が赤になって知らせる。
+
+---
+
 ## Changelog
+
+### [1.63.0] - 2026-10-15
+
+#### 追加
+
+- ACE-557-1: 上流の変更を受け取るテンプレートと検証コードが同じ値集合を持つなら、テンプレートを正本と宣言し、両者を読み比べるテストで固定する（Issue #556 / PR #557）
+
+#### カウンター更新
+
+- ACE-018: Helpful 4→5（PR #557 で status の 3 値表記を区切りの揺れ違いを含めて grep で総当たりし、Issue の対象外だった `.claude/commands/pre-commit-check.md` と FRONTMATTER_GUIDE の §1.3 / §3 の取りこぼしを着手時に拾った）
 
 ### [1.62.0] - 2026-10-15
 
