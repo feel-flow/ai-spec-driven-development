@@ -1,10 +1,10 @@
 ---
 id: ace-setup
 title: ACE セットアップガイド
-version: 1.1.0
+version: 1.2.0
 status: active
 created: 2026-03-13
-updated: 2026-05-30
+updated: 2026-10-15
 owner: feel-flow
 tags: [ace, setup, knowledge-management, playbook]
 references:
@@ -243,6 +243,7 @@ PLAYBOOK.md のエントリ一覧セクション末尾に新エントリを追�
 - エントリは常にファイル末尾（Changelog セクションの直前）に追記する
 - 既存エントリの本文（新形式の散文 / 旧形式の Insight/Context/Action）の書き換えは禁止
 - カウンター更新と Status 変更のみ許可
+- 例外: 1 次情報で誤りを示せる事実主張（PR / Issue 番号・コミットハッシュ・数値）の訂正だけは、Issue で起票した訂正 PR で該当語句を置き換えてよい（条件の正本は PLAYBOOK.md「運用ルール」の「事実訂正の例外」。ACE の追記作業では行わない）
 
 #### カウンター運用ルール
 
@@ -311,6 +312,12 @@ PLAYBOOK.md のエントリ一覧セクション末尾に新エントリを追�
 ---
 
 ## Changelog
+
+### [1.2.0] - 2026-10-15
+
+#### 追加
+
+- §4 末尾追記ルールに「事実訂正の例外」を追記（正本は PLAYBOOK.md「運用ルール」。Issue #406 / PR #553）
 
 ### [1.1.0] - 2026-05-30
 

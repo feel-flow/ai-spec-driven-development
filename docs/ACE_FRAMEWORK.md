@@ -1,10 +1,10 @@
 ---
 id: ace-framework
 title: ACE (Agentic Context Engineering) フレームワーク
-version: 1.1.0
+version: 1.2.0
 status: active
 created: 2026-03-02
-updated: 2026-03-13
+updated: 2026-10-15
 owner: feel-flow
 tags: [ace, knowledge-management, playbook, ai-driven, context-engineering]
 references:
@@ -13,7 +13,7 @@ references:
   - docs-template/05-operations/deployment/ace-autonomous.md
   - docs-template/05-operations/deployment/knowledge-management.md
   - docs/ACE_SETUP.md
-changeImpact: high
+changeImpact: medium
 visibility: public
 ---
 
@@ -154,7 +154,7 @@ ACE サイクルは以下の3フェーズで構成される：
 
 ### Phase 3: Curate（増分更新）
 
-**原則**: Playbook は **末尾追記のみ**。既存エントリの書き換えは行わない。
+**原則**: Playbook は **末尾追記のみ**。既存エントリの書き換えは行わない（唯一の例外は下記「delta 方式のルール」の事実主張の訂正で、Curate では行わない）。
 
 **実行手順**:
 
@@ -230,14 +230,15 @@ Playbook は **AIツールが直接参照できる構造化ナレッジベース
 
 ### delta 方式のルール
 
-| 操作                                                                     | 許可 | 方法                                 |
-| ------------------------------------------------------------------------ | ---- | ------------------------------------ |
-| エントリ追加                                                             | Yes  | 末尾に追記                           |
-| カウンター更新                                                           | Yes  | 既存エントリの Helpful/Harmful を +1 |
-| ステータス変更                                                           | Yes  | active → deprecated                  |
-| エントリ削除                                                             | No   | deprecated にするのみ                |
-| エントリ本文の書き換え（新形式の散文 / 旧形式の Insight/Context/Action） | No   | 新エントリとして追記                 |
-| Frontmatter 更新                                                         | Yes  | version, updated, ace_entry_count    |
+| 操作                                                                     | 許可     | 方法                                                                                                                                |
+| ------------------------------------------------------------------------ | -------- | ----------------------------------------------------------------------------------------------------------------------------------- |
+| エントリ追加                                                             | Yes      | 末尾に追記                                                                                                                          |
+| カウンター更新                                                           | Yes      | 既存エントリの Helpful/Harmful を +1                                                                                                |
+| ステータス変更                                                           | Yes      | active → deprecated                                                                                                                 |
+| エントリ削除                                                             | No       | deprecated にするのみ                                                                                                               |
+| エントリ本文の書き換え（新形式の散文 / 旧形式の Insight/Context/Action） | No       | 新エントリとして追記                                                                                                                |
+| Frontmatter 更新                                                         | Yes      | version, updated, ace_entry_count                                                                                                   |
+| 事実主張の訂正（PR / Issue 番号・コミットハッシュ・数値）                | 限定 Yes | Issue 起票の訂正 PR で該当語句のみ置換し Changelog に旧値 → 新値と根拠を記録（正本: PLAYBOOK.md「運用ルール」の「事実訂正の例外」） |
 
 ### ファイルサイズ管理
 
@@ -328,6 +329,12 @@ ACE フレームワークをプロジェクトに導入する手順は [ACE_SETU
 ---
 
 ## Changelog
+
+### [1.2.0] - 2026-10-15
+
+#### 追加
+
+- delta 方式のルールに「事実主張の訂正」の限定例外を追加（正本は PLAYBOOK.md「運用ルール」。Issue #406 / PR #553）
 
 ### [1.1.0] - 2026-03-13
 
