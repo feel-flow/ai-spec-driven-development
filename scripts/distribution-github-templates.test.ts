@@ -36,7 +36,7 @@ const REPO_ROOT = resolve(__dirname, "..");
 const TEMPLATE_ROOT = join(REPO_ROOT, "docs-template");
 const DIST_GITHUB = join(TEMPLATE_ROOT, ".github");
 
-// /init-docs が初期配置する 20 ファイル。出典は ff-dev-toolkit の
+// /init-docs が初期配置する 21 ファイル。出典は ff-dev-toolkit の
 // skills/init-docs/SKILL.md「2. ディレクトリ構造の作成」。
 // 00-planning/ と 08-knowledge/ は初期セットに含まれない（後者は /ace-setup が作成）。
 const INITIAL_SET = new Set([
@@ -52,6 +52,7 @@ const INITIAL_SET = new Set([
   "docs/03-implementation/INTEGRATIONS.md",
   "docs/03-implementation/DECISION_TREE.md",
   "docs/03-implementation/FALLBACK.md",
+  "docs/03-implementation/ERRORS.md",
   "docs/04-quality/TESTING.md",
   "docs/04-quality/VALIDATION.md",
   "docs/05-operations/DEPLOYMENT.md",

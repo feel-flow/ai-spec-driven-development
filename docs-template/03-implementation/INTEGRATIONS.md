@@ -26,7 +26,7 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
 });
 
 // 決済の上流障害（Stripe API 障害・接続断）。category は transient（再試行対象）。
-// エラークラスは PATTERNS.md「エラーハンドリング」の AppError 階層を継承する
+// エラークラスは ERRORS.md の AppError 階層を継承する
 class PaymentError extends AppError {
   readonly category: ErrorCategory = "transient";
   constructor(message: string, options?: AppErrorOptions) {
@@ -767,7 +767,7 @@ class MetricsService {
 
 外部サービス呼び出しのエラー処理は、次の正典に従う（本ファイル内で別実装を作らない）:
 
-- **エラー型と正規化**: [PATTERNS.md](./PATTERNS.md)「エラーハンドリング」— `AppError` 階層（`cause` 付き）と `normalizeExternalError()`。外部 SDK の生エラーは境界で必ず正規化する
+- **エラー型と正規化**: [ERRORS.md](./ERRORS.md) — `AppError` 階層（`cause` 付き）と `normalizeExternalError()`。外部 SDK の生エラーは境界で必ず正規化する
 - **再試行**: [FALLBACK.md](./FALLBACK.md) §4「再試行ユーティリティ」— `retryWithBackoff(fn, { operation })`。再試行可否の判定（禁止カテゴリは再試行しない）・Jitter・試行ごとのログを内蔵する。副作用のある呼び出しは冪等キー付きでのみ再試行する（§2 決済システム統合の `createPaymentIntent`）
 - **フォールバック**: [FALLBACK.md](./FALLBACK.md) §4 `fallbackInProdOnly()` — AppError 以外は deny-by-default でスロー
 - **統合テスト**: [TESTING.md](../04-quality/TESTING.md) §3「外部サービス統合テスト（モック注入）」— 外部サービスをモック実装に差し替えて結合を検証する

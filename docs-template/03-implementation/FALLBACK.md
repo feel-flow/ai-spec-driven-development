@@ -10,7 +10,7 @@ changeImpact: "MEDIUM"
 
 # フォールバック戦略（Fail-Fast in Dev, Graceful in Prod）
 
-> **Origin**: [PATTERNS.md](./PATTERNS.md) セクション 3（エラーハンドリング） | **Related**: [DEPLOYMENT.md](../05-operations/DEPLOYMENT.md)
+> **Origin**: [PATTERNS.md](./PATTERNS.md) セクション 3（エラーハンドリング。エラー型の正典は [ERRORS.md](./ERRORS.md)） | **Related**: [DEPLOYMENT.md](../05-operations/DEPLOYMENT.md)
 
 ## 1. 基本原則
 
@@ -31,7 +31,7 @@ changeImpact: "MEDIUM"
 - **バリデーションエラー** — 不正データの伝播防止
 - **データ整合性エラー** — トランザクション一貫性の維持
 - **セキュリティ関連エラー** — 脆弱性の露出防止
-- **上流の恒久的な拒否（400 / 422 等、専用クラスを持たない 4xx）** — こちらの要求が誤っているサイン。本番でフォールバックすると自コードの欠陥が隠れる（404 は NotFoundError = permanent、429 は transient として別扱い。写像は PATTERNS.md `normalizeExternalError()`）
+- **上流の恒久的な拒否（400 / 422 等、専用クラスを持たない 4xx）** — こちらの要求が誤っているサイン。本番でフォールバックすると自コードの欠陥が隠れる（404 は NotFoundError = permanent、429 は transient として別扱い。写像は ERRORS.md `normalizeExternalError()`）
 
 ### 可観測性の原則
 
@@ -116,7 +116,7 @@ changeImpact: "MEDIUM"
 
 ```typescript
 // フォールバック禁止カテゴリ（Section 1 参照）は、各エラークラスが宣言する
-// category（PATTERNS.md「エラーハンドリング」の ErrorCategory）で判定する。
+// category（ERRORS.md の ErrorCategory）で判定する。
 // エラークラスの列挙（allowlist）だと、新しいエラー型（CsrfError 等）を定義して
 // 配列への追加を忘れた時点で黙ってフォールバック対象になる。category は抽象メンバ
 // なので、サブクラスを追加した瞬間にコンパイルが宣言を要求し、漏れない。
@@ -130,7 +130,7 @@ function isNeverFallback(error: AppError): boolean {
  *
  * deny-by-default: 引数は AppError に限定する（型でも実行時でも）。外部 SDK の生エラー・
  * AxiosError 等は禁止カテゴリかどうか判定できないため、環境に関係なくスローする。
- * HTTP 境界のエラーは呼び出し側で `normalizeExternalError()`（PATTERNS.md「外部境界の
+ * HTTP 境界のエラーは呼び出し側で `normalizeExternalError()`（ERRORS.md「外部境界の
  * エラー正規化」）を通してから渡す。これを怠ると、外部 API が返した 401/403 が本番で
  * 握りつぶされる。
  *
@@ -193,7 +193,7 @@ async function getConfig(key: string): Promise<string> {
 // 方法1（推奨）: ユーティリティ関数を使用
 // ※ 外部 API（HTTP）境界の例。DB ドライバのエラーは HTTP ステータスを持たないため
 //    normalizeExternalError には通さず、リポジトリ層の専用マッパーで一意制約違反 →
-//    ConflictError（禁止カテゴリ）等に写してから渡す（PATTERNS.md「外部境界のエラー正規化」）
+//    ConflictError（禁止カテゴリ）等に写してから渡す（ERRORS.md「外部境界のエラー正規化」）
 async function getUser(id: string): Promise<User> {
   try {
     // ※ null処理は省略（フォールバック問題に焦点）

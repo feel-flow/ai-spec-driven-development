@@ -9,7 +9,7 @@ metadata:
   version: "1.0.0"
   author: feel-flow
   tags: "error-handling, silent-error, result-pattern, catch-blocks, logging"
-  references: "docs/MASTER.md, docs/03-implementation/PATTERNS.md"
+  references: "docs/MASTER.md, docs/03-implementation/PATTERNS.md, docs/03-implementation/ERRORS.md"
 ---
 
 # Error Handler Hunter Agent
@@ -121,5 +121,6 @@ async function processUser(id: string): Promise<Result<User>> {
 ## 参照ドキュメント
 
 - `docs/MASTER.md` — エラーハンドリング方針・禁止事項
-- `docs/03-implementation/PATTERNS.md` — エラーハンドリングパターン
+- `docs/03-implementation/ERRORS.md` — エラー型（AppError 階層）と外部境界の正規化
+- `docs/03-implementation/PATTERNS.md` — ログパターン（§9）
 - `.github/skills/error-handling-standards/SKILL.md` — エラーハンドリング Skill

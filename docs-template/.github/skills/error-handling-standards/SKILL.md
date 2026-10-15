@@ -4,7 +4,7 @@ description: >-
   Enforces error handling standards: silent error prohibition, custom error
   class hierarchy (AppError base with category never-fallback / transient /
   permanent, cause preservation, ValidationError / UnauthorizedError /
-  UpstreamError etc. — canonical definitions in PATTERNS.md), external-boundary
+  UpstreamError etc. — canonical definitions in ERRORS.md), external-boundary
   normalization (normalizeExternalError), Result pattern (Result.ok/Result.fail),
   proper try-catch with error type checking, structured error logging with a
   single Logger contract, fallback prohibition categories (isNeverFallback),
@@ -14,13 +14,13 @@ metadata:
   version: "1.2.0"
   author: feel-flow
   tags: "error-handling, result-pattern, custom-errors, logging, silent-error"
-  references: "docs/03-implementation/PATTERNS.md, docs/03-implementation/FALLBACK.md, docs/MASTER.md"
+  references: "docs/03-implementation/ERRORS.md, docs/03-implementation/PATTERNS.md, docs/03-implementation/FALLBACK.md, docs/MASTER.md"
 ---
 
 # エラーハンドリング基準
 
 サイレントエラーゼロトレランスを原則とし、すべてのエラーを適切に分類・処理・記録するためのスキル。
-PATTERNS.md のセクション 3, 9 および FALLBACK.md で定義されたパターンを適用する。
+ERRORS.md、PATTERNS.md のセクション 9 および FALLBACK.md で定義されたパターンを適用する。
 
 ## 1. サイレントエラーの禁止
 
@@ -56,7 +56,7 @@ throw new Error("Something went wrong");
 
 ## 2. カスタムエラークラス階層
 
-プロジェクトでは AppError を基底クラスとしたエラー階層を使用する。**定義の正典は PATTERNS.md「エラーハンドリング」**（本ファイルには基底クラスと 1 例だけを載せ、サブクラスの全一覧は複製しない — 複製は必ずドリフトする）：
+プロジェクトでは AppError を基底クラスとしたエラー階層を使用する。**定義の正典は ERRORS.md**（本ファイルには基底クラスと 1 例だけを載せ、サブクラスの全一覧は複製しない — 複製は必ずドリフトする）：
 
 ```typescript
 // options.cause で元エラーを保持する（ES2022 Error.cause。tsconfig の lib に ES2022 が必要）
@@ -78,7 +78,7 @@ abstract class AppError extends Error {
   }
 }
 
-// バリデーション詳細（any を使わない / MASTER.md）。PATTERNS.md と同じ形状
+// バリデーション詳細（any を使わない / MASTER.md）。ERRORS.md と同じ形状
 interface ValidationDetail {
   field: string;
   message: string;
@@ -86,8 +86,8 @@ interface ValidationDetail {
 }
 
 // サブクラスの例（他の NotFoundError / ForbiddenError / ConflictError / UnauthorizedError /
-// SecurityError / InternalError / UpstreamError / UpstreamRejectedError は PATTERNS.md）
-// HTTP_STATUS は PATTERNS.md「エラーハンドリング」で定義済み（AppError と同じモジュールから import）
+// SecurityError / InternalError / UpstreamError / UpstreamRejectedError は ERRORS.md）
+// HTTP_STATUS は ERRORS.md で定義済み（AppError と同じモジュールから import）
 class ValidationError extends AppError {
   readonly category: ErrorCategory = "never-fallback";
   constructor(
@@ -114,7 +114,7 @@ class ValidationError extends AppError {
 | UpstreamError         | `UPSTREAM_UNAVAILABLE` | 502             | transient      | 外部サービスの一時障害（再試行可）                                               |
 | UpstreamRejectedError | `UPSTREAM_REJECTED`    | 502             | never-fallback | 外部サービスによる恒久的な拒否（自コードの要求誤り。本番でフォールバックしない） |
 
-すべて PATTERNS.md「エラーハンドリング」で定義済み。新しいエラー種別が必要な場合は、必ず AppError を継承し `category` を宣言して作成する（宣言しないとコンパイルエラーになる）。
+すべて ERRORS.md で定義済み。新しいエラー種別が必要な場合は、必ず AppError を継承し `category` を宣言して作成する（宣言しないとコンパイルエラーになる）。
 
 ## 4. Result パターン
 
@@ -202,7 +202,7 @@ try {
 - 具体的なエラーから順に処理
 - 未知のエラーは `InternalError` でラップして再スロー（`{ cause }` で元エラーを保持）
 - 元のエラー情報は必ずログに記録
-- 外部 SDK / HTTP クライアントのエラーは境界で `normalizeExternalError()`（PATTERNS.md）により AppError へ正規化する
+- 外部 SDK / HTTP クライアントのエラーは境界で `normalizeExternalError()`（ERRORS.md）により AppError へ正規化する
 
 ## 6. 構造化エラーログ
 
