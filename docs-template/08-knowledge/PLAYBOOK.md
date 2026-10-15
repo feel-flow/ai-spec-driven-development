@@ -1,12 +1,12 @@
 ---
 title: "PLAYBOOK"
-version: "1.57.0"
+version: "1.58.0"
 status: "approved"
 created: "2026-03-10"
 updated: "2026-10-15"
 owner: "@fffokazaki"
 changeImpact: "medium"
-ace_entry_count: 105
+ace_entry_count: 106
 tags: [ace, playbook, knowledge-management]
 references:
   - https://github.com/feel-flow/ai-spec-driven-development/blob/HEAD/docs/ACE_FRAMEWORK.md
@@ -2431,14 +2431,37 @@ SBOM などの生成物は「生成できた」時点で完了と報告されや
 
 | Category | documentation-quality | Origin | PR #549 / Issue #511 |
 | Date | 2026-10-15 |
-| Helpful | 0 | Harmful | 0 |
+| Helpful | 1 | Harmful | 0 |
 | Status | active |
 
 レビューから分離した follow-up Issue は、起票後も元の PR の修正が続くため、本文の数値（行数・件数など）が着手時には古くなっている。Issue #511 は 862 行の前提で「§1 を分離すれば 700 行前後」と見積もっていたが、着手時の実測は 980 行で、その案だけでは約 817 行となり 800 行以下という AC を満たせなかった。着手時に対象を実測し、計画した移設量・削減量で AC の閾値を下回るかを実装前に計算する。足りなければ追加の移設先を選び、その理由を PR 本文に書く。
 
 ---
 
+<a id="ace-551-1"></a>
+
+### ACE-551-1: 外部の正本を写したガードテストのスナップショットだけを更新すると、ガードは緑のまま正本とずれる — 正本の更新と同時に行うか、ずれと追跡先をスナップショット側に明記する
+
+| Category | documentation-quality | Origin | PR #551 / Issue #550 |
+| Date | 2026-10-15 |
+| Helpful | 0 | Harmful | 0 |
+| Status | active |
+
+PR #551 では PATTERNS.md §3 を新設の ERRORS.md へ移し、配布物リンクガードの INITIAL_SET（ff-dev-toolkit の init-docs SKILL.md を写した初期セット）に ERRORS.md を足した。しかし出典の SKILL.md と同梱 docs-template は別リポジトリにあり、そちらは 20 ファイルのままだった。テストは緑になったが、上流が PATTERNS.md だけを移植すると展開先でエラー型の正典が消える。この矛盾はレビュー 3 レーンが独立に指摘した。外部の正本を写したスナップショットを変えるときは、同じ変更で正本も更新する。それが別リポジトリでできない場合は、スナップショットのコメントに「正本とのずれ・追跡 Issue・同時に移植すべきファイル」を書き、追跡 Issue の AC に原子的な移植を入れる。
+
+---
+
 ## Changelog
+
+### [1.58.0] - 2026-10-15
+
+#### 追加
+
+- ACE-551-1: 外部の正本を写したガードテストのスナップショットだけを更新すると、ガードは緑のまま正本とずれる — 正本の更新と同時に行うか、ずれと追跡先をスナップショット側に明記する（Issue #550 / PR #551）
+
+#### カウンター更新
+
+- ACE-549-1: Helpful 0→1（PR #551 で着手時に PATTERNS.md と §3 範囲を実測し、移設後約 793 行と見積もってから実装した再適用）
 
 ### [1.57.0] - 2026-10-15
 
