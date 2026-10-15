@@ -258,4 +258,4 @@ Issue #377 の設計時点（2026-04）の改稿案は、**PR テンプレート
 
 ---
 
-_最終更新: public / private の適用範囲（Issue #517）。それ以前は移行実装（Issue #377 系）_
+_最終更新: §3.3 に `quality:local` の段ラベルと `--only` を設けない理由を追記（Issue #389）。それ以前は public / private の適用範囲（Issue #517）、移行実装（Issue #377 系）_
