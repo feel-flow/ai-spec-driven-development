@@ -728,25 +728,25 @@ ACE Playbook で `Helpful >= 5` に達した知見を、`/ace-refine` が蒸留�
 
 PR を作る前のセルフレビューでは、Claude 系のレビューと別系列モデル（Codex 等）のクロスモデルレビューを両方実行する。モデルの系列ごとに検出できる問題のカテゴリが違うため、片方だけでは見落としが残る。
 
-出典: [ACE-001](../08-knowledge/PLAYBOOK.md#ace-001)
+出典: [ACE-001](https://github.com/feel-flow/ai-spec-driven-development/blob/HEAD/docs-template/08-knowledge/PLAYBOOK.md#ace-001)
 
 ### 同系列レビュアーの全員承認を正しさの証拠にしない
 
 同系列のレビュアーが「既存コードと整合的」を理由に全員承認した箇所は、別系列のクロスモデルレビューへ回す。既存の helper を写すときは写し元の欠陥まで継承していないかを疑い、片方だけ直さずに共有 helper へ抽出して両方を直す。
 
-出典: [ACE-445-1](../08-knowledge/PLAYBOOK.md#ace-445-1)
+出典: [ACE-445-1](https://github.com/feel-flow/ai-spec-driven-development/blob/HEAD/docs-template/08-knowledge/PLAYBOOK.md#ace-445-1)
 
 ### 番号・順序の横断変更は着手前に対象を全件列挙する
 
 番号・順序を横断的に変えるときは、着手前に意味的に等価な複数の grep パターン（直接参照・順序の散文・状態の説明・メタデータ・段階数）で対象ファイルを全部列挙する。「旧表現の grep ヒットなし」を受け入れ条件に書く。
 
-出典: [ACE-018](../08-knowledge/PLAYBOOK.md#ace-018)
+出典: [ACE-018](https://github.com/feel-flow/ai-spec-driven-development/blob/HEAD/docs-template/08-knowledge/PLAYBOOK.md#ace-018)
 
 ### 「違反ゼロ」を期待するガードは検出器自体をテストする
 
 `expect(violations).toEqual([])` の形の規約ガードを書くときは、合成入力で検出器そのものを固定するテスト（拾うべき形・拾ってはいけない形・境界値）を同じ PR に置く。実ファイルで違反ゼロを確かめるだけでは、検出器が壊れても緑のまま通る。
 
-出典: [ACE-489-1](../08-knowledge/PLAYBOOK.md#ace-489-1)
+出典: [ACE-489-1](https://github.com/feel-flow/ai-spec-driven-development/blob/HEAD/docs-template/08-knowledge/PLAYBOOK.md#ace-489-1)
 
 ## Changelog
 
