@@ -345,7 +345,7 @@ Always reference MASTER.md for project-specific requirements.
 
 ### 4. Git Workflow・セルフレビュー
 
-**基本フロー**: Issue作成 → Branch作成 → 実装 → セルフレビュー → テスト → Commit → PR作成 → **Claude Code + Codex クロスモデルレビュー** → マージ → cleanup → **ACE 知見体系化**
+**基本フロー**: Issue作成 → Branch作成 → 実装 → テスト → セルフレビュー → Commit → PR作成 → **Claude Code + Codex クロスモデルレビュー** → マージ → cleanup → **ACE 知見体系化**
 
 クロスモデルレビューの入口は `/multi-review --mode cross-model --strategy minimize_cost --perspective code-review --base origin/develop` **1 本**。`scripts/codex-review.sh` は Codex だけ欲しいときの互換入口で、推奨入口の後に重ねない。シムは plugin cache から自動解決し（`FF_DEV_TOOLKIT_ROOT` は未設定でよい）、`scripts/.ff-dev-toolkit-root` はコミットしない。plugin 未導入時のエラーは `setup-multi-agent.sh` と名前だけ出す（このリポジトリ直下の同名スクリプトは別物）。`.review-results/` は gitignore 済みの使い捨て成果物で、マージ後に残っていれば削除する。`--fresh` はエラーが leftover で止まったときだけ使う。
 
@@ -357,7 +357,7 @@ Always reference MASTER.md for project-specific requirements.
 
 **セルフレビュー必須項目**: DRY原則、コード品質、Import整理、テスト、自動チェック通過
 
-**テスト（`quality:local`）の手動実行**: push する予定のコミットでは省いてよい。`.husky/pre-push` が push のたびに `npm run quality:local` を実行し、ゲートの実測と記録（gate-record）を兼ねる。手動実行は push しない段階の確認（commit 前の挙動確認、push 前に失敗を早く知りたい場合）に限る（同じ HEAD にゲートを 2 回走らせない）
+**テスト（`quality:local`）の手動実行**: push する予定のコミットでは省いてよい。通常の push では `.husky/pre-push` が `npm run quality:local` を実行し、ゲートの実測と記録（gate-record。記録器が無い環境では記録しない）を兼ねる。ただし pre-push は作業ツリーを測るため、未コミットの変更が残っていると HEAD の実測にならない。手動実行は push しない段階の確認（commit 前の挙動確認、push 前に失敗を早く知りたい場合）に限り、手動実行と pre-push で同じ HEAD を二重に測らない。手動実行を省いた場合、ゲートの合否は push 時に確定する。pre-push を回避した（`SKIP_QUALITY_GATE=1` / `--no-verify`）場合や、環境要因で pre-push が実測にならない場合（例: Windows で既知の失敗があり別環境で測る）は、手動実行で測り PR 本文で申告する
 
 詳細は以下のテンプレートを参照:
 

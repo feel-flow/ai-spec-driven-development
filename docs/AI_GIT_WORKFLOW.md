@@ -221,7 +221,7 @@ Closes #123"
 
 #### テスト・品質ゲートの実行
 
-**本リポジトリ（`feel-flow/ai-spec-driven-development`）**では、PR 前にルートで次のゲートを通す（push 時に `.husky/pre-push` が実行する。手動実行の要否は下記）。ローカルゲートが一次であり、public リポジトリのため GitHub Actions（`.github/workflows/ci.yml`）が同じコマンドを第二のゲートとして PR 上でも実行する。
+**本リポジトリ（`feel-flow/ai-spec-driven-development`）**では、PR 前にルートで次のゲートを通す（通常の push では `.husky/pre-push` が実行する。手動実行の要否は下記）。ローカルゲートが一次であり、public リポジトリのため GitHub Actions（`.github/workflows/ci.yml`）が同じコマンドを第二のゲートとして PR 上でも実行する。
 
 **GitHub Actions の適用範囲**（[Issue #517](https://github.com/feel-flow/ai-spec-driven-development/issues/517)）:
 
@@ -235,7 +235,7 @@ Closes #123"
 npm run quality:local
 ```
 
-**手動実行を省ける場合**（[Issue #558](https://github.com/feel-flow/ai-spec-driven-development/issues/558)）: `.husky/pre-push` は push のたびに `npm run quality:local`（ゲート記録 gate-record の書き込みを含む）を実行する。push する予定のコミットでは手動実行を省いてよく、pre-push の実行がゲートの実測と記録を兼ねる。手動実行は push しない段階の確認（commit 前の挙動確認、push 前に失敗を早く知りたい場合）に限る。同じ HEAD にゲートを 2 回走らせない。
+**手動実行を省ける場合**（[Issue #558](https://github.com/feel-flow/ai-spec-driven-development/issues/558)）: 通常の push では `.husky/pre-push` が `npm run quality:local`（ゲート記録 gate-record の書き込みを含む。記録器が無い環境では記録しない）を実行する。push する予定のコミットでは手動実行を省いてよく、pre-push の実行がゲートの実測と記録を兼ねる。ただし pre-push は作業ツリーを測るため、未コミットの変更が残っていると HEAD の実測にならない。手動実行は push しない段階の確認（commit 前の挙動確認、push 前に失敗を早く知りたい場合）に限り、手動実行と pre-push で同じ HEAD を二重に測らない。pre-push を回避した（`SKIP_QUALITY_GATE=1` / `--no-verify`）場合や、環境要因で pre-push が実測にならない場合（例: Windows で既知の失敗があり別環境で測る）は、手動実行で測り PR 本文で申告する（[NO_GITHUB_ACTIONS_MIGRATION_DESIGN.md §4.2](./NO_GITHUB_ACTIONS_MIGRATION_DESIGN.md) の「スキップした場合は PR 本文等で申告する」と同じ運用）。
 
 **汎用プロジェクト向けの例**（各リポジトリの `package.json` に従う）:
 
@@ -262,7 +262,7 @@ npm audit --audit-level=moderate
 | テストカバレッジ | 80%以上                 |
 | セキュリティ     | moderate以上の脆弱性0件 |
 
-**ポイント**: 全テスト通過後にセルフレビュー（ステップ5）へ進む
+**ポイント**: テスト通過の確認は手動実行または push 時の pre-push で行う。手動実行で通過を確認した場合はそのままセルフレビュー（ステップ5）へ進む。手動実行を省いた場合、ゲートの合否は push（ステップ6）で確定する（失敗したら修正し、セルフレビューの該当観点を見直してから再 push する）
 
 **バックグラウンド実行時の注意**: 品質ゲートをバックグラウンドで回している間は、そのゲートの対象ファイル（ソース・テスト・設定）を編集しない。ゲートは開始時にツリーをスナップショットせず各ステージが逐次ファイルを読むため、途中で編集すると旧内容と新内容が混在し、結果が最終ツリーと一致する保証を無言で失う。待ち時間に充てるのは**読み取りだけ**の作業（docs 読み・既存 Issue 検索）に限る。ADR や修正案の下書きは、`docs/**` がゲート対象（Prettier / markdownlint）のため、ゲート対象外のスクラッチ領域で行い、完了後に反映する。対象ファイルを編集した場合はその実行を無効と見なして測り直す（観測: [OBS-015](./08-knowledge/OBSERVATIONS.md#obs-015)）。
 
@@ -282,7 +282,7 @@ grep -E "error|FAIL" "$OUTPUT_FILE" | tail -8
 
 #### 完了基準: 80% ルール
 
-書籍 第13章「それ、結局エンジニアが全部書くのでは？」では、AI 駆動開発において「**完璧な 100% を目指して延々と磨き続けるより、80% で出して回した方が結果的に品質が上がる**」と整理されています。本リポジトリではステップ4（Test）通過後に以下の 3 観点で「80% に到達したか」を判断します。
+書籍 第13章「それ、結局エンジニアが全部書くのでは？」では、AI 駆動開発において「**完璧な 100% を目指して延々と磨き続けるより、80% で出して回した方が結果的に品質が上がる**」と整理されています。本リポジトリではテスト通過の確認後（手動実行を省いた場合は push（ステップ6）時の pre-push 通過後）に以下の 3 観点で「80% に到達したか」を判断します。
 
 | 観点                 | 80% の意味                                                            | 残り 20% の扱い                       |
 | -------------------- | --------------------------------------------------------------------- | ------------------------------------- |
