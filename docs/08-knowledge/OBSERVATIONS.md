@@ -388,14 +388,15 @@ dry-run で grok-cli が `runtime-socket deny resolution failed` と出ても、
 
 ### OBS-025: 依存未導入のチェックアウトで `quality:local` を走らせると tsc の TS2688 で落ち、原因が「npm ci 未実行」だと読めない
 
-| Kind | problem | Count | 2 |
-| First | 2026-10-15 | Last | 2026-10-15 |
-| Status | active | Issue | なし |
+| Kind | problem | Count | 3 |
+| First | 2026-10-15 | Last | 2026-10-16 |
+| Status | promoted | Issue | feel-flow/ai-spec-driven-development#565 |
 
 `quality:local` は意図的に `npm ci` を含まないため、ルートと `mcp/` の `node_modules` が無いと最初の `build:mcp` が `Cannot find type definition file for 'node'` で落ち、型定義の不備に見えて 1 回ゲートを空費する → ゲート冒頭で `node_modules` の有無を検査し、無ければ `npm ci`（ルートと `mcp/`）を名指しして止めよ。
 
 - 2026-10-15: PR #543 の PR 前ゲートで TS2688 により exit 2。`node_modules` が両方とも不在だと確認し、`npm ci` を 2 か所で実行してから再実行で通過（初回）
 - 2026-10-15: Issue #406 / PR #553 の PR 前ゲートで、ルートの `node_modules` はあったが `mcp/node_modules` が無く TS2688 で exit 2。`npm --prefix mcp ci` 後の再実行で通過
+- 2026-10-16: PR #562 の PR 前ゲートで `mcp/node_modules` が無く [3/8] が `'vitest' は認識されていません` で exit 1。`npm --prefix mcp ci` 後はルートの `node_modules` 不在で [4/8] が同じ形で落ち、`npm ci` 後に 3 周目を回した（Count 3 で昇格）
 
 ---
 
@@ -419,14 +420,15 @@ dry-run で grok-cli が `runtime-socket deny resolution failed` と出ても、
 
 ### OBS-027: `finish.sh precheck` が separate-push で生成する MERGE_COMMAND は、`delete_branch_on_merge=true` のリポジトリでは head 削除 push が `cannot lock ref` で落ち、マージ成功でも rc 1 を返す
 
-| Kind | problem | Count | 1 |
-| First | 2026-10-15 | Last | 2026-10-15 |
+| Kind | problem | Count | 2 |
+| First | 2026-10-15 | Last | 2026-10-16 |
 | Status | promoted | Issue | feel-flow/feelflow-plugins#2135 |
 
 base を別 worktree が保持していると precheck は `--delete-branch` を外し、lease 付きの削除 push を `&&` で連結する。GitHub がマージ時に head を消すリポジトリでは、この削除が必ず失敗する。その結果マージ成否の判別に `gh pr view` / `ls-remote` での実測が 1 回余計に要る → precheck は削除の生成前にリポジトリ設定か ref の実在を確かめ、ref が無ければ削除をスキップして成功扱いにせよ。
 
 - 2026-10-15: PR #546 のマージで MERGE_COMMAND が rc 1。`gh pr view` は MERGED、`git ls-remote` は該当 ref なし、`delete_branch_on_merge=true` を確認（初回）
 - 2026-10-15: toolkit 側の修正で構造的に解消できる種類のため、利用者の起票方針（actionable は承認待ちなしで起票）に従い閾値未達で feel-flow/feelflow-plugins#2135 へ起票
+- 2026-10-16: PR #564 のマージで MERGE_COMMAND の削除 push が `! [rejected] (delete) ... (stale info)` で失敗。マージは成功、`delete_branch_on_merge=true` で ref は既に無かった。feel-flow/feelflow-plugins#2135 へ再発をコメント
 
 ---
 
@@ -584,5 +586,47 @@ clone 方式によっては `refs/remotes/origin/HEAD` が作られず、ACE / �
 レビュアーが `- verdict: suggestion failure_scenario=no ...` のように、重大度を `severity=` キーを付けずに位置で書くと、typed-verdict のパーサーがその行を拒否する。統合レポートには載らず、生成ログに 1 行出るだけになる → 統合レポートに加えて、各レーンのレポート本文（`.review-results/<cli>/<perspective>.md`）を直接読み、ログの `rejected` 行が指す指摘を拾い直す。
 
 - 2026-10-15: Issue #556 / PR #557。claude-code の test-analysis が出した Suggestion 1 件（MASTER.md と VALID_STATUS_VALUES の一致テスト）について、統合レポートの生成ログに `rejected (stray-token)` が出た。統合レポート本体での欠落は確かめていない。レーンのレポート本文を読んで拾い、対応した（初回）
+
+---
+
+<a id="obs-039"></a>
+
+### OBS-039: `/ace-refine` の大量整理で、移送・保全・一意性検証をスクリプト 1 本で回せる前提を見積もりに入れないと、乖離率 0.33 の過大見積もりになる
+
+| Kind | problem | Count | 1 |
+| First | 2026-10-16 | Last | 2026-10-16 |
+| Status | active | Issue | なし |
+
+アーカイブ 64 件・圧縮 30 件の refine を、移送と検証は手作業、要約はサブエージェント委譲と差し戻し前提で積んだが、実際は verbatim 移送・provenance 付与・一意性検証を 1 本の node スクリプトで行い、要約はコントローラが直接書いて 1 回で通った → 件数の多い refine は「機械的な移送はスクリプト 1 本 + 判断が要る要約だけ件数比例」で積め
+
+- 2026-10-16: Issue #561 / PR #562。AI 予定 4.5h → 実績 1.5h（hook 実測 wallclock 1.1h）、乖離率 0.33（初回）
+
+---
+
+<a id="obs-040"></a>
+
+### OBS-040: CI checks が無い、または Windows で全件ゲートが完走しないリポジトリでは、WSL の Linux クローンで全件ゲートを回すとマージ判定の根拠が得られる
+
+| Kind | keep | Count | 1 |
+| First | 2026-10-16 | Last | 2026-10-16 |
+| Status | active | Issue | なし |
+
+Windows の Git Bash では `tests/run-all.sh` が 2 時間超で完走せず、PR 単位の CI も無いため、`finish.sh precheck` が `RERUN_FULL_GATE=yes` のまま判定不能になる。WSL へブランチを `git clone` して高速モードの全件ゲートを回すと 140 suite が完走し、Windows では見えない赤（公開ミラー対象ファイルの番号参照）も検出できた → Windows ホストで全件ゲートが要る PR は、最初から WSL の Linux クローンで回す
+
+- 2026-10-16: feel-flow/feelflow-plugins PR #2145。WSL で 2 回実行し、1 回目で `sync-forbidden-patterns` の赤を検出、修正後 139 passed / 0 failed（初回）
+
+---
+
+<a id="obs-041"></a>
+
+### OBS-041: Bash の heredoc 経由で Python に改行コードのエスケープを含む文字列を渡すと、エスケープが剥がれて実制御文字が埋まり、生成物が壊れる
+
+| Kind | problem | Count | 1 |
+| First | 2026-10-16 | Last | 2026-10-16 |
+| Status | active | Issue | なし |
+
+`python - <<'EOF'` の中に改行コードのエスケープ（バックスラッシュ r / n）を書いて別ファイルへ書き出すと、Bash ツールから Python の文字列リテラル評価までのどこかでエスケープが剥がれ、出力先に実際の CR / LF が入る。JS ファイルへのパッチでは文字列リテラルが行をまたいで構文が壊れ、Markdown への追記では見出しとコードスパンが途中で改行された → 改行コードの表記を含む内容の生成・修正は Bash の heredoc を通さず、Write / Edit ツールで直接書く
+
+- 2026-10-16: PR #562 の作業中、`archive.mjs` の CRLF 対応パッチで発生。ファイルを Write で書き直して 1 往復を失った（初回）。同じセッションで本エントリ自体を heredoc の Python で台帳へ追記した際にも見出しが途中で改行され、Write で書いた差し替え用ファイルから直した
 
 ---

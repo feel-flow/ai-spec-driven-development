@@ -1,12 +1,12 @@
 ---
 title: "PLAYBOOK"
-version: "1.65.0"
+version: "1.66.0"
 status: "approved"
 created: "2026-03-10"
 updated: "2026-10-16"
 owner: "@fffokazaki"
 changeImpact: "medium"
-ace_entry_count: 49
+ace_entry_count: 50
 tags: [ace, playbook, knowledge-management]
 references:
   - https://github.com/feel-flow/ai-spec-driven-development/blob/HEAD/docs/ACE_FRAMEWORK.md
@@ -462,7 +462,7 @@ GitHub の PR / Issue 本文はファイル単体の閲覧と異なる base URL 
 | Category | documentation-quality | Origin | PR #447 / Issue #446 |
 | Related | ACE-046, ACE-443-1 |
 | Date | 2026-06-23 |
-| Helpful | 1 | Harmful | 0 |
+| Helpful | 2 | Harmful | 0 |
 | Status | active |
 
 配布テンプレート（`docs-template/`）内のリンクが配布ツリーの外を指すと、コピーした下流でリンク切れになり、配布物が自己完結しない。ドッグフード側の絶対 URL を配布側の相対パスへ機械変換するとき、ツリー外への参照は `../../../docs/...` となって境界を脱出するので、「URL 形式だけの差分」に見えて実は到達範囲の差になっている（PR #447 の Issue テンプレート同期で発生した）。配布物を編集したら `grep -rn '\.\./\.\./\.\./' docs-template/` 等でツリーの脱出を検出し、ツリー外への参照は配布側ではプレーンテキストにするか、ツリー内の等価な文書へ張り替える。
@@ -570,7 +570,7 @@ git は hook の実行時に `GIT_DIR` 等の環境変数を設定するため�
 
 | Category | testing | Origin | PR #484 / Issue #483 |
 | Date | 2026-08-28 |
-| Helpful | 1 | Harmful | 0 |
+| Helpful | 2 | Harmful | 0 |
 | Status | active |
 
 配布物のリンク規約を Playbook に書くだけでは適用が人手の grep に頼るため取り残しが出るうえ、リンクは「利用者側レイアウトでパスが解決するか」と「Issue / PR 本文の描画文脈で解決するか」の 2 軸で壊れるので、片方だけ直して直ったと誤認しやすい（PR #484 では既存の ACE-046 / ACE-447-2 が 14 リンクに未適用のまま残っていた）。規約を新設・適用したら同じ PR で、利用者側レイアウトを写像で再現し、相対リンク・inline code のパス・frontmatter の references をすべて解決するテストを足す。テストが修正前の内容で実際に落ちることを確かめてから緑にし、テスト名には検証している内容だけを名乗らせる。
@@ -583,7 +583,7 @@ git は hook の実行時に `GIT_DIR` 等の環境変数を設定するため�
 
 | Category | tooling | Origin | PR #484 / Issue #485 |
 | Date | 2026-08-28 |
-| Helpful | 2 | Harmful | 0 |
+| Helpful | 3 | Harmful | 0 |
 | Status | active |
 
 整形結果が版で変わるフォーマッタ（prettier 等）を `^` 範囲で許し、pre-push でフル品質ゲートを強制していると、パッチ版が上がっただけで触っていないファイルが赤くなり、全員の push が止まる（PR #484 ではローカルの prettier 3.9.6 と lockfile の 3.8.3 で整形結果が異なった）。症状が自分の差分と無関係に見えるので、原因をコードに求めて時間を溶かしやすい。整形系の devDependency は厳密に固定し、`npm ci` が通る状態を保って「`npm ci` で環境を揃えてからゲートを回す」と手順に書き、未変更ファイルが落ちたら既定ブランチの状態で再実行して既存の破綻かを切り分け、ツールの版と lockfile の版を突き合わせる。
@@ -832,7 +832,32 @@ PR #551 では PATTERNS.md §3 を新設の ERRORS.md へ移し、配布物リ�
 
 ---
 
+<a id="ace-562-1"></a>
+
+### ACE-562-1: refine の stale 判定は文書からの引用を見ないため、Archive 候補は現行ルールとして参照されていないかを確かめてから承認する
+
+| Category | knowledge-management | Origin | PR #562 |
+| Date | 2026-10-16 |
+| Helpful | 0 | Harmful | 0 |
+| Status | active |
+
+`ace-refine-report` の Archive 候補は Helpful=0 と一定期間の参照の無さから機械的に出るため、ワークフロー文書が「このルールとは別物」「引き続き有効」と現行ルールとして引用しているエントリまで stale に含まれる（PR #562 では ACE-012 / ACE-034 をアーカイブし、レビューで live へ戻した）。候補が数十件規模になる refine で、件数を一括承認するときに起きやすい。承認前に各候補 ID をリポジトリ全体で grep し、運用文書・スキル・コマンドから規範として参照されているものは Archive から外して圧縮（正準化）に回す。
+
+---
+
 ## Changelog
+
+### [1.66.0] - 2026-10-16
+
+#### 追加
+
+- ACE-562-1: refine の stale 判定は文書からの引用を見ないため、Archive 候補は現行ルールとして参照されていないかを確かめてから承認する（PR #562）
+
+#### カウンター更新
+
+- ACE-447-2: Helpful 1→2（PR #562 で、配布される PLAYBOOK.md / git-workflow.md から `/ace-setup` が配置しない `playbook/archive/` への相対リンクを Codex connector が指摘し、blob/HEAD の絶対 URL に変えた）
+- ACE-484-2: Helpful 1→2（PR #562 で、初期セットの PATTERNS.md から 08-knowledge/ への相対リンクを `distribution-github-templates.test.ts` の判定で事前に検出し、出典を絶対 URL にした）
+- ACE-484-3: Helpful 2→3（PR #562 で、Windows の `test:ace-scripts` 77 件の失敗を変更を stash した develop 状態でも再現させ、増えた失敗が 0 件であることで既存破綻と切り分けた）
 
 ### [1.65.0] - 2026-10-16
 
