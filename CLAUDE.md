@@ -199,7 +199,7 @@ npm run quality:local
 1. Issue       ─ 作業の起点を明確化（/create-issue で作成）
 2. Branch      ─ feature/#<issue>-<description> で作業を分離
 3. Implement   ─ AI駆動で実装・コミット
-4. Test        ─ `npm run quality:local`（PR 前。手順の全体像: [docs/NO_GITHUB_ACTIONS_MIGRATION_DESIGN.md](docs/NO_GITHUB_ACTIONS_MIGRATION_DESIGN.md)）
+4. Test        ─ `npm run quality:local`（push 時に pre-push が実行。手動実行の要否は下の重要ルール。手順の全体像: [docs/NO_GITHUB_ACTIONS_MIGRATION_DESIGN.md](docs/NO_GITHUB_ACTIONS_MIGRATION_DESIGN.md)）
 5. Self-Review ─ 5観点チェック＋Review Toolkit（/pre-commit-check）。深度は `bash scripts/review-level.sh` の3段階判定に従う
 6. PR          ─ develop ベースでPR作成
 7. Review      ─ Claude Code + Codex クロスモデルレビュー＋レビュー対応（修正ループ）
@@ -212,6 +212,7 @@ npm run quality:local
 
 - 全作業はIssueから開始する
 - ブランチ命名: `feature/#<issue-number>-<description>`
+- **`quality:local` の手動実行**: push する予定のコミットでは省いてよい。`.husky/pre-push` が push のたびに `npm run quality:local` を実行し、ゲートの実測と記録（gate-record）を兼ねる。手動実行は push しない段階の確認（commit 前の挙動確認、push 前に失敗を早く知りたい場合）に限る（同じ HEAD にゲートを 2 回走らせない）
 - マージ先: develop（Squash merge）
 - ACEはマージ後・cleanup後に develop で実行する（**既定（推奨）: develop 直マージ**＝知見追記を develop に直接 commit + push。大人数チーム/知見内容のレビューを残したい場合のみ `chore/ace-from-pr-<PR番号>` の小PRに切り替え）。エントリ ID は PRスコープ式（`ACE-<PR番号>-<連番>`）で衝突しない。詳細・ACE-012 との関係は [docs/AI_GIT_WORKFLOW.md ステップ10](docs/AI_GIT_WORKFLOW.md) 参照
 - 詳細: [docs/AI_GIT_WORKFLOW.md](docs/AI_GIT_WORKFLOW.md)

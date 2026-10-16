@@ -167,53 +167,41 @@ class RateLimiter {
 
 **解決策**:
 
+再試行は正典の `retryWithBackoff(fn, { operation })`（`03-implementation/FALLBACK.md` §4「再試行ユーティリティ」）を呼ぶ。再試行可否の判定（4xx などの恒久的な拒否は再試行しない）・Full Jitter・試行ごとのログは正典側に内蔵されているため、ここに実装を複製しない。
+
 ```typescript
-// リトライ機能付きHTTPクライアント
-class ResilientHttpClient {
-  private async requestWithRetry(
-    url: string,
-    options: RequestInit,
-    maxRetries: number = 3,
-  ): Promise<Response> {
-    for (let i = 0; i < maxRetries; i++) {
-      try {
-        const response = await fetch(url, {
-          ...options,
-          timeout: 5000, // 5秒タイムアウト
+// レスポンス待ちの上限（マジックナンバー禁止 / MASTER.md）
+const SERVICE_B_TIMEOUT_MS = 5000; // ms
+
+async function fetchFromServiceB(
+  url: string,
+  init: RequestInit,
+): Promise<Response> {
+  return retryWithBackoff(
+    async () => {
+      const res = await fetch(url, {
+        ...init,
+        signal: AbortSignal.timeout(SERVICE_B_TIMEOUT_MS),
+      });
+      // fetch は 4xx/5xx で reject しない。status を持つエラーを投げ、
+      // normalizeExternalError()（03-implementation/ERRORS.md）に分類させる
+      if (!res.ok) {
+        throw Object.assign(new Error(`HTTP ${res.status}`), {
+          status: res.status,
         });
-
-        if (response.ok) {
-          return response;
-        }
-
-        // 4xxエラーはリトライしない
-        if (response.status >= 400 && response.status < 500) {
-          throw new Error(`Client error: ${response.status}`);
-        }
-      } catch (error) {
-        if (i === maxRetries - 1) {
-          throw error;
-        }
-
-        // 指数バックオフでリトライ間隔を調整
-        await this.sleep(Math.pow(2, i) * 1000);
       }
-    }
-
-    throw new Error("Max retries exceeded");
-  }
-
-  private sleep(ms: number): Promise<void> {
-    return new Promise((resolve) => setTimeout(resolve, ms));
-  }
+      return res;
+    },
+    { operation: "serviceB.fetch" },
+  );
 }
 ```
 
 **学んだ教訓**:
 
-- マイクロサービス間通信にはリトライ機能が必須
-- 指数バックオフでリトライ間隔を調整する
-- 4xxエラーはリトライしない
+- マイクロサービス間通信にはリトライ機能が必須。再試行ループを手書きせず正典の `retryWithBackoff()` を使う
+- 指数バックオフ + Jitter でリトライ間隔を調整する
+- 4xxエラーはリトライしない（`fetch` の `!res.ok` は status を持つ値として投げ、分類を正典に任せる）
 - サーキットブレーカーパターンの導入を検討
 
 ---
@@ -254,7 +242,12 @@ async function processLargeDataset(filePath: string) {
 }
 
 // バッチ処理でメモリ使用量を制御
-async function processInBatches(data: any[], batchSize: number = 1000) {
+const DEFAULT_BATCH_SIZE = 1000; // 件。1 バッチで処理する上限
+
+async function processInBatches<T>(
+  data: readonly T[],
+  batchSize: number = DEFAULT_BATCH_SIZE,
+): Promise<void> {
   for (let i = 0; i < data.length; i += batchSize) {
     const batch = data.slice(i, i + batchSize);
     await processBatch(batch);

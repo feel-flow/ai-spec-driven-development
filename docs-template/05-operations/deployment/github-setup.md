@@ -267,7 +267,7 @@ gh pr create --title "perf: Optimize build process" --label "enhancement"
 
 ## 6. 関連ドキュメント
 
-- [NO_GITHUB_ACTIONS_MIGRATION_DESIGN.md](https://github.com/feel-flow/ai-spec-driven-development/blob/HEAD/docs/NO_GITHUB_ACTIONS_MIGRATION_DESIGN.md) - ソースリポのローカル品質ゲート・手動リリース（Actions 非依存の場合）
+- [NO_GITHUB_ACTIONS_MIGRATION_DESIGN.md](https://github.com/feel-flow/ai-spec-driven-development/blob/HEAD/docs/NO_GITHUB_ACTIONS_MIGRATION_DESIGN.md) - ローカル品質ゲートと手動リリース。品質ゲートの構成はリポジトリの可視性で変わる（private: ローカルゲートのみで GitHub Actions に依存しない / public: ローカルゲートを維持したまま Actions を第二のゲートとして併用）。Actions を使うことを目的に public 化はしない
 - [Git Workflow](./git-workflow.md) - 開発フローの詳細
 - [Automated Code Review](./automated-code-review.md) - 自動レビューの設定
 - [AI Tools Integration](./ai-tools-integration.md) - AIツールの統合

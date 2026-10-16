@@ -357,6 +357,8 @@ Always reference MASTER.md for project-specific requirements.
 
 **セルフレビュー必須項目**: DRY原則、コード品質、Import整理、テスト、自動チェック通過
 
+**テスト（`quality:local`）の手動実行**: push する予定のコミットでは省いてよい。`.husky/pre-push` が push のたびに `npm run quality:local` を実行し、ゲートの実測と記録（gate-record）を兼ねる。手動実行は push しない段階の確認（commit 前の挙動確認、push 前に失敗を早く知りたい場合）に限る（同じ HEAD にゲートを 2 回走らせない）
+
 詳細は以下のテンプレートを参照:
 
 - [Git Workflow 詳細](docs-template/05-operations/deployment/git-workflow.md)

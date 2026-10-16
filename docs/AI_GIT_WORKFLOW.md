@@ -221,7 +221,7 @@ Closes #123"
 
 #### テスト・品質ゲートの実行
 
-**本リポジトリ（`feel-flow/ai-spec-driven-development`）**では、PR 前にルートで次を実行する。ローカルゲートが一次であり、public リポジトリのため GitHub Actions（`.github/workflows/ci.yml`）が同じコマンドを第二のゲートとして PR 上でも実行する。
+**本リポジトリ（`feel-flow/ai-spec-driven-development`）**では、PR 前にルートで次のゲートを通す（push 時に `.husky/pre-push` が実行する。手動実行の要否は下記）。ローカルゲートが一次であり、public リポジトリのため GitHub Actions（`.github/workflows/ci.yml`）が同じコマンドを第二のゲートとして PR 上でも実行する。
 
 **GitHub Actions の適用範囲**（[Issue #517](https://github.com/feel-flow/ai-spec-driven-development/issues/517)）:
 
@@ -234,6 +234,8 @@ Closes #123"
 ```bash
 npm run quality:local
 ```
+
+**手動実行を省ける場合**（[Issue #558](https://github.com/feel-flow/ai-spec-driven-development/issues/558)）: `.husky/pre-push` は push のたびに `npm run quality:local`（ゲート記録 gate-record の書き込みを含む）を実行する。push する予定のコミットでは手動実行を省いてよく、pre-push の実行がゲートの実測と記録を兼ねる。手動実行は push しない段階の確認（commit 前の挙動確認、push 前に失敗を早く知りたい場合）に限る。同じ HEAD にゲートを 2 回走らせない。
 
 **汎用プロジェクト向けの例**（各リポジトリの `package.json` に従う）:
 
