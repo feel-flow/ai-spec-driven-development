@@ -22,6 +22,7 @@ START_HEAD="$(git rev-parse HEAD 2>/dev/null || true)"
 STEPS=(
   "run build:mcp"
   "run check"
+  "run check:ts"
   "--prefix mcp test"
   "run test:ace-scripts"
   "run validate -- docs-template"

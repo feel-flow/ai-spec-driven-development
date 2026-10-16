@@ -4,7 +4,16 @@ import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { afterEach, describe, expect, it } from "vitest";
+// @ts-expect-error 検証対象はNode.jsで直接実行するESMスクリプト（型宣言を持たない）
 import { findBracketPlaceholders, maskExemptSpans } from "./validate-docs.mjs";
+
+// Issue #582: validate-docs.mjs は型宣言を持たず import が any になるため、テストが参照する
+// findBracketPlaceholders の戻り値の要素の形だけをここで宣言してコールバック引数に付ける。
+interface BracketPlaceholderHit {
+  raw: string;
+  inner: string;
+  deferred: boolean;
+}
 
 const SCRIPT = resolve(dirname(fileURLToPath(import.meta.url)), "validate-docs.mjs");
 const VALID_DOCS = resolve(
@@ -51,7 +60,7 @@ describe("findBracketPlaceholders (Issue #507)", () => {
       ].join("\n"),
     );
     const hits = findBracketPlaceholders(masked);
-    expect(hits.map((hit) => hit.raw)).toEqual(["[金額]"]);
+    expect(hits.map((hit: BracketPlaceholderHit) => hit.raw)).toEqual(["[金額]"]);
     expect(hits[0]?.deferred).toBe(true);
   });
 
@@ -65,18 +74,18 @@ describe("findBracketPlaceholders (Issue #507)", () => {
 
   it("閉じたコードフェンス内の [金額] は拾わず、閉じ忘れフェンス内は拾う", () => {
     const closed = maskExemptSpans("```\n[金額]\n```\n本文 [金額]\n");
-    expect(findBracketPlaceholders(closed).map((hit) => hit.raw)).toEqual(["[金額]"]);
+    expect(findBracketPlaceholders(closed).map((hit: BracketPlaceholderHit) => hit.raw)).toEqual(["[金額]"]);
 
     const tilde = maskExemptSpans("~~~\n[金額]\n~~~\n本文 [金額]\n");
-    expect(findBracketPlaceholders(tilde).map((hit) => hit.raw)).toEqual(["[金額]"]);
+    expect(findBracketPlaceholders(tilde).map((hit: BracketPlaceholderHit) => hit.raw)).toEqual(["[金額]"]);
 
     const unclosed = maskExemptSpans("```\n[金額]\n本文も [SLA値]\n");
-    expect(findBracketPlaceholders(unclosed).map((hit) => hit.raw)).toEqual(["[金額]", "[SLA値]"]);
+    expect(findBracketPlaceholders(unclosed).map((hit: BracketPlaceholderHit) => hit.raw)).toEqual(["[金額]", "[SLA値]"]);
   });
 
   it("インラインコードの [x.x.x] は拾わない", () => {
     const masked = maskExemptSpans("バージョンは `[x.x.x]` と書く。本文は [x.x.x]。");
-    expect(findBracketPlaceholders(masked).map((hit) => hit.raw)).toEqual(["[x.x.x]"]);
+    expect(findBracketPlaceholders(masked).map((hit: BracketPlaceholderHit) => hit.raw)).toEqual(["[x.x.x]"]);
   });
 });
 
