@@ -7,7 +7,7 @@
 ### ディレクトリ構造
 
 ```
-docs-template/
+docs/
 ├── 00-planning/              # 数字-英語小文字（ハイフン区切り）
 │   └── PLANNING_TEMPLATE.md  # 英語大文字.md
 ├── 01-context/
@@ -130,7 +130,7 @@ my-project/
 ├── .github/
 │   └── copilot-instructions.md  # ツール固有の命名
 ├── .cursorrules                  # ツール固有の命名
-├── docs-template/                # ドキュメントテンプレート
+├── docs/                         # プロジェクト文書
 │   ├── 00-planning/
 │   │   └── PLANNING_TEMPLATE.md
 │   ├── 01-context/

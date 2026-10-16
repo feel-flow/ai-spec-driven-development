@@ -30,8 +30,11 @@ import { toPosixPath } from "./path-utils";
 //   - inline code のパス表記（`docs/...` `.github/...`）の実在検査は .github/ と
 //     初期セット内文書の両方（初期セット外の所在案内はこの表記で書くため）。
 //     配布ツリーに実体を持たない正当な表記は INLINE_PATH_EXEMPT で除外する
-//   - frontmatter references の検査と、上流レイアウト固有パス（docs-template/）の
-//     混入検査は従来どおり .github/ のみ
+//   - 上流レイアウト固有パス（docs-template/）の混入検査も .github/ と初期セット内
+//     文書の両方（Issue #509）。展開先には docs/ しか無いので、docs-template/ 起点の
+//     相対パス・構造図は展開先で誤りになる。配布元の所在を説明する正当な言及
+//     （プラグイン同梱パス・絶対 URL）は UPSTREAM_PATH_EXEMPT_PATTERNS で除外する
+//   - frontmatter references の検査は従来どおり .github/ のみ
 
 const REPO_ROOT = resolve(__dirname, "..");
 const TEMPLATE_ROOT = join(REPO_ROOT, "docs-template");
@@ -187,6 +190,49 @@ const INLINE_PATH_EXEMPT = new Set([
 // frontmatter の references: "a, b" 形式（agents / skills が使う）
 const FRONTMATTER_REFERENCES = /^\s*references:\s*"([^"]+)"\s*$/gm;
 
+// 上流レイアウト固有のパス表記。展開先には docs/ しか無いので、この文字列を含む
+// 相対パス・ディレクトリ構造図は展開先で誤りになる（Issue #483 / #509）。
+const UPSTREAM_LAYOUT_PATH = "docs-template/";
+// 配布元の所在を説明する正当な言及。この 2 形だけは展開先レイアウトに対して解決
+// されないので除外する。それ以外（`docs-template/MASTER.md` のような相対パス、
+// `docs-template/` 起点の構造図）は展開先で切れるため除外しない。
+//   1. `${CLAUDE_PLUGIN_ROOT}/docs-template/` — ff-dev-toolkit プラグイン同梱ツリーの絶対参照。
+//      初期セット外文書のコピー元案内（MASTER.md「関連ドキュメント」、DEPLOYMENT.md
+//      「配置について」注記など）がこの形で書かれる
+//   2. 絶対 URL（https://github.com/.../docs-template/...）— MASTER.md 冒頭の「テンプレート
+//      直接利用」の配布元リンク、PATTERNS.md の ACE 出典リンクなど。URL は相対解決されない
+// 「docs-template ディレクトリ」のようなスラッシュ無しの散文は UPSTREAM_LAYOUT_PATH に
+// 一致しないので規則は不要。ここに載せる場合は理由を書く（黙って増やすと検査が骨抜きになる）。
+const UPSTREAM_PATH_EXEMPT_PATTERNS: readonly RegExp[] = [
+  /\$\{CLAUDE_PLUGIN_ROOT\}\/docs-template\//g,
+  /https?:\/\/[^\s)\]>`]+/g,
+];
+
+/**
+ * 1 文書分を行単位で走査し、上流レイアウト固有のパス（docs-template/）が除外形以外で
+ * 残っている行を `<label>:<行番号>: <行>` の報告文にして返す。
+ * 除外形を行から取り除いてから判定するので、同じ行に除外形と混入が同居しても検出する。
+ * 実ファイルに対しては違反ゼロを期待するため、この関数を合成入力で別途固定する
+ * （検出器の自己検証）。
+ */
+function findUpstreamLayoutPaths(
+  sourceLabel: string,
+  content: string,
+): string[] {
+  const leaked: string[] = [];
+  const LINE_NUMBER_BASE = 1;
+  content.split("\n").forEach((line, index) => {
+    const masked = UPSTREAM_PATH_EXEMPT_PATTERNS.reduce(
+      (acc, pattern) => acc.replace(pattern, ""),
+      line,
+    );
+    if (masked.includes(UPSTREAM_LAYOUT_PATH)) {
+      leaked.push(`${sourceLabel}:${index + LINE_NUMBER_BASE}: ${line.trim()}`);
+    }
+  });
+  return leaked;
+}
+
 describe("配布版 GitHub テンプレートの参照解決", () => {
   it("検証対象の Markdown が存在する（glob 破綻で空振りしない）", () => {
     expect(MD_FILES.length).toBeGreaterThan(10);
@@ -290,12 +336,18 @@ describe("配布版 GitHub テンプレートの参照解決", () => {
     expect(LINK_CHECKED_FILES.length).toBe(MD_FILES.length + INITIAL_SET.size);
   });
 
+  // 本リポジトリは docs-template/ を自身の docs としてもドッグフードするため、
+  // 構造図や相対パスを docs-template/ 起点で書いても本リポでは通ってしまう。
+  // 展開先（docs/）で誤りになる表記を .github/ と初期セット文書の両方で拒否する（Issue #509）。
   it("上流レイアウト固有のパス（docs-template/）を含まない", () => {
     const leaked: string[] = [];
-    for (const file of MD_FILES) {
-      if (readFileSync(file, "utf8").includes("docs-template/")) {
-        leaked.push(relative(REPO_ROOT, file));
-      }
+    for (const file of LINK_CHECKED_FILES) {
+      leaked.push(
+        ...findUpstreamLayoutPaths(
+          relative(REPO_ROOT, file),
+          readFileSync(file, "utf8"),
+        ),
+      );
     }
     expect(leaked).toEqual([]);
   });
@@ -394,6 +446,49 @@ describe("検出器の自己検証", () => {
         "docs/MASTER.md",
         "[P](./01-context/PROJECT.md) [S](../.github/skills/x/SKILL.md)",
       ),
+    ).toEqual([]);
+  });
+
+  // Issue #509: 初期セット文書へ拡張した混入検査の検出器を固定する。展開先で誤りになる
+  // 相対パス・構造図は参照元と行番号つきで報告し、配布元の所在を示す正当な 2 形は拾わない。
+  it("上流レイアウト固有のパスを、参照元と行番号つきで報告する（除外形は拾わない）", () => {
+    const label = "docs-template/03-implementation/CONVENTIONS.md";
+    // 相対パス（展開先に docs-template/ は無い）
+    const relativeLeak = findUpstreamLayoutPaths(
+      label,
+      "詳細は `docs-template/MASTER.md` を参照",
+    );
+    expect(relativeLeak).toHaveLength(1);
+    expect(relativeLeak[0]).toContain(`${label}:1:`);
+    expect(relativeLeak[0]).toContain("docs-template/MASTER.md");
+    // ディレクトリ構造図の起点（行番号は 1 始まり）
+    expect(
+      findUpstreamLayoutPaths(label, "```\ndocs-template/\n├── MASTER.md\n```"),
+    ).toEqual([`${label}:2: docs-template/`]);
+    // 除外形 1: プラグイン同梱ツリーの絶対参照
+    expect(
+      findUpstreamLayoutPaths(
+        label,
+        "`${CLAUDE_PLUGIN_ROOT}/docs-template/README.md` からコピー",
+      ),
+    ).toEqual([]);
+    // 除外形 2: 絶対 URL（Markdown リンクの括弧内でも URL の終端で止まる）
+    expect(
+      findUpstreamLayoutPaths(
+        label,
+        "[配布元](https://github.com/feel-flow/ff-dev-toolkit/tree/HEAD/plugins/ff-dev-toolkit/docs-template) から取得",
+      ),
+    ).toEqual([]);
+    // 同じ行に除外形と混入が同居しても、混入の方は検出する
+    expect(
+      findUpstreamLayoutPaths(
+        label,
+        "`${CLAUDE_PLUGIN_ROOT}/docs-template/README.md` を `docs-template/README.md` に置く",
+      ),
+    ).toHaveLength(1);
+    // スラッシュ無しの散文（配布元の所在説明）は対象外
+    expect(
+      findUpstreamLayoutPaths(label, "docs-template ディレクトリから配布される"),
     ).toEqual([]);
   });
 
