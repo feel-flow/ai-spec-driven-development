@@ -6,6 +6,8 @@
 # Issue #389: 各段の開始を stdout、失敗を stderr にラベル付きで出す。最初の失敗で止め、
 # その段の終了コードをそのまま返す（旧 `&&` 連結と同じ）。個別段の実行は各 npm script を
 # 直接呼ぶ。部分実行で gate-record の pass を書かせないため、--only は設けない。
+# Issue #565: ルートまたは mcp の node_modules が無いときは、段を 1 つも実行せず exit 1 で止め、
+# STATUS=fail を記録する（npm ci は自動実行せず、案内だけ出す）。
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"

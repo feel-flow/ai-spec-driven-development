@@ -20,7 +20,8 @@ const RECORD_HELPER = join(REPO_ROOT, "scripts", "record-quality-gate.sh");
 const BASE_PATH = "/usr/bin:/bin";
 
 // 実チェックアウトで quality-local.sh を走らせるテストの前提（Issue #565）。
-// 依存が無いと本物のスクリプトが先頭で止まり `expected 1 to be 0` としか読めないので、原因を先に名指しする。
+// 依存が無いと本物のスクリプトが先頭で止まるが、テスト側の失敗は終了コードの不一致や calls ログ不在などで
+// 原因（依存不在）を名指ししないので、先にここで原因を名指しして止める。
 const REAL_CHECKOUT_DEPS: ReadonlyArray<{ dir: string; fix: string }> = [
   { dir: "node_modules", fix: "npm ci" },
   { dir: "mcp/node_modules", fix: "npm --prefix mcp ci" },
