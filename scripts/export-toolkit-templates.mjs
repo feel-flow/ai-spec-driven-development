@@ -17,9 +17,15 @@ const LICENSE = 'SOURCE_LICENSE.txt';
 const hash = value => crypto.createHash('sha256').update(value).digest('hex');
 const json = value => `${JSON.stringify(value, null, 2)}\n`;
 const assert = (condition, message) => { if (!condition) throw new Error(message); };
+// Issue #573: Git が文書化する「この階層の設定を読まない」値。Git for Windows は /dev/null を内部で nul に読み替える。
+// Windows の Git は NUL を `unable to access 'NUL': Invalid argument` で拒否するので OS で切り替えない。
+const NULL_GIT_CONFIG = '/dev/null';
 // Hookから渡るGit設定で別リポジトリやURL書換えを参照しない。ネットワーク操作は行わない。
-const gitEnvironment = () => ({ ...Object.fromEntries(Object.entries(process.env).filter(([key]) => !key.startsWith('GIT_'))),
-  GIT_CONFIG_GLOBAL: process.platform === 'win32' ? 'NUL' : '/dev/null', GIT_CONFIG_SYSTEM: process.platform === 'win32' ? 'NUL' : '/dev/null' });
+// system の遮断（GIT_CONFIG_NOSYSTEM=1 ＋ GIT_CONFIG_SYSTEM=/dev/null）は scripts/git-fixture-env.ts と共通。
+// global は本スクリプトでは読まない（/dev/null）が、fixture 側は identity 用の専用ファイルを渡す。
+// .mjs から .ts は import できないため、system の遮断を変えるときは両方を揃える。
+export const gitEnvironment = () => ({ ...Object.fromEntries(Object.entries(process.env).filter(([key]) => !key.startsWith('GIT_'))),
+  GIT_CONFIG_GLOBAL: NULL_GIT_CONFIG, GIT_CONFIG_SYSTEM: NULL_GIT_CONFIG, GIT_CONFIG_NOSYSTEM: '1' });
 const git = (cwd, ...args) => execFileSync('git', args, { cwd, env: gitEnvironment(), stdio: ['ignore', 'pipe', 'pipe'], maxBuffer: 16 * 1024 * 1024 });
 const gitText = (cwd, ...args) => git(cwd, ...args).toString('utf8').trim();
 function repository(root, name) {

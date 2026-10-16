@@ -13,21 +13,23 @@ import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { describe, expect, it } from "vitest";
 import { gitFixtureEnv } from "./git-fixture-env";
+// Issue #572: bash / git の在処と子の PATH は shell-tools.ts で決める（Windows では Git for Windows の絶対パス）
+import { childPath, shellPath, TOOLS, withChildPath } from "./shell-tools";
 
 const REPO_ROOT = resolve(__dirname, "..");
 const CODEX_SHIM = join(REPO_ROOT, "scripts", "codex-review.sh");
-const BASE_PATH = "/usr/bin:/bin";
 
 function makeReviewRepo(): string {
   const dir = mkdtempSync(join(tmpdir(), "review-cli-config-repo-"));
   const git = (...args: string[]) => {
-    const result = spawnSync("git", args, {
+    const result = spawnSync(TOOLS.git, args, {
       cwd: dir,
       encoding: "utf8",
-      env: gitFixtureEnv({ PATH: BASE_PATH }),
+      env: withChildPath(gitFixtureEnv()),
     });
     if (result.status !== 0) {
-      throw new Error(`git ${args.join(" ")} failed: ${result.stderr}`);
+      // 起動できなかったときは stderr が空なので、起動エラー（result.error）を優先して出す
+      throw new Error(`git ${args.join(" ")} failed: ${result.error?.message ?? result.stderr}`);
     }
   };
   git("init", "-b", "develop");
@@ -84,15 +86,15 @@ function runShim(
   fixture: { root: string; log: string; bin: string },
   env: Record<string, string> = {},
 ) {
-  const result = spawnSync("bash", [CODEX_SHIM, ...args], {
+  const result = spawnSync(TOOLS.bash, [shellPath(CODEX_SHIM), ...args], {
     cwd: REPO_ROOT,
     encoding: "utf8",
     env: {
       HOME: process.env.HOME,
       TMPDIR: process.env.TMPDIR,
-      PATH: `${fixture.bin}:${BASE_PATH}`,
-      FF_DEV_TOOLKIT_ROOT: fixture.root,
-      ORCH_LOG: fixture.log,
+      PATH: childPath(fixture.bin),
+      FF_DEV_TOOLKIT_ROOT: shellPath(fixture.root),
+      ORCH_LOG: shellPath(fixture.log),
       ...env,
     },
   });
@@ -207,14 +209,14 @@ describe("Copilot CLI config delegation — Issue #470", () => {
         env: {
           HOME: process.env.HOME,
           TMPDIR: process.env.TMPDIR,
-          PATH: `${stub.dir}:${BASE_PATH}`,
-          ARGV_LOG: stub.log,
+          PATH: childPath(stub.dir),
+          ARGV_LOG: shellPath(stub.log),
           REVIEW_BASE_BRANCH: "develop",
         },
       };
       const delegated = spawnSync(
-        "bash",
-        [join(REPO_ROOT, "scripts", "copilot-review.sh"), "--branch"],
+        TOOLS.bash,
+        [shellPath(join(REPO_ROOT, "scripts", "copilot-review.sh")), "--branch"],
         common,
       );
       expect(delegated.status).toBe(0);
@@ -224,8 +226,8 @@ describe("Copilot CLI config delegation — Issue #470", () => {
 
       writeFileSync(stub.log, "");
       const overridden = spawnSync(
-        "bash",
-        [join(REPO_ROOT, "scripts", "copilot-review.sh"), "--branch"],
+        TOOLS.bash,
+        [shellPath(join(REPO_ROOT, "scripts", "copilot-review.sh")), "--branch"],
         {
           ...common,
           env: { ...common.env, COPILOT_MODEL: "copilot model override" },

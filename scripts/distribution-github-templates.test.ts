@@ -1,6 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { readdirSync, readFileSync, existsSync, statSync } from "node:fs";
 import { join, resolve, dirname, normalize, relative } from "node:path";
+import { toPosixPath } from "./path-utils";
 
 // 配布版 GitHub テンプレート (docs-template/.github/) の参照が、
 // 「利用者側レイアウト」で解決することを検証する（Issue #483）。
@@ -70,7 +71,7 @@ const INITIAL_SET = new Set([
 
 /** 利用者側レイアウトのパス（.github/... または docs/...）を実ファイルへ写像する */
 function toTemplatePath(deployedPath: string): string | null {
-  const p = normalize(deployedPath);
+  const p = toPosixPath(normalize(deployedPath));
   if (p.startsWith(".github/")) return join(TEMPLATE_ROOT, p);
   if (p.startsWith("docs/"))
     return join(TEMPLATE_ROOT, p.slice("docs/".length));
@@ -105,14 +106,14 @@ function listMarkdown(dir: string): string[] {
  *   docs-template/**        → docs/**（例: docs/05-operations/DEPLOYMENT.md）
  */
 function deployedLocation(absPath: string): string {
-  const rel = relative(TEMPLATE_ROOT, absPath);
+  const rel = toPosixPath(relative(TEMPLATE_ROOT, absPath));
   if (rel.startsWith(".github/")) return rel;
-  return join("docs", rel);
+  return toPosixPath(join("docs", rel));
 }
 
 /** 相対リンクの href を、利用者リポジトリ内の絶対パスへ解決する */
 function resolveLinkTarget(deployedFile: string, href: string): string {
-  return normalize(join(dirname(deployedFile), href));
+  return toPosixPath(normalize(join(dirname(deployedFile), href)));
 }
 
 /**
@@ -195,9 +196,9 @@ describe("配布版 GitHub テンプレートの参照解決", () => {
     const broken: string[] = [];
     for (const file of LINK_CHECKED_FILES) {
       const content = readFileSync(file, "utf8");
-      const fromDir = dirname(deployedLocation(file));
+      const deployedFile = deployedLocation(file);
       for (const match of relativeLinks(content)) {
-        const target = normalize(join(fromDir, match[1]));
+        const target = resolveLinkTarget(deployedFile, match[1]);
         const templatePath = toTemplatePath(target);
         if (templatePath === null || !existsSync(templatePath)) {
           broken.push(

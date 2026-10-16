@@ -13,16 +13,17 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
 import { gitFixtureEnv } from "./git-fixture-env";
+// Issue #572: bash / git の在処と子の PATH は shell-tools.ts で決める（Windows では Git for Windows の絶対パス）
+import { childPath, shellPath, TOOLS } from "./shell-tools";
 
 const REPO_ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const CODEX_SHIM = join(REPO_ROOT, "scripts/codex-review.sh");
 const GITIGNORE = readFileSync(join(REPO_ROOT, ".gitignore"), "utf8");
-const BASE_PATH = "/usr/bin:/bin";
 
 function gitCheckIgnore(path: string): boolean {
   try {
     // hook の GIT_DIR を継承すると check-ignore が別リポジトリを見る（Issue #529）。
-    execFileSync("git", ["check-ignore", "-q", path], {
+    execFileSync(TOOLS.git, ["check-ignore", "-q", path], {
       cwd: REPO_ROOT,
       env: gitFixtureEnv(),
     });
@@ -74,16 +75,16 @@ describe("codex-review.sh shim contracts (Issues #491 / #503)", () => {
       const shimCopy = join(shimDir, "codex-review.sh");
       copyFileSync(CODEX_SHIM, shimCopy);
       chmodSync(shimCopy, 0o755);
-      writeFileSync(join(shimDir, ".ff-dev-toolkit-root"), `${sidecarRoot}\n`);
+      writeFileSync(join(shimDir, ".ff-dev-toolkit-root"), `${shellPath(sidecarRoot)}\n`);
 
-      const result = spawnSync("bash", [shimCopy, "--print-toolkit-root=kv"], {
+      const result = spawnSync(TOOLS.bash, [shellPath(shimCopy), "--print-toolkit-root=kv"], {
         encoding: "utf8",
         env: {
-          HOME: home,
+          HOME: shellPath(home),
           TMPDIR: process.env.TMPDIR,
-          PATH: BASE_PATH,
-          CODEX_HOME: join(home, ".codex"),
-          CLAUDE_CONFIG_DIR: join(home, ".claude"),
+          PATH: childPath(),
+          CODEX_HOME: shellPath(join(home, ".codex")),
+          CLAUDE_CONFIG_DIR: shellPath(join(home, ".claude")),
         },
       });
       expect(result.status, result.stderr).toBe(0);

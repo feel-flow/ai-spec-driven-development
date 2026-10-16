@@ -32,7 +32,9 @@ function extractYamlFences(markdown: string): string[] {
 
 describe("agent-config.yaml スニペットのキー実在 (Issue #506)", () => {
   it("実ファイルは perspectives.review 入れ子と tasks.review.cost_strategy を持ち、旧キーを持たない", () => {
-    const yaml = readFileSync(AGENT_CONFIG, "utf8");
+    // Issue #576: autocrlf=true の Windows では作業ツリーが CRLF になりうる（.gitattributes で LF に固定したが、
+    // 再チェックアウト前の既存クローンにも効くよう）\r を除いてから \n 前提の正規表現に掛ける
+    const yaml = readFileSync(AGENT_CONFIG, "utf8").replace(/\r\n/g, "\n");
     expect(yaml).toMatch(/^ {4}perspectives:\n {6}review:/m);
     expect(yaml).toMatch(/^tasks:\n {2}review:\n {4}cost_strategy:/m);
     expect(yaml).not.toMatch(new RegExp(`^\\s*${RETIRED_PERSPECTIVES_KEY}:`, "m"));

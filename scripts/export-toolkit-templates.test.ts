@@ -5,8 +5,10 @@ import os from 'node:os';
 import { execFileSync, spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { gitFixtureEnv } from './git-fixture-env';
+// Issue #575: 出力先は path.join 由来で Windows では `\` 区切りになる。`/` 区切りの期待値と比べる前に揃える。
+import { toPosixPath } from './path-utils';
 // @ts-expect-error 検証対象はNode.jsで直接実行するESMスクリプト
-import { FILES, prepare, applyExport, verify } from './export-toolkit-templates.mjs';
+import { FILES, prepare, applyExport, verify, gitEnvironment } from './export-toolkit-templates.mjs';
 
 const roots: string[] = [];
 afterEach(() => { vi.restoreAllMocks(); vi.unstubAllEnvs(); for (const root of roots.splice(0)) fs.rmSync(root, { recursive: true, force: true }); });
@@ -14,6 +16,27 @@ function temp() { const root = fs.mkdtempSync(path.join(os.tmpdir(), 'template-e
 const env = gitFixtureEnv();
 const git = (root: string, ...args: string[]) => execFileSync('git', args, { cwd: root, encoding: 'utf8', env, stdio: ['ignore', 'pipe', 'pipe'] }).trim();
 function put(root: string, name: string, data: string) { const p = path.join(root, name); fs.mkdirSync(path.dirname(p), { recursive: true }); fs.writeFileSync(p, data); }
+// Issue #574: symlink の作成可否は OS ではなく実際に試して判定する（Windows は開発者モード無効や
+// SeCreateSymbolicLinkPrivilege 無しで EPERM になる。ジャンクションはディレクトリ限定なのでファイルの代替にならない）。
+// skip に変えるのは Windows の EPERM だけ。それ以外の例外は環境の壊れ方を隠さずそのまま投げる。
+function probeFileSymlink(): { supported: boolean; reason: string } {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'symlink-probe-'));
+  try {
+    const target = path.join(root, 'target');
+    fs.writeFileSync(target, 'probe');
+    fs.symlinkSync(target, path.join(root, 'link'), 'file');
+    return { supported: true, reason: '' };
+  } catch (error: unknown) {
+    const code = (error as NodeJS.ErrnoException).code;
+    if (process.platform === 'win32' && code === 'EPERM') {
+      return { supported: false, reason: `この環境ではファイルの symlink を作成できない（${code}）ため skip（Issue #574）` };
+    }
+    throw error;
+  } finally {
+    fs.rmSync(root, { recursive: true, force: true });
+  }
+}
+const FILE_SYMLINK = probeFileSymlink();
 function fixture() {
   const source = temp(), target = temp();
   for (const [root, repo] of [[source, 'feelflow-plugins'], [target, 'ai-spec-driven-development']]) {
@@ -32,7 +55,8 @@ function fixture() {
   return { source, target, ref: 'release-fixture', commit, prefix };
 }
 describe('固定コミットからのテンプレート直接配布', () => {
-  it('symlink経由のCLIでも計画・出力・実ファイル不一致を判定する', { timeout: 15_000 }, () => {
+  it('symlink経由のCLIでも計画・出力・実ファイル不一致を判定する', (ctx) => {
+    ctx.skip(!FILE_SYMLINK.supported, FILE_SYMLINK.reason);
     const f = fixture(), cli = path.join(temp(), 'export-alias.mjs');
     fs.symlinkSync(fileURLToPath(new URL('./export-toolkit-templates.mjs', import.meta.url)), cli);
     const args = [cli, '--source', f.source, '--target', f.target, '--ref', f.ref, '--commit', f.commit];
@@ -56,6 +80,31 @@ describe('固定コミットからのテンプレート直接配布', () => {
     vi.stubEnv('GIT_CONFIG_KEY_0', 'remote.origin.url');
     vi.stubEnv('GIT_CONFIG_VALUE_0', 'https://example.invalid/wrong');
     expect(prepare(f).provenance.source.commit).toBe(f.commit);
+  });
+  it('利用者の global / system Git 設定をどの OS でも読まない（Issue #573）', () => {
+    // 検知器の実在確認: HOME / XDG を一時ディレクトリへ向け、そこに目印付きの global 設定を置く
+    const home = temp(), marker = 'asddprobe.leaked';
+    fs.writeFileSync(path.join(home, '.gitconfig'), `[asddprobe]\n\tleaked = global\n`);
+    fs.mkdirSync(path.join(home, 'git'), { recursive: true });
+    fs.writeFileSync(path.join(home, 'git', 'config'), `[asddprobe]\n\tleaked = xdg\n`);
+    for (const key of ['HOME', 'USERPROFILE', 'XDG_CONFIG_HOME']) vi.stubEnv(key, home);
+    const f = fixture();
+    const list = (environment: NodeJS.ProcessEnv) =>
+      execFileSync('git', ['config', '--list', '--show-origin'], { cwd: f.target, encoding: 'utf8', env: environment });
+    // 陽性対照: 隔離しなければ目印が見える（見えなければこの検査は何も確かめていない）
+    const plain = Object.fromEntries(Object.entries(process.env).filter(([key, value]) => !key.startsWith('GIT_') && value !== undefined));
+    expect(list(plain)).toContain(marker);
+    const isolated = list(gitEnvironment());
+    expect(isolated).not.toContain(marker);
+    // 残る由来は対象リポジトリの .git/config だけ。Git は cwd 相対の `file:.git/config` で出すので
+    // 対象 root 基準で解決し、Windows の短縮名や区切りの差は実パスで吸収する
+    const origins = isolated.split('\n').filter(Boolean).map(line => line.split('\t')[0]);
+    expect(origins.length).toBeGreaterThan(0);
+    const localConfig = fs.realpathSync(path.join(f.target, '.git', 'config'));
+    for (const origin of origins) {
+      expect(origin.startsWith('file:')).toBe(true);
+      expect(fs.realpathSync(path.resolve(f.target, origin.slice('file:'.length)))).toBe(localConfig);
+    }
   });
   it('既定の計画は書き込まず、承認した対象7文書と由来・ライセンスのみ出力する', () => {
     const f = fixture(), p = prepare(f);
@@ -101,7 +150,7 @@ describe('固定コミットからのテンプレート直接配布', () => {
     const f = fixture(), p = prepare(f), rename = fs.renameSync.bind(fs);
     vi.spyOn(fs, 'renameSync').mockImplementation((from, to) => {
       rename(from, to);
-      if (String(to).endsWith('/MASTER.md')) put(f.target, 'docs-template/01-context/PROJECT.md', 'concurrent edit');
+      if (toPosixPath(String(to)).endsWith('/MASTER.md')) put(f.target, 'docs-template/01-context/PROJECT.md', 'concurrent edit');
     });
     expect(() => applyExport(p, p.review)).toThrow(/changed during export/);
     expect(fs.readFileSync(path.join(f.target, 'docs-template/01-context/PROJECT.md'), 'utf8')).toBe('concurrent edit');
@@ -111,17 +160,20 @@ describe('固定コミットからのテンプレート直接配布', () => {
     const f = fixture(), p = prepare(f), rename = fs.renameSync.bind(fs);
     vi.spyOn(fs, 'renameSync').mockImplementation((from, to) => {
       rename(from, to);
-      if (String(to).endsWith('/.template-source.json')) put(f.target, 'docs-template/MASTER.md', 'concurrent edit');
+      if (toPosixPath(String(to)).endsWith('/.template-source.json')) put(f.target, 'docs-template/MASTER.md', 'concurrent edit');
     });
     expect(() => applyExport(p, p.review)).toThrow(/Export incomplete/);
     expect(verify(p).matches).toBe(false);
     expect(fs.readFileSync(path.join(f.target, 'docs-template/MASTER.md'), 'utf8')).toBe('concurrent edit');
   });
-  it('sourceのsymlinkとtargetのsymlinkを出力前に拒否する', () => {
+  it('sourceのsymlinkとtargetのsymlinkを出力前に拒否する', (ctx) => {
+    ctx.skip(!FILE_SYMLINK.supported, FILE_SYMLINK.reason);
     const f = fixture();
     fs.unlinkSync(path.join(f.source, f.prefix, 'docs-template/MASTER.md'));
     fs.symlinkSync('/etc/hosts', path.join(f.source, f.prefix, 'docs-template/MASTER.md'));
     git(f.source, 'add', '.'); git(f.source, 'commit', '-m', 'symlink');
+    // Node が symlink を作れても git が symlink（mode 120000）として保存するかは別（Windows は core.symlinks）
+    expect(git(f.source, 'ls-files', '-s')).toMatch(/^120000 /m);
     expect(() => prepare({ ...f, ref: 'HEAD', commit: git(f.source, 'rev-parse', 'HEAD') })).toThrow(/non-file source/);
     fs.unlinkSync(path.join(f.target, 'docs-template/MASTER.md'));
     fs.symlinkSync('/etc/hosts', path.join(f.target, 'docs-template/MASTER.md'));
