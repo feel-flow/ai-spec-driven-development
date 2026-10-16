@@ -11,6 +11,7 @@
     "format:md": "prettier --write \"docs/**/*.md\" \"docs-template/**/*.md\" \"*.md\"",
     "format:md:check": "prettier --check \"docs/**/*.md\" \"docs-template/**/*.md\" \"*.md\"",
     "check": "npm --prefix mcp run check",
+    "check:ts": "tsc --noEmit --pretty false -p tsconfig.json",
     "build:mcp": "npm --prefix mcp run build",
     "build:spec-index": "node scripts/build-spec-index.mjs",
     "test": "npm --prefix mcp test && npm run test:ace-scripts",
@@ -22,6 +23,7 @@
     "prepare": "husky"
   },
   "devDependencies": {
+    "@types/node": "24.13.3",
     "husky": "^9.1.0",
     "markdownlint-cli2": "^0.23.2",
     "prettier": "3.8.3",

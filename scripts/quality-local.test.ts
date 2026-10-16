@@ -24,6 +24,7 @@ const RECORD_HELPER = join(REPO_ROOT, "scripts", "record-quality-gate.sh");
 const EXPECTED_ORDER = [
   "run build:mcp",
   "run check",
+  "run check:ts",
   "--prefix mcp test",
   "run test:ace-scripts",
   "run validate -- docs-template",

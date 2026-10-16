@@ -1,4 +1,4 @@
-import { spawnSync } from "node:child_process";
+import { spawnSync, type SpawnSyncReturns } from "node:child_process";
 import { mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
@@ -41,11 +41,13 @@ function isolatedEnv(
   return { ...env, ...extra };
 }
 
+// Issue #582: ReturnType<typeof spawnSync> は最後のオーバーロード（string | Buffer）を拾い、stdout.trim() が型エラーになる。
+// encoding: "utf8" を渡すので、戻り値は string 版のオーバーロードに揃える（実行時の挙動は変わらない）。
 function git(
   cwd: string,
   env: NodeJS.ProcessEnv,
   ...args: string[]
-): ReturnType<typeof spawnSync> {
+): SpawnSyncReturns<string> {
   return spawnSync("git", args, { cwd, encoding: "utf8", env });
 }
 
