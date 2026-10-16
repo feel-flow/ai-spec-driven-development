@@ -1,2 +1,9 @@
 # Windows の autocrlf=true でも作業ツリーの Markdown を LF にし、CRLF のコミットも防ぐ。prettier 既定の endOfLine: lf と揃える
 *.md text eol=lf
+# Issue #576: YAML はテストが \n 前提の正規表現で読み（agent-config-snippet-schema.test.ts）、bash スクリプトは
+# CRLF だと MSYS bash が行末の \r を引数に含めて落ちる。どちらも autocrlf=true の Windows で CRLF にしない
+*.yaml text eol=lf
+*.yml text eol=lf
+*.sh text eol=lf
+# この行を足した後の既存チェックアウトは自動では LF にならない。`git ls-files --eol | grep w/crlf` で CRLF の
+# ファイルを確認し、未変更なら `git checkout -- <path>`（または `rm <path> && git checkout -- <path>`）で取り直す

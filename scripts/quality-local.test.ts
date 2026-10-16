@@ -9,82 +9,16 @@ import {
   writeFileSync,
 } from "node:fs";
 import { homedir, tmpdir } from "node:os";
-import { delimiter, dirname, join, resolve } from "node:path";
+import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { beforeAll, describe, expect, it } from "vitest";
 import { gitFixtureEnv } from "./git-fixture-env";
+// Issue #572: bash / git の在処と子の PATH の組み立ては shell-tools.ts へ切り出した（他の spawn 系テストと共有）
+import { childPath, nodePath, shellPath, TOOLS, withChildPath } from "./shell-tools";
 
 const REPO_ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const QUALITY_LOCAL = join(REPO_ROOT, "scripts", "quality-local.sh");
 const RECORD_HELPER = join(REPO_ROOT, "scripts", "record-quality-gate.sh");
-const IS_WINDOWS = process.platform === "win32";
-// macOS / Linux では子の PATH を OS 標準の 2 か所に絞り、実行環境の外のツールに依存しないことを確かめる
-const POSIX_BASE_DIRS: readonly string[] = ["/usr/bin", "/bin"];
-
-// 子プロセスとして起動する bash / git と、子の PATH の基底ディレクトリ（stub ディレクトリはこの前に足す）。
-interface ShellTools {
-  bash: string;
-  git: string;
-  baseDirs: readonly string[];
-  // Windows で bash が出す /c/... 形式を Node が読める形へ直す cygpath。POSIX では不要なので null
-  cygpath: string | null;
-}
-
-// Issue #570: Windows の Node は子プロセスの実行ファイルを渡した env.PATH から探すため、POSIX 形式の
-// PATH では bash を解決できない。PATH 順で bash を探すと System32 の WSL bash を拾うこともあるので、
-// Git for Windows の配置（git --exec-path = <Git>/<mingw>/libexec/git-core）から bash.exe と git.exe を
-// 絶対パスで決め、子の PATH もその 2 ディレクトリ（<Git>/usr/bin と git.exe の在処）に絞る。
-function resolveShellTools(): ShellTools {
-  if (!IS_WINDOWS) return { bash: "bash", git: "git", baseDirs: POSIX_BASE_DIRS, cygpath: null };
-  // ここだけは親の PATH で git を探す（絞った PATH を作る前の起点）
-  const exec = spawnSync("git", ["--exec-path"], { encoding: "utf8" });
-  if (exec.error || exec.status !== 0) {
-    throw new Error(
-      `git --exec-path を実行できません（Git for Windows が要ります）: ${exec.error?.message ?? exec.stderr}`,
-    );
-  }
-  const execPath = exec.stdout.trim();
-  const usrBin = join(resolve(execPath, "..", "..", ".."), "usr", "bin");
-  const gitBin = resolve(execPath, "..", "..", "bin");
-  const tools: ShellTools = {
-    bash: join(usrBin, "bash.exe"),
-    git: join(gitBin, "git.exe"),
-    baseDirs: [usrBin, gitBin],
-    cygpath: join(usrBin, "cygpath.exe"),
-  };
-  for (const exe of [tools.bash, tools.git, tools.cygpath as string]) {
-    if (!existsSync(exe)) {
-      throw new Error(`Git for Windows の ${exe} がありません（git --exec-path: ${execPath}）`);
-    }
-  }
-  return tools;
-}
-
-const TOOLS = resolveShellTools();
-
-// 子の PATH。stub ディレクトリを先頭に置き、基底ディレクトリ以外は通さない。
-function childPath(...stubDirs: string[]): string {
-  return [...stubDirs, ...TOOLS.baseDirs].join(delimiter);
-}
-
-// bash へ渡すパス。MSYS の dirname は "\" を区切りと見なさず、quality-local.sh の
-// ROOT="$(cd "$(dirname "$0")/.." && pwd)" がずれるので、Windows では "/" へ寄せる（C:/... は Node も読める）。
-function shellPath(path: string): string {
-  return IS_WINDOWS ? path.replace(/\\/g, "/") : path;
-}
-
-// bash が出したパスを Node の existsSync で読める形へ直す（Windows の /c/... → C:/...）。
-// cygpath が失敗したときは入力をそのまま返す（呼び出し元の existsSync が偽になり、その候補を使わないだけ）。
-function nodePath(path: string): string {
-  if (!TOOLS.cygpath || !path.startsWith("/")) return path;
-  const r = spawnSync(TOOLS.cygpath, ["-m", path], { encoding: "utf8" });
-  return r.status === 0 && r.stdout ? r.stdout.trim() : path;
-}
-
-// このファイルの多くのテストは bash で quality-local.sh や git を起動するので、Windows では起動が重い。単独なら
-// 最長 3.3 秒のテストが、vitest 全体（他スイートと並列）では既定の 5 秒を超えて落ちた（Issue #570）。
-// 単独時の約 6 倍まで待つ（ms）。OS で切り替えず全体に掛ける（POSIX では上限に届かないので挙動は変わらない）
-const SPAWN_TEST_TIMEOUT_MS = 20_000;
 
 // quality-local.sh の STEPS と同じ順序（段を足したらここも足す。段数はこの配列から数える）
 const EXPECTED_ORDER = [
@@ -120,17 +54,12 @@ function requireRealCheckoutDeps(): void {
 }
 
 function gitEnv(): NodeJS.ProcessEnv {
-  const env = gitFixtureEnv({
-    FF_DEV_TOOLKIT_ROOT: undefined,
-    FF_GATE_RECORD_FILE: undefined,
-  });
-  // Windows の env キーは大文字小文字を区別しない。継承した Path と PATH が並ぶとどちらが効くか
-  // 定まらないので、PATH 系のキーを全部落としてから絞った PATH を 1 つだけ置く。
-  for (const key of Object.keys(env)) {
-    if (key.toUpperCase() === "PATH") delete env[key];
-  }
-  env.PATH = childPath();
-  return env;
+  return withChildPath(
+    gitFixtureEnv({
+      FF_DEV_TOOLKIT_ROOT: undefined,
+      FF_GATE_RECORD_FILE: undefined,
+    }),
+  );
 }
 
 function resolveToolkit(): string | null {
@@ -234,7 +163,8 @@ function recordMap(path: string): Record<string, string> {
   return out;
 }
 
-describe("quality:local gate record (Issue #515)", { timeout: SPAWN_TEST_TIMEOUT_MS }, () => {
+// bash 起動の待ち時間は vitest.config.ts の testTimeout（全体設定）に任せる（Issue #570 → #577）
+describe("quality:local gate record (Issue #515)", () => {
   it("package.json は scripts/quality-local.sh を呼ぶ", () => {
     const pkg = JSON.parse(readFileSync(join(REPO_ROOT, "package.json"), "utf8")) as {
       scripts?: { "quality:local"?: string };

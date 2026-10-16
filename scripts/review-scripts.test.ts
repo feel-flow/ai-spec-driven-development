@@ -4,6 +4,8 @@ import { mkdtempSync, writeFileSync, chmodSync, rmSync, mkdirSync } from "node:f
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { gitFixtureEnv } from "./git-fixture-env";
+// Issue #572: bash / sh / git の在処と子の PATH は shell-tools.ts で決める（Windows では Git for Windows の絶対パス）
+import { childPath, shellPath, TOOLS, withChildPath } from "./shell-tools";
 
 // 自前レビュー基盤（claude/copilot/gemini/cursor-review.sh + review-common.sh）の
 // 決定論的 smoke test（Issue #452）。
@@ -32,8 +34,7 @@ const SCRIPTS: ReviewScript[] = [
   { script: "cursor-review.sh", cli: "cursor-agent", envPrefix: "CURSOR" },
 ];
 
-// git 等の基本コマンドだけを含む最小 PATH（実 CLI を確実に見えなくする）
-const BASE_PATH = "/usr/bin:/bin";
+// 子の PATH は childPath()（git 等の基本コマンドだけを含む最小 PATH。実 CLI を確実に見えなくする）
 
 let passStubDir: string | undefined;
 let failStubDir: string | undefined;
@@ -79,12 +80,13 @@ function sanitizedGitEnv(): Record<string, string> {
 
 function initGitRepo(dir: string): (...args: string[]) => void {
   const git = (...args: string[]) => {
-    const r = spawnSync("git", args, {
+    const r = spawnSync(TOOLS.git, args, {
       cwd: dir,
       encoding: "utf8",
       env: sanitizedGitEnv(),
     });
-    if (r.status !== 0) throw new Error(`git ${args.join(" ")} failed: ${r.stderr}`);
+    // 起動できなかったときは stderr が空なので、起動エラー（r.error）を優先して出す
+    if (r.status !== 0) throw new Error(`git ${args.join(" ")} failed: ${r.error?.message ?? r.stderr}`);
   };
   git("init", "-b", "develop");
   writeFileSync(join(dir, "base.txt"), "base\n");
@@ -115,9 +117,9 @@ function makeCleanRepo(): string {
 function runReview(
   script: string,
   args: string[],
-  opts: { cwd?: string; path?: string; env?: Record<string, string> } = {},
+  opts: { cwd?: string; stubDirs?: string[]; env?: Record<string, string> } = {},
 ) {
-  const result = spawnSync("bash", [join(REPO_ROOT, "scripts", script), ...args], {
+  const result = spawnSync(TOOLS.bash, [shellPath(join(REPO_ROOT, "scripts", script)), ...args], {
     cwd: opts.cwd ?? REPO_ROOT,
     encoding: "utf8",
     timeout: 60_000,
@@ -126,7 +128,7 @@ function runReview(
       // TMPDIR を落とすと macOS の git が confstr 警告を stderr に出し、
       // review-common.sh の `git diff ... 2>&1` に混入して誤判定するため引き継ぐ
       TMPDIR: process.env.TMPDIR,
-      PATH: opts.path ?? BASE_PATH,
+      PATH: childPath(...(opts.stubDirs ?? [])),
       // Claude Code セッション検出による early-skip を無効化（明示テスト以外）
       CLAUDECODE: "",
       ...opts.env,
@@ -193,7 +195,7 @@ describe.each(SCRIPTS)("$script のレビュー実行（スタブ CLI）", ({ sc
   it("Verdict: PASS ×5 で Overall APPROVED（exit 0）", () => {
     const r = runReview(script, ["--branch"], {
       cwd: fixtureRepo,
-      path: `${passStubDir}:${BASE_PATH}`,
+      stubDirs: [passStubDir as string],
       env: { REVIEW_BASE_BRANCH: "develop" },
     });
     expect(r.status).toBe(0);
@@ -203,7 +205,7 @@ describe.each(SCRIPTS)("$script のレビュー実行（スタブ CLI）", ({ sc
   it("Verdict: FAIL で Overall REJECTED（exit 1）", () => {
     const r = runReview(script, ["--branch"], {
       cwd: fixtureRepo,
-      path: `${failStubDir}:${BASE_PATH}`,
+      stubDirs: [failStubDir as string],
       env: { REVIEW_BASE_BRANCH: "develop" },
     });
     expect(r.status).toBe(1);
@@ -213,7 +215,7 @@ describe.each(SCRIPTS)("$script のレビュー実行（スタブ CLI）", ({ sc
   it(`変更なし（差分ゼロの専用リポジトリ）では ${cli} を呼ばず exit 0`, () => {
     const r = runReview(script, ["--branch"], {
       cwd: cleanRepo,
-      path: `${passStubDir}:${BASE_PATH}`,
+      stubDirs: [passStubDir as string],
       env: { REVIEW_BASE_BRANCH: "develop" },
     });
     expect(r.status).toBe(0);
@@ -238,7 +240,7 @@ describe("review-common.sh のフェイルセーフ（代表: claude-review.sh�
     try {
       const r = runReview("claude-review.sh", ["--branch"], {
         cwd: fixtureRepo,
-        path: `${dir}:${BASE_PATH}`,
+        stubDirs: [dir],
         env: { REVIEW_BASE_BRANCH: "develop" },
       });
       expect(r.status).toBe(1);
@@ -254,7 +256,7 @@ describe("review-common.sh のフェイルセーフ（代表: claude-review.sh�
     try {
       const r = runReview("claude-review.sh", ["--branch"], {
         cwd: fixtureRepo,
-        path: `${dir}:${BASE_PATH}`,
+        stubDirs: [dir],
         env: { REVIEW_BASE_BRANCH: "develop" },
       });
       expect(r.status).toBe(1);
@@ -269,7 +271,7 @@ describe("review-common.sh のフェイルセーフ（代表: claude-review.sh�
     try {
       const r = runReview("claude-review.sh", ["--branch"], {
         cwd: fixtureRepo,
-        path: `${dir}:${BASE_PATH}`,
+        stubDirs: [dir],
         env: { REVIEW_BASE_BRANCH: "develop" },
       });
       expect(r.status).toBe(1);
@@ -288,7 +290,7 @@ describe("review-common.sh のフェイルセーフ（代表: claude-review.sh�
       git("add", "staged.ts");
       const r = runReview("claude-review.sh", ["--staged"], {
         cwd: dir,
-        path: `${passStubDir}:${BASE_PATH}`,
+        stubDirs: [passStubDir as string],
       });
       expect(r.status).toBe(0);
       expect(r.output).toContain("Overall: APPROVED");
@@ -300,7 +302,7 @@ describe("review-common.sh のフェイルセーフ（代表: claude-review.sh�
   it("引数なし（auto）: ステージなしならブランチ diff に fallback して APPROVED", () => {
     const r = runReview("claude-review.sh", [], {
       cwd: fixtureRepo,
-      path: `${passStubDir}:${BASE_PATH}`,
+      stubDirs: [passStubDir as string],
       env: { REVIEW_BASE_BRANCH: "develop" },
     });
     expect(r.status).toBe(0);
@@ -317,7 +319,7 @@ describe("review-common.sh のフェイルセーフ（代表: claude-review.sh�
       git("commit", "-m", "chore: lockfile update");
       const r = runReview("claude-review.sh", ["--branch"], {
         cwd: dir,
-        path: `${passStubDir}:${BASE_PATH}`,
+        stubDirs: [passStubDir as string],
         env: { REVIEW_BASE_BRANCH: "develop" },
       });
       expect(r.status).toBe(0);
@@ -338,7 +340,7 @@ describe("review-common.sh のフェイルセーフ（代表: claude-review.sh�
       git("commit", "-m", "chore: sub lockfile update");
       const r = runReview("claude-review.sh", ["--branch"], {
         cwd: dir,
-        path: `${passStubDir}:${BASE_PATH}`,
+        stubDirs: [passStubDir as string],
         env: { REVIEW_BASE_BRANCH: "develop" },
       });
       expect(r.status).toBe(0);
@@ -361,11 +363,12 @@ describe(".husky/pre-push の品質ゲート分岐（スタブ npm）", () => {
         writeFileSync(npmStub, `#!/bin/sh\necho "stub npm $*"\nexit ${npmExitCode}\n`);
         chmodSync(npmStub, 0o755);
       }
-      const r = spawnSync("sh", [join(REPO_ROOT, ".husky", "pre-push")], {
+      // husky は hook を sh で実行するので、ここも bash ではなく sh で起動する
+      const r = spawnSync(TOOLS.sh, [shellPath(join(REPO_ROOT, ".husky", "pre-push"))], {
         cwd: REPO_ROOT,
         encoding: "utf8",
         timeout: 30_000,
-        env: { PATH: `${dir}:${BASE_PATH}`, ...env },
+        env: withChildPath({ ...env }, dir),
         ...(input === undefined ? {} : { input }),
       });
       return { ...r, output: `${r.stdout}\n${r.stderr}` };
