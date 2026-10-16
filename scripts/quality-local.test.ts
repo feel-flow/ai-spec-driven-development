@@ -9,7 +9,7 @@ import {
   writeFileSync,
 } from "node:fs";
 import { homedir, tmpdir } from "node:os";
-import { dirname, join } from "node:path";
+import { delimiter, dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { beforeAll, describe, expect, it } from "vitest";
 import { gitFixtureEnv } from "./git-fixture-env";
@@ -17,7 +17,68 @@ import { gitFixtureEnv } from "./git-fixture-env";
 const REPO_ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const QUALITY_LOCAL = join(REPO_ROOT, "scripts", "quality-local.sh");
 const RECORD_HELPER = join(REPO_ROOT, "scripts", "record-quality-gate.sh");
-const BASE_PATH = "/usr/bin:/bin";
+const IS_WINDOWS = process.platform === "win32";
+// macOS / Linux では子の PATH を OS 標準の 2 か所に絞り、実行環境の外のツールに依存しないことを確かめる
+const POSIX_BASE_DIRS: readonly string[] = ["/usr/bin", "/bin"];
+
+// 子プロセスとして起動する bash / git と、子の PATH の基底ディレクトリ（stub ディレクトリはこの前に足す）。
+interface ShellTools {
+  bash: string;
+  git: string;
+  baseDirs: readonly string[];
+  // Windows で bash が出す /c/... 形式を Node が読める形へ直す cygpath。POSIX では不要なので null
+  cygpath: string | null;
+}
+
+// Issue #570: Windows の Node は子プロセスの実行ファイルを渡した env.PATH から探すため、POSIX 形式の
+// PATH では bash を解決できない。PATH 順で bash を探すと System32 の WSL bash を拾うこともあるので、
+// Git for Windows の配置（git --exec-path = <Git>/<mingw>/libexec/git-core）から bash.exe と git.exe を
+// 絶対パスで決め、子の PATH もその 2 ディレクトリ（<Git>/usr/bin と git.exe の在処）に絞る。
+function resolveShellTools(): ShellTools {
+  if (!IS_WINDOWS) return { bash: "bash", git: "git", baseDirs: POSIX_BASE_DIRS, cygpath: null };
+  // ここだけは親の PATH で git を探す（絞った PATH を作る前の起点）
+  const exec = spawnSync("git", ["--exec-path"], { encoding: "utf8" });
+  if (exec.error || exec.status !== 0) {
+    throw new Error(
+      `git --exec-path を実行できません（Git for Windows が要ります）: ${exec.error?.message ?? exec.stderr}`,
+    );
+  }
+  const execPath = exec.stdout.trim();
+  const usrBin = join(resolve(execPath, "..", "..", ".."), "usr", "bin");
+  const gitBin = resolve(execPath, "..", "..", "bin");
+  const tools: ShellTools = {
+    bash: join(usrBin, "bash.exe"),
+    git: join(gitBin, "git.exe"),
+    baseDirs: [usrBin, gitBin],
+    cygpath: join(usrBin, "cygpath.exe"),
+  };
+  for (const exe of [tools.bash, tools.git, tools.cygpath as string]) {
+    if (!existsSync(exe)) {
+      throw new Error(`Git for Windows の ${exe} がありません（git --exec-path: ${execPath}）`);
+    }
+  }
+  return tools;
+}
+
+const TOOLS = resolveShellTools();
+
+// 子の PATH。stub ディレクトリを先頭に置き、基底ディレクトリ以外は通さない。
+function childPath(...stubDirs: string[]): string {
+  return [...stubDirs, ...TOOLS.baseDirs].join(delimiter);
+}
+
+// bash へ渡すパス。MSYS の dirname は "\" を区切りと見なさず、quality-local.sh の
+// ROOT="$(cd "$(dirname "$0")/.." && pwd)" がずれるので、Windows では "/" へ寄せる（C:/... は Node も読める）。
+function shellPath(path: string): string {
+  return IS_WINDOWS ? path.replace(/\\/g, "/") : path;
+}
+
+// bash が出したパスを Node の existsSync で読める形へ直す（Windows の /c/... → C:/...）。
+function nodePath(path: string): string {
+  if (!TOOLS.cygpath || !path.startsWith("/")) return path;
+  const r = spawnSync(TOOLS.cygpath, ["-m", path], { encoding: "utf8" });
+  return r.status === 0 && r.stdout ? r.stdout.trim() : path;
+}
 
 // quality-local.sh の STEPS と同じ順序（段を足したらここも足す。段数はこの配列から数える）
 const EXPECTED_ORDER = [
@@ -53,20 +114,31 @@ function requireRealCheckoutDeps(): void {
 }
 
 function gitEnv(): NodeJS.ProcessEnv {
-  return gitFixtureEnv({
-    PATH: BASE_PATH,
+  const env = gitFixtureEnv({
     FF_DEV_TOOLKIT_ROOT: undefined,
     FF_GATE_RECORD_FILE: undefined,
   });
+  // Windows の env キーは大文字小文字を区別しない。継承した Path と PATH が並ぶとどちらが効くか
+  // 定まらないので、PATH 系のキーを全部落としてから絞った PATH を 1 つだけ置く。
+  for (const key of Object.keys(env)) {
+    if (key.toUpperCase() === "PATH") delete env[key];
+  }
+  env.PATH = childPath();
+  return env;
 }
 
 function resolveToolkit(): string | null {
   const printed = spawnSync(
-    "bash",
-    [join(REPO_ROOT, "scripts", "codex-review.sh"), "--print-toolkit-root"],
+    TOOLS.bash,
+    [shellPath(join(REPO_ROOT, "scripts", "codex-review.sh")), "--print-toolkit-root"],
     { cwd: REPO_ROOT, encoding: "utf8", env: gitEnv() },
   );
-  const printedRoot = printed.stdout.trim().split("\n").filter(Boolean).pop();
+  // 起動自体の失敗（Issue #570 の stdout undefined）は、何が起動できなかったかを名指しして止める
+  if (printed.error) {
+    throw new Error(`${TOOLS.bash} を起動できません: ${printed.error.message}`);
+  }
+  const printedLine = printed.stdout.trim().split("\n").filter(Boolean).pop();
+  const printedRoot = printedLine ? nodePath(printedLine) : undefined;
   const candidates = [
     process.env.FF_DEV_TOOLKIT_ROOT,
     printedRoot,
@@ -130,14 +202,14 @@ function writeFixtureToolkit(dir: string): string {
 
 function initRepo(dir: string): string {
   const git = (...args: string[]) => {
-    const r = spawnSync("git", args, { cwd: dir, encoding: "utf8", env: gitEnv() });
+    const r = spawnSync(TOOLS.git, args, { cwd: dir, encoding: "utf8", env: gitEnv() });
     if (r.status !== 0) throw new Error(`git ${args.join(" ")}: ${r.stderr}`);
   };
   git("init", "-b", "develop");
   writeFileSync(join(dir, "README"), "ok\n");
   git("add", ".");
   git("commit", "-m", "init");
-  const head = spawnSync("git", ["rev-parse", "HEAD"], {
+  const head = spawnSync(TOOLS.git, ["rev-parse", "HEAD"], {
     cwd: dir,
     encoding: "utf8",
     env: gitEnv(),
@@ -169,10 +241,10 @@ describe("quality:local gate record (Issue #515)", () => {
     try {
       writeFixtureToolkit(toolkit);
       const head = initRepo(dir);
-      const r = spawnSync("bash", [RECORD_HELPER, "--status", "pass", "--expect-head", head], {
+      const r = spawnSync(TOOLS.bash, [shellPath(RECORD_HELPER), "--status", "pass", "--expect-head", head], {
         cwd: dir,
         encoding: "utf8",
-        env: { ...gitEnv(), FF_DEV_TOOLKIT_ROOT: toolkit },
+        env: { ...gitEnv(), FF_DEV_TOOLKIT_ROOT: shellPath(toolkit) },
       });
       expect(r.status, r.stderr).toBe(0);
       const rec = recordMap(join(dir, ".git", "ff-dev-toolkit", "gate-record"));
@@ -193,13 +265,13 @@ describe("quality:local gate record (Issue #515)", () => {
     try {
       writeFixtureToolkit(toolkit);
       const head = initRepo(dir);
-      const env = { ...gitEnv(), FF_DEV_TOOLKIT_ROOT: toolkit };
-      spawnSync("bash", [RECORD_HELPER, "--status", "pass", "--expect-head", head], {
+      const env = { ...gitEnv(), FF_DEV_TOOLKIT_ROOT: shellPath(toolkit) };
+      spawnSync(TOOLS.bash, [shellPath(RECORD_HELPER), "--status", "pass", "--expect-head", head], {
         cwd: dir,
         encoding: "utf8",
         env,
       });
-      const fail = spawnSync("bash", [RECORD_HELPER, "--status", "fail", "--expect-head", head], {
+      const fail = spawnSync(TOOLS.bash, [shellPath(RECORD_HELPER), "--status", "fail", "--expect-head", head], {
         cwd: dir,
         encoding: "utf8",
         env,
@@ -219,14 +291,14 @@ describe("quality:local gate record (Issue #515)", () => {
       const head = initRepo(dir);
       const recDir = join(home, ".codex", "plugins", "cache", "mp", "ff-dev-toolkit", "9.9.9");
       writeFixtureToolkit(recDir);
-      const r = spawnSync("bash", [RECORD_HELPER, "--status", "pass", "--expect-head", head], {
+      const r = spawnSync(TOOLS.bash, [shellPath(RECORD_HELPER), "--status", "pass", "--expect-head", head], {
         cwd: dir,
         encoding: "utf8",
         env: {
           ...gitEnv(),
-          HOME: home,
-          CODEX_HOME: join(home, ".codex"),
-          CLAUDE_CONFIG_DIR: join(home, ".claude"),
+          HOME: shellPath(home),
+          CODEX_HOME: shellPath(join(home, ".codex")),
+          CLAUDE_CONFIG_DIR: shellPath(join(home, ".claude")),
         },
       });
       expect(r.status, r.stderr).toBe(0);
@@ -243,10 +315,10 @@ describe("quality:local gate record (Issue #515)", () => {
       initRepo(dir);
       const missing = join(dir, "empty-toolkit");
       mkdirSync(missing);
-      const r = spawnSync("bash", [RECORD_HELPER, "--status", "pass"], {
+      const r = spawnSync(TOOLS.bash, [shellPath(RECORD_HELPER), "--status", "pass"], {
         cwd: dir,
         encoding: "utf8",
-        env: { ...gitEnv(), FF_DEV_TOOLKIT_ROOT: missing },
+        env: { ...gitEnv(), FF_DEV_TOOLKIT_ROOT: shellPath(missing) },
       });
       expect(r.status, r.stderr).toBe(0);
       expect(r.stderr).toMatch(/スキップ/);
@@ -271,26 +343,26 @@ describe("quality:local gate record (Issue #515)", () => {
       chmodSync(join(failDir, "npm"), 0o755);
       const passFile = join(passDir, "gate-record");
       const failFile = join(failDir, "gate-record");
-      const pass = spawnSync("bash", [QUALITY_LOCAL], {
+      const pass = spawnSync(TOOLS.bash, [shellPath(QUALITY_LOCAL)], {
         cwd: REPO_ROOT,
         encoding: "utf8",
         env: {
           ...gitEnv(),
-          PATH: `${passDir}:${BASE_PATH}`,
-          FF_DEV_TOOLKIT_ROOT: toolkit,
-          FF_GATE_RECORD_FILE: passFile,
+          PATH: childPath(passDir),
+          FF_DEV_TOOLKIT_ROOT: shellPath(toolkit),
+          FF_GATE_RECORD_FILE: shellPath(passFile),
         },
       });
       expect(pass.status, pass.stderr).toBe(0);
       expect(recordMap(passFile).STATUS).toBe("pass");
-      const fail = spawnSync("bash", [QUALITY_LOCAL], {
+      const fail = spawnSync(TOOLS.bash, [shellPath(QUALITY_LOCAL)], {
         cwd: REPO_ROOT,
         encoding: "utf8",
         env: {
           ...gitEnv(),
-          PATH: `${failDir}:${BASE_PATH}`,
-          FF_DEV_TOOLKIT_ROOT: toolkit,
-          FF_GATE_RECORD_FILE: failFile,
+          PATH: childPath(failDir),
+          FF_DEV_TOOLKIT_ROOT: shellPath(toolkit),
+          FF_GATE_RECORD_FILE: shellPath(failFile),
         },
       });
       expect(fail.status).toBe(1);
@@ -316,19 +388,19 @@ describe("quality:local gate record (Issue #515)", () => {
         : "";
       writeFileSync(
         join(binDir, "npm"),
-        `#!/bin/sh\necho "$*" >> "${log}"\ncase "$*" in\n${failCase}esac\nexit 0\n`,
+        `#!/bin/sh\necho "$*" >> "${shellPath(log)}"\ncase "$*" in\n${failCase}esac\nexit 0\n`,
       );
       chmodSync(join(binDir, "npm"), 0o755);
       writeFixtureToolkit(toolkit);
       try {
-        const r = spawnSync("bash", [QUALITY_LOCAL], {
+        const r = spawnSync(TOOLS.bash, [shellPath(QUALITY_LOCAL)], {
           cwd: REPO_ROOT,
           encoding: "utf8",
           env: {
             ...gitEnv(),
-            PATH: `${binDir}:${BASE_PATH}`,
-            FF_DEV_TOOLKIT_ROOT: toolkit,
-            FF_GATE_RECORD_FILE: join(binDir, "gate-record"),
+            PATH: childPath(binDir),
+            FF_DEV_TOOLKIT_ROOT: shellPath(toolkit),
+            FF_GATE_RECORD_FILE: shellPath(join(binDir, "gate-record")),
           },
         });
         const calls = readFileSync(log, "utf8").trim().split("\n");
@@ -394,19 +466,19 @@ describe("quality:local gate record (Issue #515)", () => {
         if (present.mcp) mkdirSync(join(dir, "mcp", "node_modules"), { recursive: true });
         writeFixtureToolkit(toolkit);
         initRepo(dir);
-        writeFileSync(join(binDir, "npm"), `#!/bin/sh\necho "$*" >> "${log}"\nexit 0\n`);
+        writeFileSync(join(binDir, "npm"), `#!/bin/sh\necho "$*" >> "${shellPath(log)}"\nexit 0\n`);
         chmodSync(join(binDir, "npm"), 0o755);
         const gateFile = join(binDir, "gate-record");
         // 前回の緑が残っている状態から始める
         writeFileSync(gateFile, "STATUS=pass\n");
-        const r = spawnSync("bash", [join(dir, "scripts", "quality-local.sh")], {
+        const r = spawnSync(TOOLS.bash, [shellPath(join(dir, "scripts", "quality-local.sh"))], {
           cwd: dir,
           encoding: "utf8",
           env: {
             ...gitEnv(),
-            PATH: `${binDir}:${BASE_PATH}`,
-            FF_DEV_TOOLKIT_ROOT: toolkit,
-            FF_GATE_RECORD_FILE: gateFile,
+            PATH: childPath(binDir),
+            FF_DEV_TOOLKIT_ROOT: shellPath(toolkit),
+            FF_GATE_RECORD_FILE: shellPath(gateFile),
           },
         });
         const calls = existsSync(log) ? readFileSync(log, "utf8").trim().split("\n") : [];
@@ -454,17 +526,17 @@ describe("quality:local gate record (Issue #515)", () => {
       const dir = mkdtempSync(join(tmpdir(), "ql-fresh-"));
       try {
         const head = initRepo(dir);
-        const env = { ...gitEnv(), FF_DEV_TOOLKIT_ROOT: TOOLKIT_ROOT as string };
-        const rec = spawnSync("bash", [RECORD_HELPER, "--status", "pass", "--expect-head", head], {
+        const env = { ...gitEnv(), FF_DEV_TOOLKIT_ROOT: shellPath(TOOLKIT_ROOT as string) };
+        const rec = spawnSync(TOOLS.bash, [shellPath(RECORD_HELPER), "--status", "pass", "--expect-head", head], {
           cwd: dir,
           encoding: "utf8",
           env,
         });
         expect(rec.status, rec.stderr).toBe(0);
         const check = spawnSync(
-          "bash",
+          TOOLS.bash,
           [
-            join(TOOLKIT_ROOT as string, "scripts", "check-merge-freshness.sh"),
+            shellPath(join(TOOLKIT_ROOT as string, "scripts", "check-merge-freshness.sh")),
             "--remote-head",
             head,
           ],
