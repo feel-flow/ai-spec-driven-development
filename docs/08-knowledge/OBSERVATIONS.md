@@ -390,13 +390,14 @@ dry-run で grok-cli が `runtime-socket deny resolution failed` と出ても、
 
 | Kind | problem | Count | 3 |
 | First | 2026-10-15 | Last | 2026-10-16 |
-| Status | promoted | Issue | feel-flow/ai-spec-driven-development#565 |
+| Status | mitigated | Issue | feel-flow/ai-spec-driven-development#565 |
 
 `quality:local` は意図的に `npm ci` を含まないため、ルートと `mcp/` の `node_modules` が無いと最初の `build:mcp` が `Cannot find type definition file for 'node'` で落ち、型定義の不備に見えて 1 回ゲートを空費する → ゲート冒頭で `node_modules` の有無を検査し、無ければ `npm ci`（ルートと `mcp/`）を名指しして止めよ。
 
 - 2026-10-15: PR #543 の PR 前ゲートで TS2688 により exit 2。`node_modules` が両方とも不在だと確認し、`npm ci` を 2 か所で実行してから再実行で通過（初回）
 - 2026-10-15: Issue #406 / PR #553 の PR 前ゲートで、ルートの `node_modules` はあったが `mcp/node_modules` が無く TS2688 で exit 2。`npm --prefix mcp ci` 後の再実行で通過
 - 2026-10-16: PR #562 の PR 前ゲートで `mcp/node_modules` が無く [3/8] が `'vitest' は認識されていません` で exit 1。`npm --prefix mcp ci` 後はルートの `node_modules` 不在で [4/8] が同じ形で落ち、`npm ci` 後に 3 周目を回した（Count 3 で昇格）
+- 2026-10-16: 対策完了を照合。PR #566（1520ca03）で `scripts/quality-local.sh` が段の前に root / mcp の `node_modules` を確かめ、不在なら名指しで `npm ci` / `npm --prefix mcp ci` を案内して exit 1 で止まることを develop で確認し、mitigated へ移した
 
 ---
 
@@ -628,5 +629,19 @@ Windows の Git Bash では `tests/run-all.sh` が 2 時間超で完走せず、
 `python - <<'EOF'` の中に改行コードのエスケープ（バックスラッシュ r / n）を書いて別ファイルへ書き出すと、Bash ツールから Python の文字列リテラル評価までのどこかでエスケープが剥がれ、出力先に実際の CR / LF が入る。JS ファイルへのパッチでは文字列リテラルが行をまたいで構文が壊れ、Markdown への追記では見出しとコードスパンが途中で改行された → 改行コードの表記を含む内容の生成・修正は Bash の heredoc を通さず、Write / Edit ツールで直接書く
 
 - 2026-10-16: PR #562 の作業中、`archive.mjs` の CRLF 対応パッチで発生。ファイルを Write で書き直して 1 往復を失った（初回）。同じセッションで本エントリ自体を heredoc の Python で台帳へ追記した際にも見出しが途中で改行され、Write で書いた差し替え用ファイルから直した
+
+---
+
+<a id="obs-042"></a>
+
+### OBS-042: Git Bash から `wsl.exe -- bash -lc '...'` に渡したコマンド文字列の中の `$?` は正しく展開されず、失敗したコマンドの終了コードが 0 に見える
+
+| Kind | problem | Count | 1 |
+| First | 2026-10-16 | Last | 2026-10-16 |
+| Status | active | Issue | なし |
+
+`wsl.exe -d Ubuntu -- bash -lc 'false; echo "probe:$?"'` は `probe:0` を出す。終了コードを `$?` で読む検証を `bash -lc` の引数文字列に埋め込むと、実際は exit 1 のスクリプトが exit 0 に見え、存在しないバグを追って `bash -x` で 2 往復した → WSL での検証はスクリプトファイルへ書いて `MSYS_NO_PATHCONV=1 wsl.exe -d <distro> -- bash <ファイルの /mnt パス>` で実行し、終了コードはファイル内で読む
+
+- 2026-10-16: Issue #565 / PR #566 の Linux 検証で、`quality-local.sh` が依存不在で exit 1 を返すのに `EXIT=0` と表示された。スクリプトファイル経由の再測定で `rc:1` を確認（初回）
 
 ---

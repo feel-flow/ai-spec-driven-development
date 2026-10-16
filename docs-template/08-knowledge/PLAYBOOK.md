@@ -1,12 +1,12 @@
 ---
 title: "PLAYBOOK"
-version: "1.66.0"
+version: "1.67.0"
 status: "approved"
 created: "2026-03-10"
 updated: "2026-10-16"
 owner: "@fffokazaki"
 changeImpact: "medium"
-ace_entry_count: 50
+ace_entry_count: 51
 tags: [ace, playbook, knowledge-management]
 references:
   - https://github.com/feel-flow/ai-spec-driven-development/blob/HEAD/docs/ACE_FRAMEWORK.md
@@ -845,7 +845,27 @@ PR #551 では PATTERNS.md §3 を新設の ERRORS.md へ移し、配布物リ�
 
 ---
 
+<a id="ace-566-1"></a>
+
+### ACE-566-1: 前提を満たさないと別の症状で落ちるゲートやテストは、最初の段より前に前提を名指しで検査して止める
+
+| Category | tooling | Origin | PR #566 |
+| Related | ACE-484-3 |
+| Date | 2026-10-16 |
+| Helpful | 0 | Harmful | 0 |
+| Status | active |
+
+依存の導入や環境の前提を自分では満たさないゲートは、前提が欠けると途中の段が型定義の不在やコマンド未検出のような原因の読めない形で落ち、利用者はゲートを何周も空費する（`quality:local` では `node_modules` 不在が TS2688 や `vitest` 未検出として現れ、3 回観測された）。同じ前提に暗黙に依存するテストも、終了コードの不一致としか読めない失敗になる。前提を自動で満たさない方針のゲートほど、最初の段より前に前提の在否を確かめ、不在の対象と満たすためのコマンドを名指しして失敗させる。前提に依存するテストにも同じ確認を `beforeAll` 等で置く。
+
+---
+
 ## Changelog
+
+### [1.67.0] - 2026-10-16
+
+#### 追加
+
+- ACE-566-1: 前提を満たさないと別の症状で落ちるゲートやテストは、最初の段より前に前提を名指しで検査して止める（PR #566）
 
 ### [1.66.0] - 2026-10-16
 
