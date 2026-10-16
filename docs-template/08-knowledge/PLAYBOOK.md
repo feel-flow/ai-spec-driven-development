@@ -1,12 +1,12 @@
 ---
 title: "PLAYBOOK"
-version: "1.64.0"
+version: "1.65.0"
 status: "approved"
 created: "2026-03-10"
-updated: "2026-10-15"
+updated: "2026-10-16"
 owner: "@fffokazaki"
 changeImpact: "medium"
-ace_entry_count: 111
+ace_entry_count: 49
 tags: [ace, playbook, knowledge-management]
 references:
   - https://github.com/feel-flow/ai-spec-driven-development/blob/HEAD/docs/ACE_FRAMEWORK.md
@@ -107,7 +107,7 @@ ACE エントリ ID は **PRスコープ式** を採用する（このセクシ�
 ### 記述ガイドライン
 
 - **anchor**: 各エントリは見出し直前に `<a id="ace-XXX"></a>` を 1 行付与する。`XXX` は **エントリ ID を小文字化したもの**（新規は `ace-438-1` / `ace-i425-1`、旧エントリは `ace-001`。anchor 部分は常に小文字英数字＋ハイフン）。ファイルレベル参照（`PLAYBOOK.md` 単体）は常にファイル先頭に着地するため、anchor がなければ個別エントリへの誘導が成立しない。anchor 付与により他ドキュメントから `[ACE-438-1](path/to/PLAYBOOK.md#ace-438-1)` 形式で**特定エントリに直接ジャンプ可能**になる。
-- **参照リンク形式**: 他ドキュメントから ACE エントリを参照する場合は `[ACE-XXX](path/to/PLAYBOOK.md#ace-XXX)` 形式に統一する（`XXX` はエントリ ID の接頭辞 `ACE-` / `ace-` を除いた部分。新規は `438-1`、旧は 3 桁 `040`。label は `ACE-438-1`、anchor は `#ace-438-1`）。`[PLAYBOOK ACE-XXX]` / `[PLAYBOOK.md ACE-XXX]` 等の異なる label は使わない（[ACE-040](#ace-040) 語彙統一 / [ACE-024](#ace-024) 用語衝突防止 の系。Origin: Issue [#425](https://github.com/feel-flow/ai-spec-driven-development/issues/425)）。
+- **参照リンク形式**: 他ドキュメントから ACE エントリを参照する場合は `[ACE-XXX](path/to/PLAYBOOK.md#ace-XXX)` 形式に統一する（`XXX` はエントリ ID の接頭辞 `ACE-` / `ace-` を除いた部分。新規は `438-1`、旧は 3 桁 `040`。label は `ACE-438-1`、anchor は `#ace-438-1`）。`[PLAYBOOK ACE-XXX]` / `[PLAYBOOK.md ACE-XXX]` 等の異なる label は使わない（[ACE-040](https://github.com/feel-flow/ai-spec-driven-development/blob/HEAD/docs-template/08-knowledge/playbook/archive/process.md#ace-040) 語彙統一 / [ACE-024](https://github.com/feel-flow/ai-spec-driven-development/blob/HEAD/docs-template/08-knowledge/playbook/archive/documentation-quality.md#ace-024) 用語衝突防止 の系。Origin: Issue [#425](https://github.com/feel-flow/ai-spec-driven-development/issues/425)）。参照先は、active エントリなら `PLAYBOOK.md#ace-xxx`、アーカイブ済みエントリなら `playbook/archive/<category>.md#ace-xxx` とする（配布される文書（docs-template/ 配下・.claude/commands/）から archive を指すときは、`/ace-setup` が archive を配置しないため `blob/HEAD` の絶対 URL にする）。どちらか迷うときは `playbook/archive/` を ID で grep して所在を確かめる。
 - **本文の構成**: 1 文目 =「何を学んだか」（知見の本質）。2 文目 =「どんな状況で使うか」（非自明な適用条件。再現条件が明確であるほど価値が高い）。最後に「次回何をすべきか」（推奨アクション）。
 
 ---
@@ -170,20 +170,12 @@ ACE エントリ ID は **PRスコープ式** を採用する（このセクシ�
 
 ### ACE-001: クロスモデルレビューは単一AIモデルでは検出できない問題を発見する
 
-| フィールド | 値                |
-| ---------- | ----------------- |
-| Category   | process           |
-| Origin     | PR #316 / PR #319 |
-| Date       | 2026-03-10        |
-| Helpful    | 12                |
-| Harmful    | 0                 |
-| Status     | active            |
+| Category | process | Origin | PR #316 / PR #319 |
+| Date | 2026-03-10 |
+| Helpful | 12 | Harmful | 0 |
+| Status | active |
 
-**Insight**: 異なるAIモデル（Claude/Codex/Gemini/CodeRabbit）は異なるカテゴリの問題を検出する。単一モデルのレビューでは見落とされる問題が、クロスモデルレビューで発見される。
-
-**Context**: PR #316（ドキュメント）では Claude がnpmパッケージ名の間違いと壊れたリンク、Codex がスクリプト未実装注記の不足、Gemini Bot がパッケージスコープの間違いと無料枠数値の不一致、CodeRabbit が未実装スクリプトの注記不足を検出。PR #319（スクリプト）では Codex が CRITICAL_BLOCK 誤検出バグを発見し、Claude の pr-review-toolkit（code-reviewer + silent-failure-hunter）が stderr 握りつぶし・サイレントフォールバック・空結果の偽成功を検出。いずれも単一モデルでは検出されなかった。
-
-**Action**: PR作成前のセルフレビューでは、`pr-review-toolkit`（Claude系サブエージェント）と `codex review --base develop`（GPT系クロスモデル）の両方を実行する。Bot系レビュー（Gemini Code Assist, CodeRabbit）がある場合はその指摘も確認する。
+異なる系列の AI モデルは異なるカテゴリの問題を検出し、単一モデルのレビューでは見落とす欠陥がクロスモデルレビューで見つかる（PR #316 では Claude・Codex・Gemini・CodeRabbit がそれぞれ別の誤りを、PR #319 では Codex が誤検出バグを、Claude 系が stderr の握りつぶし・偽成功を検出した）。ドキュメントでもスクリプトでも、PR を作る前のセルフレビューに当てはまる。Claude 系のレビュー（`pr-review-toolkit`）と別系列のクロスモデルレビュー（Codex 等）を両方実行し、Bot のレビューがあればその指摘も確認する。
 
 ---
 
@@ -191,41 +183,12 @@ ACE エントリ ID は **PRスコープ式** を採用する（このセクシ�
 
 ### ACE-002: CLIフラグは実機の --help 出力と照合が必須
 
-| フィールド | 値                   |
-| ---------- | -------------------- |
-| Category   | tooling              |
-| Origin     | PR #316 / Issue #315 |
-| Date       | 2026-03-10           |
-| Helpful    | 2                    |
-| Harmful    | 0                    |
-| Status     | active               |
+| Category | tooling | Origin | PR #316 / Issue #315 |
+| Date | 2026-03-10 |
+| Helpful | 2 | Harmful | 0 |
+| Status | active |
 
-**Insight**: Web検索やAI生成の情報だけでは CLI フラグの正確性は保証されない。`codex -p` は存在せず `codex exec` が正解、Copilot `-s` は sandbox ではなく `--silent`、Cursor `-p` は boolean フラグでプロンプトは positional 引数など、実機確認しなければ分からない差異が多い。
-
-**Context**: Multi-CLI Review ドキュメント作成時に5つのAI CLIのフラグを調査。Web検索とAI生成の情報を信じてドキュメント化したが、セルフレビューと実機テストで複数の誤りが発覚。特に Codex CLI は `-p` フラグが存在しないにもかかわらず、Web上の古い情報では `-p` が使われていた。
-
-**Action**: CLI ツールのフラグを記述する際は、(1) `command --help` で実機確認、(2) 公式リポジトリの README/docs と照合、(3) 可能なら `--dry-run` 等で動作確認、の3ステップを必ず実施する。
-
----
-
-<a id="ace-003"></a>
-
-### ACE-003: bash スクリプトは macOS デフォルト環境（bash 3.2）でテストする
-
-| フィールド | 値                   |
-| ---------- | -------------------- |
-| Category   | devops               |
-| Origin     | PR #319 / Issue #317 |
-| Date       | 2026-03-10           |
-| Helpful    | 0                    |
-| Harmful    | 0                    |
-| Status     | active               |
-
-**Insight**: macOS のデフォルト bash は 3.2（bash 4.0+ が GPLv3 に移行したため Apple が更新を停止）であり、`declare -A`（連想配列）、`head -n -1`（GNU拡張）、`timeout` コマンドなどが使えない。CI環境（Linux, bash 5.x）では動くが macOS では動かないスクリプトが生まれやすい。
-
-**Context**: `multi-review.sh` を連想配列ベースで実装したところ、macOS の bash 3.2 で `declare -A: invalid option` エラーが発生。関数ベースのルックアップに書き直し、`head -n -1` を `sed` に変更、`timeout` を kill ベースフォールバックに変更して解決。
-
-**Action**: bash スクリプトの移植性を確保するには、(1) 連想配列の代わりに case 文/関数ルックアップを使用、(2) GNU 拡張コマンドには POSIX 互換フォールバックを用意、(3) macOS のデフォルト環境で `--dry-run` テストを実施する。shebang は `#!/usr/bin/env bash` のまま、bash 3.2+ 互換コードを書く。
+CLI フラグは Web 検索や AI 生成の情報では正確性が保証されず、実機でしか分からない差異が多い（`codex -p` は存在せず `codex exec` が正しい、Copilot の `-s` は sandbox ではなく `--silent` など）。複数の CLI の使い方を文書化するときに起きやすい。フラグを書くときは `command --help` の実機出力と公式の README / docs で照合し、可能なら `--dry-run` 等で動作も確かめる。
 
 ---
 
@@ -233,178 +196,12 @@ ACE エントリ ID は **PRスコープ式** を採用する（このセクシ�
 
 ### ACE-004: ドキュメントの動作説明は実装メカニズムと一致させる
 
-| フィールド | 値         |
-| ---------- | ---------- |
-| Category   | process    |
-| Origin     | PR #350    |
-| Date       | 2026-03-18 |
-| Helpful    | 1          |
-| Harmful    | 0          |
-| Status     | active     |
+| Category | process | Origin | PR #350 |
+| Date | 2026-03-18 |
+| Helpful | 1 | Harmful | 0 |
+| Status | active |
 
-**Insight**: ドキュメントに「自動実行」と記載したが、実際にはCLAUDE.mdの指示に基づいてAIツールが順次実行する仕組みだった。「自動」「手動」「並列」「順次」等の動作表現が実装メカニズムと乖離すると、読者（人間・AI両方）が誤った前提で行動し、トラブルシューティング時に混乱する。
-
-**Context**: PR #350 のレビューでCodeRabbitが「自動実行」表現と`execute_tasks()`の実装（事前計画の一括/順次実行）の不一致を指摘。また`npm run code-review:codex`が`package.json`に未定義であることも発覚。ドキュメント作成時に「こうなるべき」を「こうなっている」として記述してしまうパターン。
-
-**Action**: ドキュメントに動作説明を書く際は、(1) 実装コード/設定ファイルで実際の動作を確認、(2) 記載するコマンドは実在を検証（`package.json`のscripts、`--help`出力等）、(3) 「自動」「手動」等の表現は実装メカニズムに基づいて正確に選択する。
-
----
-
-<a id="ace-005"></a>
-
-### ACE-005: 索引と実体を分離する委譲パターンでAIコンテキスト消費を抑える
-
-| フィールド | 値                   |
-| ---------- | -------------------- |
-| Category   | architecture         |
-| Origin     | PR #369 / Issue #368 |
-| Date       | 2026-04-26           |
-| Helpful    | 0                    |
-| Harmful    | 0                    |
-| Status     | active               |
-
-**Insight**: AI が常時参照する中心文書（MASTER.md / PATTERNS.md 等）には **索引（概要 + リンク）のみ** を置き、実体は専用ファイルに分離する委譲パターンを採用すると、AI は必要なときだけ実体ファイルをロードできるためコンテキスト消費が抑えられる。文書側の認知負荷も下がり、レビューしやすい diff になる。
-
-**Context**: PR #369 で Decision Tree（配置判断ガイド）を docs-template に追加する際、既存の `FALLBACK.md`（PATTERNS.md 3.3 節から委譲）と同じ構造を採用。MASTER.md には 1 行リンクのみ、PATTERNS.md には「概要表 + 詳細リンク」の索引セクション（11節）、実体は新規 `DECISION_TREE.md` に集約。pr-review-toolkit / Codex の 5/5 レビューでも整合的な階層として APPROVED。
-
-**Action**: docs-template に大型ガイド（100行超）を追加する際は、(1) MASTER.md など最上位文書には**1〜2行のリンクのみ** 追加、(2) PATTERNS.md など中間文書には「概要表 + 詳細リンク」の索引セクションを置く、(3) 実体は専用ファイルに集約。既存の参照実装: `FALLBACK.md`, `DECISION_TREE.md`。
-
----
-
-<a id="ace-006"></a>
-
-### ACE-006: サンプル付きテンプレファイルには⚠️SAMPLEバナーと固有化手順を必ず併設する
-
-| フィールド | 値                   |
-| ---------- | -------------------- |
-| Category   | tooling              |
-| Origin     | PR #369 / Issue #368 |
-| Date       | 2026-04-26           |
-| Helpful    | 0                    |
-| Harmful    | 0                    |
-| Status     | active               |
-
-**Insight**: docs-template/ 配下のテンプレで具体例（特定ドメインのパス・名前）を含める場合、採用プロジェクトが固有化を忘れて「サンプルのまま運用される」失敗モードが発生する。冒頭の **⚠️ SAMPLE バナー** と末尾の **「プロジェクト固有化の手順」** セクションをセットで配置することで、採用時の見落としを構造的に防げる。
-
-**Context**: PR #369 の `DECISION_TREE.md` は Web API バックエンドをサンプルドメインとして `infrastructure/clients/` 等の具体的パスを含む構成にした。設計時の失敗モード分析で「Web API サンプルのパスが消えないまま使われる（F1）」「自プロジェクトと合わない分岐が残る（F2）」を識別し、防御策として SAMPLE バナーとプロジェクト固有化手順（コピー → 書き換え → バナー削除 → frontmatter 更新）を明文化。
-
-**Action**: docs-template に具体例（コードパス、ドメイン名、実装名）を含む新規テンプレファイルを追加する際は: (1) ファイル冒頭に `> ⚠️ **SAMPLE — テンプレートです**` 引用ブロックと書き換え案内を配置、(2) 末尾に「プロジェクト固有化の手順」セクション（番号付き手順 + frontmatter の `created/updated/owner` 置換まで含める）を配置、(3) 該当しない分岐・セクションは「**該当セクションごと削除してよい**」と明記、(4) 該当する失敗モード（採用後にサンプルのまま残る等）を仕様書側にリストアップしておく。
-
----
-
-<a id="ace-007"></a>
-
-### ACE-007: Claude Code skill 内のツール参照は名称・subagent_type を実機 / system prompt で照合する
-
-| フィールド | 値                   |
-| ---------- | -------------------- |
-| Category   | tooling              |
-| Origin     | PR #374 / Issue #373 |
-| Date       | 2026-04-26           |
-| Helpful    | 0                    |
-| Harmful    | 0                    |
-| Status     | active               |
-
-**Insight**: Claude Code の skill 定義（`.claude/commands/*.md`）に SubAgent 起動を書く際、ツール名は **`Task`** であり `Agent` ではない。subagent_type も Claude Code 公式の組み込み（`Explore` / `general-purpose` 等）と照合する必要がある。誤った名称を skill に書くと、実行時にモデルが対応するツールを引けず失敗する。
-
-**Context**: PR #374 の `/refine-issue` skill で `Agent ツール（subagent_type: Explore）` と記述したところ、4 つのレビュアー（Toolkit code-reviewer / comment-analyzer、Copilot、Gemini）のうち 3 つが「`Agent` ツールは Claude Code に存在しない、`Task` が正解」と独立して指摘。設計プラン側でも `Task tool` と `Agent(...)` の表記揺れがあった。Claude Code の system prompt で公式 tool 一覧と Available agent types を確認すれば防げる。
-
-**Action**: skill 内で SubAgent / Tool 呼び出しを書く際は、(1) Claude Code の公式 system prompt 内 "Tools available" / "Available agent types" を確認、(2) ツール名 `Task` / `Edit` / `Read` 等を正確に書く、(3) `subagent_type` は組み込み（`general-purpose`, `Explore`, `output-style-setup`, `statusline-setup` 等）+ プロジェクトの `.claude/agents/` 定義を確認、(4) 環境依存の subagent_type（`Explore` 等）は `general-purpose` を fallback として併記する。
-
----
-
-<a id="ace-008"></a>
-
-### ACE-008: クロスリポジトリ操作する skill は全 gh コマンドに `--repo` 必須・mention は `@<assignee>` を使う
-
-| フィールド | 値                   |
-| ---------- | -------------------- |
-| Category   | tooling              |
-| Origin     | PR #374 / Issue #373 |
-| Date       | 2026-04-26           |
-| Helpful    | 0                    |
-| Harmful    | 0                    |
-| Status     | active               |
-
-**Insight**: skill が「クロスリポジトリ対応」を謳う場合、`gh issue view` だけでなく **`gh issue edit` / `gh issue comment` / `gh label create` / `gh issue edit --add-label` の全てに `--repo <owner/repo>` を渡す**必要がある。1 つでも欠けると、別 repo の Issue を更新できないか、現在の repo の同番号 Issue を誤更新する。さらに mention placeholder は `@<owner>` だと GitHub が repo 所有者（organization）と解釈して**組織全体に通知が飛ぶ事故**が起きるため、`@<assignee>` を使う。
-
-**Context**: PR #374 の `/refine-issue` skill 初版で、`gh issue view` には `--repo` を付けていたが後続の edit / comment / label create には付け忘れていた。Copilot と Gemini の両方が「全 gh コマンドに `--repo` を渡せ」を独立して指摘。さらに Gemini が `@<owner>` プレースホルダの誤メンション問題を指摘し、`@<assignee>` への変更を提案。
-
-**Action**: クロスリポジトリ対応 skill を書く際は、(1) skill 冒頭の入力パースで `repo` を確定したら以降の **全** gh サブコマンドに `--repo <owner/repo>` を必須で渡す規約を明示、(2) skill 末尾に「使用する gh CLI コマンド一覧」テーブルを置いて保守者が一覧確認できるようにする、(3) mention placeholder は `@<assignee>` を使い、bot suffix（`[bot]`）は skip する fallback 規則を書く、(4) `gh label create` は `--force` で「不在時 create / 存在時 update」の冪等にする。
-
----
-
-<a id="ace-009"></a>
-
-### ACE-009: 長時間 Orchestrator の失敗の真因は upstream Issue spec 曖昧さ — 探索型 refine が必要
-
-| フィールド | 値                   |
-| ---------- | -------------------- |
-| Category   | process              |
-| Origin     | PR #374 / Issue #373 |
-| Date       | 2026-04-26           |
-| Helpful    | 0                    |
-| Harmful    | 0                    |
-| Status     | active               |
-
-**Insight**: AI Orchestrator (完遂型 / A 型) で Issue を自動完遂する仕組みが「結構できないものが多い」と感じたとき、真因は **Orchestrator の賢さ不足ではなく、入力 Issue の spec 曖昧さ**であることが多い。曖昧な spec を渡された Orchestrator は推測で穴埋めするしかなく、ハズす。必要なのは「曖昧な Issue → 実行可能な Issue」に研ぎ澄ます探索型 (B 型) skill を upstream に置くこと。
-
-**Context**: 当初は「長時間駆動 Orchestrator + compact 耐性」のアーキテクチャをブレストしていたが、「A 型 Orchestrator の失敗パターン」を深掘りした結果、根本原因が Issue spec 自体の曖昧さに移動。`/create-issue`（新規 Issue ゲート）は既存だったが、既に立った曖昧 Issue を refine する手段がなかった。`/refine-issue` MVP を先に作ってから Orchestrator ループ・司令ファイルを後付けする路線にスコープ変更し、6 観点ブレストで設計を確定。
-
-**Action**: 「AI agent が信頼できない / 完遂率が低い」と感じたら、(1) agent 自体の改善より先に、与えている入力データ (Issue / spec / プロンプト) の品質を疑う、(2) upstream に「入力を磨く skill」を置けないか検討する、(3) ブレストで「真因が一段下のレイヤーにある」可能性を必ず一度は検証する、(4) MVP は upstream の単一 skill に絞り、Orchestrator ループ等は動作確認後に後付けする路線が安全（空回りを高速化するリスクを避ける）。
-
----
-
-<a id="ace-010"></a>
-
-### ACE-010: Issue クローズ前は commit log でなく現在のファイル実体を grep 照合する — silent regression を検出する
-
-| フィールド | 値                   |
-| ---------- | -------------------- |
-| Category   | process              |
-| Origin     | PR #387 / Issue #360 |
-| Date       | 2026-04-30           |
-| Helpful    | 0                    |
-| Harmful    | 0                    |
-| Status     | active               |
-
-**Insight**: Issue が PR で完了したと判断する際、関連 PR の commit message・diff・タイトルだけを根拠に「完了」と決めるのは危険。同じファイルを触る後続 PR が stale-base merge / 衝突解決ミスで silent revert を起こしている可能性があり、commit log を遡るだけでは「現在の develop の実体」を保証できない。今回 Issue #360（MD060 lint 有効化）は PR #384 で完了したと判断して一旦クローズしたが、46 分後にマージされた PR #377（chore: no GitHub Actions）が `.markdownlint.json` に `"MD060": false` を再追加する形で silent revert していた。develop の実体は未達成のまま、再 open と修正 PR #387 が必要になった。
-
-**Context**: Issue #360 / PR #383 / PR #384 / PR #377 が 2026-04-27 数時間以内に同じ config と表整形を並行で触り、AI エージェントが PR #384 の commit メッセージ「MD060 再有効化」を根拠に「Issue #360 は完了」と判断してクローズを実行。Issue #386（後継 Prettier 導入）に着手する直前に develop の `.markdownlint.json` を実際に開いたところ `"MD060": false` が残存していて regression が発覚。`git log -p .markdownlint.json` で追跡すると PR #384 → PR #377 の順で「有効化 → 再無効化」になっていた。
-
-**Action**: AI エージェントが Issue / PR を「完了」として閉じる前に必ず:
-
-1. **受け入れ基準を develop の最新実体に対して検証する** — `git switch develop && git pull --ff-only` の後で `cat path/to/config` または `grep -n target path/to/config` で受け入れ基準が満たされているかを直接確認する。Closes #N が含まれる commit が積まれていることは「実体が達成されている」ことを意味しない。
-2. **受け入れ基準が config / lint / format / CI 設定系なら、当該ファイルの直近 N コミットを必ず追う** — `git log -p -10 path/to/config` で関連時期に silent revert がないかチェックする。1 行追加 / 1 行削除の往復は git log で時系列を見ないと発見しにくい。
-3. **同領域を触る PR が並行している時期は特に警戒する** — 24h 以内に同 path を触る PR が 2 件以上あり、片方が古い base から派生している場合 stale-base merge による silent regression のリスクが高い。merge 後に必ず実体検証を挟む。
-4. **AI エージェントが「クローズ判断」のような shared state 操作を行う前に advisor / 別 agent に検証させる** — 大規模リポジトリで commit メッセージだけで判断するのはハイリスク。
-
----
-
-<a id="ace-011"></a>
-
-### ACE-011: Prettier × markdownlint MD060 衝突は当該テーブルだけに `<!-- prettier-ignore -->` を付与する局所抑制で解く
-
-| フィールド | 値                   |
-| ---------- | -------------------- |
-| Category   | tooling              |
-| Origin     | PR #388 / Issue #386 |
-| Date       | 2026-04-30           |
-| Helpful    | 0                    |
-| Harmful    | 0                    |
-| Status     | active               |
-
-**Insight**: Prettier と markdownlint は GFM テーブル整列の判定基準が異なる（Prettier は `string-width` / Unicode 11 emoji 幅、markdownlint MD060 は東アジア幅基準）。絵文字（🛠 など）混在テーブルでは、Prettier が「整列している」と判断する状態で markdownlint MD060 が「整列していない」と判断する、両者を同時に満たす整列が存在しない衝突状態が生じる。設定レベル（`proseWrap` / `printWidth`）で解決しようとしても無理（両者の幅算定アルゴリズム自体の差なので config では合わせられない）。最小スコープの解は当該テーブル直前に `<!-- prettier-ignore -->` を 1 行付与し、markdownlint 側に整列を合わせること。Prettier はその 1 ブロックだけスキップし、他のテーブル / 本文整形は通常通り効く。
-
-**Context**: PR #388 で `prettier@^3.8.3` を Markdown 整形ツールとして導入する際、`docs/NO_GITHUB_ACTIONS_MIGRATION_DESIGN.md` の `🛠 Fixes` を含む 2 つのテーブル（行 47 / 行 151）で Prettier 整形後に MD060 が 3 件 fail する状態を確認。`format:md:check` と `lint:md` を同時に通したいが、`prettier --write` を当てると markdownlint が落ち、markdownlint に合わせると `format:md:check` が落ちる、というデッドロック。`<!-- prettier-ignore -->` を当該テーブルの直前に置き、markdownlint が要求する trailing-space 整列を保持する形で両立を実現。
-
-**Action**: AI エージェントが Markdown lint と Markdown formatter を同居させるリポジトリで作業する際:
-
-1. **Prettier 導入 PR では必ず先に `npm run format:md && npm run lint:md` を順に実行**してデッドロック箇所を洗い出す。後から個別 fix するより、衝突候補を最初に列挙する方が局所抑制スコープを正確に定義できる。
-2. **衝突は「絵文字 / 全角記号 / 半角・全角混在」のテーブルセルに集中する**ことを前提に視覚検査する。string-width の Unicode 幅テーブルと markdownlint の幅判定の差は予測不能なので、empirical に当該行を見つけるしかない。
-3. **`<!-- prettier-ignore -->` は当該テーブル / コードブロックの直前に 1 行置くだけ**。範囲指定（end コメントなど）は不要で、Prettier は次の単一ノードだけをスキップする。グローバル `.prettierignore` で対象ファイル全体を除外するのは過剰（他の整形が利かなくなる）なので避ける。
-4. **PR 本文に「Prettier (string-width 基準) と markdownlint MD060 (異なる幅算定) で衝突する」理由を明記する**。再発時に他の作業者が同じ調査を 0 から繰り返さないため。
-5. **`format:md:check` を `quality:local` に組み込む順序は `validate → format:md:check → lint:md`**。整形検査を構文検査の前に置くことで「整形漏れ」と「文法違反」が同時に出ても切り分けやすくなる。
+ドキュメントの「自動」「手動」「並列」「順次」といった動作表現が実装メカニズムと食い違うと、人も AI も誤った前提で動き、トラブルシューティングで混乱する。「こうなるべき」を「こうなっている」として書いたときに起きる（PR #350 では、AI が CLAUDE.md の指示で順次実行する仕組みを「自動実行」と書き、未定義の npm script も記載していた）。動作説明を書くときは実装コード・設定で実際の動作を確かめ、記載するコマンドは `package.json` の scripts や `--help` で実在を検証する。
 
 ---
 
@@ -412,53 +209,12 @@ ACE エントリ ID は **PRスコープ式** を採用する（このセクシ�
 
 ### ACE-012: PR マージ・push 前は必ず `git status` でブランチを確認する（develop 直 push 事故防止）
 
-| フィールド | 値                             |
-| ---------- | ------------------------------ |
-| Category   | process                        |
-| Origin     | PR #391 / PR #393 / Issue #295 |
-| Date       | 2026-05-06                     |
-| Helpful    | 0                              |
-| Harmful    | 0                              |
-| Status     | active                         |
+| Category | process | Origin | PR #391 / PR #393 / Issue #295 |
+| Date | 2026-05-06 |
+| Helpful | 0 | Harmful | 0 |
+| Status | active |
 
-**Insight**: バックグラウンドでブランチが切り替わる事象は外部プロセス（他作業者の `gh pr merge`、IDE 拡張、自動化フック等）で発生しうる。**自分のターン内で `git checkout` していないことは、現在のブランチが想定通りである保証にならない**。`git push` の直前には必ず `git branch --show-current` または `git status` の出力を確認する。同様に Issue 着手時は、同 Issue 用の他ブランチや未追跡ファイルが既に存在しないか `git branch | grep -w <issue-number>` および `git status -uall` で確認する習慣を入れる。
-
-**Context**: Issue #295 の作業中、PR #391 がユーザーまたは他プロセスにより突然マージされ、ローカル HEAD が feature branch から develop に自動切り替わった。この切り替わりに気づかず `git push` した結果、レビュー対応コミット（ba391fa）が develop に直接乗り、`Never commit directly to develop` ルールに違反。`git revert ba391fa` + 新 PR #393 で正規化が必要となった。さらに同 Issue の作業着手時にも、別ブランチ `feature/#295-organization-rollout-guide` と未追跡ファイル `06-reference/ORGANIZATION_ROLLOUT.md` が既に存在することに気づかず、無自覚に重複作業を作りかけた。
-
-**Action**: AI エージェントが Git 操作を行う際:
-
-1. **Issue 着手前の確認**: `git branch | grep -w <issue-number>`、`git status -uall` で同 Issue の他ブランチ・未追跡ファイル・進行中の作業がないかチェック。並列作業の発見時はユーザーに統合方針を相談する。
-2. **`git push` の直前**: `git branch --show-current` を必ず実行し、想定ブランチと一致するか確認。一致しない場合は push を中止して原因調査。
-3. **PR 操作前の状態確認**: `gh pr view <PR>` で他者によるマージ・close を事前確認。マージ済みなら作業内容を新ブランチに分離。
-4. **develop / main に直 push してしまった場合**: `git revert <SHA>` で revert commit（変更を打ち消す新規 commit）を作成 → push して直 push 分を無効化、同内容を新ブランチに cherry-pick して正規 PR で再投入する。`git reset --hard` + force push は履歴削除を伴い他協働者に影響するため避ける。
-5. **PR ready / merge 操作前**: 直前にもう一度 `git status` でローカルが想定状態か確認。push 済 commit と PR head が一致しているかも `gh pr view <PR> --json headRefOid` で照合する。
-
----
-
-<a id="ace-013"></a>
-
-### ACE-013: 並列 reviewer の指摘は古い snapshot 由来の誤検知を含む — 実態 grep で双方向検証する
-
-| フィールド | 値                             |
-| ---------- | ------------------------------ |
-| Category   | process                        |
-| Origin     | PR #391 / PR #393 / Issue #295 |
-| Date       | 2026-05-06                     |
-| Helpful    | 0                              |
-| Harmful    | 0                              |
-| Status     | active                         |
-
-**Insight**: Toolkit / Copilot / Gemini Code Assist 等の並列レビューでは、**reviewer が PR の特定 commit（多くは初回 push 時点）を見ている都合で、すでに修正済みの内容を Critical として再指摘するノイズ**が混入する。逆に reviewer が実態を正しく見抜いて指摘した場合、**こちらが「修正済み」と思い込んで grep 確認を怠ると本物の Critical を見逃す**。指摘を受け取った瞬間に `grep -n` で実態確認し、**両方向**（false positive / true positive）を切り分ける。これを怠ると、誤検知に基づいて再修正してファイルを破壊するか、本物のバグを残してマージしてしまう。
-
-**Context**: PR #391 で 1500 行残存（C1 / C2）と bash 「上記出力」プレースホルダ（S1）を Toolkit / Copilot / Gemini が並列 Critical として指摘したが、`grep -n "1500" <該当ファイル>` で確認したところすでに修正済みだった（reviewer 側の snapshot が古かった）。スキップ判断で正解。逆に PR #393 では archive-strategy.md に追記した「`archive/README.md` は提供されていない、初回作成する」記述に対し、Toolkit が「実態は PR #391 で雛形として既に追加済み」と Critical 指摘。`ls docs-template/archive/` で確認したところ事実だったため、即修正した。**両ケースとも、grep / ls による実態確認なしで判断していたら誤った PR 状態でマージされていた**。
-
-**Action**: PR レビューを受け取った AI エージェントは:
-
-1. **指摘の真偽は常に grep で検証**: Critical / Important / Suggestion の区別なく、指摘箇所を `grep -n "<キーワード>" <該当ファイル>` で検索。検出されなければ false positive、検出されれば true positive。
-2. **false positive の対応**: 修正をスキップし、PR コメントに「該当箇所は commit XXXX で修正済み（reviewer の snapshot が古い可能性）」と返す。**勝手にスキップせず明示する**ことで、後続 reviewer が同じ指摘を繰り返すのを防ぐ。
-3. **true positive の対応**: 通常通り fix commit。PR 本文に「実態確認の結果、X は確かに〜」と記録する。
-4. **複数 reviewer が同じ箇所を指摘した場合**: snapshot 時刻を `gh pr view --json reviews --jq '.reviews[].submittedAt'` で確認。すべて同時刻に近いなら共通の古い snapshot 由来、ばらついているなら真正のバグの可能性が高い。
-5. **逆方向の罠も警戒**: 「Toolkit が指摘していないから OK」と思い込まず、自分の追記内容（特にテンプレート実態に関する主張）は `ls` / `cat` で実物を確認してから書く。**書きながら一度実物を見る**を習慣にする。
+バックグラウンドでブランチが切り替わる事象は外部プロセス（他作業者の `gh pr merge`、IDE 拡張、自動化フック等）で発生しうるため、自分のターン内で `git checkout` していないことは、現在のブランチが想定通りである保証にならない（Issue #295 では PR #391 の突然のマージで HEAD が develop に切り替わり、気づかず push したレビュー対応コミットが develop に直接乗って revert + 新 PR #393 が必要になった）。Git 操作の前後で状態を確かめるべき場面は、`git push` の直前、PR のマージ・ready 操作の前、Issue 着手時（同 Issue の他ブランチや未追跡ファイルによる重複作業の防止）である。`git push` 直前に `git branch --show-current` で想定ブランチを確認し、PR 操作前は `gh pr view` で他者によるマージ・close と PR head の一致（`--json headRefOid`）を確かめ、Issue 着手時は `git branch | grep -w <issue-number>` と `git status -uall` を実行する。develop / main に直 push した場合は `git reset --hard` + force push を避け、`git revert <SHA>` で打ち消し、同内容を新ブランチへ cherry-pick して正規 PR で再投入する。
 
 ---
 
@@ -466,54 +222,13 @@ ACE エントリ ID は **PRスコープ式** を採用する（このセクシ�
 
 ### ACE-014: 索引文書は SSOT を子に集約し、自身は誘導と 1 行サマリのみ — 数値の重複は持たない
 
-| フィールド | 値                             |
-| ---------- | ------------------------------ |
-| Category   | architecture                   |
-| Origin     | PR #391 / PR #393 / Issue #295 |
-| Related    | ACE-005（補強）                |
-| Date       | 2026-05-06                     |
-| Helpful    | 4                              |
-| Harmful    | 0                              |
-| Status     | active                         |
+| Category | architecture | Origin | PR #391 / PR #393 / Issue #295 |
+| Related | ACE-005（補強） |
+| Date | 2026-05-06 |
+| Helpful | 4 | Harmful | 0 |
+| Status | active |
 
-**Insight**: ACE-005 で「索引と実体を分離する委譲パターン」を導入したが、**索引側に「概要だから」と数値表をミラー掲載すると DRY 違反となり、子の閾値変更時に索引が同期漏れる事故が起きる**。索引には「子へのリンク + キーワードレベルの 1 行サマリ」のみを置く。閾値などの具体値は表ではなくテキスト中に「**500 / 800 / 1200 行** の三段階（検討 / 推奨 / 必須）」のように 1 行で要約する。これにより、子で閾値を変えても索引側は「リンク先で SSOT を確認すればよい」状態を保てる。
-
-**Context**: PR #391 で `ORGANIZATIONAL_ROLLOUT.md`（索引）に 4 子ガイドへのリンクと並べて「文書分割の閾値」表（500/800/1200 を 3 行）を併記した。これが子文書 `document-splitting.md` の閾値表と完全に重複し、Toolkit / Gemini Code Assist が「索引が SSOT」「子が SSOT」「MASTER.md は子が SSOT として参照」の三重宣言になっていると指摘。PR #393 で索引の閾値表・アーカイブ判定表・月次ヘルスチェック項目セクションを削除し、サマリ表 1 つに集約（「**500 / 800 / 1200 行** の三段階（検討 / 推奨 / 必須）」など 1 行ずつ）。さらに索引運用ルールに「子の数値・手順を索引にコピペしない（DRY 違反）」を明記して、SSOT を子側に一本化した。
-
-**Action**: 索引 + 子の構造を採用する際:
-
-1. **索引冒頭に SSOT マッピング表を置く**: 各カテゴリ（閾値 / 判定基準 / 項目リスト等）について「正本はどの子ガイドか」「索引は誘導のみか SSOT か」を表で宣言。読者は「数値の正本」を 1 ホップで見つけられる。
-2. **索引には数値表を置かない**: 表を作る場合は「サマリ」列のみ（具体値は 1 行のキーワードに留める）にする。「行数 / 判断 / 詳細リンク」のような 3 列以上の表は子に委譲。
-3. **索引の運用ルールに「子の内容をコピペしない」を明記**: 将来の作業者（人 / AI）が「親にも書きたい」誘惑を抑止する保険文。
-4. **数値変更時のチェックリスト**: 子の閾値を変えたら `grep -rn "<旧数値>" docs-template/ docs/` で他文書の散らばりを確認 → 索引のサマリ行のキーワードが依然正確か（「500/800/1200」を「200/400/800」に変えたら索引も）を確認。
-5. **書籍 / 仕様書からの引用は子側で「準拠出典」として明記**: 「書籍 第14章準拠」「RFC ZZZZ 準拠」を子の SSOT 行に書き、索引には「（詳細は子）」のリンクのみ。一次出典が書かれていない索引数値は孤立しやすく、別 SSOT が割り込みやすい。
-
----
-
-<a id="ace-015"></a>
-
-### ACE-015: 表を導入したら散文の主張を表に対して再読する — 「N 段階」「太字の領域」型の自己矛盾は人手レビューで見落とされる
-
-| フィールド | 値                    |
-| ---------- | --------------------- |
-| Category   | documentation-quality |
-| Origin     | PR #395 / Issue #296  |
-| Date       | 2026-05-06            |
-| Helpful    | 0                     |
-| Harmful    | 0                     |
-| Status     | active                |
-
-**Insight**: 「以下の **二段階の目安** で…」と散文で書きながら直後の table が **3 行**、「**AI に丸投げすると事故る領域は太字** : 要件定義と設計」と書きながら table の 領域 列が **5 行すべて太字** ── このような「散文の主張 vs 表の実体」の自己矛盾は、人間が書いた直後の自己レビューでは catch しにくく、Cross-Model Review で初めて検出される。原因は、表を作りながら散文を書くと「思い描いている表」と「最終的に書いた表」がずれていることに気付かないため。**表を書いたら散文に戻って read-aloud し、表を実際に数えてから断定的な数値・形式の言及をすること**。
-
-**Context**: PR #395 で書籍ギャップ補強として 5 章分のガイドラインを追記した際、`AI_GIT_WORKFLOW.md` step 6 PR サイズ章で「**二段階の目安**」と書きつつ table が 3 行（推奨 / 警告 / 要分割）、`AI_SPEC_DRIVEN_DEVELOPMENT.md` 3.1.3「読み解き方」 bullet で「**太字の領域は**要件定義と設計」と書きつつ table の領域列が **要件定義 / 設計 / コード生成 / テスト / ナレッジ** すべて太字（GFM では強調用途で領域名を一律太字にしていた）── どちらも筆者の自己レビュー / `npm run quality:local` (markdownlint / prettier / MCP check) では検出されず、Toolkit `comment-analyzer` が Critical として両方を独立検出。さらに同じ章では「**実装層は**コード生成・テスト生成・パターン検出」と書きながら table 上「パターン検出」は「ナレッジ」行の AI 役割であり実装層ではないという、**3 つ目の散文-table 不一致**まで検出された。
-
-**Action**: 表を含むドキュメントを書く際に:
-
-1. **table を確定させてから散文を書く**: 順序を「散文 → table」ではなく「table → 散文」にする。table 完成後、表のセル内容を「N 行ある」「X 列が太字」「Y 行は Z 列に属する」という事実から散文を書き起こす。
-2. **「N 段階」「N 通り」「太字の」「上の表で」のような数値・形式言及は最後にチェック**: PR 提出前の自己レビューで、これらのキーワードに hit する箇所を全部 grep し、表の現状と一致しているか目視確認。`grep -nE "(段階|通り|太字|上の表|N 行)" <ファイル>` を新ガイド作成のチェックリスト項目として常用する。
-3. **散文が table を「要約」する場合は要約の事実性を二重チェック**: 「実装層は X / Y / Z」のような分類言及は、その X / Y / Z すべてが table の対応行にあるか確認。matrix を散文で言い換える際は、行・列のラベルからコピペするのが安全。
-4. **Cross-Model Review を必ず通す**: 散文-table 矛盾は人間の単独レビューで通り抜ける典型。Toolkit / Copilot / Gemini のいずれかは概ね catch するため、ガイド系 PR では並列レビューを省略しない。
-5. **数値境界は排他的整数で書く**: 「200 行以下 / 200〜400 / 400 超」のような両端重複ではなく「200 行以下 / 201〜400 / 401 行以上」のように境界が排他になる書き方を使う（boundary inclusivity の曖昧さも自己矛盾の一種）。
+索引と子文書に分ける構成で、索引側に「概要だから」と数値表を写すと、子の値を変えたときに索引が同期漏れし、SSOT の宣言も二重・三重になる（PR #391 で索引に子と同じ閾値表を併記し、PR #393 で集約した）。索引には子へのリンクと「500 / 800 / 1200 行の三段階」のようなキーワード 1 行のサマリだけを置き、数値・手順の正本は子に一本化する。索引の冒頭に「どの値の正本はどの子か」を宣言し、運用ルールに「子の内容をコピーしない」と書き、子の値を変えたら旧値を grep して散らばりを確かめる。
 
 ---
 
@@ -521,54 +236,13 @@ ACE エントリ ID は **PRスコープ式** を採用する（このセクシ�
 
 ### ACE-016: Markdown の anchor link は label と URL の両方にフラグメントを書く — `\[text#anchor\]\(url\)` 形式は無効
 
-| フィールド | 値                    |
-| ---------- | --------------------- |
-| Category   | documentation-quality |
-| Origin     | PR #395 / Issue #296  |
-| Related    | ACE-013（補強）       |
-| Date       | 2026-05-06            |
-| Helpful    | 4                     |
-| Harmful    | 0                     |
-| Status     | active                |
+| Category | documentation-quality | Origin | PR #395 / Issue #296 |
+| Related | ACE-013（補強） |
+| Date | 2026-05-06 |
+| Helpful | 4 | Harmful | 0 |
+| Status | active |
 
-**Insight**: `\[docs/X.md#section\]\(../docs/X.md\)` のように **anchor をラベル文字列にだけ書き、URL に書き忘れる**形式は GitHub Markdown / GFM で anchor として機能せず、リンク先のファイル冒頭にしか飛ばない。執筆時にはラベルに `#section` が含まれているのを見て「anchor 設定済み」と錯覚しやすいが、リンクとして機能するのは **URL 側の `#section` だけ**。**anchor を含む cross-doc link を書いたら、必ず URL 部分に `#anchor` がコピーされているか目視で確認する**。両方の AI reviewer（Copilot + Gemini Code Assist）が独立に同じ指摘を出した場合は高確度の anchor バグなので、即時 fix commit にまとめる。
-
-**Context**: PR #395 で `.github/pull_request_template.md` line 15 に `詳細: \[docs/AI_GIT_WORKFLOW.md#ステップ6-pr作成\]\(../docs/AI_GIT_WORKFLOW.md\)` と書いた（ラベルに `#ステップ6-pr作成` あり、URL に欠落）。`npm run quality:local` の markdownlint / prettier / MCP check は **anchor の存在検査をしないため** sliently 通過し、PR ready 後に Copilot review と Gemini Code Assist が**独立に同じ Critical 指摘**を返した。両者とも fix suggestion で `(../docs/AI_GIT_WORKFLOW.md#ステップ6-pr作成)` を提案しており、自分でも C1 として既に Toolkit comment-analyzer 経由で検出していたため、3 経路一致で confidence 100。同 PR の `AI_SPEC_DRIVEN_DEVELOPMENT.md` 内 link `docs/AI_GIT_WORKFLOW.md` は anchor を持たない普通の cross-doc link で問題なし、つまりラベルに anchor を書いた場合だけ起きるエラーパターン。
-
-**Action**: cross-doc link を書く際:
-
-1. **anchor を含む場合の必ず通る形式**: `\[label\]\(path#anchor\)` または `\[label#anchor\]\(path#anchor\)`（label と URL の両方に書くか、URL のみに書くか。**ラベルのみに書くのは禁止**）。
-2. **PR 提出前の grep チェック**: `grep -nE "\]\(\.\./[^)]+\)" <変更ファイル>` で cross-doc link を抜き出し、ラベル側に `#` があるなら URL 側にも `#` があるか視認。CI で完全自動検出は難しいが、PR 提出前のセルフレビューで意識的に行うと catch できる。
-3. **GitHub の anchor 生成規則**: `### ステップ6: PR作成` → `#ステップ6-pr作成`（ASCII を lowercase、コロン削除、空白を `-`、Unicode 文字は保持）。Japanese 見出しでも anchor は機能するが、英数字記号の正規化規則を覚えておく。
-4. **複数 AI reviewer の同一指摘は最優先で fix**: Copilot + Gemini + Toolkit が独立に同じ箇所を Critical 指摘した場合、誤検知の確率は極めて低い。ACE-013 では「逆に false positive を疑う」習慣を推奨したが、**3 経路一致は true positive と判定**してよい。
-5. **anchor 自動チェックの将来拡張余地**: lint レベルでは markdown-link-check や remark-validate-links のような外部ツールで cross-doc anchor を validate できる。本リポジトリの quality:local には未組込（PR #395 時点）。導入する場合は別 issue で議論。
-
----
-
-<a id="ace-017"></a>
-
-### ACE-017: 並列 review agent は worktree を巻き戻す副作用を持ち得る — `git status` 監視と `git restore --source=HEAD` で復旧する
-
-| フィールド | 値                   |
-| ---------- | -------------------- |
-| Category   | process              |
-| Origin     | PR #395 / Issue #296 |
-| Date       | 2026-05-06           |
-| Helpful    | 0                    |
-| Harmful    | 0                    |
-| Status     | active               |
-
-**Insight**: main worktree で **複数の review agent を並列起動**した場合、agent が分析過程で `git restore` / `git checkout` 系のコマンドを実行（典型的には「PR 前の状態と diff を見るため」「base branch の内容を確認するため」）し、staged + working tree が **base コミットの状態に巻き戻る**事故が発生し得る。HEAD ポインタと remote push 済みの commit は無事のため、被害はあくまで「working tree が一時的に古くなる」レベルだが、**気付かずに次の編集を始めるとマージ事故**になる。`git restore --source=HEAD --staged --worktree <files>` で即時復旧可能。**並列 review agent 起動直後は必ず `git status --short` で working tree が clean かを確認する**。worktree を別に切る `--worktree` モードで起動できるなら、それが最も安全。
-
-**Context**: PR #395 で Toolkit `code-reviewer` と `comment-analyzer` を並列起動（Agent tool の単一メッセージ複数 tool*use）して review report を受け取った直後、5 ファイル全てが「Modified」かつ index にも staged で **pre-PR 状態（追加した 150 行が消えた状態）**になっていることを system reminder 経由で発見。`git log` 上の HEAD は `6a80bc4`（自分の commit）のままで remote も同じ位置だったため、どこかの agent が `git restore --source=develop --staged --worktree <files>` 相当を実行したと推定。`git restore --source=HEAD --staged --worktree .github/ISSUE_TEMPLATE/feature.md .github/pull_request_template.md docs/AI*\*.md`で即時復旧、その後の review-fix と merge は問題なく進行。**この事故は HEAD/remote が無事だから復旧できたが、もし agent が`git reset --hard` 相当を実行していれば commit ごと失っていた\*\*ため、防止策の優先度は高い。
-
-**Action**: 並列 review agent を起動する際:
-
-1. **起動前に commit + push を完了させる**: HEAD と remote が無事なら最悪 working tree 巻き戻りでも復旧可能。「未コミットのまま review 起動」は避ける。
-2. **起動直後の `git status` 監視を習慣化**: 並列 agent の report 受取後は、内容を読む前に **必ず `git status --short` を実行**。staged 修正 (左カラム `M`)・unstaged 修正 (右カラム `M`)・両方 (`MM`) のいずれかが出たら巻き戻しの可能性。
-3. **巻き戻りに気付いたら即復旧**: HEAD が無事なら `git restore --source=HEAD --staged --worktree <files>` で working tree と index を HEAD 状態に戻す。`grep` で追加内容（例: 「PR Size Check」「6 観点」）が file に残っているか復旧後検証。
-4. **`isolation: "worktree"` モードで起動**: Agent tool 側に `isolation` パラメタがある場合、`worktree` を指定すると agent は隔離された一時 worktree で作業するため、main worktree の状態に副作用を与えない。本 PR の review agent は `isolation` を指定せず main worktree で動かしたが、これは将来的に標準 isolation 化を検討すべき。
-5. **`git reset --hard` を含む destructive 操作の禁止周知**: agent prompt に「**`git reset --hard` / `git restore --source=<base>` / `git checkout <base> -- .` は実行禁止。read-only 操作（`git diff`, `git show`, `git log`）に限定する**」と明記する。レビュー目的ならどの操作も destructive 不要。
+Markdown の anchor はラベル側ではなく URL 側の `#section` だけが機能するため、ラベルにだけ anchor を書いたリンクはファイル先頭にしか飛ばず、markdownlint / prettier も検出しない。ラベルに `#section` が見えていると「anchor 設定済み」と錯覚しやすい。anchor を含む別文書へのリンクを書いたら URL 側に `#anchor` があるかを確かめ（GitHub の slug は英字を小文字化・記号を除去・空白を `-`・Unicode は保持）、複数の AI レビュアーが独立に同じ箇所を指摘したら true positive として即修正する。
 
 ---
 
@@ -576,32 +250,13 @@ ACE エントリ ID は **PRスコープ式** を採用する（このセクシ�
 
 ### ACE-018: 横断的な番号・順序変更は着手前に grep で全 SSOT を列挙する
 
-| フィールド | 値                    |
-| ---------- | --------------------- |
-| Category   | documentation-quality |
-| Origin     | PR #397 / Issue #396  |
-| Related    | ACE-014 / ACE-015     |
-| Date       | 2026-05-06            |
-| Helpful    | 5                     |
-| Harmful    | 0                     |
-| Status     | active                |
+| Category | documentation-quality | Origin | PR #397 / Issue #396 |
+| Related | ACE-014 / ACE-015 |
+| Date | 2026-05-06 |
+| Helpful | 5 | Harmful | 0 |
+| Status | active |
 
-**Insight**: 「ステップ 8 を 10 に動かす」「順序を A→B→C から A→C→B に変える」のような **番号・順序変更は、想定の 2〜3 倍のファイルに散らばっている** ことが多い。本リポジトリでも当初想定 6 ファイルが、実際には 8 ファイル（CLAUDE.md / AI_GIT_WORKFLOW.md / PRACTICAL_GUIDE.md / MASTER.md / DEPLOYMENT.md / git-workflow.md / ace-cycle.md / ace-curate.md）+ レビュー指摘で取り残し 2 ファイル（knowledge-management.md / DEPLOYMENT.md 別箇所）の計 10 ファイルに及んだ。**着手前に複数のキーワードで grep を仕掛けて SSOT chain を全部列挙し、TodoWrite に登録してから編集を始める**。
-
-**Context**: PR #396/#397 で 10 ステップ Workflow の順序を「ACE 8 → Merge 9 → Cleanup 10」から「Merge 8 → Cleanup 9 → ACE 10」に変更。最初に Issue 起票時には 6 ファイルしか想定しておらず、実装中に追加 2 ファイル（ace-cycle.md / ace-curate.md）を発見。さらに Toolkit comment-analyzer のレビューで **既存リスト・ナビゲーション表など別 2 ファイルの取り残し**が検出され、fix commit で対応。grep キーワードは 1 種類（`"ステップ8: ACE"` だけ）では不十分で、`"マージ前"`、`"Merge\s*→.*Cleanup"`、`"Workflow Step:\s*8"` など **意味的に等価な複数表現を網羅的に**走査する必要があった。
-
-**Action**: 番号・順序変更タスクに着手する前に:
-
-1. **意味的に等価な grep パターンを 5 種類以上用意する**:
-   - 番号への直接参照（`grep -rn "ステップ8\|Step 8\|step\s*8"`）
-   - 順序の散文表現（`grep -rn "ACE → Merge\|Implement.*Test.*Self-Review"`）
-   - 状態説明文（`grep -rn "マージ前\|マージ後\|レビュー完了後"`）
-   - 関連メタデータ（`grep -rn "Workflow Step:"`）
-   - 散文中の段階数言及（`grep -rn "9 ステップ\|10 ステップ\|N 項目"`）
-2. **検出された全ファイルを TodoWrite に登録**: 着手前に「修正対象 N ファイル」を可視化することで、レビューで取り残しが見つかったときに「想定外」ではなく「予定外」として扱える（議論が早い）。
-3. **取り残しチェックを PR の受け入れ条件に含める**: 「grep `"<旧表現>"` でヒットなし」という客観的な完了基準を Issue 本文に書く。Toolkit / Copilot review はこの種の網羅性を catch しやすい。
-4. **ナビゲーション表・対応マトリクス・チェックリストを意識的に探す**: 「ステップ詳細」だけ更新して「ナビゲーション表」を忘れる事故が多い（PR #397 で発生）。表の説明文・列ラベルもキーワード検索の対象にする。
-5. **「歴史的経緯」 callout は意図的な残存として grep 対象から除外**: 「書籍ギャップとの関係」「PR #XXX で順序見直し」のような callout は意図的に古い表現を保持するため、grep 結果から人手で除外する。callout の存在自体を別 grep で確認する（`grep -rn "書籍ギャップとの関係"`）。
+番号・順序の横断変更は、想定の 2〜3 倍のファイルに散らばっている（PR #397 では想定 6 ファイルが実際は 10 ファイル）。番号への直接参照・順序の散文・状態の説明（「マージ前」等）・メタデータ・段階数への言及は、意味が等価でも字面が違うため、1 種類の grep キーワードでは拾いきれない。着手前に意味的に等価な複数の grep パターンで対象を全部列挙して作業リストに登録し、ナビゲーション表・対応表も対象に含め、「旧表現の grep ヒットなし」を受け入れ条件に書く（経緯として意図的に旧表現を残す注記は除外する）。
 
 ---
 
@@ -609,30 +264,13 @@ ACE エントリ ID は **PRスコープ式** を採用する（このセクシ�
 
 ### ACE-019: 既存ルール違反になる新パターンは「例外」として明示的に名乗らせる
 
-| フィールド | 値                   |
-| ---------- | -------------------- |
-| Category   | process              |
-| Origin     | PR #397 / Issue #396 |
-| Related    | ACE-012（修正対象）  |
-| Date       | 2026-05-06           |
-| Helpful    | 2                    |
-| Harmful    | 0                    |
-| Status     | active               |
+| Category | process | Origin | PR #397 / Issue #396 |
+| Related | ACE-012（修正対象） |
+| Date | 2026-05-06 |
+| Helpful | 2 | Harmful | 0 |
+| Status | active |
 
-**Insight**: 新しい運用パターンが既存 PLAYBOOK エントリ・グローバルルールに違反する場合、**「これは X の例外として扱う」と該当箇所に明示的に書く**。書かないと暗黙の policy split が生じ、(a) 後続 AI が古いルールを参照して新パターンを「違反」として扱う、(b) Toolkit / Copilot が Critical として指摘する、(c) チームメンバーがどちらを優先するか迷う。Comment-analyzer は「実装は妥当だが既存の禁則と衝突しているのに carve-out が無い」を Critical 指摘として独立検出する精度を持つため、PR レビュー前に自分で見つけて潰すべき。
-
-**Context**: PR #397 で「個人開発（簡易）」パターン（マージ後に develop へ ACE エントリを直接 commit + push）を導入。これは PLAYBOOK ACE-012「Never commit directly to develop」と直接衝突するため、Toolkit comment-analyzer が「ACE-012 を名指しで違反、carve-out が必要」と Critical 指摘。fix commit b75f86d で 5 サイト（CLAUDE.md / AI_GIT_WORKFLOW.md / git-workflow.md / ace-cycle.md / ace-curate.md）に「**ACE-012 の例外として明示**: 通常 develop への直接 commit は禁止だが、(1) PLAYBOOK.md は append-only、(2) 1 サイクル分の知見追加は履歴上独立 commit として読める、(3) `knowledge:` プレフィックスで識別可能 — の 3 条件を満たすため、個人開発（簡易）パターンに限り許容する。3 人以上のリポジトリでは適用しない。」と注記して解消。実装の正当性自体は問題なく、欠けていたのは **「これは違反ではなく例外である」という明示的な naming** だけだった。
-
-**Action**: 新運用パターン・新コーディング規約を導入するときに:
-
-1. **既存 PLAYBOOK / CLAUDE.md / 規約と衝突するか chec先**: 着手前に `grep -rn "<該当キーワード>" docs-template/08-knowledge/ CLAUDE.md ~/.claude/CLAUDE.md` で対立するルールを列挙する。特に "Never X" / "禁止" / "MUST NOT" 表現は要注意。
-2. **対立が見つかった場合の選択肢は 3 つ**:
-   - **(a) 例外として明示**: 違反箇所に「これは ACE-XXX / CLAUDE.md L<行> の例外である。理由: ...」と明記。最も一般的で安全。
-   - **(b) 旧ルールを deprecated 化**: 旧 ACE エントリの Status を `deprecated` にし、新パターンを正規ルールとして昇格。旧コミッタへの周知が必要。
-   - **(c) 新パターンを撤回**: 違反コストが exception 注記を上回ると判断したら、新パターンを採用しない。
-3. **「明示」のレベルは 3 点セット**: 例外であることの宣言 + 例外を許す**条件**（最低 3 つ）+ 例外が**適用されないケース**（チーム規模・リポ性質などの境界）。3 点揃わないと「言い訳」に見えて信頼されない。
-4. **複数サイトに展開する場合は文言を verbatim に揃える**: 例外の説明が文書ごとに微妙に違うと「結局どれが正？」になる。canonical な 1 文を決めて全サイトに同じ文言で貼る（ACE-014 の SSOT 原則を例外説明にも適用）。
-5. **Cross-Model Review で取りこぼしを catch する**: 例外を書いたつもりでも文言が弱い・条件が抜けている場合、Toolkit comment-analyzer / Copilot が指摘する。彼らに任せて自分は「全サイトに書いたか」「文言が揃ったか」のチェックに集中する。
+既存ルールに違反する新パターンを導入するとき、該当箇所に「これは X の例外」と明示しないと暗黙の方針分裂が生じ、後続の AI やレビュアーが違反として扱う（PR #397 では develop への直 commit を許すパターンが ACE-012 と衝突し、Critical 指摘を受けた）。新しい運用・規約を入れる前に「禁止」「MUST NOT」等の対立ルールを grep で列挙し、例外として明示するか、旧ルールを deprecated にするか、新パターンを撤回するかを選ぶ。例外は「宣言・許す条件・適用しないケース」の 3 点をそろえ、複数箇所に書くなら同じ文言にする。
 
 ---
 
@@ -640,27 +278,12 @@ ACE エントリ ID は **PRスコープ式** を採用する（このセクシ�
 
 ### ACE-020: 自動コンテンツ生成ツールは自身のマーカー文字列を本文に含むドキュメントを破壊する
 
-| フィールド | 値                   |
-| ---------- | -------------------- |
-| Category   | tooling              |
-| Origin     | PR #403 / Issue #402 |
-| Related    | -                    |
-| Date       | 2026-05-07           |
-| Helpful    | 0                    |
-| Harmful    | 0                    |
-| Status     | active               |
+| Category | tooling | Origin | PR #403 / Issue #402 |
+| Date | 2026-05-07 |
+| Helpful | 0 | Harmful | 0 |
+| Status | active |
 
-**Insight**: セクションヘッダーを目印にしてファイル末尾を書き換える自動生成ツール（backlinks 自動更新、TOC 自動生成、auto-changelog 等）は、**そのマーカー文字列を本文中に説明として書いているドキュメントを破壊する**。マーカーが「セクション開始位置」と「本文の説明文」の両方の意味で出現するため、ツールは説明文の途中をセクション開始と誤認し、それ以降を全削除する。`tsc` や `npm test` では検出できない（ファイルは valid な markdown のまま）。問題はランタイムにのみ顕在化し、被害は破壊されたファイルが PR に紛れ込んだ後に気づく。
-
-**Context**: 2026-02-12 commit `6ea43f8`（Issue #311 を参照し PR を経ず develop へ直 commit）で導入された `scripts/obsidian-sync.mjs` は各 markdown 末尾に `## Linked from` セクションを自動生成する設計だった。しかし `docs-template/08-knowledge/OBSIDIAN_GUIDE.md` 自身が「`## Linked from` セクションを自動生成する」と本文で説明しており、自動生成スクリプトはその文字列を section header と誤認して **OBSIDIAN_GUIDE.md を 379 行 → 26 行に破壊**（"各ドキュメント末尾に「" の途中で文章切断）。バグは 2026-05-07 の PR #400 マージ時に post-merge hook 経由で実行されて発覚し、Obsidian 統合全体の撤退判断（PR #403）の決定打となった。約 3 ヶ月間 silent に存在していた。
-
-**Action**: 自動コンテンツ生成ツールを設計する際:
-
-1. **マーカーは本文に出現しえない記法を選ぶ**: HTML コメント形式の sentinel（`<!-- BEGIN_BACKLINKS -->` ... `<!-- END_BACKLINKS -->`）など、説明文として地の文に書くのが不自然な形式を使う。`## Linked from` のような Markdown ヘッダーは本文の説明にも自然に登場するため不適。
-2. **mutation 範囲を明示する begin/end ペアを必須にする**: 単一マーカーから「ファイル末尾まで全部置換」型は再帰汚染と相性が悪い。begin/end の両方が揃わないファイルはスキップする。
-3. **自分自身の README/GUIDE を exclusion list に入れる**: ツールの動作を説明するドキュメントはそのツールの mutation 対象から外す。ツール側で `OBSIDIAN_GUIDE.md` のような既知ファイルを skip する allowlist/denylist を持つ。
-4. **mutating tool は最低限の snapshot test を必ず添える**: 「マーカーを本文中に含むファイル」の golden file を input にして、出力が破壊されないことを assert するテストを最低 1 件入れる。tsc を通っただけでは ship してはいけない。
-5. **post-merge / pre-commit など強制実行系に ship する前に dry-run モードを通す**: 自動化に組み込む前に、`--dry-run` で全対象ファイルへの想定変更を出力して目視レビューする。lint フックや husky に直接組み込んだ後はバグの被害が回復しにくい。
+見出しなどのマーカーを目印にファイルを書き換える自動生成ツールは、そのマーカー文字列を説明として本文に含む文書を破壊し、結果は valid な Markdown のままなので型検査やテストでは検出できない（`## Linked from` を本文で説明していた OBSIDIAN_GUIDE.md が 379 行から 26 行に切断され、約 3 ヶ月気付かれなかった）。backlinks・TOC・changelog などの自動更新ツールを設計・導入するときに当てはまる。マーカーは HTML コメントの begin/end ペアのように本文に出にくい形にして揃わないファイルはスキップし、マーカーを含む golden file のテストと dry-run を通してから hook に組み込む。
 
 ---
 
@@ -668,27 +291,13 @@ ACE エントリ ID は **PRスコープ式** を採用する（このセクシ�
 
 ### ACE-021: テンプレ配布リポでは「リポ自身が使うインフラ」と「テンプレ利用者が受け取る成果物」を物理的に分離する
 
-| フィールド | 値                   |
-| ---------- | -------------------- |
-| Category   | architecture         |
-| Origin     | PR #403 / Issue #402 |
-| Related    | ACE-005              |
-| Date       | 2026-05-07           |
-| Helpful    | 0                    |
-| Harmful    | 0                    |
-| Status     | active               |
+| Category | architecture | Origin | PR #403 / Issue #402 |
+| Related | ACE-005 |
+| Date | 2026-05-07 |
+| Helpful | 0 | Harmful | 0 |
+| Status | active |
 
-**Insight**: 「リポジトリ自身が動くプロジェクトでもあり、かつ他者がコピーするテンプレートでもある」二重用途のリポでは、**配布対象ディレクトリ（例: `docs-template/`）にリポ自身の運用インフラを置くと、テンプレ利用者にもノイズが伝播する**。リポメンテナの利便（自分のドキュメント管理を Obsidian でやりたい等）と、テンプレ利用者の最小構成（URL 参照だけで使い始めたい）は本質的に競合する。物理的な分離（別ディレクトリ）でしか解決できず、`.gitignore` や条件分岐では足りない（テンプレを clone する人は `.gitignore` 込みで受け取る）。
-
-**Context**: 本リポは AI 仕様駆動開発の **テンプレートを配布する** ことが第一目的で、利用者は `docs-template/` をコピーして 7 文書ベースで使い始めることを想定している。しかし Issue #311 / commit `6ea43f8`（develop 直 commit）で Obsidian 統合を `docs-template/.obsidian/`、`docs-template/08-knowledge/OBSIDIAN_GUIDE.md`、`docs-template/08-knowledge/OBSIDIAN_EVALUATION.md` 等に配置したことで、**テンプレ利用者にも Obsidian 前提のインフラが付随**するようになった。さらに自動 backlinks 生成が `docs-template/` 配下の全 .md に `## Linked from` セクションを付与する設計だったため、利用者がコピーした瞬間「Obsidian で開く前提のテンプレ」になる。利用者が Obsidian を使わない場合これらは全部ノイズで、AI に読ませた際のトークン消費にも直結する。PR #403 で全削除に至った最大の構造的理由がこれ。
-
-**Action**: 二重用途リポを設計する際:
-
-1. **「テンプレ利用者がコピーするか？」を各ディレクトリに対して明示する**: README に「`docs-template/` は配布対象、`docs/` はリポ解説、`scripts/` はリポ運用」のような **配布境界マップ** を 1 表で書く。新規ファイル追加時にどちらかを選ばせる強制力にする。
-2. **リポ自身の運用インフラは配布ディレクトリ外に置く**: Obsidian/Notion/Hugo など特定ツールに依存する設定・スクリプト・ドキュメントは `docs-template/` の外（リポルート直下や `.repo/`、`tools/` 等）に置く。配布対象に入れるのはツール非依存の素の Markdown だけにする。
-3. **配布物の Markdown には自動生成セクションを書き込まない**: backlinks/TOC/メタ情報は配布物本体の中ではなく、別ファイル（`backlinks.json` など）として生成し、それを使いたい利用者が opt-in で参照する形にする。利用者の本文を mutate しない。
-4. **PR レビュー時に「これは配布されるファイルか？」を必ず問う**: `docs-template/` 配下の変更は **テンプレ利用者の受け取りに影響する変更** である。コードレビューチェックリストに「テンプレ利用者は Obsidian/特定ツールがなくても使えるか？」を含める。
-5. **撤退コストの試算を導入時に行う**: 「もし採用しないことになったら何ファイル消すことになるか？」を導入 PR の段階で試算する（PR #403 では 13 ファイル削除 + 8 ファイル編集、+7/-1859 行）。撤退コストが大きすぎる導入は、配布境界外でまず試行するか、採用判断を先延ばしにする。
+自分自身も動くプロジェクトで、かつ他者がコピーするテンプレートでもあるリポジトリでは、配布ディレクトリにリポ自身の運用インフラを置くと利用者にノイズとトークン消費が伝播し、`.gitignore` や条件分岐では防げない（Obsidian 統合を `docs-template/` に置いたことが、PR #403 での全撤退の構造的な理由になった）。ディレクトリごとに「利用者がコピーするか」を配布境界マップで明示し、特定ツールに依存するインフラは配布ディレクトリの外に置き、配布物の Markdown に自動生成セクションを書き込まない。導入 PR の段階で撤退コスト（PR #403 では 13 ファイル削除 + 8 ファイル編集、+7/-1859 行）を試算する。
 
 ---
 
@@ -696,27 +305,13 @@ ACE エントリ ID は **PRスコープ式** を採用する（このセクシ�
 
 ### ACE-022: 機能削除時は consumer だけでなく定数・型・ユーティリティも grep して取り残しを防ぐ
 
-| フィールド | 値                   |
-| ---------- | -------------------- |
-| Category   | process              |
-| Origin     | PR #403 / Issue #402 |
-| Related    | ACE-018              |
-| Date       | 2026-05-07           |
-| Helpful    | 0                    |
-| Harmful    | 0                    |
-| Status     | active               |
+| Category | process | Origin | PR #403 / Issue #402 |
+| Related | ACE-018 |
+| Date | 2026-05-07 |
+| Helpful | 0 | Harmful | 0 |
+| Status | active |
 
-**Insight**: 機能を削除する PR では、**機能本体ディレクトリ削除 → consumer 編集 → ビルド OK** で完了したように見えるが、**TypeScript の `tsc` は未使用 export を warning しない**ため、その機能のためだけに作られた定数・型・ユーティリティが他モジュールに孤立して残る。`npm run build` も `npm run check` も pass するので CI では検出されない。手動 grep を「機能名 / 機能専用識別子」で実行しないと dead code として静かに残り続ける。
-
-**Context**: PR #403 で `mcp/src/obsidian/` 配下 5 ソース + `scripts/obsidian-sync.mjs` 等 13 ファイル削除と 7 ファイル編集を実施（最終的に下記 fix commit で `mcp/src/constants.ts` が加わり 8 ファイル編集、計 +7/-1859 行）。`git grep -i obsidian` で「Obsidian」文字列の取り残しはゼロを確認、`mcp build`/`mcp check`/`quality:local` も全 pass。しかし Toolkit code-reviewer が `mcp/src/constants.ts:21-36` の `BACKLINKS_SECTION_HEADER` と `BACKLINKS_SECTION_TEMPLATE` を **dead code として検出**。これらは削除済み `mcp/src/obsidian/backlinks.ts` でだけ使われていた定数で、ビルドは通るが「完全排除」を謳う PR タイトル・CHANGELOG と矛盾する状態だった。fix commit `8628140` で対応。レビューが無ければ silent regression として残った。
-
-**Action**: 機能削除 PR を作る際:
-
-1. **機能名でなく機能の語彙すべてで grep する**: 「Obsidian」だけでなく、その機能専用の識別子（`BACKLINKS_SECTION_*`、`buildBacklinksMap`、`validateAllLinks` など）も全部 grep キーワードに含める。`git grep -i "<feature_name>\|<feature_specific_constants>\|<feature_function_names>"` を 1 コマンドにする。
-2. **削除候補を「本体 / 設定 / 定数 / 型 / 関数 / テスト / ドキュメント」の 7 カテゴリで網羅する**: 機能本体ディレクトリだけ消して終わりにせず、Issue 本文の「削除対象」リストにこの 7 カテゴリを明示し、TodoWrite で 1 つずつ確認する。
-3. **「未使用 export 検出」ツールを CI に入れる**: `ts-prune`、`knip`、`unimported` など TypeScript 用の dead code 検出ツールを quality:local に組み込む。一度入れれば類似の取り残しを継続的に防げる。
-4. **削除 PR の self-review に「孤立 export チェック」を含める**: PR Review チェックリストに「削除した機能の専用 constants/types/utilities が他モジュールに残っていないか？ `git grep` で確認」項目を追加。Toolkit code-reviewer はこの種の検出が得意なので、必ず通す。
-5. **同じモジュール内に定数を置く設計を選ぶ**: 機能専用の定数は `mcp/src/<feature>/constants.ts` のように **機能ディレクトリ配下に閉じ込める**。削除時に親ディレクトリごと消せば取り残しが構造的に発生しなくなる。共通 constants ファイルへの追加は「本当に他機能でも使うか？」を着手前に問う。
+機能削除で本体ディレクトリと呼び出し元を消すとビルドもチェックも通るが、`tsc` は未使用 export を警告しないため、その機能専用の定数・型・ユーティリティが他モジュールに孤立して残る（PR #403 では機能名の grep がゼロでも、専用の定数が dead code として残った）。削除 PR では機能名だけでなく専用の識別子すべてで grep し、本体・設定・定数・型・関数・テスト・ドキュメントの各分類で取り残しを確かめる。可能なら `knip` 等の未使用 export 検出を品質ゲートに入れ、機能専用の定数は機能ディレクトリの配下に閉じ込める。
 
 ---
 
@@ -724,55 +319,13 @@ ACE エントリ ID は **PRスコープ式** を採用する（このセクシ�
 
 ### ACE-023: ドキュメント中の事実主張（PR/Issue 番号・ハッシュ・数値）は執筆時に 1 次情報で照合する
 
-| フィールド | 値                    |
-| ---------- | --------------------- |
-| Category   | documentation-quality |
-| Origin     | PR #405 / Issue #404  |
-| Related    | ACE-002 / ACE-018     |
-| Date       | 2026-05-07            |
-| Helpful    | 2                     |
-| Harmful    | 0                     |
-| Status     | active                |
+| Category | documentation-quality | Origin | PR #405 / Issue #404 |
+| Related | ACE-002 / ACE-018 |
+| Date | 2026-05-07 |
+| Helpful | 2 | Harmful | 0 |
+| Status | active |
 
-**Insight**: ドキュメント中で具体的な PR 番号・コミットハッシュ・数値を書くとき、**記憶や類推で書いた値は高確率で誤りを含む**。執筆中に `gh` / `git` で照合する習慣を持つ。`#N` 表記は Issue 番号・PR 番号の両方で commit メッセージに登場し混同しやすい。
-
-**Context**: PR #405 で「PR #311 (2026-02-12)」を 4 箇所に書いたが `gh pr view 311` → 404、実態は **Issue #311 を参照する commit `6ea43f8`（PR を経ず develop へ直 commit）**。撤退コスト数値「13 削除 + 7 編集、+7/-1842 行」も実態は「13 削除 + 8 編集、+7/-1859 行」（`gh pr view 403 --json additions,deletions,changedFiles` で取得可能）。Toolkit code-reviewer が両方 Critical 検出 → fix commit `b4b5191`。ACE-002（CLI フラグ実機照合）を事実関係全般に拡張した位置付け。
-
-<!-- 意図的な歴史的記述: 上記「-1842」「7 編集」は PR #405 で誤記した値の引用であり訂正対象ではない（Issue #406）。実値は 13 削除 + 8 編集、+7/-1859 行 -->
-
-**Action**:
-
-1. **PR / Issue 番号**: `gh pr view <N>` / `gh issue view <N>` で実在性と所属を確認。`#N` が両方ありうるため不明なら両方照会
-2. **コミットハッシュ**: `git log --first-parent` で merge commit 経由か直 commit かを判定（直 commit はガードレール全部スキップしている）
-3. **数値**: `gh pr view <N> --json additions,deletions,changedFiles` で 1 次情報取得、または `git show --stat <merge-commit>`
-
----
-
-<a id="ace-024"></a>
-
-### ACE-024: SSOT で確立した用語を再利用する前に既存定義との衝突を確認する
-
-| フィールド | 値                    |
-| ---------- | --------------------- |
-| Category   | documentation-quality |
-| Origin     | PR #409 / Issue #408  |
-| Related    | ACE-014 / ACE-018     |
-| Date       | 2026-05-07            |
-| Helpful    | 0                     |
-| Harmful    | 0                     |
-| Status     | active                |
-
-**Insight**: SSOT として新設するドキュメントで「コア 7 文書」のような **フレームワーク内で確立された用語** を再利用するときは、**個数や名称が偶然一致しても意味が同じとは限らない**。新ドキュメントが既存用語を別の意味で使うと読者は誤った mental model を獲得する。Toolkit + Copilot の独立 reviewer が両方 Critical として検出する典型パターン。
-
-**Context**: PR #409 で `docs-template/README.md` を SSOT 新設した際、ルート直下のセットアップ系 7 ファイル（`MASTER.md` + `GETTING_STARTED_*` 3 種 + `SETUP_*` 3 種）を **「コア 7 文書 + ルート直下」** という見出しで列挙した。しかしフレームワーク既定の「コア 7 文書」は `MASTER.md` / `PROJECT.md` / `ARCHITECTURE.md` / `DOMAIN.md` / `PATTERNS.md` / `TESTING.md` / `DEPLOYMENT.md` の 7 ファイル（番号付きフォルダ配下に分散）を指す（`CLAUDE.md` L123-131 等で定義）。個数が偶然 7 で一致したことが衝突を見えにくくした。Toolkit comment-analyzer が C2 として検出、Copilot review も SSOT としての用語整合性を独立検出。fix commit `ab9c968` で見出しを「ルート直下のセットアップ系ドキュメント」に変更し、冒頭で正しい「コア 7 文書」定義を明示した。
-
-**Action**:
-
-1. **SSOT 新設前に固有名詞・カテゴリ名を列挙する**: 新ドキュメントで使う用語（数値、ラベル、見出し）を着手前にピックアップ
-2. **各語について grep で既存定義を探す**: `grep -rn "<用語>" docs-template/ CLAUDE.md ai_spec_driven_development.md README.md` で既存利用箇所を全て確認
-3. **既存定義があり別の意味で使う場合は別の語を採用**: 衝突するなら命名を変える（例: 「ルート直下のセットアップ系ファイル」のように修飾を加える）
-4. **同じ意味で使うなら既存定義へリンク**: SSOT 内で再定義せず、既存ドキュメントへの参照に留める
-5. **数や種別の偶然の一致は危険シグナル**: 「7」「コア」「メイン」「標準」のような汎用語が個数まで一致するときは、用語衝突の確率が高いと意識する
+文書に書く PR / Issue 番号・コミットハッシュ・数値は、記憶や類推で書くと高確率で誤り、`#N` は Issue と PR の両方に使われるため特に混同しやすい（PR #405 では実在しない「PR #311」と、撤退コストの誤った数値を書いた）。CLI フラグを実機で照合する ACE-002 を、事実主張全般に広げた知見である。執筆中に `gh pr view` / `gh issue view` で番号の実在と種別を、`git log --first-parent` でコミットの経路を、`gh pr view --json additions,deletions,changedFiles` で数値を照合する。
 
 ---
 
@@ -780,117 +333,13 @@ ACE エントリ ID は **PRスコープ式** を採用する（このセクシ�
 
 ### ACE-025: スクリプトの「対象範囲」を文書化するときは glob 表現ではなく実装上の対象列挙方式まで踏み込む
 
-| フィールド | 値                    |
-| ---------- | --------------------- |
-| Category   | documentation-quality |
-| Origin     | PR #411 / Issue #410  |
-| Related    | ACE-023 / ACE-043     |
-| Date       | 2026-05-19            |
-| Helpful    | 1                     |
-| Harmful    | 0                     |
-| Status     | active                |
+| Category | documentation-quality | Origin | PR #411 / Issue #410 |
+| Related | ACE-023 / ACE-043 |
+| Date | 2026-05-19 |
+| Helpful | 1 | Harmful | 0 |
+| Status | active |
 
-**Insight**: スクリプトの検証対象を「`docs-template/**/*.md`」のような glob 表現で説明されると、読者は「該当パターンに合致する全ファイルが対象」と誤解する。実装が「固定リスト配列で列挙された 7 ファイルのみ存在チェック」のような **glob ではない対象列挙方式** だった場合、glob 表現は嘘になり、読者は「拡張文書を追加すれば CI で守られる」と誤期待する。
-
-**Context**: PR #411 で frontmatter ガイド §2/§4.1 に「`validate-docs.mjs` は `docs-template/**/*.md` のコア 7 文書を検証」と書いたが、実装は `scripts/validate-docs.mjs:16-59` の `CORE_DOCS` 配列で 7 ファイルを列挙し、`scripts/validate-docs.mjs:153-172` で `fs.existsSync` で逐次チェックする形だった。**glob walk は一度も行っていない**。Toolkit code-reviewer W1 と Copilot review が独立検出。実害として、拡張文書（GLOSSARY/DECISIONS/FAQ 等）や PLAYBOOK は frontmatter を持っていても CI 検証されないが、ガイドの記述からはそれが分からない。fix commit で表組みの「入力」列を「`docs-template/` 配下の **固定 7 ファイル**（CORE_DOCS 配列で列挙）」に変更し、§4.1 の検証スクリプト列を「✅ CI 検証 / ❌ CI 対象外」の 2 値表に整理した。
-
-**Action**:
-
-1. **glob 表現を使う前にスクリプト本体を読む**: `walkMarkdown(dir)` 型の glob walk か、`CORE_DOCS`/`KNOWN_FILES` 型の固定リストか、`if (path.match(filter))` 型の条件フィルタかを確認
-2. **対象列挙方式を 1 行で明示**: 「固定 N ファイル（X 配列で列挙）」「`docs/specs/**/*.md` を glob 走査」「`*.md` のうち frontmatter 持ちのみ」のように方式名を含めて書く
-3. **CI 対象外との対比表を作る**: 「✅ CI 検証」と「❌ CI 対象外」を同じ表で並べる。読者は「自分が書こうとしているファイルがどちらか」を即判定したい
-4. **拡張手順を併記**: 固定リスト方式の場合は「拡張対象にしたい場合は X 配列に追加 or 別スクリプト化」と書いておく
-5. **glob と固定リストの混在に注意**: 「対象は `docs/**/*.md` だが、一部除外あり」のようなパターンは特に誤解されやすいので除外ルールも明記
-
----
-
-<a id="ace-026"></a>
-
-### ACE-026: 同名関数が複数ファイルに併存する場合は機能対応表で並列説明する
-
-| フィールド | 値                    |
-| ---------- | --------------------- |
-| Category   | documentation-quality |
-| Origin     | PR #411 / Issue #410  |
-| Related    | ACE-023               |
-| Date       | 2026-05-19            |
-| Helpful    | 0                     |
-| Harmful    | 0                     |
-| Status     | active                |
-
-**Insight**: リポジトリ内に同名（例: `parseFrontMatter`）で実装が異なる関数が複数存在するとき、「パーサーは ... という制約がある」のように **単数形・一括化** で説明すると、ある実装で通る書き方を別実装で書いて壊れる。**機能 × 実装の対応表** で並列化するのが安全。
-
-**Context**: PR #411 で frontmatter ガイド §5.4.2 に「`mcp/src/utils.ts:33` と `scripts/validate-docs.mjs:74` の `parseFrontMatter` は (...) `>-` / `|` を空文字に丸める、配列は `[a,b,c]` 形式か `- item` 行のみ対応」と単数形で一括説明した。実態は 3 実装で対応機能が異なる:
-
-- `mcp/src/utils.ts`: `>-` のみ flatten、`|` は literal、配列は `[a,b]` と `- item` 両対応
-- `scripts/validate-docs.mjs`: `>-`/`|` どちらも特別扱いなし、配列構文 (`[a,b]`/`- item`) は warning
-- `scripts/build-spec-index.mjs`: `>-`/`|` 両方 flatten、配列両対応、ネスト map は明示的 skip
-
-Toolkit comment-analyzer が Critical C1/C2 として独立検出、Copilot review、gemini-code-assist も指摘。fix commit で **3 実装 × 5 機能** のチェック対応表に書き直し、「実用上の指針」（どのテンプレが安全か）を併記した。
-
-**Action**:
-
-1. **同名関数を grep で全列挙**: `grep -rn "function parseFrontMatter\|parseFrontMatter\s*=\|parseFrontMatter\s*:" --include='*.{ts,js,mjs,py}'` で実装を全部見つける
-2. **サポート機能の集合を縦軸に**: 各実装で扱う YAML/データ機能を全部列挙（配列、ネスト、複数行文字列、コメント、エスケープ等）
-3. **`✅ / ❌ / ⚠` の 3 値で対応表を作る**: 機能 × 実装の表で対応状況を一目化
-4. **「実用上の指針」を併記**: 「テンプレからずらすときは X 実装を通るか確認」「どの書き方が全実装で安全か」を具体的に書く
-5. **複数実装併存自体を解消すべきかも検討**: 対応表が複雑になったら、共通ライブラリ化や 1 実装への統一を別 Issue で提起する
-
----
-
-<a id="ace-027"></a>
-
-### ACE-027: 配布対象ファイル内の行番号 hard-coded 参照は採用後に即陳腐化するため heading anchor 化する
-
-| フィールド | 値                    |
-| ---------- | --------------------- |
-| Category   | documentation-quality |
-| Origin     | PR #411 / Issue #410  |
-| Related    | ACE-016               |
-| Date       | 2026-05-19            |
-| Helpful    | 0                     |
-| Harmful    | 0                     |
-| Status     | active                |
-
-**Insight**: `docs-template/MASTER.md:147` のような **行番号 hard-coded 参照** は二重に脆い: (a) 元ファイルの編集で即ズレる、(b) 配布対象 (`docs-template/`) の場合はテンプレ採用者がコピー後に編集するため**確実に**ズレる。**heading anchor / セクションタイトル文字列参照**に置き換えると編集に強い。
-
-**Context**: PR #411 で frontmatter ガイドが `docs-template/MASTER.md:147` (Frontmatter version 参照)、`:363-365` (Spec Kit 拡張宣言)、`:404-413` (spec 6 ステータス表)、`:623-637` (ステータスワークフロー)、`README.md:121`、`PLAYBOOK.md:35,146,280-282` 等、行番号参照を 6 箇所以上で使用。Toolkit code-reviewer S1 が「`docs-template/` は配布対象 (DESIGN_PRINCIPLES.md P2) なので採用者のコピー先で即ズレる」と指摘。検証時点では参照行は全て正確だったが、すぐ陳腐化するリスクが高い。fix commit で全て見出しテキスト形式 (`docs-template/MASTER.md「ステータスワークフロー」`) に置換した。
-
-**Action**:
-
-1. **配布対象 (`docs-template/`) 内ファイルへの参照は heading anchor を強制**: `MASTER.md:147` → `MASTER.md「プロジェクト識別情報」セクション` or GitHub Markdown の slug anchor `MASTER.md#プロジェクト識別情報`
-2. **頻繁に編集される SSOT ファイル（MASTER.md / PLAYBOOK.md / 各種運用ガイド）への参照も heading anchor 推奨**
-3. **行番号 hard-code は「コード行で論証が必要」な場合のみ**: スクリプト実装の根拠を示す時など。その場合も commit hash を併記して「時点」を明示する（例: `validate-docs.mjs:108-135 (4e59e7c 時点)`）
-4. **PR 提出前に grep で棚卸し**: `grep -rnE '\.md:\d+|\.ts:\d+|\.mjs:\d+' docs/ docs-template/` で行番号参照を全列挙し、配布対象 / SSOT への参照を heading anchor 化
-5. **GitHub Markdown の anchor slug ルールを把握**: 日本語見出しは小文字化されず空白は `-` に変換、特殊文字は除去される。`#プロジェクト識別情報` のように見出し文字列そのままで動く
-
----
-
-<a id="ace-028"></a>
-
-### ACE-028: 外部ツールの「現状」仕様を書くときは公式ドキュメントを WebFetch / WebSearch で必ず照合する
-
-| フィールド | 値                    |
-| ---------- | --------------------- |
-| Category   | documentation-quality |
-| Origin     | PR #414 / Issue #413  |
-| Related    | ACE-023               |
-| Date       | 2026-05-19            |
-| Helpful    | 0                     |
-| Harmful    | 0                     |
-| Status     | active                |
-
-**Insight**: SaaS / IDE / CLI ツール（GitHub Copilot, Cursor, Codex CLI 等）の対応状況・設定方法・推奨ファイル名は **数ヶ月単位で変化** し、LLM の training cutoff より新しい場合は **「古い知識のまま断定する」事故** が起きる。「最新仕様を整理する」型のドキュメントを書く場合、各事実主張ごとに **公式ドキュメント URL を WebFetch / WebSearch で必ず照合** し、出典 URL も併記する。
-
-**Context**: PR #414 で `docs/FRONTMATTER_GUIDE.md` §7.1「AI ツール別 frontmatter 対応状況」を執筆した際、「Copilot は MCP 非対応 ❌」「Codex CLI は MCP 非対応 ❌」「Cursor の指示ファイルは `.cursorrules`」「Cursor の MCP は一部対応」と一般論で書いた。Toolkit comment-analyzer と code-reviewer が独立に公式ドキュメントを照合し、すべて事実誤認と判明: (a) Copilot は VS Code Agent mode 等で MCP GA 済み (2025-04)、(b) Codex CLI も `codex mcp add` で MCP 対応済み、(c) Cursor の `.cursorrules` は 0.43+ で deprecated → `.cursor/rules/*.mdc` 推奨、(d) Cursor の MCP は tools/resources/dynamic context すべて完全実装。本ガイドの中核セクションで「Copilot ユーザーは MCP 経由で `spec_lookup` を使えない」という誤った技術判断を導くリスクがあった。fix commit で対応表を「全 4 ツール ✅、自動呼出 vs 明示設定」軸に再構築し、4 ツールの公式ドキュメント URL を表下に併記した。
-
-**Action**:
-
-1. **「現状仕様」を含む対応表は WebFetch/WebSearch を fact-check の前提に組み込む**: 「GitHub Copilot の MCP 対応状況は？」「Cursor の最新 rules ファイル形式は？」のような問いには **必ず公式ドキュメント URL を取得して照合** してから書く
-2. **LLM training cutoff より新しい変化が起きやすい領域を意識**: IDE 拡張機能 (`docs.github.com`, `cursor.com/docs`, `developers.openai.com`)、CLI tool 仕様 (`cli.github.com`)、SaaS API 変更、ライブラリの API stable/deprecated は特に rot しやすい
-3. **出典 URL を本文に併記**: 「参考一次情報: [GitHub Copilot MCP](URL) / [Cursor MCP](URL)」のように本文に書き残すと、後で読者・レビュアーが照合しやすく、自分の knowledge cutoff 起因の事故を防げる
-4. **執筆時点でわからない場合は明示**: 「2026-05 時点では...」のような時点明示か、「最新仕様は公式ドキュメントを参照」とエスケープする
-5. **レビュアー（特に並列レビュー）に WebFetch を期待**: Toolkit comment-analyzer は WebFetch を使って公式情報と照合してくれる。仕様系の主張があるドキュメントは並列レビューを必ず通す
+スクリプトの対象範囲を `docs-template/**/*.md` のような glob で説明すると、実装が固定リスト（PR #411 では `CORE_DOCS` 配列の 7 ファイル）だった場合に嘘になり、読者は「文書を追加すれば CI で守られる」と誤期待する。対象範囲を文書化する前にスクリプト本体を読み、glob 走査・固定リスト・条件フィルタのどれかを確かめる。方式名を含めて 1 行で書き（「固定 7 ファイル（CORE_DOCS 配列で列挙）」など）、CI の対象と対象外を同じ表に並べ、除外ルールと拡張手順も明記する。
 
 ---
 
@@ -898,139 +347,13 @@ Toolkit comment-analyzer が Critical C1/C2 として独立検出、Copilot revi
 
 ### ACE-029: 外部ツール依存物（shell script の依存コマンド、shebang、インストーラオプション）を文書化するときは実体を読んで列挙する
 
-| フィールド | 値                    |
-| ---------- | --------------------- |
-| Category   | documentation-quality |
-| Origin     | PR #414 / Issue #413  |
-| Related    | ACE-025               |
-| Date       | 2026-05-19            |
-| Helpful    | 1                     |
-| Harmful    | 0                     |
-| Status     | active                |
+| Category | documentation-quality | Origin | PR #414 / Issue #413 |
+| Related | ACE-025 |
+| Date | 2026-05-19 |
+| Helpful | 1 | Harmful | 0 |
+| Status | active |
 
-**Insight**: shell スクリプトや hook の「実行要件」を文書化するときは、**shebang だけで判断せず、ファイル本体を読んで使用コマンド（`grep`, `xargs`, `awk`, `find` 等）を列挙する** こと。インストーラ依存の「PATH に通す方法」を書くときは **インストーラの具体オプション名を引用する**。どちらも実体を見ずに一般論で書くと、Windows 等の追加要件のある環境で詰む。
-
-**Context**: PR #414 で frontmatter ガイド §7.2「実行環境別」表に「`.husky/pre-commit` (`#!/bin/sh`) → Windows native では sh.exe 必要」と書いたが、GitHub Copilot review が「`.husky/pre-commit` の実体は `grep -E ... | xargs npx ...` で coreutils も使うため、sh.exe だけでは不足。**`sh + coreutils (grep/xargs)`** が要件」と指摘。また「Git for Windows をインストールすれば `sh.exe` が PATH に通る」と書いたが、Git for Windows のインストーラオプション（「Use Git from Git Bash only」「Use Git from the Windows Command Prompt」「Use Git and optional Unix tools from the Command Prompt」の 3 択）によって `Git\usr\bin` が PATH に追加されるかが変わるため断定できない。さらに gemini-code-assist が「`scripts/*.sh` は `bash` ではなく `sh` で起動を」と suggest したが、`head -1 scripts/*.sh` で確認すると全部 `#!/bin/bash` or `#!/usr/bin/env bash` shebang のため `bash` 実行が整合（gemini の suggest は誤り）。fix commit で (a) `.husky/pre-commit` 要件を「sh + coreutils」に詳細化、(b) Git for Windows の具体オプション名 "Use Git and optional Unix tools from the Command Prompt" を案内、(c) 落とし穴に「`scripts/*.sh` は `#!/bin/bash` shebang のため bash 起動」を明記した。
-
-**Action**:
-
-1. **shell hook / script の「実行要件」を書く前に本体を grep**: `grep -oE '\b(grep|xargs|awk|find|sed|sort|uniq|cut|tr|tee|jq)\b' .husky/* scripts/*.sh` のように依存コマンドを抽出
-2. **shebang を一覧で確認**: `head -1 scripts/*.sh` で全 shebang を出す。`#!/bin/sh` か `#!/bin/bash` で起動方法が変わる
-3. **インストーラ依存の「PATH」記述はオプション名を引用**: Git for Windows なら「インストーラの "Use Git and optional Unix tools from the Command Prompt" オプション」のように具体的に。「インストールすれば OK」は事故の元
-4. **「PATH 通っていなければ手動追加」のフォールバックを併記**: `C:\Program Files\Git\usr\bin` 等の具体パスを書いておくと、ユーザーが詰んだときに自力解決できる
-5. **未検証の主張は弱める**: 「Windows + Git Bash で `/merge-cleanup` も動く」のような実機検証していない主張は、「⚠️ 大半は動作（未検証）」のように記号と注釈で正直に表現
-
----
-
-<a id="ace-030"></a>
-
-### ACE-030: 対応表で `⚠️` を多用したら判定軸自体が間違っているサイン
-
-| フィールド | 値                    |
-| ---------- | --------------------- |
-| Category   | documentation-quality |
-| Origin     | PR #414 / Issue #413  |
-| Related    | ACE-026               |
-| Date       | 2026-05-19            |
-| Helpful    | 0                     |
-| Harmful    | 0                     |
-| Status     | active                |
-
-**Insight**: ツール対応表で `✅ / ❌` で判定できず **`⚠️ 一部対応` のような曖昧記号を使う** と、読者は「一部って何？」を想像で埋めて誤った技術判断につながる。`⚠️` が出てきたら **判定軸自体を見直し**、具体的な条件（「✅ 要設定」「✅ Agent mode のみ」等）に切り替えるのが正解。
-
-**Context**: PR #414 で frontmatter ガイド §7.1「AI ツール別」表で Cursor の MCP 列に「⚠️ 一部対応（要設定）」と書いたが、Toolkit comment-analyzer が「Cursor は MCP の初期採用者で、tools/resources/dynamic context すべて完全実装。`一部` というニュアンスは実態と乖離。さらに `要設定` という caveat は Claude Code を除く全ツール（Cursor/Copilot/Codex）に等しく適用される条件のため、Cursor だけにこの注記を付けるのは inconsistent」と指摘。本質的には「MCP 対応の有無」軸自体が崩壊しており、正しい判定軸は「**自動呼出 vs 明示設定**」だった。fix commit で表の判定軸を再構築し、4 ツール全部 `✅` にしたうえで Claude Code は「✅ 自動呼出」、他 3 ツールは「✅ 要設定（.cursor/mcp.json / mcp.json / codex mcp add）」のように具体的な設定方法を併記した。
-
-**Action**:
-
-1. **対応表で `⚠️` を使いたくなったら判定軸を疑う**: `⚠️` は「✅ でも ❌ でもない曖昧領域」を表すが、これは判定軸が現実に合っていないサイン
-2. **判定軸を「対応有無」から「対応方法・条件」に切り替える**: 「MCP 対応 ✅/❌」ではなく「MCP の組み込み方（自動 / 設定ファイル / インストール時オプション）」のように具体化
-3. **`⚠️` を残す場合は具体的な条件を併記**: 「⚠️ Agent mode のみ」「⚠️ 大半動作（未検証）」のように **何が条件なのか** を即座に分かる形で記述
-4. **複数ツール／環境を比較する表は「全 ✅ + 違い列」の形を優先**: 「全部対応している、違いは設定方法だけ」とわかる方が、対応状況の意思決定が容易
-5. **レビュー時に `⚠️` をカウント**: PR で対応表を追加するときは `⚠️` 出現数を数え、3 つ以上あれば判定軸の見直しを必ず検討
-
----
-
-<a id="ace-031"></a>
-
-### ACE-031: ドキュメントを書くときは配布境界に基づいて「想定読者」を意識する（採用者向け / コントリビューター向け / リポメンテナ向け）
-
-| フィールド | 値                    |
-| ---------- | --------------------- |
-| Category   | documentation-quality |
-| Origin     | PR #416 / Issue #415  |
-| Related    | ACE-021               |
-| Date       | 2026-05-19            |
-| Helpful    | 0                     |
-| Harmful    | 0                     |
-| Status     | active                |
-
-**Insight**: 配布対象テンプレリポジトリでは、各ドキュメントが **「採用者（テンプレを自プロジェクトに取り込む人）向け」「コントリビューター向け」「リポメンテナ向け」のいずれを想定読者にしているか** を意識して書く。これが曖昧だと「採用者には届かないインフラ機能（MCP サーバー等）」を「採用者向け value」として紹介してしまい、読者を混乱させる。
-
-**Context**: PR #411 / #414 で frontmatter ガイドを「テンプレ採用者向けの導入ガイド」として執筆したが、本リポジトリ自身が運用する MCP サーバー (`mcp/` ディレクトリ、`docs/DESIGN_PRINCIPLES.md` P2 で配布境界外 ❌ No) を「採用者が `spec_lookup` / `spec_search` で minimal context を得る」型の value 主張として記述してしまった。ユーザーから「mcp を入れると（採用者環境で）起動するのか？」と直接質問が出て、ガイドが配布境界を踏み外していたことが判明。PR #416 で MCP value 主張を全撤去し、§1.2 を「CI / 別ツールへの索引提供」視点に書き直して採用者にとっての value を実態に合わせた。
-
-**Action**:
-
-1. **ドキュメント執筆前に想定読者を 1 文で書き出す**: 「このガイドは X を Y するための Z 向け」（採用者 / コントリビューター / リポメンテナ）
-2. **配布境界 (`docs/DESIGN_PRINCIPLES.md` P2) と読者を突き合わせる**: 採用者向けガイドで参照するのは「✅ Yes」のディレクトリだけ（`docs-template/` 等）。「❌ No」のディレクトリ（`mcp/` / `scripts/` / `.claude/` 等）は採用者には届かない
-3. **「リポ自身が運用するインフラ」を value 主張として書かない**: 配布境界外のものは「コントリビューター向けの実装メタ情報」として注釈付きで残すか、別ドキュメントに切り出す
-4. **想定読者と配布境界のズレを PR 説明に明記**: 「このガイドは X 向けで、Y は配布境界外なので除外」と書くと、レビュアーが整合性をチェックしやすい
-5. **採用者向けドキュメントは「採用後にも参照される運用ガイド」「採用前に読む手順書（frontmatter なし）」に分ける**: 後者は `docs-template/README.md:121` で「frontmatter を持たないテンプレ」として明示されている
-
----
-
-<a id="ace-032"></a>
-
-### ACE-032: 機能撤去型の改稿後は、残った value 主張・周辺記述・論理連鎖が全て成立しているか改めて読み直す
-
-| フィールド | 値                    |
-| ---------- | --------------------- |
-| Category   | documentation-quality |
-| Origin     | PR #416 / Issue #415  |
-| Related    | ACE-022               |
-| Date       | 2026-05-19            |
-| Helpful    | 0                     |
-| Harmful    | 0                     |
-| Status     | active                |
-
-**Insight**: ドキュメントから機能・主張を撤去するとき、(a) **残った value 主張の実現メカニズムが消えていないか**、(b) **周辺記述（表のセル、別セクションの言及、参考リンク等）に取り残しがないか**、(c) **撤去で論理連鎖が宙に浮いていないか** を改めて読み直す。撤去は追加より見落としが起きやすい。
-
-**Context**: PR #416 で frontmatter ガイドから MCP 関連の value 主張を撤去した際、(a) §1.2「AI ツールに索引で絞り込ませる」という value 主張は残したが、それを実現するメカニズム（MCP `spec_lookup` / `spec_search`）を消したため **実現手段の無い value 主張** が宙に浮いた。Toolkit comment-analyzer W2 が「`dist/spec-index.json` を読む AI 経路が MCP 経由しかなく、MCP 撤去後は実現手段なし」と検出。(b) §2 表の「`npm run quality:local` ... `MCP test`」記述も周辺記述として取り残し（gemini-code-assist が指摘）。(c) §5.4.2 line 299「AI 提供用なら `mcp/src/utils.ts`」が §2.1 の新フレーミング（採用者には配布されない）と矛盾（code-reviewer W1）。fix commit で 3 件まとめて修正。
-
-**Action**:
-
-1. **撤去 PR では各 value 主張をリストアップして「メカニズムは残っているか」をチェック**: 「X できる」と書いてあるなら「X を実現するのは何で、それは残ったか」を確認
-2. **`grep` で撤去対象キーワードの残存を全文走査**: `grep -nE "(MCP|spec_lookup|spec_search)" docs/FRONTMATTER_GUIDE.md` のような形で周辺記述の取り残しを検出
-3. **撤去後にガイド全体を頭から通し読みする**: セクション内の整合だけでなく、セクション間の論理連鎖（§1.2 で言った話を §5.4.2 で違うこと言っていないか）を確認
-4. **撤去で「全行 uniform」になった表がないか確認**: 1 列・1 行を抜いた結果、表の情報量がゼロに近づくケースは表自体の再構成が必要（ACE-033 と関連）
-5. **レビュアーへの依頼に「撤去で論理穴が生じていないか」を明示**: 「§X 改稿で論理的整合性が保てているか確認してほしい」と PR 説明に書くと、レビュアーが意識して検証する
-
----
-
-<a id="ace-033"></a>
-
-### ACE-033: 対応表で全行 / 全 cell が uniform になったら、表自体が情報を持っていないサイン
-
-| フィールド | 値                    |
-| ---------- | --------------------- |
-| Category   | documentation-quality |
-| Origin     | PR #416 / Issue #415  |
-| Related    | ACE-026 / ACE-030     |
-| Date       | 2026-05-19            |
-| Helpful    | 0                     |
-| Harmful    | 0                     |
-| Status     | active                |
-
-**Insight**: ツール / 環境 / 実装の比較表で **全行 / 全 cell が同じ値（全 `✅` 等）になっているなら、その軸は表として情報を持っていない**。差別化情報のある軸だけを残し、共通部分は 1 文の散文に集約するのが正解。表は「違いがある」前提のデータ表現形式であって、共通項を述べる手段ではない。
-
-**Context**: PR #416 で frontmatter ガイド §7.1「AI ツール別」表から MCP 行を撤去した結果、5 行中 4 行が `✅ ✅ ✅ ✅` の uniform になり、Toolkit code-reviewer S2 が「表として情報量が薄い、4 ✅ 行は 1 文に集約すべき」と指摘。差別化情報は「プロジェクト指示ファイル名」1 行のみだった。fix commit で共通機能を「4 ツール共通で機能する: (a) frontmatter テキストを context として読む、(b) スクリプト実行、(c) 規律遵守」のように 1 文に集約し、表は「プロジェクト指示ファイル」1 列だけの小型表に縮小した。
-
-**Action**:
-
-1. **対応表を書いたら全 cell の値を見て判定**: 全行 / 全列が同じ値になっていないか確認
-2. **uniform 行は散文に降格**: 「全 X で ✅」型の行は「X 全部で機能する: (a)/(b)/(c)...」のように 1 文に集約
-3. **差別化情報が 1 行以下になったら表を 1 列にする**: 「行ヘッダ + 1 列の値」の小型表は読みやすく、表として機能する
-4. **「対応有無の表 vs 対応方法の表」を意識**: 対応有無は ✅/❌ で十分だが、対応方法（設定ファイル名、コマンド、URL 等）の差を見せたいなら別の表として組み直す
-5. **撤去 PR で特に発生しやすい**: 機能撤去で表の行・列が減ったら、残った表が uniform になっていないか必ず確認（ACE-032 と連動）
+shell スクリプトや hook の実行要件は shebang だけでは判断できず、本体が使う `grep` / `xargs` 等のコマンドまで要件になる（PR #414 では `#!/bin/sh` の hook を「sh.exe があれば動く」と書いたが、実際は coreutils も必要だった）。インストーラ経由の PATH の扱いもオプション次第で変わるため、一般論では断定できない。実行要件を書く前に本体を grep して依存コマンドを、`head -1` で shebang を列挙し、インストーラはオプション名を引用して手動で PATH に追加する経路も併記し、実機で確かめていない主張は未検証と明記する。
 
 ---
 
@@ -1038,32 +361,13 @@ Toolkit comment-analyzer が Critical C1/C2 として独立検出、Copilot revi
 
 ### ACE-034: 実装中は implementation-notes.md を作業ブランチに並走させて spec 乖離・トレードオフ・判断理由を捕捉する
 
-| フィールド | 値                                                 |
-| ---------- | -------------------------------------------------- |
-| Category   | process                                            |
-| Origin     | 外部知見（Anthropic エンジニア公開実装プロンプト） |
-| Related    | ACE-009 / ACE-023 / ACE-032                        |
-| Date       | 2026-05-19                                         |
-| Helpful    | 0                                                  |
-| Harmful    | 0                                                  |
-| Status     | active                                             |
+| Category | process | Origin | 外部知見（Anthropic エンジニア公開実装プロンプト） |
+| Related | ACE-009 / ACE-023 / ACE-032 |
+| Date | 2026-05-19 |
+| Helpful | 0 | Harmful | 0 |
+| Status | active |
 
-**Insight**: 実装着手から PR 作成までの間、作業ブランチ直下に `implementation-notes.md` を 1 枚並走させ、(1) spec に書かれていなかった判断、(2) spec から変更した点、(3) 取った/捨てた選択肢とその理由（トレードオフ）、(4) レビュアー・ユーザーが知るべきその他情報を逐次記録する。コミット diff とレビューコメントには「why / 捨てた選択肢 / spec との差分」が残らず、ACE Phase 1 Generate の raw material の品質に上限が生じるため、in-flight でしか書けない情報を能動的に残す。
-
-**Context**: Anthropic エンジニアが SNS で公開した実装プロンプト（"implement \<SPEC\> and while you do keep a running implementation-notes.html file (or markdown) with decisions you had to make weren't in the spec, things you had to change, tradeoffs you had to make or anything else I should know"）を契機に、本リポの ACE Playbook (ACE-001 〜 033) と grep 照合し未抽出と確認。本リポの既存 ACE サイクル ([ace-cycle.md](../05-operations/deployment/ace-cycle.md)) は post-merge に `gh pr diff` + レビューコメントを raw material として Generate するが、コミットに残らない判断理由・捨てた選択肢・spec 乖離の文脈は diff には現れない。実際 ACE-032（PR #416 で MCP value 撤去後に §5.4.2 が宙に浮いた）のような「気付いた瞬間に書いておけば反映漏れがなかった」ケースが頻発しており、in-flight な判断ログの欠落が構造的に存在する。
-
-**Action**:
-
-1. **実装着手と同時に作業ブランチ直下に `implementation-notes.md` を作成**: 最低限 4 つの見出しを持つ
-   - `## Decisions not in spec`（spec にない判断）
-   - `## Changes from spec`（spec から変えた点）
-   - `## Tradeoffs`（採った/捨てた選択肢と理由）
-   - `## Open questions / TODO`（未決事項）
-2. **コミットと一緒に追記**: 「なぜこの選択をしたか」を 1〜3 行で残す。後で書こうとすると確実に忘れる
-3. **PR 作成時に PR description に転記または同梱**: レビュアーが「なぜ」を読みやすくなり、レビュー指摘の精度が上がる
-4. **ACE Phase 1 Generate の raw material は「PR description（implementation-notes 転記済み）」**: Action 5 でマージ前にファイル自体は削除されるため、ファイル本体ではなく PR description（転記済みの判断ログ）を `gh pr view --json body` で取得して Generate プロンプトに渡す。`gh pr diff` / `gh issue view` / レビューコメントと併せて入力にする（[ace-cycle.md §Phase 1](../05-operations/deployment/ace-cycle.md)）
-5. **マージ前にファイルを削除し PR description に統合（推奨）**: squash merge を標準とするリポでは「PR に同梱したまま残す」と squash 後にルート直下に前 PR のファイルが残り、次の feature branch が衝突・上書きする構造問題が起きる（ACE-021 と同型）。pr-ready 直前に (a) 中身を PR description に転記、(b) `git rm implementation-notes.md` で削除、(c) `git commit -m "chore: integrate implementation-notes into PR description"` の 3 ステップで処理する。長期保存したい場合は `notes/<issue-num>.md` 形式で per-PR ファイル化する代替案もあるが（並行 PR で衝突しない）、リポに notes/ が累積するトレードオフがある
-6. **スコープ外発見は引き続き Issue 化（[workflow-principles.md 原則2](../05-operations/deployment/workflow-principles.md)）**: implementation-notes は「現 PR の判断ログ」、Issue は「別タスクへの分岐」と役割を分ける（排他ではなく補完）
+コミット diff とレビューコメントには「why / 捨てた選択肢 / spec との差分」が残らず、ACE Phase 1 Generate の raw material の品質に上限が生じるため、in-flight でしか書けない判断ログを作業ブランチの `implementation-notes.md` に並走させて残す（ACE-032 のように、気付いた瞬間に書いておけば反映漏れがなかったケースが頻発していた）。実装着手から PR 作成までの間、spec にない判断・spec から変えた点・採った/捨てた選択肢とトレードオフ・未決事項の 4 見出しで、コミットと一緒に 1〜3 行ずつ逐次追記する。PR 作成時に中身を PR description へ転記し、squash merge 後にルート直下へ前 PR のファイルが残って次ブランチと衝突しないよう、マージ前に `git rm` で削除する（長期保存するなら `notes/<issue-num>.md` の per-PR 化も可）。Generate の入力はファイル本体ではなく転記済みの PR description（`gh pr view --json body`）とし、スコープ外発見は引き続き Issue 化して、notes は現 PR の判断ログという役割に留める。
 
 ---
 
@@ -1071,186 +375,13 @@ Toolkit comment-analyzer が Critical C1/C2 として独立検出、Copilot revi
 
 ### ACE-035: 新規 process パターンを Playbook に追加するときは「ドッグフード + advisor / second opinion」で運用上の構造問題を検出する
 
-| フィールド | 値                |
-| ---------- | ----------------- |
-| Category   | process           |
-| Origin     | PR #420           |
-| Related    | ACE-021 / ACE-034 |
-| Date       | 2026-05-19        |
-| Helpful    | 2                 |
-| Harmful    | 0                 |
-| Status     | active            |
+| Category | process | Origin | PR #420 |
+| Related | ACE-021 / ACE-034 |
+| Date | 2026-05-19 |
+| Helpful | 2 | Harmful | 0 |
+| Status | active |
 
-**Insight**: 新しい process パターン（特に「マージ後の振る舞い」を伴うもの）を Playbook に追加する PR では、(1) その PR 自身で当該パターンを実行（ドッグフード）し、(2) advisor / second opinion に「この推奨を本リポで運用したら何が起きるか」を確認させる。初稿の机上判断だけだと、自リポの merge strategy（squash か否か）と矛盾する構造問題を見逃す。
-
-**Context**: PR #420 で ACE-034 Action 5「マージ時の扱い」初稿に「(a) PR に同梱したまま残す」を推奨に設定。advisor がこれを「squash merge 標準のリポでは ACE-021 と同型の構造問題（次 feature branch がルート直下で衝突）を起こす」と指摘し、「(b) マージ前削除 + PR description 統合」に pivot。advisor を呼ばずにマージしていたら、自分の PR でドッグフードした implementation-notes.md が develop ルートに残り、次 PR が確実に衝突した。机上では見落とす運用問題が「ドッグフード + advisor」の組み合わせで検出された具体例。
-
-**Action**:
-
-1. **Playbook 新規エントリの Action / 推奨パターンには「自リポでの運用シミュレーション」段落を必ず通す**: 特に squash merge / rebase merge / merge commit の選択がエントリの推奨と矛盾しないか確認
-2. **PR 自身でドッグフード可能なパターンは必ずドッグフードする**: implementation-notes.md / 命名規則 / コミットメッセージ規則など、PR 内で実行できるものは PR 内で 1 回回す
-3. **advisor / second opinion を「初稿完成 → quality:local 通過 → commit 前」のタイミングで必ず呼ぶ**: post-commit に呼ぶと修正コストが上がる
-4. **構造問題が見つかったら pivot 経緯を implementation-notes.md に記録**: pivot 自体が ACE Phase 1 の raw material になる（ACE-034 と組み合わせる）
-
----
-
-<a id="ace-036"></a>
-
-### ACE-036: 外部知見（SNS / ブログ / 社内 wiki）を Playbook に取り込む前に既存 ACE エントリ全件と grep 照合する
-
-| フィールド | 値                   |
-| ---------- | -------------------- |
-| Category   | knowledge-management |
-| Origin     | PR #420              |
-| Related    | ACE-018 / ACE-023    |
-| Date       | 2026-05-19           |
-| Helpful    | 0                    |
-| Harmful    | 0                    |
-| Status     | active               |
-
-**Insight**: 外部の SNS / ブログ / 公式ドキュメント等で見つけた「実装パターン」を Playbook に取り込む前に、既存 ACE エントリのタイトル + Insight 行を全件 grep 照合する。これがないと (a) 既存知見の細分化（同じ insight を別エントリで再記述）、(b) 矛盾する推奨の併存、(c) Related フィールドへの相互リンク漏れ が起きる。
-
-**Context**: PR #420 で Anthropic エンジニアが SNS で公開した implementation-notes.md 並走パターンを取り込む際、ACE-001〜033 を `grep -niE "implementation|notes|decision|tradeoff"` で照合し未抽出と確認。さらに「気付いた瞬間に書く」観点で ACE-032（撤去後の論理連鎖切れ）と類似性があり、Related フィールドに ACE-032 を追加。grep 照合せずに新規追加だけしていたら、ACE-009（Issue spec 曖昧さ）や ACE-023（事実主張は 1 次情報照合）との関連付けも漏れた可能性がある。ACE-018 が「自リポ内の横断的番号変更時の事前 grep」を扱うのに対し、本 Insight は「外部知見取り込み時の事前 grep」を扱う相補的知見。
-
-**Action**:
-
-1. **取り込み前に grep キーワードを決めて全件照合**: 外部パターンの中心概念を 3〜5 個のキーワードに分解 → `grep -niE "kw1|kw2|kw3" docs-template/08-knowledge/PLAYBOOK.md`
-2. **照合結果は「重複 / 類似 / 関連 / 新規」の 4 段階で分類**: 「類似」「関連」は Related フィールドへの相互リンクで処理、「重複」は Helpful +1、「新規」のみ新エントリ作成
-3. **Issue 起票時点で grep 照合結果を本文に書く**: 「既存 ACE-XXX と類似だが観点が違う」など根拠を明示 → レビュアーが「これは別エントリで正しいか」を判断できる
-4. **Related フィールドへの相互リンクは執筆過程で発見した類似性も含める**: ACE-034 で執筆中に気付いた ACE-032 との類似は当初の Issue 本文には無く、執筆中に発覚 → Related に追加した実例
-
----
-
-<a id="ace-037"></a>
-
-### ACE-037: ACE エントリの新規追加は対応する運用手順（workflow / self-review / ace-cycle）への組み込みを同 PR で済ませる
-
-| フィールド | 値                          |
-| ---------- | --------------------------- |
-| Category   | knowledge-management        |
-| Origin     | PR #420                     |
-| Related    | ACE-014 / ACE-031 / ACE-034 |
-| Date       | 2026-05-19                  |
-| Helpful    | 0                           |
-| Harmful    | 0                           |
-| Status     | active                      |
-
-**Insight**: ACE Playbook に新規エントリを追加する PR では、対応する運用手順（`git-workflow.md` / `self-review.md` / `ace-cycle.md` / `workflow-principles.md` 等）への組み込みも同 PR で済ませる。Playbook に書いてあるだけで運用フックに組み込まれない ACE は「死蔵知見」になり、Helpful カウンターが永久にゼロのまま蓄積する。
-
-**Context**: PR #420 で ACE-034 を追加する際、当初は「Playbook 追加のみ」のスコープも検討したが、概念知見と運用手順はセットで効くため 1 PR で `docs-template/05-operations/deployment/git-workflow.md`（ステップ3 Implement）/ `docs/AI_GIT_WORKFLOW.md`（同）/ `ace-cycle.md`（Phase 1 対象データ）の 3 ドキュメントに組み込んだ。Copilot レビューで Action 4 が指す raw material 取得経路の整合性が指摘されたが、これは「組み込みが片手落ち（ace-cycle.md に PR description が無かった）」ためで、本 Insight の重要性を裏付ける具体例になった。組み込みを全て同 PR で済ませると Copilot のような cross-model reviewer が「整合性チェック」を一気に通せる。
-
-**Action**:
-
-1. **新規 ACE 起票時に「組み込み先候補」を Issue 本文にリストする**: `git-workflow.md` / `self-review.md` / `ace-cycle.md` / `workflow-principles.md` / `PATTERNS.md` / `TESTING.md` のどれに組み込むか or 組み込み不要か を着手前に判定
-2. **「組み込み不要」と判断した場合はその理由を Issue に明記**: 後から見た人が「なぜ Playbook だけに残されたのか」を理解できる
-3. **組み込みが多数のドキュメントにまたがる場合は ACE-014 の SSOT 原則を遵守**: 1 箇所に詳細、他は誘導リンクのみ
-4. **PR レビューで「運用手順との整合性」指摘が出たら本 Insight の発動サイン**: 「組み込み忘れ」ではなく「組み込み計画段階の漏れ」として再発防止を考える（実装後の追記ではなく Issue 段階で判定する）
-
----
-
-<a id="ace-038"></a>
-
-### ACE-038: 「データ収集待ち」を要求する受入基準でも、ロールバック容易な変更は先行実装 + 試行中ステータス明記でフィードバックループを早める
-
-| フィールド | 値                |
-| ---------- | ----------------- |
-| Category   | process           |
-| Origin     | PR #423           |
-| Related    | ACE-034 / ACE-035 |
-| Date       | 2026-05-20        |
-| Helpful    | 0                 |
-| Harmful    | 0                 |
-| Status     | active            |
-
-**Insight**: 受入基準が「N サンプル運用後に判断」を要求する Issue では、(a) 変更が 1〜3 行で revert 容易 / (b) 待たずに動かす方が学習機会が増える、を満たす場合に「先行実装 + 試行中ステータス明示 + ロールバック条件明記」のパターンで前進できる。データを溜める時間も「観点なしで運用したら何が拾えないか」を観察できる時間として活用すべきで、観点ありで運用しながら評価する方が情報密度が高い。
-
-**Context**: Issue #421 の受入基準は「ACE-034 を 5 PR 以上で運用してから判断」だったが、観点追加は 1 行 diff で revert コスト極小、かつ「観点なしで運用すると implementation-notes 由来の raw material が構造的に拾われない」リスクの方が大きいと判断。PR #423 で先に観点 7 を追加 + L57 / Changelog に「試行中: 5 PR で評価」を明記して、ロールバック条件を本文に残した状態でマージ。「待つ間に何が拾えなかったか」のデータも、観点 7 ありで運用しないと取れない構造になっていた。
-
-**Action**:
-
-1. **「データ収集待ち」受入基準を見たら 3 軸で判定する**: (a) 変更の revert コスト（行数・依存）、(b) 「待つ間に何ができないか」のコスト、(c) 試行中ステータスを文書化できるか
-2. **revert コスト極小（1〜3 行）+ 試行中明示できる場合は先行実装**: ただし「試行中」「N PR で評価」「ロールバック条件」を**テンプレ本文に書く**（PR description だけだとマージ後にアクセスしづらい）
-3. **試行中ステータスは目立つ場所に書く**: 観点 / ルールの末尾括弧（例: `（試行中: [Issue #XXX](...)、5 PR で評価）`）、または独立した「## 試行中」セクション
-4. **評価期間後のロールバック判定 Issue を着手時に起票**: 「5 PR 後に評価」follow-up Issue を最初に作っておくと、評価忘れによる定着リスクが下がる（PR #423 では follow-up #424 #425 を同時起票）
-
----
-
-<a id="ace-039"></a>
-
-### ACE-039: AI プロンプトテンプレに「分析観点リスト」と「分類カテゴリリスト」が並存する場合、新観点追加時はカテゴリ対応を観点側に明記する
-
-| フィールド | 値                |
-| ---------- | ----------------- |
-| Category   | tooling           |
-| Origin     | PR #423           |
-| Related    | ACE-014 / ACE-024 |
-| Date       | 2026-05-20        |
-| Helpful    | 0                 |
-| Harmful    | 0                 |
-| Status     | active            |
-
-**Insight**: AI プロンプトテンプレで「観点 N 項目 / カテゴリ M 種類」のように 2 つの列挙が並存する場合、新観点を追加するときに対応カテゴリを明記しないと AI が分類に迷う。観点リスト側に「カテゴリは X または Y を推奨」を 1 句書くだけで AI 出力の一貫性が大きく上がる。Gemini Code Assist のような副レビュアーが detect しやすい欠陥でもある。
-
-**Context**: PR #423 で ACE Phase 1 Generate プロンプトに観点 7「判断ログ」を追加したが、L62 のカテゴリリスト（coding/architecture/testing/security/performance/devops/process/tooling）には観点 7 に対応する明示語がなく、Gemini Code Assist が medium priority で「観点 7 をどのカテゴリに分類すべきか不明確 → 推奨カテゴリを観点側に追記せよ」と指摘。fix commit で観点 7 に「カテゴリは `process` または `architecture` を推奨」を追記して解消。
-
-**Action**:
-
-1. **観点リストとカテゴリリストが並存するプロンプトで新観点を追加するときは、観点側に推奨カテゴリを明記する**: 「**観点名**: 説明（カテゴリは X または Y を推奨）」の形式で 1 句
-2. **カテゴリリスト自体を観点と 1:1 にできる場合は構造化を優先**: 観点 N 項目とカテゴリ M 種類が異なる軸を持つ場合のみ (1) のパターンを使う
-3. **副レビュアー（Gemini Code Assist 等の auto-bot）の medium priority 指摘は無視しない**: Toolkit 一次レビューで見逃すパターンを independent detect する役割を持つ。Critical でなくても「カテゴリ整合」「対応欠落」系の medium は対応すべき
-
----
-
-<a id="ace-040"></a>
-
-### ACE-040: AI プロンプトテンプレ内で同概念を複数の語で表現すると AI 出力品質が下がる — 一次定義（SSOT）の語彙に統一する
-
-| フィールド | 値                |
-| ---------- | ----------------- |
-| Category   | process           |
-| Origin     | PR #423           |
-| Related    | ACE-014 / ACE-024 |
-| Date       | 2026-05-20        |
-| Helpful    | 0                 |
-| Harmful    | 0                 |
-| Status     | active            |
-
-**Insight**: AI プロンプトテンプレや知見エントリで同概念を 2〜3 の異なる語（例: 「spec 乖離」「spec から逸脱」「spec から変更した点」）で表現すると、AI が「これらは別概念か？」と誤解する余地が生まれ、冗長な分類や category mismatch を引き起こす。**一次定義（最初に登場する場所）を SSOT として扱い、他は同じ語彙を使う**。ACE-024（SSOT 用語の既存定義との衝突確認）の dual: 一度確立した用語が**自リポ内で**徐々に変質するパターン。
-
-**Context**: PR #423 のレビューで comment-analyzer S3 が指摘。元々 PLAYBOOK ACE-034 エントリは「spec から変更した点」「spec にない判断」を正準形として使っていたが、観点 7 ドラフトでは「逸脱」、L35 対象データ表セルでは「乖離」と表記揺れが発生していた。3 箇所で異なる語を使うと AI prompt として渡された時に AI が冗長分類するリスクあり。fix commit で全箇所を ACE-034 の正準語「spec にない判断 / spec から変更した点 / 捨てた選択肢」に統一。
-
-**Action**:
-
-1. **AI プロンプトテンプレ / 知見エントリで複数箇所が同概念に言及する場合、一次定義（SSOT）を grep で特定し、他箇所は同じ語彙を使う**: `grep -rn "<概念名>" docs-template/` で散らばりを確認
-2. **新エントリ・新観点を起草するときは既存 SSOT 用語を最初に確認**: 既存 PLAYBOOK エントリの Insight 文 / Action ステップで使われている語彙をピックアップして草稿の語彙を合わせる
-3. **レビュー段階で表記揺れが検出されたら、変更箇所だけでなくファイル全体を grep で確認して同 commit で統一する**: 部分修正だとレビュー後に新たな揺れが入る
-
----
-
-<a id="ace-041"></a>
-
-### ACE-041: マージ後 cleanup の未追跡ファイルガードに引っかかったら、独立した chore PR で .gitignore 追加して cleanup を継続する
-
-| フィールド | 値                |
-| ---------- | ----------------- |
-| Category   | process           |
-| Origin     | PR #423           |
-| Related    | ACE-009 / ACE-012 |
-| Date       | 2026-05-20        |
-| Helpful    | 0                 |
-| Harmful    | 0                 |
-| Status     | active            |
-
-**Insight**: マージ後 cleanup の `git status --porcelain` ガードでツール設定ファイル（`.codex/`、`.vscode/local.json` 等）に止まった場合、その場で削除や restore せず、独立した chore PR で `.gitignore` 追加するパターンが安全。CLAUDE.md「勝手に git restore / git clean しない」原則を守りつつ cleanup を継続できる。短命の chore PR は Draft + 並列セルフレビューをスキップ可能な「真に trivial な変更」の典型例。
-
-**Context**: PR #423 マージ後の `/merge-cleanup 423` で `.codex/config.toml`（Codex CLI ローカル MCP 設定、`.claude/settings.local.json` と同型）が未追跡で検出され Step 1 ガードに引っかかった。中身を確認しユーザーに 3 択提示 → `.gitignore` 追加を選択 → chore branch `chore/#426-gitignore-codex` 作成 → 3 行追加 commit → 非 Draft PR #427 で直接 ready + merge → PR #423 + #427 の 2 本まとめて cleanup 完遂。
-
-**Action**:
-
-1. **cleanup ガードで未追跡ファイルに止まったら、中身を確認して 3 分類する**: (a) 作業中の commit し損ね → 元ブランチに戻して commit、(b) ツール / 個人設定 → chore PR + .gitignore、(c) ビルド成果物 → .gitignore
-2. **ツール設定の chore PR は短命で済ませる**: 1 ファイル 1〜3 行の .gitignore 追加なら Toolkit/Copilot 並列レビューはスキップ可能（PR description に "trivial な .gitignore" と理由を明記）
-3. **cleanup 中の chore PR は元 PR と同じ run で merge + cleanup する**: PR 番号を 2 つ持つ cleanup（`gh pr view A` + `gh pr view B` を順番に処理）で 1 cycle 完結
-4. **`.gitignore` への追加は既存セクションの末尾**: `# <Tool name>` 見出し + パターン 1 行で、既存パターン（`.claude/settings.local.json` 等）と同じスタイルに合わせる
+マージ後の振る舞いを伴うような新しい process パターンは、机上の判断だけだと自リポの merge 戦略（squash 等）と矛盾する構造問題を見落とす（PR #420 では「作業ノートを PR に同梱して残す」推奨が squash merge の運用では次のブランチで衝突することを、advisor が指摘した）。Playbook に process パターンを追加する PR に当てはまる。PR 自身でそのパターンを 1 回実行（ドッグフード）し、初稿が品質ゲートを通った後・commit 前に、advisor / second opinion へ「この推奨を本リポで運用したら何が起きるか」を確認させる。
 
 ---
 
@@ -1258,54 +389,13 @@ Toolkit comment-analyzer が Critical C1/C2 として独立検出、Copilot revi
 
 ### ACE-042: テンプレファイル内の同一概念 placeholder は同一シンボル + 大文字で統一する — `XXX`/`NNN`/`xxx` 混在は AI/人のコピペ後置換漏れによる silent rot を誘発する
 
-| フィールド | 値                          |
-| ---------- | --------------------------- |
-| Category   | documentation               |
-| Origin     | PR #428 / Issue #425        |
-| Related    | ACE-014 / ACE-024 / ACE-040 |
-| Date       | 2026-05-20                  |
-| Helpful    | 1                           |
-| Harmful    | 0                           |
-| Status     | active                      |
+| Category | documentation | Origin | PR #428 / Issue #425 |
+| Related | ACE-014 / ACE-024 / ACE-040 |
+| Date | 2026-05-20 |
+| Helpful | 1 | Harmful | 0 |
+| Status | active |
 
-**Insight**: テンプレファイル内で同一概念の placeholder を `XXX`（heading 大文字）/ `xxx`（anchor 小文字）/ `NNN`（guideline 別シンボル）と書き分けると、AI / 人がコピペ後に片方の置換だけ忘れて anchor が壊れる silent rot を誘発する。anchor は ID 文字列の見た目が本物と区別しにくく、`ace-xxx` のまま残っても見落とされやすい。同一概念は **1 文書内で 1 シンボル + 大文字（`XXX` / `NNN` 等「明らかに置換しろ」と読める形）に統一** する。
-
-**Context**: PR #428（Issue #425 anchor 化）で PLAYBOOK.md エントリテンプレに `<a id="ace-xxx"></a>`（lowercase）+ heading `### ACE-XXX:`（uppercase）+ guideline `<a id="ace-NNN"></a>`（uppercase N）の 3 種類の placeholder symbol を混在させた。Copilot review が「コピペ時に `ace-xxx` のまま残り `#ace-001` 等の参照と不一致になる silent rot リスク」を検出。post-merge で Gemini code-assist も別観点（「`NNN` の主語が不明確で `ace-001` 全体を指すかのように読める」）から独立に同じ placeholder 曖昧さを指摘。複数 AI が異なる切り口から同種の構造問題を検出した（[ACE-001](#ace-001) 系の補強）。
-
-**Action**:
-
-1. **同一概念は 1 文書内で同じシンボルに統一**: 「3 桁置換ターゲット」を `XXX` か `NNN` か 1 つに揃える。3 種類混ぜない
-2. **シンボルは大文字 + 連続 (`XXX` / `NNN` / `YYY`)**: 小文字 `xxx` は実在の anchor `ace-xxx` と見た目が区別できず誤コピペを誘発する。大文字連続は「明らかに置換せよ」のシグナルとして強い
-3. **置換ルールを placeholder の直近に明記**: 「`XXX` は 3 桁数字に置換」と動詞形で書く。「`XXX` は 3 桁ゼロパディング」だけだと、`XXX` が完全形 `ace-001` を指すかと曲解される（Gemini が独立指摘した構造）
-4. **複数文書に同じ placeholder 規則を書くなら 1 箇所を SSOT 化、他はポインタ**: 重複させると 1 箇所だけ更新する drift 事故が起きる（[ACE-014](#ace-014) の系。PR #428 では 4 文書重複を Toolkit comment-analyzer が検出）
-
----
-
-<a id="ace-043"></a>
-
-### ACE-043: 品質ゲート script の chain と文書の「統括内容」記述は drift する — 自然文サマリではなく実体 script 名で列挙する
-
-| フィールド | 値                          |
-| ---------- | --------------------------- |
-| Category   | documentation-quality       |
-| Origin     | PR #429 / Issue #417        |
-| Related    | ACE-023 / ACE-025 / ACE-018 |
-| Date       | 2026-05-20                  |
-| Helpful    | 0                           |
-| Harmful    | 0                           |
-| Status     | active                      |
-
-**Insight**: 品質ゲート script（`quality:local` のような複数 npm script を `&&` で連結したもの）の中身を文書で「validate / lint / prettier を統括」のような **自然文サマリ** で要約すると、`package.json:scripts.*` の実体が変わったときに文書側が drift する。drift は同じ周辺を編集する別 PR の review (Toolkit / Copilot 等) が偶発的に検出するパターンが多く、検出までのラグが長い (PR #414 → PR #416 review → Issue #417 → PR #429 で 1 ヶ月以上)。自然文サマリの代わりに **実体 script 名を順序通り列挙する** 形式で書けば、`package.json` を変更する PR で grep にヒットし、同 PR 内で文書側も同期できる。
-
-**Context**: PR #414 で `quality:local` に `format:md:check` を追加した際、`docs/FRONTMATTER_GUIDE.md §2` 表の「`quality:local`: 上記の validate / lint / prettier を統括」記述は更新されなかった。さらに後の PR で `build:spec-index` が定義 (`package.json:14`) されたが `quality:local` chain には組み込まれず、`docs/FRONTMATTER_GUIDE.md §2` 表が「`build:spec-index` も統括しているかのように読める」記述のまま放置された。PR #416 で Toolkit code-reviewer が **pre-existing 誤記** として検出 → Issue #417 起票 → PR #429 で `package.json` に `build:spec-index` を追加するとともに `FRONTMATTER_GUIDE.md §2` と `NO_GITHUB_ACTIONS_MIGRATION_DESIGN.md §3.2-3.3` の bash ブロック / 表 / 「中身の順序」記述を実体と整合。修正中、Toolkit comment-analyzer がさらに §3.2 line 89 の「`format:md` は存在しません」（実態は存在する）と §3.3 line 94 の「中身の順序」での `format:md:check` 欠落を追加検出し、同 PR の fix commit で潰した。
-
-**Action**:
-
-1. **品質ゲート script を変更する PR では `package.json:scripts.*` と文書の chain 記述を双方向 grep**: `grep -rn 'quality:local' docs/` で言及箇所を全列挙し、自然文サマリではなく実体 script 名を列挙形式で書き直す
-2. **「統括」「相当」「同等」のような曖昧語を避ける**: 「上記の validate / lint / prettier を統括」より「`build:mcp → check → mcp test → test:ace-scripts → validate -- docs-template → build:spec-index → format:md:check → lint:md` を順に実行」のような **実体列挙** が drift しにくい
-3. **スクリプト挙動の説明では慣用語 (no-op / safe / handles gracefully) を避ける**: 「不在で no-op」のような表現は読み手の前提次第で「何もしない」「失敗しない」「副作用なし」の解釈が分かれる。`scripts/build-spec-index.mjs` の不在時挙動は厳密には「specs=0 で `dist/spec-index.json` を空索引として書き出し exit 0」であり、出力先・出力内容・exit code・副作用を字面で書く方が retrievable で誤読されにくい（ACE-025 を補強）
-4. **「pre-existing な誤記」を起票するときは検出元 PR と原典 PR を明示**: Issue #417 のように「PR #416 review で発見、PR #414 起源」と書けば、修正 PR (#429) でも history を辿りやすい
-5. **drift 修正 PR では同セクション内の隣接記述も再走査**: 触ったセクション (= heading 配下) の他の事実主張も Toolkit / Copilot に再読させる（[ACE-044](#ace-044) と組み合わせる）
+テンプレート内の同一概念の placeholder を `XXX` / `xxx` / `NNN` のように書き分けると、コピー後に片方だけ置換し忘れ、`ace-xxx` のように本物と見分けにくい壊れた anchor が残る。同一概念は 1 文書内で 1 つのシンボルにそろえ、「明らかに置換せよ」と読める大文字の連続（`XXX` 等）にする。置換ルールは placeholder の直近に動詞形で書き（「`XXX` は 3 桁数字に置換」）、複数文書に同じ規則を書くなら 1 箇所を正本にして他はポインタにする。
 
 ---
 
@@ -1313,33 +403,13 @@ Toolkit comment-analyzer が Critical C1/C2 として独立検出、Copilot revi
 
 ### ACE-044: review 指摘を取り込むスコープは「編集セクション境界」で判定する — 触ったセクション内の隣接 stale は同 PR、別ファイル / 別セクションは別 issue
 
-| フィールド | 値                          |
-| ---------- | --------------------------- |
-| Category   | process                     |
-| Origin     | PR #429 / Issue #417        |
-| Related    | ACE-032 / ACE-037 / ACE-043 |
-| Date       | 2026-05-20                  |
-| Helpful    | 2                           |
-| Harmful    | 0                           |
-| Status     | active                      |
+| Category | process | Origin | PR #429 / Issue #417 |
+| Related | ACE-032 / ACE-037 / ACE-043 |
+| Date | 2026-05-20 |
+| Helpful | 2 | Harmful | 0 |
+| Status | active |
 
-**Insight**: Toolkit / Copilot review は編集差分から離れた行も検査するため、本 PR で触っていない pre-existing stale を発見することがある。これを「同 PR で潰す」か「別 issue にする」かは「touch ファイル外 vs ファイル内」だけでは粒度が粗く、**「同セクション (= heading 配下) vs 別セクション」の境界** を判定軸に加えると読み手にとって自然な PR diff になる。同セクション内の隣接 stale を放置すると、`build:spec-index` を追加した PR が「半端な最新化（隣の行は古いまま）」と読まれ、レビュー時の文脈分断を招く。
-
-**Context**: PR #429 で `docs/NO_GITHUB_ACTIONS_MIGRATION_DESIGN.md §3.2-3.3` を編集（`build:spec-index` 追加）。Toolkit comment-analyzer が以下を検出:
-
-- **W1**: 同 §3.2 内 line 89 注記「`package.json` に `format:md` は存在しません」が事実誤認（実態は `format:md` / `format:md:check` の両方が存在）。本 PR では line 89 を触っていなかったが、隣接行（line 86 表の `build:spec-index` 追加）を編集したため「半端な最新化」と読まれる risk。**同 PR で整合**。
-- **W2**: 同 §3.3 内 line 94「中身の順序」で `format:md:check` 欠落（pre-existing）。本 PR で同行に `build:spec-index` を**挿入したことで** 「この行を最新版に整えた」と読まれる risk が高まった。**同 PR で 1 トークン追加して整合**。
-- **S2/S3**: `README.md:74` / `.github/pull_request_template.md:28` の stale 記述（`quality:local` の chain 列挙）。本 PR では触っていないファイル。**別 issue 化 (#430)**。
-
-3 段階の判定基準が機能した: (1) touch ファイル外 = 別 issue、(2) touch ファイル内かつ別セクション = 状況次第（W1/W2 は同セクションだったので同 PR）、(3) touch セクション内 = 機械的に同 PR で整合。
-
-**Action**:
-
-1. **review 指摘を分類するとき 3 段階で判定**: (a) touch ファイル外 → 別 issue を即起票（CLAUDE.md「『別 Issue』と言ったら即 `gh issue create`」ルール）、(b) touch ファイル内 / 別セクション → 影響範囲と PR スコープを天秤にかける、(c) touch セクション内 → 1 fix commit に束ねて同 PR で機械的に整合
-2. **「半端な最新化」を意識的に回避する**: PR で同行や隣接行に変更を加えたら、その行が含まれる説明全体が一致しているかを再走査。`grep -n <ファイル>` で section の境界を確認してから fix commit を切る
-3. **別 issue 化したものは fix commit のコメントで明示**: PR コメントで「W1/W2 は本 PR で対応、S2/S3 は #430 で別対応」のように issue 番号を引いてレビュアーの脳内マップを補助する
-4. **pre-existing と本 PR 起因を区別する**: コミットメッセージで「W1 (comment-analyzer): pre-existing で本 PR で隣接行を編集したため整合対応」のように **来歴を残す**。これにより後続の review が「なぜこの 1 行も直したのか」を辿れる
-5. **本 PR スコープ判定で迷ったら軽量側 (= 範囲内) に倒す**: CLAUDE.md ルール「過剰な issue 分割は PR の流れを止める」と整合。ただし「触っていないファイル」だけは別 issue を例外なく適用する
+レビューが差分外の既存の古い記述を指摘したとき、同 PR で直すかどうかは「触ったファイルか」だけでは粗く、「触ったセクション（見出し配下）か」を判定軸に加えると自然な差分になる。同じセクションの隣接行を放置すると「半端な最新化」と読まれる（PR #429 では隣接行を編集した節の既存の誤記を同 PR で直し、触っていないファイルは別 Issue にした）。触ったセクション内なら同 PR で整合させ、同じファイルの別セクションは影響範囲で判断し、触っていないファイルは別 Issue にして、同 PR で直した既存の不整合はコミットに来歴を残す。
 
 ---
 
@@ -1347,26 +417,13 @@ Toolkit comment-analyzer が Critical C1/C2 として独立検出、Copilot revi
 
 ### ACE-045: 設計文書内の「mirror 付録（実体の参照用コピー）」は本体改稿で silent drift する — mirror を持つなら本体改稿で同期、または mirror を削って外部参照に置換
 
-| フィールド | 値                          |
-| ---------- | --------------------------- |
-| Category   | documentation-quality       |
-| Origin     | PR #431 / Issue #430        |
-| Related    | ACE-014 / ACE-043 / ACE-044 |
-| Date       | 2026-05-20                  |
-| Helpful    | 3                           |
-| Harmful    | 0                           |
-| Status     | active                      |
+| Category | documentation-quality | Origin | PR #431 / Issue #430 |
+| Related | ACE-014 / ACE-043 / ACE-044 |
+| Date | 2026-05-20 |
+| Helpful | 3 | Harmful | 0 |
+| Status | active |
 
-**Insight**: 設計文書（design doc / 仕様書）の付録に「実体ファイルの参照用コピー」を載せると、実体ファイルを改稿した瞬間 mirror が silent に drift する。`format:md:check` / markdownlint は内容の一致を検査しないため自動検出されず、後から読んだ人は「mirror = 実体」と誤認したまま古い snapshot を信じる。chain drift（ACE-043）/ 索引の数値重複（ACE-014）と源流を共有するが、本件は「同一文書内に実体のコピーを抱える」mirror パターン特有の落とし穴で、`grep` で気付かなければ次の chain 変更まで silent rot する。
-
-**Context**: PR #431 で `.github/pull_request_template.md` の Self-Review Results を簡略化（旧 chain 列挙 → `npm run quality:local` 1 行）した際、Toolkit code-reviewer I1 (88%) が `docs/NO_GITHUB_ACTIONS_MIGRATION_DESIGN.md` 付録 A (L211-258) を検出。付録 A 冒頭の「`.github/pull_request_template.md` には**反映済み**。以下は採用時点の**参照用コピー**。」という注記が本 PR で本体を改稿した瞬間「反映済み」が嘘になり、付録 A の参照用コピーが本体と乖離。Toolkit は同 PR 内 fix commit でテンプレ本体と付録 A を同時更新するよう推奨し、mirror を持つ場合の同期責任を明示した。同型の bug は ACE-014（索引文書の数値重複）/ ACE-043（chain の自然文サマリ drift）と源流を共有するが、本件は「同一文書内に実体のコピーを抱える」mirror パターンに特化。
-
-**Action**:
-
-1. **設計文書内に mirror 付録を作らない**: 外部ファイル（PR テンプレ / 設定ファイル等）の現行スナップショットが必要なら、(a) 付録ではなく `[該当ファイル](path)` への参照 URL のみ置く、(b) 「採用時点」のような時系列情報が重要なら git tag / commit SHA への永続リンクを使う
-2. **mirror を持つ判断をした場合は本体改稿 PR で同期**: ACE-044 の「touch ファイル外 = 別 issue」原則の **carve-out 例外**として、mirror であることが文書内に明示されている付録は同 PR で同期する（mirror 注記自体が「本体と整合させる」契約として機能する）
-3. **mirror 注記には「自動同期されません」を明記**: 「以下は採用時点の参照用コピーで、自動同期されません。一次情報は `path/to/source`」のように一次情報の場所を明示し、本体と mirror どちらを信じるかを読者が判断できるようにする
-4. **mirror の存在を grep で発見可能にする**: コードフェンス内の特徴的なヘッダや mirror 注記の定型句（「参照用コピー」「採用時点」「反映済み」等）で着手前に grep し、本体改稿時に未認識の mirror を見落とさない仕組みにする
+設計文書の付録に実体ファイルの参照用コピー（mirror）を載せると、実体を改稿した瞬間に黙って食い違い、format / lint は内容の一致を検査しないので「反映済み」の注記が嘘のまま残る（PR #431 で PR テンプレートを簡略化した際に検出された）。設計文書には mirror を作らず、実体への参照か commit SHA の永続リンクを置く。mirror を持つと決めたら本体を改稿する PR で同時に同期し（触っていないファイルでも同 PR で直す例外）、mirror には「自動同期されない・一次情報はどこか」を明記し、「参照用コピー」等の定型句で grep できるようにしておく。
 
 ---
 
@@ -1374,104 +431,13 @@ Toolkit comment-analyzer が Critical C1/C2 として独立検出、Copilot revi
 
 ### ACE-046: PR/Issue body 内の相対リンクは `pull/N/` または `issues/N/` 起点で展開される — リポローカルテンプレでは `blob/HEAD/` 絶対 URL を使い、配布版は plain text にする
 
-| フィールド | 値                                                                    |
-| ---------- | --------------------------------------------------------------------- |
-| Category   | documentation-quality                                                 |
-| Origin     | PR #437 / Issue #433-#436                                             |
-| Date       | 2026-05-20                                                            |
-| Helpful    | 2                                                                     |
-| Harmful    | 0                                                                     |
-| Status     | active                                                                |
-| Related    | [ACE-016](#ace-016)（anchor URL 欠落）/ [ACE-044](#ace-044) carve-out |
+| Category | documentation-quality | Origin | PR #437 / Issue #433-#436 |
+| Related | ACE-016（anchor URL 欠落）/ ACE-044 carve-out |
+| Date | 2026-05-20 |
+| Helpful | 2 | Harmful | 0 |
+| Status | active |
 
-**Insight**: GitHub の PR/Issue body はファイル単体閲覧時と **異なる base URL** でレンダリングされる。`.github/pull_request_template.md` を新規 PR で展開した場合、相対リンク `../docs/X.md` は repo ルートに届かず `repo/docs/X.md` という存在しない URL（HTTP 404）に解決される。先頭 `../` が無い `docs-template/X.md` のような形も同様に `pull/N/docs-template/X.md` 起点で展開され 404。テンプレファイル内では「ファイル単体閲覧」と「PR/Issue body 展開」で互換性のない 2 モードがあり、相対リンクは両方を満たせない。
-
-**Context**: PR #431 で Gemini Code Assist が `[docs/...](../docs/...)` を「PR body 展開時にリンク切れ」と指摘 → ACE-044 carve-out 判定で別 Issue 化 → PR #437 で実証 + 修正。HEAD リクエストで確認: `repo/docs/AI_GIT_WORKFLOW.md` は **404**、`blob/HEAD/docs/AI_GIT_WORKFLOW.md` は **200**、`pull/N/docs/AI_GIT_WORKFLOW.md` は 302 → `pull/new/...`（事実上 404）。仕様根拠は [github/markup#576](https://github.com/github/markup/issues/576)。PR #437 で `.github/pull_request_template.md` の 3 箇所（L15/L28/L54）を `blob/HEAD/` 絶対 URL 化した直後、Gemini が L39 `[Review Response Policy](docs-template/...)` の絶対 URL 化漏れを指摘 — 当方 grep が `\.\./` 前提だったため先頭 `../` の無い形を見逃した。fix commit `38f12e1` で対応。同問題はリポローカル PR テンプレ 4 箇所 + ISSUE_TEMPLATE 16 箇所 + 配布版 15 箇所の計 35 箇所に存在（子 Issue #434/#436/#435 で段階対応）。
-
-**Action**:
-
-1. **リポローカル PR/Issue テンプレ**: `https://github.com/<owner>/<repo>/blob/HEAD/<path>` 形式の絶対 URL を使う。`HEAD` は GitHub が default branch に自動解決するため `develop`/`main` ハードコードを避けられる（default branch リネーム耐性あり）。
-2. **配布版テンプレ** (`docs-template/.github/`): 採用先リポの URL が不明なので絶対 URL 不可。リンクを外し inline code (`` `docs-template/X.md` ``) に変更し、採用者向けに「リンク化する場合は自リポの `blob/HEAD/` URL に置換」と注釈を付ける。
-3. **相対リンク検出 grep の拡張**: [ACE-016](#ace-016) Action 2 の `grep -nE "\]\(\.\./[^)]+\)"` は先頭 `../` のみ catch する。テンプレファイル内では `\]\([^h)#][^)]*\.md` （http/`#` で始まらない URL 部分を持つリンク全般）まで広げる。実証: PR #437 で `../` 前提 grep を信じて 3 箇所修正 → Gemini が L39 `docs-template/...` の絶対 URL 化漏れを指摘 → 拡張 grep で hit する形。
-4. **検証手順**: (1) `gh pr view <N> --json body --jq .body` で PR body の生テキストを確認、(2) `curl -sI <絶対 URL>` で各リンクが HTTP 200 を返すか確認、(3) ファイル単体閲覧でも開けるか確認（`blob/HEAD/` なら両モード OK）。
-
----
-
-<a id="ace-441-1"></a>
-
-### ACE-441-1: ドキュメントを走査するツールの正規表現を緩めるときは実ファイルで件数検証し、パターンを「実 ID の形」に制約する
-
-| フィールド | 値                   |
-| ---------- | -------------------- |
-| Category   | testing              |
-| Origin     | PR #441 / Issue #440 |
-| Related    | ACE-042 / ACE-028    |
-| Date       | 2026-05-30           |
-| Helpful    | 0                    |
-| Harmful    | 0                    |
-| Status     | active               |
-
-**Insight**: ドキュメント（PLAYBOOK 等）を走査するスクリプトの見出し検出正規表現を緩めると、その doc 自身が含む **テンプレート/例の placeholder 見出し**（code fence 内の `### ACE-XXX:` 等）まで誤検出しうる。合成 fixture のユニットテストは green でも、実ファイルに対して走らせて初めて件数ズレが露見する。パターンは「拾いたい実体の形」（ID なら数字始まり / `i`＋数字始まり）に制約してテンプレ placeholder を構造的に除外し、緩和後は必ず**本物のファイル**に対して件数を検証する。
-
-**Context**: PR #441 で ACE エントリ ID を PR スコープ式に変える際、`check-category-size.ts` の検出正規表現を `/^### ACE-\d{3,}:/m` → `/^### ACE-[\w-]+:/m` に緩めた。ユニットテスト（合成 fixture）は通ったが、実 PLAYBOOK に `ace:check-playbook-categories` を走らせると総エントリ数が 46→47 になり `coding / architecture / testing / ...` という不自然なカテゴリが出現。原因は緩めた `[\w-]+` がエントリテンプレート（code fence 内）の `### ACE-XXX:` を実エントリとして拾ったこと。旧 `\d{3,}` は `XXX`（非数字）を弾いていたため顕在化していなかった。実装プランの正規表現案が緩すぎた欠陥を、プランの「実ファイル検証」ステップが捕捉した。
-
-**Action**:
-
-1. doc を parse するツールの正規表現を緩めたら、**合成 fixture だけでなく本物のファイルに対して走らせ、件数・カテゴリの妥当性を目視確認する**（プランに「実ファイル検証」ステップを必ず入れる）。
-2. パターンは拾いたい実体の形に制約する。ID 検出なら `/^### ACE-(?:\d[\w-]*|i\d[\w-]*):/m`（数字始まり / `i`＋数字始まり）で doc 内のテンプレ placeholder（`ACE-XXX`/`NNN`）を除外。
-3. placeholder 除外を回帰テストで固定する（`ACE-XXX` / `ACE-NNN` / `i`＋非数字 `ACE-iabc` を含めて「集計されない」ことを assert）。
-
----
-
-<a id="ace-441-2"></a>
-
-### ACE-441-2: pre-commit hook は正式品質ゲート（quality:local）の軽量サブセット — pr-ready 前に必ず full ゲートを回す
-
-| フィールド | 値                   |
-| ---------- | -------------------- |
-| Category   | process              |
-| Origin     | PR #441 / Issue #440 |
-| Related    | ACE-043              |
-| Date       | 2026-05-30           |
-| Helpful    | 0                    |
-| Harmful    | 0                    |
-| Status     | active               |
-
-**Insight**: pre-commit hook が通っても、正式品質ゲート（`npm run quality:local`）が落ちうる。hook は速度優先で軽量サブセット（このリポジトリでは markdownlint のみ）しか実行しないため、prettier `--check`・MCP build/check・各テスト・docs 検証・spec-index などの追加チェックは hook を素通りする。**commit が通った＝ゲート通過、と錯覚しない。**
-
-**Context**: PR #441 で、commit 時の pre-commit hook（markdownlint のみ）は全 commit で 0 error だったが、`quality:local` を回すと `format:md:check`（prettier `--check`）が 3 ファイルで未整形を検出して落ちた。markdownlint は通すが prettier 整形は別ルールのため、hook だけを信じて pr-ready にすると CI 相当の `quality:local` で初めて落ちる。
-
-**Action**:
-
-1. **pr-ready の前に必ず `npm run quality:local` を通しで回す**（10 ステップ workflow の Step4）。hook 通過をゲート通過と同一視しない。
-2. doc/設定変更を含む PR では特に prettier 整形漏れに注意。`npx prettier --write <変更ファイル>` を pre-ready で一度かける。
-3. hook と full ゲートの差分（何が hook に無く full にあるか）を把握しておく。
-
----
-
-<a id="ace-443-1"></a>
-
-### ACE-443-1: framework リポは自テンプレをドッグフードするため知見ベースは `docs-template/` 配下 — AI レビュアーの「docs-template→docs」パス提案は実在確認してから採否を決める
-
-| フィールド | 値                          |
-| ---------- | --------------------------- |
-| Category   | documentation-quality       |
-| Origin     | PR #443 / Issue #442        |
-| Related    | ACE-027 / ACE-031 / ACE-001 |
-| Date       | 2026-05-30                  |
-| Helpful    | 0                           |
-| Harmful    | 0                           |
-| Status     | active                      |
-
-**Insight**: 本フレームワークは自分のドキュメントテンプレート（`docs-template/`）を**自リポでもドッグフード**しているため、アクティブな ACE 知見ベース（PLAYBOOK.md 等）は `docs-template/08-knowledge/` に存在し、`docs/08-knowledge/` は**存在しない**。AI レビュアー（特に Gemini Code Assist）は「採用先プロジェクトでは `docs-template/` は削除され `docs/` がアクティブ」という一般則から、リポ自身の設定ファイル（`.cursorrules` / `AGENTS.md`）の `docs-template/...` 参照を `docs/...` に変えるよう提案するが、framework リポ自身ではこれを適用すると**リンク切れになる**。レビュー提案のパス変更は、提案先パスが実在するか（`ls`）を確認してから採否を決める。
-
-**Context**: PR #443 で `.cursorrules` / `AGENTS.md` に ACE 採番 SSOT へのポインタ（`docs-template/08-knowledge/PLAYBOOK.md#エントリid規則`）を追加したところ、Gemini が medium 2 件で「採用先で `docs-template/` 削除時にリンク切れ → `docs/08-knowledge/PLAYBOOK.md` に変更」を提案。だが本リポには `docs/08-knowledge/` が無く（実 PLAYBOOK は `docs-template/` 側）、提案適用は逆にリンク切れを生むため不採用とし、根拠を PR にコメントで残した。一方、配布対象の `SETUP_*.md`（`docs-template/` 配下）はテンプレ相対パス `./08-knowledge/...` を使っており採用先コピー後も解決するため、Gemini の懸念は配布側では既に回避済みだった。
-
-**Action**:
-
-1. AI レビュアーがパス変更（特に `docs-template/` ↔ `docs/`）を提案したら、**提案先パスの実在を `ls` で確認**してから採否を決める。framework リポ自身では `docs-template/` がアクティブ知見ベース。
-2. リポ自身の設定ファイル（root の `.cursorrules` / `AGENTS.md` / `.github/copilot-instructions.md`）は `docs-template/...` を指す。配布対象テンプレ（`docs-template/SETUP_*.md` 等）はテンプレ相対パス `./...` を使い、採用先コピー後も解決するようにする。
-3. 不採用のレビュー提案は根拠（実在確認結果）を PR コメントに残す。
+GitHub の PR / Issue 本文はファイル単体の閲覧と異なる base URL で描画されるため、テンプレート内の相対リンク（`../docs/X.md` も `docs-template/X.md` も）は本文に展開すると 404 になり、両方のモードを満たす相対リンクは無い（仕様根拠: github/markup#576）。リポジトリ内の PR / Issue テンプレートでは `blob/HEAD/` の絶対 URL を使い、採用先の URL が分からない配布版はリンクを外して inline code にし、置換の注釈を添える。相対リンクの検出は `../` 始まりだけでなく `http` / `#` で始まらないリンク全般に広げ、`gh pr view --json body` と `curl -sI` で実際に解決するかを確かめる。
 
 ---
 
@@ -1479,51 +445,13 @@ Toolkit comment-analyzer が Critical C1/C2 として独立検出、Copilot revi
 
 ### ACE-445-1: Claude 系レビュアーが「既存と整合的だから OK」と全員一致した箇所こそ cross-model レビューの出番 — 同系列の合意は正しさの証明ではない
 
-| フィールド | 値                   |
-| ---------- | -------------------- |
-| Category   | process              |
-| Origin     | PR #445 / Issue #444 |
-| Related    | ACE-001              |
-| Date       | 2026-06-19           |
-| Helpful    | 5                    |
-| Harmful    | 0                    |
-| Status     | active               |
+| Category | process | Origin | PR #445 / Issue #444 |
+| Related | ACE-001 |
+| Date | 2026-06-19 |
+| Helpful | 5 | Harmful | 0 |
+| Status | active |
 
-**Insight**: 同系列（Claude）の複数レビュアーが borderline な silent-failure を「既存コードとの整合性」を理由に全員一致で承認しても、それは安全の証拠にならない。むしろ「既存と整合的だから OK」という同系列の合意は、cross-model（別系列）レビューが最も価値を出すシグナルである。整合性（consistency）は正しさ（correctness）の証明ではない。
-
-**Context**: PR #445 で env 変数の閾値を `Number.parseInt` で解釈する `parseMaxPlaybookLines` を、既存 `parseMaxPerCategory` を mirror して実装した。subagent-driven の Task レビュー（sonnet）2 回 + 最終 whole-branch レビュー（opus、本セッション最高能力モデル）すべてが APPROVED。opus は `Number.isFinite` の冗長さを「sibling parser との意図的 mirror で、乖離させる方が悪い」と明示的に**修正に反対**した。しかし Codex（gpt-5.4）の silent-failure-hunter と code-reviewer が独立に「`"800abc"`→800、`"1e3"`→1 を無警告で受理する入力検証ギャップ」を Important として検出。共有ヘルパー `parsePositiveIntEnv`（`/^[0-9]+$/` で厳密化）に抽出して両パーサを同時に堅牢化し、乖離ではなく収束で解消した（[ACE-001](#ace-001) を一段具体化した事例）。
-
-**Action**:
-
-1. Claude 系セルフレビュー（`pr-review-toolkit` / subagent-driven の task・final レビュー）が全員 APPROVED でも、**cross-model レビュー（Codex `scripts/codex-review.sh --base develop`）を省略しない**。特に「既存と整合的だから」という理由で borderline を承認した箇所は cross-model に回す価値が高い。
-2. 既存 helper を mirror するときは、**mirror 元の欠陥（loose な `parseInt` 等）を継承していないか**疑う。修正は片方だけ直して乖離させるより、共有ヘルパーに抽出して両方同時に堅牢化する。
-3. 入力検証は「mirror 元と同じ」ではなく、字面で正しさを担保する（例: `/^[0-9]+$/` で厳密な正の整数のみ受理）。
-
----
-
-<a id="ace-447-1"></a>
-
-### ACE-447-1: 別ドキュメントへの anchor 付きリンクは実見出しの slug と一致させる — label↔URL ミラー（ACE-016）だけでは壊れたアンカーを作りうる
-
-| フィールド | 値                    |
-| ---------- | --------------------- |
-| Category   | documentation-quality |
-| Origin     | PR #447 / Issue #446  |
-| Related    | ACE-016               |
-| Date       | 2026-06-23            |
-| Helpful    | 0                     |
-| Harmful    | 0                     |
-| Status     | active                |
-
-**Insight**: ACE-016（anchor は label と URL の両方に書く）を満たしても、フラグメントが参照先ドキュメントの**実見出しの GitHub slug と一致していなければリンクは解決しない**。番号付き見出し `## 3. エラーハンドリング` の slug は `#3-エラーハンドリング` で、`#エラーハンドリング` は 404 になる。label↔URL ミラーリングは「壊れたアンカーを両方に等しく書く」ことすら起こす。ACE-016 は presence（両方に書く）、本エントリは validity（実 slug と一致）。
-
-**Context**: PR #447 で Issue テンプレの参照リンクを ACE-016 準拠（URL 側にもフラグメント付与）に整えた際、bug.md の `PATTERNS.md#エラーハンドリング` が実見出し `## 3. エラーハンドリング`（slug `#3-エラーハンドリング`）と不一致でリンク切れになり Codex code-reviewer が検出。さらに ARCHITECTURE.md は `## 5. インフラストラクチャ` と `#### インフラ` が併存し `#インフラ` は後者に解決する曖昧ケースもあった。
-
-**Action**:
-
-1. 別ドキュメントへ anchor 付きリンクを張るときは、参照先の実見出しを開いて GitHub slug 規則（小文字化・記号除去・空白→ハイフン、`3.`→`3-`）で slug を確定してから書く。
-2. slug が番号付き・全角括弧などで脆い、または同名見出しが複数あって曖昧なときは、フラグメントを label と URL の両方から除去してファイルトップへのリンクにする（曖昧さ回避を優先）。
-3. ACE-016（presence）と本エントリ（validity）の両方を満たして初めて anchor リンクは健全。
+同系列（Claude）の複数レビュアーが「既存コードと整合的」を理由に全員承認しても安全の証拠にはならず、それはむしろ別系列のクロスモデルレビューが最も価値を出すシグナルである（PR #445 では既存パーサを写した入力検証の穴を、Claude 系は全員承認し、Codex だけが検出した）。Claude 系のセルフレビューが全員承認でも、クロスモデルレビューを省略しない。既存 helper を写すときは写し元の欠陥まで継承していないかを疑い、片方だけ直して乖離させずに共有 helper へ抽出して両方を同時に直し、入力検証は字面で正しさを担保する（例: `/^[0-9]+$/`）。
 
 ---
 
@@ -1531,25 +459,13 @@ Toolkit comment-analyzer が Critical C1/C2 として独立検出、Copilot revi
 
 ### ACE-447-2: 配布物（docs-template/）内のリンクは配布ツリー外を指さない — ドッグフード絶対URLの相対化で `../../../` がツリーを脱出する
 
-| フィールド | 値                    |
-| ---------- | --------------------- |
-| Category   | documentation-quality |
-| Origin     | PR #447 / Issue #446  |
-| Related    | ACE-046, ACE-443-1    |
-| Date       | 2026-06-23            |
-| Helpful    | 1                     |
-| Harmful    | 0                     |
-| Status     | active                |
+| Category | documentation-quality | Origin | PR #447 / Issue #446 |
+| Related | ACE-046, ACE-443-1 |
+| Date | 2026-06-23 |
+| Helpful | 1 | Harmful | 0 |
+| Status | active |
 
-**Insight**: 配布テンプレ（`docs-template/`、利用者がコピーする）内のリンクが配布ツリー外（リポジトリ直下 `docs/` 等）を指すと、コピーした下流プロジェクトでリンク切れになり「自己完結した配布物」でなくなる。ドッグフード側の絶対 URL（`blob/HEAD/...`）を配布側の相対パスへ機械変換するとき、ツリー外参照は `../../../docs/...` となって配布ツリーを脱出する。「URL 形式の差分のみ」の同期に見えて、実は到達範囲の差（絶対は常に解決、相対はツリー境界に縛られる）になっている。
-
-**Context**: PR #447 で Issue テンプレを2セット（`.github/`=ドッグフード絶対URL / `docs-template/.github/`=配布相対パス）で同期した際、撤退コスト試算の `[docs/DESIGN_PRINCIPLES.md]` 参照を配布側で `../../../docs/DESIGN_PRINCIPLES.md` に相対化してしまい、Codex code-reviewer が「配布物が自己完結しない」と検出。配布側はプレーンテキスト化（外部参照を落とす）、ドッグフード側は絶対 URL を維持して解消。
-
-**Action**:
-
-1. 配布物を編集したら `grep -rn '\.\./\.\./\.\./' docs-template/` 等でツリー脱出リンクを検出する。
-2. 配布ツリー外への参照は、配布側ではプレーンテキスト化するか配布ツリー内の等価ドキュメントへ張り替える。ドッグフード側のみ絶対 URL（`blob/HEAD/`、[ACE-046](#ace-046)）を保持。
-3. ドッグフード→配布の同期は「URL 形式の差分のみ」を原則としつつ、その差が到達範囲の差でもある点を常に確認する。
+配布テンプレート（`docs-template/`）内のリンクが配布ツリーの外を指すと、コピーした下流でリンク切れになり、配布物が自己完結しない。ドッグフード側の絶対 URL を配布側の相対パスへ機械変換するとき、ツリー外への参照は `../../../docs/...` となって境界を脱出するので、「URL 形式だけの差分」に見えて実は到達範囲の差になっている（PR #447 の Issue テンプレート同期で発生した）。配布物を編集したら `grep -rn '\.\./\.\./\.\./' docs-template/` 等でツリーの脱出を検出し、ツリー外への参照は配布側ではプレーンテキストにするか、ツリー内の等価な文書へ張り替える。
 
 ---
 
@@ -1557,50 +473,13 @@ Toolkit comment-analyzer が Critical C1/C2 として独立検出、Copilot revi
 
 ### ACE-447-3: 大規模 doc PR の cross-model レビューは clean verdict に収束しない — ゲートは「Critical 不在＋実 Important 全対応」、green を待ってループしない
 
-| フィールド | 値                   |
-| ---------- | -------------------- |
-| Category   | process              |
-| Origin     | PR #447 / Issue #446 |
-| Related    | ACE-445-1, ACE-001   |
-| Date       | 2026-06-23           |
-| Helpful    | 1                    |
-| Harmful    | 0                    |
-| Status     | active               |
+| Category | process | Origin | PR #447 / Issue #446 |
+| Related | ACE-445-1, ACE-001 |
+| Date | 2026-06-23 |
+| Helpful | 1 | Harmful | 0 |
+| Status | active |
 
-**Insight**: 多数ファイルのドキュメント PR では、LLM cross-model レビュー（Codex 等）は毎ラウンド新しい言い回し・整合性 nit を出し、REJECTED 判定が green に収束しにくい。マージ可否のゲートは「verdict が PASS になること」ではなく「**Critical がゼロ＋検出された実 Important を全対応したこと**」に置く。clean verdict を待って無限ループしない。ただし cross-model 自体は省略しない（[ACE-445-1](#ace-445-1)）。
-
-**Context**: PR #447（Issue テンプレ刷新、15+ ファイルの Markdown）で Codex を3ラウンド実行し、いずれも REJECTED（Critical=0、毎回 doc 整合の Important を2〜4件検出）。各ラウンドで実指摘を fix commit に束ねて対応し、silent-failure/type/test は2ラウンド目以降安定 PASS、code-reviewer/comment-analyzer は新しい nit を出し続けた。ユーザーの「Critical 指摘がなければマージを止めない」ポリシーに従い、実 Important 全対応・Critical 不在を確認して merge した。
-
-**Action**:
-
-1. cross-model レビューは必ず回す（[ACE-445-1](#ace-445-1)）が、ループ終了条件は「Critical=0 かつ実 Important 全対応」。green verdict は終了条件にしない。
-2. 各ラウンドの指摘は「実バグ/不整合」と「誤検知/好みの言い回し」を切り分け、前者のみ fix。誤検知は根拠付きで却下し記録する（例: `#インフラ` は実在見出しに解決＝誤検知）。
-3. 収束しない兆候（毎回 Critical=0 で新規 nit のみ）が出たら、ループを打ち切りマージ判断をユーザーに提示する。
-
----
-
-<a id="ace-449-1"></a>
-
-### ACE-449-1: `set -e` 下の bash 関数は末尾を `[[ cond ]] && cmd` で終わらせない — cond 偽で関数が非ゼロを返し呼び出し元の errexit がスクリプトを無出力で殺す
-
-| フィールド | 値                   |
-| ---------- | -------------------- |
-| Category   | tooling              |
-| Origin     | PR #449 / Issue #448 |
-| Date       | 2026-07-02           |
-| Helpful    | 0                    |
-| Harmful    | 0                    |
-| Status     | active               |
-
-**Insight**: `set -euo pipefail` の下では、`[[ cond ]] && cmd` の失敗は「&&リストの途中」なら errexit を発火しないが、それが**関数の最終文**だと関数の戻り値が非ゼロになり、関数呼び出し（単純コマンド）として errexit が発火してスクリプト全体がバナーすら出さずに死ぬ。「デフォルト値がすでに設定済み」という正常系ほど cond が偽になるため、設定が充実した環境でだけ発症する。しかも同じイディオムはコピペで水平増殖する（本件は `apply_task_defaults` と `load_config` の 2 関数に存在）。
-
-**Context**: PR #449 で `multi-agent.sh --dry-run` が exit 0・完全無出力なことを発見。develop 版でも再現したため自分の変更起因ではない既存バグと切り分けた。原因は `apply_task_defaults` 末尾の `[[ -z "$STRATEGY" ]] && STRATEGY=...` — config が全値を供給する（yq インストール済み + 同梱 config）環境では常に偽 → 関数が 1 を返し即死。`return 0` を追加して修正したが、Claude 系 silent-failure-hunter が同一クラスの残存を疑って走査し、`load_config` にも同パターン（`output_dir` 欠落 config で実機再現）を発見した。
-
-**Action**:
-
-1. `set -e` を使う bash スクリプトでは、関数末尾の `[[ cond ]] && cmd` に `return 0` を続けるか、`if` 文に書き換える。
-2. この種のバグを 1 箇所直したら、**同じイディオムを同ファイル・同リポで grep して水平展開を確認**する（`&& .*$` で終わる関数末尾）。
-3. ツールが「無出力で正常終了」したら、まず base ブランチで再現確認して既存バグか自変更起因かを切り分けてから直す。
+多数のファイルにまたがるドキュメント PR では、クロスモデルレビューが毎ラウンド新しい言い回しや整合性の nit を出し、clean verdict に収束しにくい（PR #447 では 3 ラウンドとも Critical 0 で、Important が 2〜4 件ずつ出た）。マージ可否のゲートは verdict の PASS ではなく、「Critical がゼロで、検出された実 Important を全対応したこと」に置く。各ラウンドで実バグ・不整合だけを直して誤検知は根拠付きで却下し、新規の nit だけが続く兆候が出たらループを打ち切ってマージ判断をユーザーに示す（クロスモデルレビュー自体は省略しない）。
 
 ---
 
@@ -1608,25 +487,13 @@ Toolkit comment-analyzer が Critical C1/C2 として独立検出、Copilot revi
 
 ### ACE-449-2: 「既定から外す」変更はデータの空化ではなく明示的なゲート条件で実装し、ドキュメントに書いたオプトイン手順はその場で回帰テストに固定する
 
-| フィールド | 値                   |
-| ---------- | -------------------- |
-| Category   | process              |
-| Origin     | PR #449 / Issue #448 |
-| Related    | ACE-445-1            |
-| Date       | 2026-07-02           |
-| Helpful    | 1                    |
-| Harmful    | 0                    |
-| Status     | active               |
+| Category | process | Origin | PR #449 / Issue #448 |
+| Related | ACE-445-1 |
+| Date | 2026-07-02 |
+| Helpful | 1 | Harmful | 0 |
+| Status | active |
 
-**Insight**: 「X を既定から外すがオプトインは残す」という要件を「X の割り当てデータを空にする」で実装すると、除外（既定で動かない）は達成できてもオプトイン経路（明示指定で動く）が一緒に死ぬ。しかも実行系は空プランを exit 0 で完走するため、ドキュメントの案内どおりに実行したユーザーは「動いた」と誤解する三重のサイレント失敗になる。除外は「明示指定がない場合のみスキップ」というゲート条件で表現し、ドキュメントに書いた具体的なコマンド例（オプトイン経路）は同 PR で回帰テストに固定する。
-
-**Context**: PR #449 で Copilot をレビュー既定から外す際、初版は `get_cli_perspectives_review` の copilot 行を空文字にした。Claude 系 code-reviewer は「問題なし」で通過したが、Codex（cross-model）と silent-failure-hunter が独立に「`--cli copilot-cli` 明示でもプランに載らず exit 0」を検出（[ACE-445-1](#ace-445-1) の再演）。perspectives を復元し「review タスクかつ `CLI_FILTER` 空のときのみ skip」のゲートに実装し直し、空実行プランは非 dry-run で exit 1 に変更、`--cli copilot-cli` オプトインを含む 9 テストを `scripts/multi-agent.test.ts` に固定した。
-
-**Action**:
-
-1. 「既定から外す」は割り当てデータの削除ではなく、**プラン構築時のゲート条件**（明示オプトインで素通し）で実装する。
-2. ドキュメント・コメントに具体的なオプトインコマンドを書いたら、**その コマンドが動くことを同 PR のテストで検証**する（案内と実装の drift を構造的に防ぐ）。
-3. 実行対象が 0 件のプランは警告ではなく **非ゼロ exit** にする — 「何も実行せず成功」はゲート系ツールで最悪のサイレント失敗。
+「既定から外すがオプトインは残す」を割り当てデータの空化で実装するとオプトイン経路まで死に、空のプランが exit 0 で完走するので、案内どおりに実行した利用者は動いたと誤解する（PR #449 では Copilot の perspectives を空にしたため、`--cli copilot-cli` を明示しても何も実行されなかった）。除外は「明示指定が無いときだけスキップする」ゲート条件で実装する。ドキュメントに書いたオプトインのコマンド例は同じ PR のテストで固定し、実行対象が 0 件のプランは警告ではなく非ゼロ exit にする。
 
 ---
 
@@ -1634,24 +501,12 @@ Toolkit comment-analyzer が Critical C1/C2 として独立検出、Copilot revi
 
 ### ACE-449-3: 「設定駆動」を謳う config を編集する前に、そのキーが実際にスクリプトから読まれているか確認する — 読まれない飾りキーはハードコードとの同期注記を付ける
 
-| フィールド | 値                    |
-| ---------- | --------------------- |
-| Category   | documentation-quality |
-| Origin     | PR #449 / Issue #448  |
-| Date       | 2026-07-02            |
-| Helpful    | 2                     |
-| Harmful    | 0                     |
-| Status     | active                |
+| Category | documentation-quality | Origin | PR #449 / Issue #448 |
+| Date | 2026-07-02 |
+| Helpful | 2 | Harmful | 0 |
+| Status | active |
 
-**Insight**: 「設定駆動で統一管理」を謳うツールでも、config の全キーが実装から読まれているとは限らない。読まれない「飾りキー」を編集して挙動が変わったと思い込むと、ドキュメント・config・実装の三者が別々の状態を主張する drift が生まれる。config を編集する変更では、まず**そのキーを読むコード（yq/jq 呼び出し等）を grep で実在確認**し、読まれていなければ (a) 実装のハードコードも同時に変更し、(b) config とドキュメントに「実体はスクリプト内ハードコード、同期編集が必要」と注記する。
-
-**Context**: PR #449 で `agent-config.yaml` の perspectives を変更したが、`multi-agent.sh` の `load_config` が yq で読むのは `mode` / `parallel` / `tasks.*` のみで、perspectives・fallback・cost_tier は**すべてスクリプト内ハードコード**だった（編集しても挙動不変）。さらに `review-config.yaml` は `agent-config.yaml` への symlink で、2 ファイルに見えて実体は 1 つだった。ハードコード側（`get_cli_perspectives_review` 等）を同時に変更し、multi-cli-review-orchestration.md に同期編集の注記を追加した。
-
-**Action**:
-
-1. config ファイルを編集する前に、`grep`（yq/jq のキー参照）で**そのキーが実装から読まれているか確認**する。
-2. 読まれない飾りキーを見つけたら、ハードコード側を同時に変更した上で、config・ドキュメント両方に「SSOT はスクリプト内、同期編集必須」の注記を残す（読み取り実装の追加は別 issue でよい）。
-3. 同種の設定ファイルが複数見えたら `ls -la` で symlink かどうか確認してから編集する（重複編集・片側編集事故の防止）。
+「設定駆動」を謳うツールでも config の全キーが実装から読まれているとは限らず、読まれない飾りキーを編集すると文書・config・実装が別々の状態を主張する（PR #449 では `agent-config.yaml` の perspectives が実はスクリプト内のハードコードで、`review-config.yaml` はその symlink だった）。config を編集する前に、そのキーを読むコード（yq / jq の呼び出し等）を grep で確かめ、同種のファイルが複数あれば `ls -la` で symlink かを見る。読まれていなければハードコード側も同時に変え、config と文書に「正本はスクリプト内で、同期編集が必要」と注記する。
 
 ---
 
@@ -1659,313 +514,92 @@ Toolkit comment-analyzer が Critical C1/C2 として独立検出、Copilot revi
 
 ### ACE-459-1: git hook 環境から spawn するサブプロセス git は GIT\_\* を除去しないと実リポジトリを破壊する — テストフィクスチャの git init/commit が呼び出し元リポジトリを直撃した
 
-| フィールド | 値                   |
-| ---------- | -------------------- |
-| Category   | tooling              |
-| Origin     | PR #459 / Issue #453 |
-| Related    | ACE-449-1            |
-| Date       | 2026-07-02           |
-| Helpful    | 1                    |
-| Harmful    | 0                    |
-| Status     | active               |
+| Category | tooling | Origin | PR #459 / Issue #453 |
+| Related | ACE-449-1 |
+| Date | 2026-07-02 |
+| Helpful | 1 | Harmful | 0 |
+| Status | active |
 
-**Insight**: git は hook（pre-push 等）を実行するとき `GIT_DIR` 等の環境変数を設定する。hook から品質ゲート → テストランナー → テストフィクスチャの git コマンドと継承されると、フィクスチャの `git init` / `checkout -b` / `commit` が **tmpdir ではなく呼び出し元の実リポジトリを対象に実行**される。しかも途中まで成功する（ブランチ作成・コミット混入・`git init` による `core.bare=true` 書き換え）ため、失敗地点のエラーだけ見ても破壊に気付けない。特に linked worktree からの push で発火しやすい（メイン worktree の hook では GIT_DIR が設定されないことがあり、テストが「通っていた」ことは安全の証明にならない）。
-
-**Context**: PR #459 で worktree から push した際、pre-push → quality:local → vitest → review-scripts.test.ts のフィクスチャ git が GIT*DIR を継承。実ブランチに "init" コミットが混入し、`feature/test` ブランチが作成され、メインの `.git/config` が `core.bare=true` に書き換えられた（`git rev-parse --show-toplevel` が全域で失敗する状態）。フィクスチャ env から `GIT*`プレフィックスを全除去する`sanitizedGitEnv()` で修正し、`GIT_DIR` を模擬設定した回帰テストで固定した。
-
-**Action**:
-
-1. テスト・スクリプトからサブプロセス git を spawn するときは、**`GIT_` プレフィックスの環境変数を全除去**した env を渡す（`GIT_CONFIG_GLOBAL=/dev/null` / `GIT_CONFIG_SYSTEM=/dev/null` の再設定もセットで）。
-2. パス指定は cwd 依存にせず `git -C <対象ディレクトリ>` で固定する（hook 由来の環境でも対象がすり替わらない）。
-3. リポジトリが不可解な壊れ方をしたら（`must be run in a work tree` 等）、`git config --local --list` で `core.bare` / `core.worktree` の汚染を疑う。
+git は hook の実行時に `GIT_DIR` 等の環境変数を設定するため、hook から品質ゲート・テストランナーへ継承されると、テストフィクスチャの `git init` / `commit` が tmpdir ではなく呼び出し元の実リポジトリを対象に動く（PR #459 では linked worktree からの push で、実ブランチへのコミット混入と `core.bare=true` への書き換えが起きた）。処理が途中まで成功するため、失敗地点のエラーだけでは破壊に気付けない。テストやスクリプトからサブプロセスの git を起動するときは `GIT_` で始まる環境変数をすべて除いた env を渡して `git -C <対象>` で固定し、不可解な壊れ方をしたら `git config --local --list` で `core.bare` / `core.worktree` の汚染を疑う。
 
 ---
-
-<a id="ace-459-2"></a>
-
-### ACE-459-2: linked worktree での並行開発は「メインと同じ」前提が3箇所で破れる — husky 不発・gitignore の symlink すり抜け・共有 config 汚染
-
-| フィールド | 値                   |
-| ---------- | -------------------- |
-| Category   | process              |
-| Origin     | PR #459 / Issue #453 |
-| Related    | ACE-459-1            |
-| Date       | 2026-07-02           |
-| Helpful    | 0                    |
-| Harmful    | 0                    |
-| Status     | active               |
-
-**Insight**: `git worktree add` で作った作業ツリーはメインと同じに見えて、(a) husky v9 の hooks 実体 `.husky/_` は untracked のため worktree に存在せず **pre-commit / pre-push が無言で発火しない**、(b) `.gitignore` の `node_modules/`（末尾スラッシュ）はディレクトリ限定で **symlink の node_modules を無視せず誤コミットできる**、(c) `.git/config` はメインと共有のため worktree 内での事故（ACE-459-1）が**メイン側にも波及**する。
-
-**Context**: PR #459 を worktree で並行開発した際、(a) により初回 push が品質ゲートなしで通り、`npm run prepare` 実行後に初めて hook が発火。(b) により依存共有用の symlink node_modules がコミットに混入（mode 120000）し amend で除去。(c) は ACE-459-1 の破壊がメインの config に及んだ形で確認。
-
-**Action**:
-
-1. worktree を作ったら最初に `npm run prepare`（husky 再セットアップ）を実行し、hooks が発火することを確認してから作業する。
-2. `.gitignore` のディレクトリ除外は末尾スラッシュなし（`node_modules`）にして symlink も無視させる。
-3. worktree での `git add -A` 後は `git status --short` で mode 120000（symlink）の混入がないか確認してからコミットする。
-
----
-
-<a id="ace-460-1"></a>
-
-### ACE-460-1: git diff の出力をパスで分類するツールは `--no-renames` を付ける — rename 表記 `{old => new}` は拡張子判定とディレクトリ前方一致の両方をすり抜ける
-
-| フィールド | 値                   |
-| ---------- | -------------------- |
-| Category   | tooling              |
-| Origin     | PR #460 / Issue #454 |
-| Date       | 2026-07-02           |
-| Helpful    | 0                    |
-| Harmful    | 0                    |
-| Status     | active               |
-
-**Insight**: `git diff --numstat` はリネーム検出が有効だと `docs/{old.md => new.md}` 形式のパスを出力する。この表記は `case *.md)` のような拡張子分類にも `^scripts/` のような前方一致にもマッチしないため、パスベースの判定ロジック（レビューレベル判定、センシティブパス検知、対象ファイルフィルタ等）が**リネームを含む変更だけ静かに誤判定**する。特に「センシティブディレクトリへ跨いで移動するリファクタ」が重点レビュー判定を逃れるのは危険側の欠陥。
-
-**Context**: PR #460 の review-level.sh 初版で発生。Toolkit pr-test-analyzer が実測（`git mv docs/old.md docs/new.md` → docs のみなのに code 扱い、`{lib => mcp/src}/util.ts` → Level 3 すり抜け）で検出した。`git diff --numstat --no-renames` に変更（rename が add+delete に分解され素のパスになる。行数は増えるが判定は安全側）し、rename 分類・跨ぎ移動の回帰テストで固定した。
-
-**Action**:
-
-1. `git diff` の出力パスを分類・マッチングするスクリプトでは **`--no-renames` を明示**する（判定の正確性 > 行数の見かけ）。
-2. パス判定ツールのテストには「リネームを含む diff」のケースを必ず1本入れる（新規作成だけのフィクスチャでは rename 表記経路を通らない）。
-
----
-
-<a id="ace-462-1"></a>
-
-### ACE-462-1: 安全ゲートをスキップするか判定するループでは、空文字・想定外入力を「危険側」ではなく「安全側（ゲート実行）」に倒す — `case $x in *[!0]*)` は空文字を「全ゼロ」と同一視する
-
-| フィールド | 値                   |
-| ---------- | -------------------- |
-| Category   | tooling              |
-| Origin     | PR #462 / Issue #461 |
-| Related    | ACE-449-1            |
-| Date       | 2026-07-02           |
-| Helpful    | 0                    |
-| Harmful    | 0                    |
-| Status     | active               |
-
-**Insight**: 入力を分類して「安全ゲート（品質チェック等）をスキップするか」を決めるコードは、**想定外・欠落入力を必ずゲート実行側（fail-closed）に倒す**べき。特にシェルの `case "$x" in *[!0]*) ...` は「非ゼロ文字を含むか」の判定だが、**空文字列は `*[!0]*` にマッチしない**ため「全ゼロ（＝この文脈では削除＝スキップ）」と同一視され、フィールド欠落・空行がゲート回避（fail-open）を引き起こす。「肯定条件（削除だからスキップ）」だけを書くと、パターンに当てはまらない全入力が暗黙にスキップ側へ流れる。
-
-**Context**: PR #462 で pre-push が「ブランチ削除のみの push（local sha 全ゼロ）は品質ゲートをスキップ」する実装に、Toolkit silent-failure-hunter が「空 `local_sha`（stdin のフィールド欠落・空行）が `*[!0]*` に非マッチ → deletions_only=true のままスキップ」という fail-open を検出（実測再現）。git 標準入力では発火しないが、`"") deletions_only=false` の1行追加で fail-closed に矯正し、フィールド欠落 stdin でゲート実行を検証するテストを追加した。
-
-**Action**:
-
-1. 安全ゲートのスキップ判定は「スキップしてよい条件」を厳密列挙し、それ以外（空・想定外・パース失敗）は**すべてゲート実行側**へ倒す（明示的な `"") ...` / `*) ...` 分岐を書く）。
-2. `case ... *[!0]*` のような「否定文字クラス」は空文字を意図せず通すので、空文字ケースを別途明示する。
-3. テストは正常系だけでなく「欠落・空・不正フィールド」の入力でゲートが**実行される**ことを1本以上固定する。
-
-<a id="ace-464-1"></a>
-
-### ACE-464-1: 集約レポートの stale 混入は「削除」でなく「読む側を今回の実行計画にスコープ」して断つ
-
-| フィールド | 値           |
-| ---------- | ------------ |
-| Category   | architecture |
-| Origin     | PR #464      |
-| Date       | 2026-07-03   |
-| Helpful    | 0            |
-| Harmful    | 0            |
-| Status     | active       |
-
-**Insight**: 共有ディレクトリを glob して集約するレポートが前回実行の成果物（stale）を拾う問題を「stale を削除する」で直そうとすると、消しすぎ（他実行・ユーザーのファイル破壊）vs 残しすぎ（別 task 再利用・同名残骸）のジレンマから逃れられない。読む側を「今回の実行計画（例: `EXECUTION_PLAN` の cli:perspective エントリ）が産んだファイルだけ」にスコープすれば、プラン外は原理的に読まれず、ディスクは非破壊のまま stale が混入しない。
-
-**Context**: `multi-agent.sh` のレポートが `${OUTPUT_DIR}/${cli}/*.md` を無条件収集し前回だけ実行した perspective を「今回の結果」として混入。当初「実行前クリーンアップ（削除）」で対処したが、cross-model レビューが破壊性（共有 --output-dir のユーザーファイル/他 CLI 結果の消失）と残留（別 task 再利用・rename 時の stale）を反復指摘し収束しなかった。
-
-**Action**: 集約/レポートが「今そこにある成果物を全部読む」設計は stale 混入源。まず consumer を「今回の既知集合（実行計画・マニフェスト）」にスコープする。同名上書き漏れ対策の削除が要るなら「今回どうせ再生成する自分の出力先だけ」に限定し（他は非破壊）、出力欠落は削除で隠さず「⚠️ No output」として可視化＋exit code に反映する。
-
-<a id="ace-464-2"></a>
-
-### ACE-464-2: cross-model レビューが実質的な新指摘を出し続けるなら各指摘を patch せず「設計を疑え」— 停止は「新規 Critical/Important 不在」
-
-| フィールド | 値         |
-| ---------- | ---------- |
-| Category   | process    |
-| Origin     | PR #464    |
-| Date       | 2026-07-03 |
-| Helpful    | 0          |
-| Harmful    | 0          |
-| Status     | active     |
-
-**Insight**: cross-model レビューが round を重ねても新しい substantive 指摘（破壊性・silent failure・traversal…）を出し続けるのは、細部の欠陥ではなく approach 自体が間違っているサイン。個別 patch を積み続けるより approach をピボット（削除ベース→プラン駆動）した方が、関連指摘群がまとめて構造的に消える。ループの停止は all-green ではなく「新規の実質 Critical/Important が出ないこと」で判断する（[ACE-447-3](#ace-447-3) の code PR 版）。
-
-**Context**: PR #464 は Codex を 9 round 回した。削除ベース設計への指摘（消しすぎ／残しすぎ）が round をまたいで収束せず、プラン駆動へ設計転換した途端に破壊性/残留/silent 系の指摘が構造的に解消。以降は traversal・重複・境界など細粒度の指摘に収束した。
-
-**Action**: 同一テーマの指摘が 2〜3 round 続いたら「この設計を patch し続けるべきか」を自問し、必要なら実装途中でも approach をピボットする。停止ゲートは「Critical 不在＋実 Important 全対応＋回帰テスト（可能なら mutation で検知力を確認）」。primary（Toolkit）が pass 済みなら green を待って無限ループしない。
 
 <a id="ace-464-3"></a>
 
 ### ACE-464-3: 複数経路が同じ untrusted トークンを消費するなら消費地点ごとの silent skip でなく入口で一度 fail-loud 検証する
 
-| フィールド | 値         |
-| ---------- | ---------- |
-| Category   | security   |
-| Origin     | PR #464    |
-| Date       | 2026-07-03 |
-| Helpful    | 1          |
-| Harmful    | 0          |
-| Status     | active     |
+| Category | security | Origin | PR #464 |
+| Date | 2026-07-03 |
+| Helpful | 1 | Harmful | 0 |
+| Status | active |
 
-**Insight**: ユーザー由来の識別子（`--cli` / `--perspective` 等）をパスセグメントに使うとき、各消費地点で `is_safe "$x" || continue` と黙ってスキップすると、(a) 不正入力が `"(No results)"` に化けて表面化しない (b) ガードを付け忘れた経路（例: 実行/write 側）が traversal 可能なまま残る。消費前の**単一チェックポイント**（実行・レポートの各入口）で形式＋セグメント安全性を一度だけ検証し、不正は非0で fail-loud に落とせば全経路（write/clear/read）が一括で守られる。
+利用者由来の識別子（`--cli` 等）をパスに使うとき、消費地点ごとに安全性を確かめて不正なら黙ってスキップすると、不正な入力が「結果なし」に化けて表面化せず、ガードを付け忘れた経路（PR #464 では書き込み側）が traversal 可能なまま残る。複数の経路が同じ untrusted トークンを消費するなら、検証を消費前の単一の関数に集約し、不正は skip ではなくエラーと非 0 終了で落とす。`cli:perspective` のような複合形式は区切りの存在も検証する（区切りが無いと両片が同じ値になり、検証をすり抜ける）。
 
-**Context**: `multi-agent.sh` で traversal ガードを read/clear にだけ付け、実行（`run_single_task` の write）経路が無防備だった。さらに各所の silent `continue` が malformed plan（`:` 無しで cli 名と perspective 名が同値化する等）を隠蔽していた。
-
-**Action**: untrusted トークンを複数経路が使うなら、検証を各サイトに散らさず「消費前の単一検証関数」に集約し、不正は skip でなく `error + 非0` で落とす。`cli:perspective` のような複合形式は「区切りの存在」も検証する（区切り無しは両片が同値化して検証をすり抜ける）。関連: [ACE-462-1](#ace-462-1)（不明入力は安全側へ）。
-
-<a id="ace-465-1"></a>
-
-### ACE-465-1: パース後どこからも読まれないデッドフラグ/デッド設定は「実装 vs 削除」を既定動作との重複と命名スキーマの整合で判定する
-
-| フィールド | 値           |
-| ---------- | ------------ |
-| Category   | architecture |
-| Origin     | PR #465      |
-| Related    | ACE-449-3    |
-| Date       | 2026-07-03   |
-| Helpful    | 0            |
-| Harmful    | 0            |
-| Status     | active       |
-
-**Insight**: 未使用フラグ / config キーを見つけたとき「せっかくあるから実装する」に流れる前に 2 点を確認する。(1) その機能が意図する挙動が**既定動作で既に実現されていないか**、(2) config のキー名が**実装が実際に消費する識別子と一致しているか**。両方が「削除」を指すなら、実装は既定動作の焼き直し＋二重命名スキーマの維持コストにしかならない。削除して案内と実態を一致させる。削除する場合の回帰テストは「フラグが消えたこと」でなく「**未知オプションとして fail-loud（exit 1）になったこと**」を検証する（元の欠陥が silent-ignore だったため、silent 経路が消えたことを証明する）。
-
-**Context**: PR #465 で `multi-agent.sh --delegate-toolkit` を削除（Issue #451）。このフラグは parse 後どこからも読まれず（[ACE-449-3](#ace-449-3) の飾りキーと同型）、指定しても exit 0 で silent に無視されていた。実装案（`agent-config.yaml` の `toolkit_delegation` を読む）を検討したが、(1) その CLI 割り当ては `build_distributed_plan`（既定の分散プラン）とほぼ同一で重複、(2) `toolkit_delegation` のキー（`code-reviewer` 等 = pr-review-toolkit サブエージェント名）は orchestrator の perspective 実体名（`code-review` / `error-handler-hunt`）と一致せず対応 perspective ファイルも存在しない、という二重の不整合が判明。削除を選び、`--delegate-toolkit` が exit 1 + `Unknown option` を返す回帰テストを固定した。
-
-**Action**: パース後未使用のフラグ / config キーを見つけたら、まず (a) `grep` でそのキーを読むコードの実在を確認（[ACE-449-3](#ace-449-3)）、(b) 意図する挙動が既定動作と重複しないか、(c) キー名が実装の消費識別子と一致するかを見る。実装が既定の焼き直し or 命名スキーマの新設・維持を要するだけなら削除する。削除時は使用例を全ドキュメントから消し（`grep` で 0 件確認）、回帰テストは「未知オプション → exit 1 + エラーメッセージ」の fail-loud を検証する。
+---
 
 <a id="ace-465-2"></a>
 
 ### ACE-465-2: cross-model が指摘した「互換性破壊」も、修正案が Issue の明示的決定と矛盾するなら盲従せず実害（呼び出し元の実在）を検証して判断する
 
-| フィールド | 値         |
-| ---------- | ---------- |
-| Category   | process    |
-| Origin     | PR #465    |
-| Related    | ACE-445-1  |
-| Date       | 2026-07-03 |
-| Helpful    | 1          |
-| Harmful    | 0          |
-| Status     | active     |
+| Category | process | Origin | PR #465 |
+| Related | ACE-445-1 |
+| Date | 2026-07-03 |
+| Helpful | 1 | Harmful | 0 |
+| Status | active |
 
-**Insight**: cross-model レビューは省略しない（[ACE-445-1](#ace-445-1)）が、その指摘を盲従もしない。cross-model が「互換性破壊」等を指摘し提示した修正案が、Issue で明示的に選ばれた方針と正面から矛盾する場合、修正案を鵜呑みにすると決定を覆すことになる。指摘の**妥当な核**（例: breaking change の存在）と**提示された修正案**（例: 互換レイヤーの追加）を分け、核が**実害を持つか**を検証してから対応を決める。実害ゼロ（依存する呼び出し元が実在しない）なら、決定を覆さず「**意図的な breaking change**」として明記するのが正しい対応。
+クロスモデルレビューの指摘は省略せずに受けるが、提示された修正案が Issue で明示的に決めた方針と矛盾するなら盲従しない（PR #465 では「互換レイヤーを挟め」という案が、Issue #451 の「未知フラグはエラー」という決定を覆すものだった）。指摘の妥当な核（例: 破壊的変更がある）と修正案を分け、核が実害を持つかを、依存する呼び出し元が実在するかを grep で確かめて判断する。実害がゼロなら方針を維持し、意図的な破壊的変更として PR 本文とコミットに明記する。
 
-**Context**: PR #465 で Codex code-reviewer が「silent に受理されていた `--delegate-toolkit` を exit 1 化するのは互換性破壊。互換レイヤーを挟むか breaking change として扱え」と指摘（Toolkit 系 4 観点は指摘せず Codex のみ = [ACE-445-1](#ace-445-1) の再演）。互換レイヤー案は Issue #451 が明示的に選んだ案2「未知フラグはエラー」と矛盾し、無効果フラグを警告付きで温存する元のアンチパターンへの逆戻りだった。リポジトリ内で `--delegate-toolkit` を呼ぶ自動化（husky / CI / `.claude/hooks`）が実在しないことを `grep` で検証し、互換レイヤーは採用せず PR 本文に意図的 breaking change として明記した。
-
-**Action**: cross-model の指摘は「妥当な核」と「提示された修正案」を分けて扱う。修正案が Issue / 設計で明示的に決めた方針と矛盾するなら、`receiving-code-review` に沿って実害を検証してから push back する。破壊的変更系の指摘は「その破壊に実際に依存する呼び出し元が存在するか」を `grep` / 検索で確認し、実害ゼロなら方針は維持しつつ意図的 breaking change として PR 本文・commit に明記する。関連: [ACE-445-1](#ace-445-1)（同系列合意より cross-model）/ [ACE-447-3](#ace-447-3)（clean verdict を待たない）。
-
-<a id="ace-469-1"></a>
-
-### ACE-469-1: opt-in 公開ゲートの fail-safe は構造破壊入力（閉じデリミタ欠落）で破れる — パーサは走査境界を先に確定し、壊れた構造は skip でなく fail-loud に回す
-
-| フィールド | 値         |
-| ---------- | ---------- |
-| Category   | security   |
-| Origin     | PR #469    |
-| Related    | ACE-464-3  |
-| Date       | 2026-07-03 |
-| Helpful    | 0          |
-| Harmful    | 0          |
-| Status     | active     |
-
-**Insight**: 「フラグ明示時のみ許可（opt-in）」のゲートは値の判定が正しくても、**値を探す走査の境界**が壊れた入力で崩れると突破される。frontmatter パーサが「キーが見つかったら即 return」だと、閉じデリミタ欠落時に走査が本文へ溢れ、本文中の記法例・引用が「明示されたフラグ」として誤認される（= internal 文書が public 判定）。境界（閉じデリミタ）の存在を**先に**確定し、走査をブロック内に限定する。さらに「開始デリミタあり・閉じなし」は構造的破損であり、fail-safe の quiet skip（未指定と同じ扱い）に混ぜると作者ミスが無言で沈むため、typo 値と同じ fail-loud 経路に回す。
-
-**Context**: PR #469 の `sync-to-public.mjs`（visibility: public の文書だけを internal→public 同期）で、初版 `readVisibility` は `visibility:` 行に当たり次第 return していた。閉じ `---` の無いファイルでは本文まで走査され、本文の例文 `visibility: public` で公開されうる欠陥を Toolkit（errors/tests）と Codex が独立に同一箇所として検出。「閉じデリミタ確認 → ブロック内限定走査 → broken は invalidFiles に集約して書き込みゼロで exit 1」に修正した。
-
-**Action**: opt-in ゲートのパーサを書く/レビューするときは「値の許容判定」でなく「**走査がどこで止まるか**」を先に疑う。(a) ブロック境界の存在確認 → (b) 境界内のみ走査 → (c) 境界破損は quiet skip でなく fail-loud、の順で実装し、「閉じデリミタ欠落 + 本文にフラグ例文」の合成フィクスチャで「同期されない/中断する」をテストに固定する。関連: [ACE-464-3](#ace-464-3)（入口で一度 fail-loud 集約）/ [ACE-462-1](#ace-462-1)（想定外入力は安全側へ）。
-
-<a id="ace-469-2"></a>
-
-### ACE-469-2: コピーして使う雛形ファイルに opt-in フラグの「許可値」を焼き込まない — 雛形経由で全新規文書が公開既定になる
-
-| フィールド | 値         |
-| ---------- | ---------- |
-| Category   | security   |
-| Origin     | PR #469    |
-| Date       | 2026-07-03 |
-| Helpful    | 0          |
-| Harmful    | 0          |
-| Status     | active     |
-
-**Insight**: opt-in 設計（未指定 = 安全側）はファイル単体では正しくても、**「必ずコピーして使え」と案内している雛形**に許可値（`visibility: public` 等)を書くと、コピーの瞬間に全新規文書へ許可が継承され、実質「公開が既定」に反転する。opt-in の安全性は「明示コストが漏れ側にある」ことに依存しており、雛形はそのコストをゼロにしてしまう。一括付与スクリプトで「対象ディレクトリの全ファイル」に機械的にフラグを撒くと、この种の「ファイル自体は公開してよいが、雛形としての性質上フラグを持たせてはいけない」例外を見落とす。
-
-**Context**: PR #469 で docs/specs/ を公開分類とし一括で `visibility: public` を付与した際、`spec-template.md`（ガイドが「spec 作成時は必ずコピー」と指示する雛形）にも付与してしまった。internal リポジトリで雛形から作られる新規 spec（クライアント固有設計が最も書かれる場所）が公開既定になる漏洩リスクとして Codex code-reviewer が Critical 検出。雛形からフラグを削除し、「雛形には含めない。公開したい spec のみ作成後に明示」を FRONTMATTER_GUIDE §5.5 に明文化した。
-
-**Action**: opt-in フラグを既存ファイル群へ一括付与するときは、付与前に「このファイルはコピー元（テンプレート/雛形/サンプル）として案内されていないか」を分類に加える。雛形は許可値を持たせず（キー自体を書かない）、必要なら「作成後に明示せよ」を雛形の案内文とガイドに書く。レビュー観点としては「雛形・スキャフォールド・generator の出力既定値」は opt-in 反転の定番経路として必ず確認する。
+---
 
 <a id="ace-484-1"></a>
 
 ### ACE-484-1: テンプレート欠陥の修正は「実際にコピーされる実体」を先に特定する — 報告先リポジトリと配布実体が別だと直しても下流に届かない
 
-| フィールド | 値                   |
-| ---------- | -------------------- |
-| Category   | process              |
-| Origin     | PR #484 / Issue #483 |
-| Date       | 2026-08-28           |
-| Helpful    | 2                    |
-| Harmful    | 0                    |
-| Status     | active               |
+| Category | process | Origin | PR #484 / Issue #483 |
+| Date | 2026-08-28 |
+| Helpful | 2 | Harmful | 0 |
+| Status | active |
 
-**Insight**: 同じ名前のテンプレートが複数リポジトリに実体を持つとき、「欠陥が報告されたリポジトリ」と「実際にコピー元として読まれるリポジトリ」は一致するとは限らない。着手時に**セットアップコマンドがどのパスを読むか**を確認しないと、直したのに下流の出力が変わらない。再現確認の段階で「報告された欠陥が手元で再現しない」が出たら、それは Issue の誤りではなく**別実体を見ているサイン**として扱う。
+同名のテンプレートが複数のリポジトリに実体を持つとき、欠陥が報告されたリポジトリと実際にコピー元として読まれるリポジトリは一致するとは限らない（Issue #483 では、`/init-docs` と `/ace-setup` が読んでいたのは本リポではなく ff-dev-toolkit 同梱の docs-template だった）。報告された欠陥が手元で再現しないときは、Issue の誤りより別の実体を見ていることを第一仮説にする。配布物の修正に着手する前にセットアップ手順が参照するパスを grep し、その実体と自リポのファイルを `diff -rq` して正本を決め、修正だけでは下流が変わらないならその旨と移植先の Issue を PR に書く。
 
-**Context**: Issue #483（downstream 展開時のテンプレート欠陥 8 件）を本リポの `docs-template/` に照合したところ、2 件（ACE 追記先の三説併存 / カテゴリ 8 種 vs 11 種）が再現しなかった。原因を追うと、`/init-docs` と `/ace-setup` の SKILL.md はいずれも `${FF_DEV_TOOLKIT_ROOT}/docs-template/` を読んでおり、**実際のコピー元は ff-dev-toolkit プラグイン同梱の docs-template** だった。プラグイン側は PLAYBOOK が 11 カテゴリ・`playbook/` 分割方式へ進化しており、公開リポ側は 8 カテゴリ・800 行分割のままという乖離が生じていた。プラグイン側の実ファイルを確認すると 8 件すべてが再現した。
-
-**Action**: 配布物の欠陥修正に着手する前に、(1) セットアップ手順（SKILL.md / スクリプト）が参照するパスを grep し、(2) そのパスの実体と自リポの該当ファイルを `diff -rq` して乖離の有無を確認する。乖離があれば「どちらが SSOT か」を先に決め、修正 PR には**この修正だけでは下流の挙動が変わらない**旨と移植先 Issue を明記する。再現しない項目は「Issue の誤り」ではなく「実体差」を第一仮説にする。関連: [ACE-021](#ace-021)（テンプレ配布リポ分離）。
+---
 
 <a id="ace-484-2"></a>
 
 ### ACE-484-2: 配布物のリンク規約は Playbook に書くだけでは適用漏れが残る — 利用者側レイアウトを再現する機械検証で固定する
 
-| フィールド | 値                   |
-| ---------- | -------------------- |
-| Category   | testing              |
-| Origin     | PR #484 / Issue #483 |
-| Date       | 2026-08-28           |
-| Helpful    | 1                    |
-| Harmful    | 0                    |
-| Status     | active               |
+| Category | testing | Origin | PR #484 / Issue #483 |
+| Date | 2026-08-28 |
+| Helpful | 1 | Harmful | 0 |
+| Status | active |
 
-**Insight**: 「配布物のリンクはこう書く」という規約を Playbook に記録しても、適用は人手の grep に依存するため配布ツリーの一部に取り残しが残る。しかも配布物のリンクは **(a) パスが利用者側レイアウトで解決するか** と **(b) レンダリング文脈（Issue / PR body）で解決するか** の 2 軸で壊れるため、片方だけ直して「直った」と誤認しやすい。規約は、利用者側レイアウトを仮想的に組んで全参照を解決する**テスト**として固定しないと再発する。
+配布物のリンク規約を Playbook に書くだけでは適用が人手の grep に頼るため取り残しが出るうえ、リンクは「利用者側レイアウトでパスが解決するか」と「Issue / PR 本文の描画文脈で解決するか」の 2 軸で壊れるので、片方だけ直して直ったと誤認しやすい（PR #484 では既存の ACE-046 / ACE-447-2 が 14 リンクに未適用のまま残っていた）。規約を新設・適用したら同じ PR で、利用者側レイアウトを写像で再現し、相対リンク・inline code のパス・frontmatter の references をすべて解決するテストを足す。テストが修正前の内容で実際に落ちることを確かめてから緑にし、テスト名には検証している内容だけを名乗らせる。
 
-**Context**: 本リポには [ACE-046](#ace-046)（PR/Issue body の相対リンクは `issues/N/` 起点で 404。配布版は plain text にする）と [ACE-447-2](#ace-447-2)（配布物内リンクは配布ツリー外を指さない）が既に記録されていたが、`docs-template/.github/ISSUE_TEMPLATE/*.md` の 14 リンクには未適用のまま残っていた。PR #484 は初手で「パスのベースを `../../docs/` に直す」だけの修正をしており、(a) は満たしたが (b) を落としていた。これを Codex CLI と Toolkit `code-reviewer` が**独立に同一箇所を Critical 検出**し、両方が根拠として既存の ACE-046 を引用した。追加した回帰テストを develop 時点の内容に対して走らせると、`docs-template/` 混入 13 ファイルと Issue body で壊れる相対リンク 18 箇所を検出して落ちる。
-
-**Action**: 配布物のパス・リンク規約を新設または適用したら、同じ PR で機械検証を足す。検証は「利用者側レイアウト（リポジトリ直下に `.github/` と `docs/` が並ぶ）を写像で再現し、相対リンク・inline code パス・frontmatter references をすべて解決する」形にし、**修正前の内容に対して実際に落ちること**を確認してから緑にする（`scripts/distribution-github-templates.test.ts`）。テスト名は検証していることだけを名乗る（「利用者側レイアウトで解決する」と「配布ツリー内に存在する」は別物で、後者は `/init-docs` の初期セット外への参照を緑のまま通す）。関連: [ACE-046](#ace-046) / [ACE-447-2](#ace-447-2)。
+---
 
 <a id="ace-484-3"></a>
 
 ### ACE-484-3: フォーマッタを caret 範囲で許すと push ゲートが環境依存で赤くなる — 「触っていないファイルが落ちる」で切り分けが溶ける
 
-| フィールド | 値                   |
-| ---------- | -------------------- |
-| Category   | tooling              |
-| Origin     | PR #484 / Issue #485 |
-| Date       | 2026-08-28           |
-| Helpful    | 2                    |
-| Harmful    | 0                    |
-| Status     | active               |
+| Category | tooling | Origin | PR #484 / Issue #485 |
+| Date | 2026-08-28 |
+| Helpful | 2 | Harmful | 0 |
+| Status | active |
 
-**Insight**: 整形結果がバージョンで変わるツール（prettier 等）を `^` 範囲で許し、かつ pre-push でフル品質ゲートを強制していると、パッチ版が上がっただけで**自分が触っていないファイルが赤くなり全員の push が止まる**。症状が「自分の差分と無関係」に見えるため、原因をコードや自分の変更に求めて時間を溶かす。`npm ci` で環境を揃えられれば復旧できるが、lockfile と package.json が同期していないとその逃げ道も塞がる。
+整形結果が版で変わるフォーマッタ（prettier 等）を `^` 範囲で許し、pre-push でフル品質ゲートを強制していると、パッチ版が上がっただけで触っていないファイルが赤くなり、全員の push が止まる（PR #484 ではローカルの prettier 3.9.6 と lockfile の 3.8.3 で整形結果が異なった）。症状が自分の差分と無関係に見えるので、原因をコードに求めて時間を溶かしやすい。整形系の devDependency は厳密に固定し、`npm ci` が通る状態を保って「`npm ci` で環境を揃えてからゲートを回す」と手順に書き、未変更ファイルが落ちたら既定ブランチの状態で再実行して既存の破綻かを切り分け、ツールの版と lockfile の版を突き合わせる。
 
-**Context**: PR #484 の作業中、`npm run quality:local` が未変更 3 ファイル（`COPILOT_AGENTS.md` / `best-practices/01-coding-standards.md` / `FAQ.md`）で失敗した。`git stash` して develop 状態でも同じ 3 件が落ちるため既存の破綻と判明。実体はローカル `node_modules` の prettier が 3.9.6、lockfile は 3.8.3 で、union 型の折り返しと表整形の結果が版間で異なっていた（3.9.6 は 1 行へ結合、3.8.3 は分割を維持）。復旧のため `npm ci` を試みたが `@emnapi/*` の同期崩れで失敗し、`npm install --no-save prettier@3.8.3` で lockfile 準拠に戻して全項目グリーンになった。3.9.6 の整形結果でコミットしていれば、次に 3.8.3 の環境が触ったとき差分が反転する。
-
-**Action**: 整形系の devDependency は**厳密固定**（`^` を外す）し、`npm ci` が通る状態（package.json と package-lock.json の同期）を維持する。ゲートの前提を「`npm ci` で環境を揃えてから `npm run quality:local`」と手順書に明記する。切り分け手順としては、未変更ファイルがゲートで落ちたら (1) `git stash` して既定ブランチ状態で再実行し既存破綻か切り分ける、(2) `npx <tool> --version` と lockfile の版を突き合わせる、の順に確認する。整形差分を「とりあえず直す」前に版を疑うこと。
+---
 
 <a id="ace-489-1"></a>
 
 ### ACE-489-1: 「違反ゼロ」を期待するガードは検出器が壊れても緑のまま通る — 合成入力で検出器自体を固定する
 
-| フィールド | 値                   |
-| ---------- | -------------------- |
-| Category   | testing              |
-| Origin     | PR #489 / Issue #488 |
-| Date       | 2026-08-28           |
-| Helpful    | 5                    |
-| Harmful    | 0                    |
-| Status     | active               |
+| Category | testing | Origin | PR #489 / Issue #488 |
+| Date | 2026-08-28 |
+| Helpful | 5 | Harmful | 0 |
+| Status | active |
 
-**Insight**: 規約違反を検出するテストは `expect(violations).toEqual([])` の形になりやすい。この形は**検出器（正規表現・分類ロジック）が何も拾わなくなっても緑になる**。しかも入力が実ファイルだけだと、違反が 0 件に収束していく（＝規約が守られるほど検出器の稼働確認が効かなくなる）という性質まで加わる。合成入力で「拾うべきものを拾い、拾ってはいけないものを拾わない」を別テストとして固定しないと、ガードは静かに空振りに退化する。ファイル収集の liveness 検証（`files.length > 0`）はこの穴を塞がない — 塞げるのは「ファイルを集められたか」だけで、「そこから抽出できたか」ではない。
-
-**Context**: PR #489 で配布物のリンク規約ガードを追加した際、リンク抽出の正規表現が `\]\(([^h)#][^)]*\.md)\)` の形で、`.md)` 直結にしか一致しなかった。`foo.md#section` のようなアンカー付きリンクは取りこぼし、**ガードが存在する状態で回避経路が残っていた**（配布ツリーには同じ書き方が 34 箇所ある）。Toolkit `code-reviewer` と Codex CLI が独立にこれを指摘。既存テストは実ファイル入力 + 違反ゼロ期待だったため、正規表現が壊れても検出できない構造でもあった。否定先読み（`(?!https?://|#|mailto:)`）へ変更し、抽出・パス解決・可否判定を合成入力で固定するテスト群を追加した。
-
-**Action**: 規約ガードを書くときは、違反検出のテストと**検出器の自己検証**をセットで置く。自己検証には (a) 拾うべき代表形（今回ならアンカー付き・サブディレクトリ相対）、(b) 拾ってはいけない形（絶対 URL・ページ内アンカー・inline code）、(c) 分類関数の境界値、を合成文字列で書く。リンク抽出の正規表現では「アンカー / クエリの後置」を最初に疑う。「先頭 1 文字で除外する」形（`[^h)#]`）は `](hooks/foo.md)` のような正当な相対パスまで落とすので、除外は否定先読みで意図を明示する。関連: [ACE-484-2](#ace-484-2)（規約は機械検証で固定する）。
+`expect(violations).toEqual([])` の形の規約ガードは、検出器（正規表現・分類ロジック）が何も拾わなくなっても緑のまま通り、規約が守られて違反が 0 件に近づくほど検出器の稼働確認が効かなくなる（PR #489 ではリンク抽出の正規表現がアンカー付きリンクを取りこぼしていた）。ファイルを集められたかの確認（`files.length > 0`）では、そこから抽出できたかは分からない。規約ガードには違反検出のテストと、合成入力で検出器そのものを固定するテスト（拾うべき代表形・拾ってはいけない形・分類関数の境界値）をセットで置き、リンク抽出ではアンカーやクエリの後置を最初に疑い、除外は先頭 1 文字の否定ではなく否定先読みで書く。
 
 ---
 
@@ -1995,19 +629,6 @@ Toolkit comment-analyzer が Critical C1/C2 として独立検出、Copilot revi
 
 ---
 
-<a id="ace-502-1"></a>
-
-### ACE-502-1: 実行環境の下限（engines）を上げたら、その環境を表す型定義パッケージのメジャーも同じ PR で揃える — engines は実行時にしか効かず、tsc は型定義の版までしか API を知らない
-
-| Category | tooling | Origin | PR #502 / Issue #501 |
-| Date | 2026-09-06 |
-| Helpful | 0 | Harmful | 0 |
-| Status | active |
-
-`engines.node` を引き上げても `@types/node` のような環境の型定義パッケージが旧メジャーのままだと、宣言上は使ってよい新 API を書いた途端に `tsc` が型不明で落ち、「engines は満たしているのにビルドできない」という切り分けにくい不整合になる。`engines` を変える PR では、その環境を型として表す devDependency（`@types/node`、ランタイム SDK の型パッケージ等）の対応メジャーを同じ PR で揃え、lockfile を同期し、更新後パッケージと推移依存の `engines` を自分の宣言と再照合する（[ACE-498-1](#ace-498-1) の逆向き適用）。別 PR に分けると、その間に書かれたコードが偽の型エラーで手戻りする。
-
----
-
 <a id="ace-505-1"></a>
 
 ### ACE-505-1: 別実体の文書から規則文を転記するときは、転記先の実体で各事実主張を再検証する — 転記元で真だった「検出する」「全文書に Frontmatter がある」が転記先では偽になっている
@@ -2033,318 +654,6 @@ Toolkit comment-analyzer が Critical C1/C2 として独立検出、Copilot revi
 | Status | active |
 
 `review-config.yaml` → `agent-config.yaml` の統一で `docs-template/` と `README.md` は grep して直したが、`format:md` / `lint:md` の glob（`docs/**` `docs-template/**` `*.md`）に含まれない `.claude/commands/setup-ai-config.md` の案内文が残り、Toolkit code-reviewer の Warning になった。同ディレクトリは pre-commit の変更ファイル lint でしか検査されないため、既存の MD060 違反も同時に露出した。名称・パス・既定値を統一する PR では、grep の起点を「品質ゲートが見る範囲」ではなく「リポジトリ全体から node_modules / .git を除いた範囲」（`git grep -n '<旧名>'`）にし、ヒット先が現役の案内文か履歴記録（PLAYBOOK・Changelog）かを分類してから直す。
-
----
-
-<a id="ace-508-1"></a>
-
-### ACE-508-1: 「違反ゼロ」ガードの検出器で対象を拡張子や表記形式で狭めない — 除外は理由つきの明示リストで持ち、狭めた分だけ同クラスの欠陥が素通りする
-
-| Category | testing | Origin | PR #508 / Issue #490 |
-| Related | ACE-484-2 / ACE-489-1 |
-| Date | 2026-09-06 |
-| Helpful | 0 | Harmful | 0 |
-| Status | active |
-
-配布物のリンクガードを docs 本体へ広げた際、相対リンクの正規表現が `.md` 限定だったため、DECISION_TREE.md の雛形表にある `.skeleton.ts` / `.sql` への初期セット外リンク 38 件を素通りし、レビュアーが目視で見つけた。展開先で切れるかどうかは拡張子と無関係なので、検出器は「相対パスで拡張子付きのファイルを指すもの」を全部拾い、拾ってはいけない正当な表記（生成物 `.github/copilot-instructions.md`、記入例 `.github/workflows/xxx.yml`、架空例 `docs/specs/*.md`）は `EXEMPT` 集合に**理由コメントつき**で載せる。「拾いすぎを避けるために対象を狭める」より「全部拾って例外を可視化する」方が、例外が増えたときに検査の骨抜きが diff で見える。合成入力の自己検証（[ACE-489-1](#ace-489-1)）には狭めなかったケース（`.ts` / `.sql`）を必ず含める。
-
----
-
-<a id="ace-508-2"></a>
-
-### ACE-508-2: 大量の機械的文書変換はサブエージェントへ委譲し、検出器（テスト）は自分で先に赤にしてから渡す — 規約は変換の前後例・注記の文言と配置・完了条件の走査スクリプトを明示する
-
-| Category | process | Origin | PR #508 / Issue #490 |
-| Related | ACE-484-2 |
-| Date | 2026-09-06 |
-| Helpful | 0 | Harmful | 0 |
-| Status | active |
-
-初期セット外リンク 78 件の inline code 化を、テスト拡張（自分、TDD で先に失敗させる）と文書書き換え（サブエージェント）に分けて並列にした。委譲プロンプトに (1) 変換の前後例（`[x](./deployment/x.md)` → `` `docs/05-operations/deployment/x.md` ``、アンカーは節名の散文へ）、(2) 注記の正確な文言と挿入位置（ファイルごと・節ごとに 1 回）、(3) 触ってよいファイルの列挙と禁止事項（commit / branch / scripts）、(4) 完了条件として残件を数える走査スクリプト（0 件で完了）を入れたところ、1 往復・修正なしで通り、テストも初回緑になった。規約を「PR #484 の前例に従って」のような参照だけで渡すと、パス形式（展開先 `docs/...` か参照元相対か）や注記の粒度がぶれる。ただし委譲側の走査スクリプトも検出器と同じ前提（`.md` 限定）を共有していたため、[ACE-508-1](#ace-508-1) の取りこぼしは委譲では見つからない — 検出器の網羅性は委譲前に別途疑う。
-
----
-
-<a id="ace-510-1"></a>
-
-### ACE-510-1: エラーの扱い（フォールバック可否・再試行可否）は statusCode やクラス列挙から再導出せず、基底の抽象メンバで各サブクラスに宣言させる — ラップ境界では「一時障害のときだけ包む」規則と対にしないと、包んだ瞬間に分類が消える
-
-| Category | architecture | Origin | PR #510 / Issue #486 |
-| Related | ACE-505-1 |
-| Date | 2026-09-06 |
-| Helpful | 0 | Harmful | 0 |
-| Status | active |
-
-docs-template のエラー例で、禁止カテゴリをクラス列挙（allowlist）→ HTTP ステータス集合へ直したところ、type-design-analyzer が「どちらも整数値域からの再導出で、サブクラス追加時に強制されない（`SecurityError` のステータス変更で黙って外れる、`InternalError` が 5xx だから再試行される）」と指摘した。`abstract readonly category: "never-fallback" | "transient" | "permanent"` を基底に置き、`isNeverFallback` / `isRetryableError` を category 判定にすると、サブクラス追加時にコンパイルが宣言を要求し、判定関数側の集合は不要になる。ただし分類は**ラップ境界で消える**: サービス固有型（`PaymentError` = transient）で正規化済みエラーを無条件に包むと 401 が transient に化け、fallbackInProdOnly と再試行が認証失敗を一時障害として扱う（決済・メール・正典 `processUser` の 3 経路で同じ欠陥がレビュー 2 巡にわたって見つかった）。「transient のときだけサービス固有型で包み、それ以外はそのまま伝播」を全ラップ箇所に適用し、`grep "new XxxError("` で cause が AppError の箇所を総当たりする。
-
----
-
-<a id="ace-510-2"></a>
-
-### ACE-510-2: 文書の節単位置換では、置換範囲の終端に「削るつもりのない節」を置かない — 置換後に見出し一覧の before / after を diff して、隣接節の消失を機械的に確かめる
-
-| Category | process | Origin | PR #510 / Issue #486 |
-| Related | ACE-508-2 |
-| Date | 2026-09-06 |
-| Helpful | 0 | Harmful | 0 |
-| Status | active |
-
-FALLBACK.md §4 を「`### ✅ OK` 見出しから `### 再試行ユーティリティ` 見出しまで」の範囲で書き直した際、その間にあった「### 適用判断ガイド」表（7 行の散文ルール）を新テキストに含め忘れ、丸ごと消した。lint / format / validate はすべて通り、code-reviewer が 2 巡目で「grep してもどこにも無い」と気づくまで残った。範囲置換は「置換したい節の直後の見出し」を終端にし、置換前後で `grep -n "^##"` の出力を diff して、消えた見出しがゼロであることを確認してからコミットする。写経される文書では節の消失はリンク切れより発見が遅い（参照が無い節は誰も辿らない）。
-
----
-
-<a id="ace-516-1"></a>
-
-### ACE-516-1: エラー分類を 1 クラスで変えたら、写像関数の実際の switch を docstring に列挙し、禁止カテゴリの列挙箇所を grep で総当たりする — 「4xx は never-fallback」のようなスローガンは実写像（404 = permanent、429 = transient）と食い違い、適用判断表・チェックリスト・SKILL の表のどれか 1 つが必ず取り残される
-
-| Category | architecture | Origin | PR #516 / Issue #514 |
-| Related | ACE-510-1 |
-| Date | 2026-09-06 |
-| Helpful | 0 | Harmful | 0 |
-| Status | active |
-
-`UpstreamRejectedError.category` を permanent → never-fallback に 1 行変えたところ、禁止カテゴリの列挙が `ErrorCategory` コメント・FALLBACK.md §1 リスト・チェックリスト「4 種」・適用判断ガイド表・SKILL.md §3 表 / §7 コメント / §8 判断基準表の 7 箇所に写し取られており、Issue の追記だけでは適用判断表が漏れ、レビュー 1 巡目で silent-failure-hunter が拾った。さらに docstring と §1 に書いた「上流の 4xx は never-fallback」は `normalizeExternalError()` の実際の switch（401/403 → 認証、404 → NotFoundError = permanent、409 → Conflict、429 → transient、残りの 4xx だけ UpstreamRejected）と一致せず、`default:` が 1xx〜3xx まで拒否扱いにしていた既存欠陥も分類の格上げで顕在化した。分類を変えるときは (1) 写像関数の switch をそのまま docstring に書き写す（スローガンにしない）、(2) `grep -rn "認証・認可\|禁止カテゴリ\|N 種"` で列挙箇所を総当たりし、表・コメント・チェックリストを同じコミットで更新する、(3) 格上げで「本番で throw に変わる」経路が既定分岐に含まれていないか `default:` を読む。
-
----
-
-<a id="ace-516-2"></a>
-
-### ACE-516-2: ログ経路で「形状情報を残す」ために任意オブジェクトを JSON 化しない — 診断 allowlist（status / code / body）を迂回して cause 内の PII・秘密がそのまま載る。型名 + 上位キー名だけを出し、catch 内では対象値に再度触らない
-
-| Category | security | Origin | PR #516 / Issue #514 |
-| Related | ACE-510-1 |
-| Date | 2026-09-06 |
-| Helpful | 0 | Harmful | 0 |
-| Status | active |
-
-`serializeError()` の非 Error cause が HTTP 形状でないとき `{}` に潰れるのを直すために、上限つき `JSON.stringify` で全体を文字列化する `describeValue()` を入れたところ、Codex と Toolkit code-reviewer が同時に「`{ requestBody: { email, apiSecret } }` のような cause で、同 PR が別ファイルから消したメールアドレスが今度は 2000 文字分ログに載る」と指摘した。`pickHttpDiagnostics` が allowlist で守っていた境界を、その隣のフォールバック経路が丸ごと開けていた。値を出さず `{ type: constructor.name, keys: Object.keys(value).slice(0, N), keyCount }` に変えると形状の追跡には十分で、PII は構造的に載らない。さらに 2 巡目で「catch 内の `Object.prototype.toString.call(value)` も `Symbol.toStringTag` の getter を呼ぶため投げる」と指摘され、ログ経路の catch は固定値を返し対象値に再度触らない形にした。「投げないログ経路」は try 側だけでなく catch 側の式にも同じ規律が要る。
-
----
-
-<a id="ace-516-3"></a>
-
-### ACE-516-3: SDK エラーから HTTP ステータスを推定するとき、数値の範囲（100〜599）だけで採用しない — MongoDB の WriteConflict(112) など別ドメインの整数番号が範囲に収まる。HTTP レスポンスの形（`response` オブジェクトの同伴）を必須条件にする
-
-| Category | architecture | Origin | PR #516 / Issue #514 |
-| Related | ACE-516-1 |
-| Date | 2026-09-06 |
-| Helpful | 0 | Harmful | 0 |
-| Status | active |
-
-SendGrid の `ResponseError` は HTTP ステータスを数値の `code` に入れるため、`readHttpStatus()` に「`code` が 100〜599 の整数なら採用」を足した。silent-failure-hunter が「MongoDB の `MongoServerError.code` は 112 / 189 / 251 / 262 など範囲内の値を多数持ち、リポジトリ層のマッパーを飛ばして `retryWithBackoff` に渡す誤用（FALLBACK.md 自身が『よくある』と警告する経路）では、再試行すべき WriteConflict が `UpstreamRejectedError(upstreamStatus: 112)` = never-fallback になって 1 回目で投げる」と具体化した。範囲は必要条件であって十分条件ではない。SendGrid は `response.headers / body` を持ち Mongo エラーは `response` を持たないので、「`response` が非 null オブジェクト かつ 範囲内」を採用条件にした。他 SDK の独自番号と衝突しうるヒューリスティックは、値域ではなく**形**（同伴フィールドの存在）で判定する。
-
----
-
-<a id="ace-519-1"></a>
-
-### ACE-519-1: 受け入れ条件に検査コマンドを書くときファイル引数でスコープを狭めない — 狭めた検査はそのまま通るため「検証済み」の錯覚を作り、同じ主張を持つ他ファイルが無検査で残る
-
-| Category | process | Origin | PR #519 / Issue #517 |
-| Related | ACE-018 / ACE-022 / ACE-505-2 |
-| Date | 2026-09-07 |
-| Helpful | 0 | Harmful | 0 |
-| Status | active |
-
-Issue #517 の AC は `grep "Actions 非依存" docs/AI_GIT_WORKFLOW.md CLAUDE.md` と 2 ファイルを名指しし、実装はこれを 0 件にして AC を満たした。だが同じ無条件主張は `.cursorrules`（3 つ目の AI 設定ファイル）と `docs/FRONTMATTER_GUIDE.md` に残り、Toolkit レビューで初めて出た。AC の検査コマンドは「合格の定義」として読まれるので、引数で狭めた範囲がそのまま検証範囲になり、狭さ自体は起票者も実装者もレビュアーも疑わない。起票時はスコープを引数で絞らず対象ツリー全体を掃く形で書く（絞るなら除外パスと理由を AC に併記する）。実装側は AC の検査が通っても、同じ主張語で 1 度はリポジトリ全体を掃く。
-
----
-
-<a id="ace-519-2"></a>
-
-### ACE-519-2: 一方向同期のツリーでは同期可否フラグの値ごとに壊れ方が逆になる — 同期対象は SSOT を直さないと巻き戻り、同期対象外は SSOT を直しても下流コピーが凍結したまま残る
-
-| Category | process | Origin | PR #519 / Issue #517 |
-| Related | ACE-484-1 / ACE-021 |
-| Date | 2026-09-07 |
-| Helpful | 0 | Harmful | 0 |
-| Status | active |
-
-`scripts/sync-to-public.mjs` は internal（SSOT）→ public の一方向同期で、frontmatter が `visibility: public` の文書だけを運び、対象外は削除せず orphan として報告する。PR #519 が public 側で直した 2 文書はこの値で挙動が分かれた — `visibility: public` の `AI_GIT_WORKFLOW.md` は次回同期で上書きされ Issue #517 の AC ごと巻き戻る一方、`visibility: internal` の設計文書は同期が触らないため SSOT を直しても public 側のコピーは古いまま残る。「実際にコピーされる実体を先に特定する」（ACE-484-1）だけでは後者が漏れるので、編集前に同期可否フラグを読み、対象なら SSOT 側を、対象外なら両側を直す（または下流コピーを消す）。同期が長く走っていないリポジトリでは巻き戻りが「いつか必ず起きるが今日は起きない」形で潜伏するため、同期の再開前に解消しておく。
-
----
-
-<a id="ace-519-3"></a>
-
-### ACE-519-3: 同一文書内に実体のコピーを抱える節は、見出しと冒頭文が「現行を反映済み」と主張するか「設計時点の案」と名乗るかで扱いが分かれる — 前者は mirror（同期か撤去）、後者は記録節（本文を同期せず主張文だけ直す）
-
-| Category | documentation-quality | Origin | PR #519 / Issue #517 |
-| Related | ACE-045 / ACE-500-1 |
-| Date | 2026-09-07 |
-| Helpful | 0 | Harmful | 0 |
-| Status | active |
-
-`NO_GITHUB_ACTIONS_MIGRATION_DESIGN.md` 付録 A が本体 PR テンプレと 3 度目の drift を起こしたとき、ACE-045（mirror は同期か撤去）と ACE-500-1（記録節は書き換えない）が同じ節に対して逆を指示した。見分けは節の自己申告で、付録 A は見出しが「PR テンプレート改稿案」で §5 から「付録 A に沿って更新」と参照される設計時点のスナップショット＝記録節だった。壊れていたのは冒頭の「反映済み」という現行パリティの主張 1 文だけなので、本文は同期せずその 1 文をスナップショット宣言 + 現行正本への外部参照へ差し替えた。これで同期責務そのものが消えるため、記録を失わずに ACE-045 の失敗モードが構造的に再発しなくなる。
-
----
-
-<a id="ace-526-1"></a>
-
-### ACE-526-1: 文書の正本を移すときは同期の所有対象も限定する
-
-| フィールド | 値                   |
-| ---------- | -------------------- |
-| Category   | architecture         |
-| Origin     | PR #526 / Issue #524 |
-| Date       | 2026-09-08           |
-| Helpful    | 0                    |
-| Harmful    | 0                    |
-| Status     | active               |
-
-**Insight**: 正本を移すという説明だけでは、既存の一方向同期が新しい合意を上書きする。公開可否と編集元の所有権を分離し、移管対象だけを同期の作成・上書き・凍結判定から除外する。
-
-**Context**: ASDD 2.0の標準を公開側で編集する方針に合わせ、9パスの限定リストと同期保護を追加した。保護対象の既存ファイルと欠落ファイル、対象外の通常文書を同時に検証した。
-
-**Action**: 移管するパスを列挙し、同期実行側の保護を先に統合する。コピーを止めるだけでなく、orphanなどの報告も所有権と一致させる。対象外の既存同期と公開条件は維持する。
-
----
-
-<a id="ace-527-1"></a>
-
-### ACE-527-1: 計画の一致と現在の出力の一致を別々に検証する
-
-| フィールド | 値                   |
-| ---------- | -------------------- |
-| Category   | testing              |
-| Origin     | PR #527 / Issue #525 |
-| Date       | 2026-09-08           |
-| Helpful    | 0                    |
-| Harmful    | 0                    |
-| Status     | active               |
-
-**Insight**: 計画時のハッシュを照合するだけでは、その後の手編集を検出できない。書き込み前の競合判定と完了判定は、実行時のファイルを読み直して行う。
-
-**Context**: 固定SHAからのテンプレート出力で、verifyが古い状態を成功扱いにし、最初の出力後に編集された後続ファイルを上書きする欠陥を独立レビューで検出した。rename後に別ファイルを変更する実Gitテストで再現した。
-
-**Action**: 全対象の事前確認に加え、各置換直前にもレビュー時の状態と照合する。最後に実際の全出力を検証し、途中変更や部分完了を成功として報告しない。保存済みの計画を再利用したcheckもテストする。
-
----
-
-<a id="ace-532-1"></a>
-
-### ACE-532-1: 形式ゲートを入れるときは追記テンプレと Generate 出力ラベルも同時に正準フォーマットへ揃える
-
-| Category | process | Origin | PR #532 / Issue #478 |
-| Date | 2026-09-14 |
-| Helpful | 0 | Harmful | 0 |
-| Status | active |
-
-エントリ形式の機械ゲートだけ先に入れると、追記テンプレが旧形式のまま新規 ID を旧形式で書き続け、allowlist 初期化後もゲートが赤くなるか allowlist が肥える。Generate 出力が `**Insight**` ラベルだと、メタがコンパクトでも本文マーカーで旧形式判定される。ゲート・テンプレ・Phase 1 出力を同じ変更で揃える。
-
----
-
-<a id="ace-533-1"></a>
-
-### ACE-533-1: 探索順の契約テストは関数定義の出現位置ではなく、隔離環境でリゾルバを実行して検証する
-
-| Category | testing | Origin | PR #533 / Issue #491 |
-| Date | 2026-09-14 |
-| Helpful | 0 | Harmful | 0 |
-| Status | active |
-
-`indexOf("select_cache_toolkit")` が当たるのは関数定義であり、sidecar 解決より前に定義がある限り呼び出し順を逆転させても緑のまま残る。探索順を固定するなら HOME / CODEX_HOME を隔離し、cache と stale sidecar を並べて `--print-toolkit-root=kv` の `source=` を断言する。ソース文字列の前後関係だけを見るテストは、対象の機構を通っていない。
-
----
-
-<a id="ace-533-2"></a>
-
-### ACE-533-2: 推奨入口と互換入口を同じコードフェンスに並べず、エラー案内は実出力の文言で書く
-
-| Category | process | Origin | PR #533 / Issue #491 |
-| Date | 2026-09-14 |
-| Helpful | 0 | Harmful | 0 |
-| Status | active |
-
-同じフェンスに `/multi-review` と `codex-review.sh --fresh` を並べると、上から実行したエージェントが推奨結果を直後に退避し課金も二重になる。clone 直後の実エラーは `setup-multi-agent.sh` と名前だけ出し、パス付きコマンドは版不一致のときだけ出る。コピー用フェンスは推奨入口 1 本にし、エラー案内は実出力を写し、リポジトリ直下の同名スクリプトと toolkit の setup を混同させない。
-
----
-
-<a id="ace-534-1"></a>
-
-### ACE-534-1: ゲート記録器はレビューシムの版一致検査で解決せず、record-gate-head.sh の実在だけを見る
-
-| Category | tooling | Origin | PR #534 / Issue #515 |
-| Date | 2026-09-14 |
-| Helpful | 0 | Harmful | 0 |
-| Status | active |
-
-`--print-toolkit-root` は配置済みシムと toolkit テンプレートのバイト一致を要求する。同じ 0.108.0 でもホストの cache 実体が違うと identity が rc=2 になり、record-gate-head.sh はあるのに記録がスキップされる。ゲート補助スクリプトは cache glob / sidecar で実ファイルを探し、失敗理由を「cache が無い」に決め打ちしない。
-
----
-
-<a id="ace-535-1"></a>
-
-### ACE-535-1: Git fixture は local user.name を書かず、専用 config と AUTHOR/COMMITTER env に identity を閉じる
-
-| Category | testing | Origin | PR #535 / Issue #529 |
-| Date | 2026-09-14 |
-| Helpful | 0 | Harmful | 0 |
-| Status | active |
-
-hook の `GIT_DIR` を 1 spawn でも継承すると `git config user.name` は cwd より呼び出し元リポジトリを向く。継承 `GIT_*` を捨てたうえで local identity は書かず、プロセス固有の `GIT_CONFIG_GLOBAL` と `GIT_AUTHOR_*` / `GIT_COMMITTER_*` だけを渡す。helper の extra に `GIT_DIR` を戻さない。
-
----
-
-<a id="ace-536-1"></a>
-
-### ACE-536-1: 分類カテゴリの列挙は PLAYBOOK 一覧が正本で、他文書へ写すと再乖離する
-
-| Category | documentation-quality | Origin | PR #536 / Issue #487 |
-| Date | 2026-09-14 |
-| Helpful | 0 | Harmful | 0 |
-| Status | active |
-
-`/ace-curate` と `ace-cycle` が 8 種を写していると、実態の `documentation-quality` が選択肢から落ちる。分類は PLAYBOOK のカテゴリ一覧を参照し、列挙を他文書へコピーしない。行数上限の式や件数ゲートもチェッカー説明と PLAYBOOK を同時に更新する。
-
----
-
-<a id="ace-536-2"></a>
-
-### ACE-536-2: 件数導出のヘッダ行数は HTML コメントをマスクしてから最初の実見出しを探す
-
-| Category | tooling | Origin | PR #536 / Issue #487 |
-| Date | 2026-09-14 |
-| Helpful | 0 | Harmful | 0 |
-| Status | active |
-
-`analyzePlaybookMarkdown` は HTML コメントを除くが、ヘッダ行数を生本文の最初の `### ACE-<数字>` で切ると追記例が終端になる。導出上限が過小になり密度警告が偽陽性になる。コメントを同長スペースでマスクしてから実見出し位置を取り、原文の行数を数える。
-
----
-
-<a id="ace-537-1"></a>
-
-### ACE-537-1: バックグラウンド実行では tail -n へパイプせず、出力は素のまま流して完了後に出力ファイルを絞る
-
-| Category | process | Origin | PR #537 / Issue #480 |
-| Date | 2026-09-14 |
-| Helpful | 0 | Harmful | 0 |
-| Status | active |
-
-長時間コマンドを `cmd | tail -n` でバックグラウンド起動すると、`tail -n` が末尾確定のため EOF を待ち、ホストの出力ファイルは終了まで空になる。途中失敗に気づけない。「パイプしない」という知識だけでは、長い出力を要約したい動機のほうが強く再発する。バックグラウンドではコマンドを素のまま起動し、絞り込みは完了後にホストが保存した出力ファイルへ対して行う。`grep` / `head` は EOF 待ちとは別挙動なので同じ「終了までバッファ」に畳まない。
-
----
-
-<a id="ace-539-1"></a>
-
-### ACE-539-1: テンプレートツリーの角括弧は未確定値警告に畳み、消費者ツリーだけ leftover と deferred を分岐する
-
-| Category | documentation-quality | Origin | PR #539 / Issue #507 |
-| Date | 2026-09-14 |
-| Helpful | 0 | Harmful | 0 |
-| Status | active |
-
-`/init-docs` が推測で埋めずに残す `[金額]` `[SLA値]` `[x.x.x]` と、消費者が埋めるべき `[プロジェクト名]` は同じ `[…]` でも失敗クラスが違う。basename が `docs-template` なら角括弧を未確定値警告にして exit 0 を保ち、消費者ツリーでは leftover と deferred を別文言で出す。deferred は inner の exact-set（と `x.x` 連なり）に限り、`includes('SLA')` は `[SLACK連携]` を誤分類する。閉じたフェンス・リンク・タスクリストはマスクし、閉じ忘れは検査対象に残す。
-
----
-
-<a id="ace-539-2"></a>
-
-### ACE-539-2: git と node を複数回 spawn する vitest は既定 5s を超えうる — SKIP_QUALITY_GATE せず it の timeout を明示する
-
-| Category | tooling | Origin | PR #539 / Issue #507 |
-| Date | 2026-09-14 |
-| Helpful | 0 | Harmful | 0 |
-| Status | active |
-
-pre-push の `quality:local` で symlink CLI テストが 5.1〜6.4s になり vitest 既定 5s で落ち、レビュー修正の push が止まった。単体再実行は 1.6s で通るため「テストが壊れた」と誤診しやすい。プロセス spawn が複数ある `it` には `{ timeout: 15_000 }` を付け、ゲート自体は通す。
 
 ---
 
@@ -2524,6 +833,15 @@ PR #551 では PATTERNS.md §3 を新設の ERRORS.md へ移し、配布物リ�
 ---
 
 ## Changelog
+
+### [1.65.0] - 2026-10-16
+
+#### 整理（/ace-refine）
+
+- Archived: ACE-003, ACE-005, ACE-006, ACE-007, ACE-008, ACE-009, ACE-010, ACE-011, ACE-013, ACE-015, ACE-017, ACE-024, ACE-026, ACE-027, ACE-028, ACE-030, ACE-031, ACE-032, ACE-033, ACE-036, ACE-037, ACE-038, ACE-039, ACE-040, ACE-041, ACE-043, ACE-441-1, ACE-441-2, ACE-443-1, ACE-447-1, ACE-449-1, ACE-459-2, ACE-460-1, ACE-462-1, ACE-464-1, ACE-464-2, ACE-465-1, ACE-469-1, ACE-469-2, ACE-502-1, ACE-508-1, ACE-508-2, ACE-510-1, ACE-510-2, ACE-516-1, ACE-516-2, ACE-516-3, ACE-519-1, ACE-519-2, ACE-519-3, ACE-526-1, ACE-527-1, ACE-532-1, ACE-533-1, ACE-533-2, ACE-534-1, ACE-535-1, ACE-536-1, ACE-536-2, ACE-537-1, ACE-539-1, ACE-539-2（helpful=0・30日以上参照なし。原文は playbook/archive/ のカテゴリ別ファイルへ verbatim 保全）
+- Compacted: ACE-001, ACE-002, ACE-004, ACE-012, ACE-014, ACE-016, ACE-018, ACE-019, ACE-020, ACE-021, ACE-022, ACE-023, ACE-025, ACE-029, ACE-034, ACE-035, ACE-042, ACE-044, ACE-045, ACE-046, ACE-445-1, ACE-447-2, ACE-447-3, ACE-449-2, ACE-449-3, ACE-459-1, ACE-464-3, ACE-465-2, ACE-484-1, ACE-484-2, ACE-484-3, ACE-489-1（旧テーブル形式を正準フォーマットへ要約。原文は playbook/archive/ のカテゴリ別ファイルが正）
+- Promoted: ACE-001, ACE-018, ACE-445-1, ACE-489-1（PATTERNS.md §14 へ蒸留。元エントリは live に active のまま残す）
+- live の旧テーブル形式が 0 件になったため、legacy-format-allowlist.txt を空にした（Issue #561）
 
 ### [1.64.0] - 2026-10-15
 
@@ -2979,7 +1297,7 @@ PR #551 では PATTERNS.md §3 を新設の ERRORS.md へ移し、配布物リ�
 
 #### 更新
 
-- ACE-025（スクリプトの対象範囲を実装列挙で書く）Helpful: 0 → 1 — PR #429 で「不在で no-op」のような慣用語ではなく「specs=0 で `dist/spec-index.json` を空索引として書き出し exit 0」と実装挙動を字面で書く事例として補強。Related に [ACE-043](#ace-043) を追加
+- ACE-025（スクリプトの対象範囲を実装列挙で書く）Helpful: 0 → 1 — PR #429 で「不在で no-op」のような慣用語ではなく「specs=0 で `dist/spec-index.json` を空索引として書き出し exit 0」と実装挙動を字面で書く事例として補強。Related に [ACE-043](https://github.com/feel-flow/ai-spec-driven-development/blob/HEAD/docs-template/08-knowledge/playbook/archive/documentation-quality.md#ace-043) を追加
 
 ### [1.20.0] - 2026-05-20
 

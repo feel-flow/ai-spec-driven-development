@@ -318,7 +318,7 @@ bash scripts/review-level.sh --base develop
 - **センシティブパス**（行数によらず Level 3）: (a) 実行系ディレクトリ（`scripts/`・`.husky/`・`.github/`・`mcp/src/`・`docs-template/scripts/`）、(b) すべてのシェルスクリプト（`*.sh`）、(c) `package.json`、(d) ルート直下の設定・コードファイル（`vitest.config.ts` 等）
 - 閾値は `REVIEW_LEVEL_LIGHT_MAX_LINES` / `REVIEW_LEVEL_STANDARD_MAX_LINES` で上書き可
 - 判定は**推奨**であり機械的にはブロックしない（強制ゲートは pre-push の `quality:local` が担う）
-- センシティブパスが行数によらず重点になるのは、レビュー・品質ゲートの実行系に潜伏バグが実在した教訓（[ACE-449-1](../docs-template/08-knowledge/PLAYBOOK.md#ace-449-1)）による
+- センシティブパスが行数によらず重点になるのは、レビュー・品質ゲートの実行系に潜伏バグが実在した教訓（[ACE-449-1](../docs-template/08-knowledge/playbook/archive/tooling.md#ace-449-1)）による
 
 #### 5つの観点
 

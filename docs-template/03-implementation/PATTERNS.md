@@ -1,10 +1,10 @@
 ---
 title: "PATTERNS"
-version: "1.6.0"
+version: "1.7.0"
 status: "draft"
 owner: "@your-github-handle"
 created: "YYYY-MM-DD"
-updated: "2026-10-15"
+updated: "2026-10-16"
 changeImpact: "medium"
 ---
 
@@ -715,6 +715,8 @@ ACE Playbook で `Helpful >= 5` に達した知見を、`/ace-refine` が蒸留�
 - **昇格は移動ではない**: 元の Playbook エントリは `Status: active` のまま残す（蒸留オーバーレイ）。詳細な適用条件は出典リンク先を参照
 - **昇格手順の SSOT**: `/ace-refine` スキル本体
 
+> 注: 以下の 4 件は、このリポジトリ自身（ai-spec-driven-development）で昇格させた例である。導入先では削除するか、自プロジェクトの昇格パターンに置き換える。出典リンクが `blob/HEAD` の絶対 URL なのは、このファイルが `/init-docs` の初期セットに含まれ、初期セット外の `08-knowledge/` へ相対リンクを張れないためである。
+
 <!-- /ace-refine が以下の形式で追記する。まだない場合は削除せず「該当なし（昇格発生後に追記）」と明記する
 
 ### [パターンを一言で表す見出し]
@@ -724,9 +726,35 @@ ACE Playbook で `Helpful >= 5` に達した知見を、`/ace-refine` が蒸留�
 出典: [ACE-XXX](../08-knowledge/PLAYBOOK.md#ace-xxx)
 -->
 
-- 該当なし（昇格発生後に追記）
+### クロスモデルレビューを省略しない
+
+PR を作る前のセルフレビューでは、別系列モデルの CLI（Codex 等）が使えるなら、ホスト自身のセルフレビューにそのクロスモデルレビューを加え、省略しない。モデルの系列ごとに検出できる問題のカテゴリが違うため、同系列だけでは見落としが残る。.asdd/config.json で複数 AI レビューを無効にしている場合（`features.multiReview=false`）は適用しない。
+
+出典: [ACE-001](https://github.com/feel-flow/ai-spec-driven-development/blob/HEAD/docs-template/08-knowledge/PLAYBOOK.md#ace-001)
+
+### 同系列レビュアーの全員承認を正しさの証拠にしない
+
+同系列のレビュアーが「既存コードと整合的」を理由に全員承認した箇所は、別系列のクロスモデルレビューへ回す。既存の helper を写すときは写し元の欠陥まで継承していないかを疑い、片方だけ直さずに共有 helper へ抽出して両方を直す。
+
+出典: [ACE-445-1](https://github.com/feel-flow/ai-spec-driven-development/blob/HEAD/docs-template/08-knowledge/PLAYBOOK.md#ace-445-1)
+
+### 番号・順序の横断変更は着手前に対象を全件列挙する
+
+番号・順序を横断的に変えるときは、着手前に意味的に等価な複数の grep パターン（直接参照・順序の散文・状態の説明・メタデータ・段階数）で対象ファイルを全部列挙する。「旧表現の grep ヒットなし」を受け入れ条件に書く。
+
+出典: [ACE-018](https://github.com/feel-flow/ai-spec-driven-development/blob/HEAD/docs-template/08-knowledge/PLAYBOOK.md#ace-018)
+
+### 「違反ゼロ」を期待するガードは検出器自体をテストする
+
+`expect(violations).toEqual([])` の形の規約ガードを書くときは、合成入力で検出器そのものを固定するテスト（拾うべき形・拾ってはいけない形・境界値）を同じ PR に置く。実ファイルで違反ゼロを確かめるだけでは、検出器が壊れても緑のまま通る。
+
+出典: [ACE-489-1](https://github.com/feel-flow/ai-spec-driven-development/blob/HEAD/docs-template/08-knowledge/PLAYBOOK.md#ace-489-1)
 
 ## Changelog
+
+### [1.7.0] - 2026-10-16
+
+- §14「実証済みパターン（ACE 昇格）」へ `/ace-refine` で ACE-001 / ACE-445-1 / ACE-018 / ACE-489-1 を昇格した（Issue #561）
 
 ### [1.6.0] - 2026-10-15
 
