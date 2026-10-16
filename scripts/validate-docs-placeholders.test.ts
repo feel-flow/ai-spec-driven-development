@@ -7,8 +7,9 @@ import { afterEach, describe, expect, it } from "vitest";
 // @ts-expect-error 検証対象はNode.jsで直接実行するESMスクリプト（型宣言を持たない）
 import { findBracketPlaceholders, maskExemptSpans } from "./validate-docs.mjs";
 
-// Issue #582: validate-docs.mjs は型宣言を持たず import が any になるため、テストが参照する
-// findBracketPlaceholders の戻り値の要素の形だけをここで宣言してコールバック引数に付ける。
+// Issue #582: validate-docs.mjs の戻り値の型は JSDoc にしか無く、allowJs を掛けない tsc からは import が any になる。
+// テストが参照する findBracketPlaceholders の戻り値の要素の形をここで宣言してコールバック引数に付ける
+// （実装と食い違っても tsc は検出しない。食い違いは下の toEqual が実行時に検出する）。
 interface BracketPlaceholderHit {
   raw: string;
   inner: string;
