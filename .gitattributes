@@ -6,4 +6,5 @@
 *.yml text eol=lf
 *.sh text eol=lf
 # この行を足した後の既存チェックアウトは自動では LF にならない。`git ls-files --eol | grep w/crlf` で CRLF の
-# ファイルを確認し、未変更なら `git checkout -- <path>`（または `rm <path> && git checkout -- <path>`）で取り直す
+# ファイルを確認し、未変更なら `rm <path> && git checkout -- <path>` で取り直す（`git checkout -- <path>` だけでは
+# stat が一致したままなので何もしない。Issue #576 で実測）
