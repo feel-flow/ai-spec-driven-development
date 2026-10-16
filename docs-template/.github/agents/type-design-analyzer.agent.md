@@ -54,18 +54,22 @@ interface IUserService {
 
 ```typescript
 // NG: string で何でも受け入れる
-function sendEmail(to: string, subject: string): void { ... }
+function sendEmail(to: string, subject: string): void {
+  /* ... */
+}
 
 // OK: Branded Type で制約を表現
-type Email = string & { readonly __brand: 'Email' };
-type NonEmptyString = string & { readonly __brand: 'NonEmptyString' };
+type Email = string & { readonly __brand: "Email" };
+type NonEmptyString = string & { readonly __brand: "NonEmptyString" };
 
-function sendEmail(to: Email, subject: NonEmptyString): void { ... }
+function sendEmail(to: Email, subject: NonEmptyString): void {
+  /* ... */
+}
 
 // バリデーション付きファクトリ関数
 function createEmail(value: string): Result<Email> {
   if (!isValidEmail(value)) {
-    return Result.fail(new ValidationError('Invalid email format'));
+    return Result.fail(new ValidationError("Invalid email format"));
   }
   return Result.ok(value as Email);
 }
@@ -75,7 +79,9 @@ function createEmail(value: string): Result<Email> {
 
 ```typescript
 // NG: any 型の使用
-function processData(data: any): any { ... }
+function processData(data: any): any {
+  /* ... */
+}
 
 // NG: 型アサーションの乱用
 const user = data as User; // 型チェックをバイパス
@@ -83,10 +89,7 @@ const user = data as User; // 型チェックをバイパス
 // OK: 型ガードの使用
 function isUser(data: unknown): data is User {
   return (
-    typeof data === 'object' &&
-    data !== null &&
-    'id' in data &&
-    'email' in data
+    typeof data === "object" && data !== null && "id" in data && "email" in data
   );
 }
 ```

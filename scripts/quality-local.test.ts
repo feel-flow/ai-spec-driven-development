@@ -19,6 +19,20 @@ const QUALITY_LOCAL = join(REPO_ROOT, "scripts", "quality-local.sh");
 const RECORD_HELPER = join(REPO_ROOT, "scripts", "record-quality-gate.sh");
 const BASE_PATH = "/usr/bin:/bin";
 
+// quality-local.sh の STEPS と同じ順序（段を足したらここも足す。段数はこの配列から数える）
+const EXPECTED_ORDER = [
+  "run build:mcp",
+  "run check",
+  "--prefix mcp test",
+  "run test:ace-scripts",
+  "run validate -- docs-template",
+  "run check:md-ts",
+  "run build:spec-index",
+  "run format:md:check",
+  "run lint:md",
+];
+const STEP_COUNT = EXPECTED_ORDER.length;
+
 // 実チェックアウトで quality-local.sh を走らせるテストの前提（Issue #565）。
 // 依存が無いと本物のスクリプトが先頭で止まるが、テスト側の失敗は終了コードの不一致や calls ログ不在などで
 // 原因（依存不在）を名指ししないので、先にここで原因を名指しして止める。
@@ -289,16 +303,6 @@ describe("quality:local gate record (Issue #515)", () => {
   });
 
   describe("段ラベルと停止位置 (Issue #389)", () => {
-    const EXPECTED_ORDER = [
-      "run build:mcp",
-      "run check",
-      "--prefix mcp test",
-      "run test:ace-scripts",
-      "run validate -- docs-template",
-      "run build:spec-index",
-      "run format:md:check",
-      "run lint:md",
-    ];
     const FAILING_STEP_RC = 7;
 
     beforeAll(requireRealCheckoutDeps);
@@ -336,7 +340,7 @@ describe("quality:local gate record (Issue #515)", () => {
       }
     }
 
-    it("成功時は 8 段を従来の順で呼び、各段の開始ラベルが実際の呼び出しと一致する", () => {
+    it("成功時は全段を従来の順で呼び、各段の開始ラベルが実際の呼び出しと一致する", () => {
       const { r, calls, status } = runWithStub(null);
       expect(r.status, r.stderr).toBe(0);
       expect(calls).toEqual(EXPECTED_ORDER);
@@ -345,14 +349,14 @@ describe("quality:local gate record (Issue #515)", () => {
         .filter((line) => line.startsWith("==> quality:local "));
       expect(labels).toEqual(
         EXPECTED_ORDER.map(
-          (args, i) => `==> quality:local [${i + 1}/${EXPECTED_ORDER.length}] npm ${args}`,
+          (args, i) => `==> quality:local [${i + 1}/${STEP_COUNT}] npm ${args}`,
         ),
       );
-      expect(r.stdout).toContain("✓ quality:local: 全 8 段が通過しました");
+      expect(r.stdout).toContain(`✓ quality:local: 全 ${STEP_COUNT} 段が通過しました`);
       expect(status).toBe("pass");
     });
 
-    it.each([1, 4, 8])(
+    it.each([1, 4, STEP_COUNT])(
       "%i 段目が落ちたらその段の終了コードを返し、段名を stderr に出して後続を呼ばない",
       (stepNo) => {
         const failing = EXPECTED_ORDER[stepNo - 1];
@@ -360,9 +364,9 @@ describe("quality:local gate record (Issue #515)", () => {
         expect(r.status).toBe(FAILING_STEP_RC);
         expect(calls).toEqual(EXPECTED_ORDER.slice(0, stepNo));
         expect(r.stderr).toContain(
-          `[${stepNo}/8] npm ${failing} が失敗しました（exit ${FAILING_STEP_RC}）。この段だけ再実行: npm ${failing}`,
+          `[${stepNo}/${STEP_COUNT}] npm ${failing} が失敗しました（exit ${FAILING_STEP_RC}）。この段だけ再実行: npm ${failing}`,
         );
-        expect(r.stdout).not.toContain("全 8 段が通過しました");
+        expect(r.stdout).not.toContain(`全 ${STEP_COUNT} 段が通過しました`);
         expect(status).toBe("fail");
       },
     );
@@ -436,10 +440,10 @@ describe("quality:local gate record (Issue #515)", () => {
       },
     );
 
-    it("両方在るときは従来どおり 8 段を実行して exit 0", () => {
+    it("両方在るときは従来どおり全段を実行して exit 0", () => {
       const { r, calls, status } = runInFixture({ root: true, mcp: true });
       expect(r.status, r.stderr).toBe(0);
-      expect(calls).toHaveLength(8);
+      expect(calls).toEqual(EXPECTED_ORDER);
       expect(status).toBe("pass");
     });
   });

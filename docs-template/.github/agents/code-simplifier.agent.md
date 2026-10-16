@@ -54,7 +54,9 @@ function formatUserName(user: User): string {
 ```typescript
 // NG: 不要な変数
 const isValid = value !== null && value !== undefined;
-if (isValid) { ... }
+if (isValid) {
+  /* ... */
+}
 // → if (value != null) { ... }
 
 // NG: 冗長な条件分岐

@@ -302,7 +302,7 @@ app.post("/api/users", validateCreateUser, createUserHandler);
 
 **推奨: 一貫したレスポンス構造**
 
-```typescript
+```jsonc
 // 成功レスポンス
 {
   "data": {

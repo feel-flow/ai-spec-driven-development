@@ -259,11 +259,15 @@ docs-template/TESTING.mdのテスト戦略に従って、以下の機能のユ�
 
    ```typescript
    // ❌ 間違い
-   if (user.age > 18) { ... }
+   if (user.age > 18) {
+     /* ... */
+   }
 
    // ✅ 正しい
    const MINIMUM_AGE = 18; // 成人年齢（歳）
-   if (user.age > MINIMUM_AGE) { ... }
+   if (user.age > MINIMUM_AGE) {
+     /* ... */
+   }
    ```
 
 3. **any型の使用**

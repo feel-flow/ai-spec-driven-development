@@ -48,7 +48,9 @@ metadata:
 
 ```typescript
 // NG: マジックナンバー
-if (retryCount > 3) { ... }
+if (retryCount > 3) {
+  /* ... */
+}
 setTimeout(callback, 30000);
 
 // OK: 名前付き定数
