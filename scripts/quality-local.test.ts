@@ -74,14 +74,16 @@ function shellPath(path: string): string {
 }
 
 // bash が出したパスを Node の existsSync で読める形へ直す（Windows の /c/... → C:/...）。
+// cygpath が失敗したときは入力をそのまま返す（呼び出し元の existsSync が偽になり、その候補を使わないだけ）。
 function nodePath(path: string): string {
   if (!TOOLS.cygpath || !path.startsWith("/")) return path;
   const r = spawnSync(TOOLS.cygpath, ["-m", path], { encoding: "utf8" });
   return r.status === 0 && r.stdout ? r.stdout.trim() : path;
 }
 
-// 各テストは bash を起動して quality-local.sh を走らせるので、Windows では起動が重い。単独なら最長 3.3 秒の
-// テストが、vitest 全体（他スイートと並列）では既定の 5 秒を超えて落ちた（Issue #570）。単独時の約 6 倍まで待つ（ms）
+// このファイルの多くのテストは bash で quality-local.sh や git を起動するので、Windows では起動が重い。単独なら
+// 最長 3.3 秒のテストが、vitest 全体（他スイートと並列）では既定の 5 秒を超えて落ちた（Issue #570）。
+// 単独時の約 6 倍まで待つ（ms）。OS で切り替えず全体に掛ける（POSIX では上限に届かないので挙動は変わらない）
 const SPAWN_TEST_TIMEOUT_MS = 20_000;
 
 // quality-local.sh の STEPS と同じ順序（段を足したらここも足す。段数はこの配列から数える）
@@ -207,7 +209,8 @@ function writeFixtureToolkit(dir: string): string {
 function initRepo(dir: string): string {
   const git = (...args: string[]) => {
     const r = spawnSync(TOOLS.git, args, { cwd: dir, encoding: "utf8", env: gitEnv() });
-    if (r.status !== 0) throw new Error(`git ${args.join(" ")}: ${r.stderr}`);
+    // 起動できなかったときは stderr が空なので、起動エラー（r.error）を優先して出す
+    if (r.status !== 0) throw new Error(`git ${args.join(" ")}: ${r.error?.message ?? r.stderr}`);
   };
   git("init", "-b", "develop");
   writeFileSync(join(dir, "README"), "ok\n");
@@ -218,7 +221,7 @@ function initRepo(dir: string): string {
     encoding: "utf8",
     env: gitEnv(),
   });
-  if (head.status !== 0) throw new Error(head.stderr);
+  if (head.status !== 0) throw new Error(`git rev-parse HEAD: ${head.error?.message ?? head.stderr}`);
   return head.stdout.trim();
 }
 
