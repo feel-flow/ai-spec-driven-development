@@ -13,6 +13,7 @@
  * 検査から外すマーカー: 先頭語の後ろに `no-check:` と理由を書く。理由が無ければ違反として報告する。
  *   ```typescript no-check: 意図的に構文を崩した悪い例
  *
+ * フェンスは引用（>）の中・リスト項目の開始行・タブでインデントした位置にあっても拾う。
  * 他言語のフェンス（```` ````markdown ```` など）の中に書かれた TypeScript フェンスは、
  * 外側のフェンスの本文として扱い検査しない。
  *
@@ -33,9 +34,16 @@ const EXIT_OK = 0;
 const EXIT_VIOLATION = 1;
 const EXIT_NO_TARGET = 2;
 
-const FENCE_OPEN = new RegExp(`^( *)(\`{${MIN_FENCE_LENGTH},}|~{${MIN_FENCE_LENGTH},})(.*)$`);
-const FENCE_CLOSE = new RegExp(`^ *(\`{${MIN_FENCE_LENGTH},}|~{${MIN_FENCE_LENGTH},}) *$`);
+// フェンス行の判定は、引用（>）とリストの記号を取り除いた後の本文に対して行う
+const FENCE_OPEN = new RegExp(`^(\`{${MIN_FENCE_LENGTH},}|~{${MIN_FENCE_LENGTH},})(.*)$`);
+const FENCE_CLOSE = new RegExp(`^[ \\t]*(\`{${MIN_FENCE_LENGTH},}|~{${MIN_FENCE_LENGTH},})[ \\t]*$`);
+const QUOTE_MARKER = /^ {0,3}>[ \t]?/;
+const LIST_MARKER = /^[ \t]*(?:[-*+]|\d{1,9}[.)])[ \t]+/;
+const LEADING_WHITESPACE = /^[ \t]*/;
+const NO_CHECK_TOKEN = new RegExp(`^${NO_CHECK_MARKER}(?::|\\s|$)`);
 const LINE_BREAK = /\r?\n/;
+// CommonMark のタブストップ（桁）
+const TAB_STOP = 4;
 
 function toPosix(p) {
   return p.split(path.sep).join('/');
@@ -61,20 +69,63 @@ function parseInfo(info) {
   const [first = '', ...rest] = trimmed.split(/\s+/);
   const lang = first.toLowerCase();
   const tail = rest.join(' ');
-  if (!tail.startsWith(NO_CHECK_MARKER)) return { lang, noCheck: false, reason: '' };
+  // no-check は語として一致させる（no-checking などを受理しない）
+  if (!NO_CHECK_TOKEN.test(tail)) return { lang, noCheck: false, reason: '' };
   const reason = tail.slice(NO_CHECK_MARKER.length).replace(/^:/, '').trim();
   return { lang, noCheck: true, reason };
 }
 
-/** CommonMark と同じく、開きフェンスのインデント幅までを各行の先頭から取り除く。 */
-function stripIndent(line, indent) {
-  const leading = line.match(/^ */)[0].length;
-  return line.slice(Math.min(indent, leading));
+/** 先頭から最大 maxDepth 段の引用記号（>）を取り除く。取り除いた段数と文字数も返す。 */
+function stripQuotes(line, maxDepth = Infinity) {
+  let depth = 0;
+  let removed = 0;
+  let rest = line;
+  while (depth < maxDepth) {
+    const m = rest.match(QUOTE_MARKER);
+    if (!m) break;
+    depth++;
+    removed += m[0].length;
+    rest = rest.slice(m[0].length);
+  }
+  return { depth, removed, rest };
+}
+
+function nextColumn(col, ch) {
+  return ch === '\t' ? col + TAB_STOP - (col % TAB_STOP) : col + 1;
+}
+
+/** 先頭 end 文字が占める桁数（タブは TAB_STOP 桁のタブストップまで進める）。 */
+function columnsOf(text, end) {
+  let col = 0;
+  for (let i = 0; i < end; i++) col = nextColumn(col, text[i]);
+  return col;
+}
+
+/** CommonMark と同じく、開きフェンスの桁位置までの空白を行頭から取り除く。取り除いた文字数も返す。 */
+function stripColumns(text, cols) {
+  let col = 0;
+  let i = 0;
+  while (i < text.length && col < cols && (text[i] === ' ' || text[i] === '\t')) {
+    col = nextColumn(col, text[i]);
+    i++;
+  }
+  return { text: text.slice(i), removed: i };
+}
+
+/** 引用・リスト記号・インデントの後ろにあるフェンスの開始を読む。フェンスでなければ null。 */
+function readFenceOpen(line) {
+  const q = stripQuotes(line);
+  const prefix = (q.rest.match(LIST_MARKER) ?? q.rest.match(LEADING_WHITESPACE))[0];
+  const m = q.rest.slice(prefix.length).match(FENCE_OPEN);
+  // バッククォートのフェンスは情報文字列にバッククォートを含められない（CommonMark）
+  if (!m || (m[1][0] === '`' && m[2].includes('`'))) return null;
+  return { quoteDepth: q.depth, indentCols: columnsOf(q.rest, prefix.length), fence: m[1], info: parseInfo(m[2]) };
 }
 
 /**
  * Markdown 1 ファイルから TypeScript フェンスを抜き出す。
- * @returns {Array<{ lang: string, noCheck: boolean, reason: string, fenceLine: number, indent: number, source: string }>}
+ * removed[k] は本文 k 行目で行頭から取り除いた文字数（列番号を元の行へ戻すのに使う）。
+ * @returns {Array<{ lang: string, noCheck: boolean, reason: string, fenceLine: number, removed: number[], source: string }>}
  */
 export function extractBlocks(text) {
   const lines = text.split(LINE_BREAK);
@@ -82,26 +133,32 @@ export function extractBlocks(text) {
   let open = null;
   const finish = () => {
     if (TS_LANGS.has(open.info.lang)) {
-      blocks.push({ ...open.info, fenceLine: open.fenceLine, indent: open.indent, source: open.body.join('\n') });
+      blocks.push({ ...open.info, fenceLine: open.fenceLine, removed: open.removed, source: open.body.join('\n') });
     }
     open = null;
   };
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i];
     if (!open) {
-      const m = line.match(FENCE_OPEN);
-      // バッククォートのフェンスは情報文字列にバッククォートを含められない（CommonMark）
-      if (m && !(m[2][0] === '`' && m[3].includes('`'))) {
-        open = { fence: m[2], indent: m[1].length, info: parseInfo(m[3]), fenceLine: i + 1, body: [] };
-      }
+      const fence = readFenceOpen(line);
+      if (fence) open = { ...fence, fenceLine: i + 1, body: [], removed: [] };
       continue;
     }
-    const c = line.match(FENCE_CLOSE);
+    const q = stripQuotes(line, open.quoteDepth);
+    if (q.depth < open.quoteDepth) {
+      // 引用が終わるとフェンスも閉じる（CommonMark）。この行は改めてフェンスの開始として読む
+      finish();
+      i--;
+      continue;
+    }
+    const c = q.rest.match(FENCE_CLOSE);
     if (c && c[1][0] === open.fence[0] && c[1].length >= open.fence.length) {
       finish();
       continue;
     }
-    open.body.push(stripIndent(line, open.indent));
+    const stripped = stripColumns(q.rest, open.indentCols);
+    open.body.push(stripped.text);
+    open.removed.push(q.removed + stripped.removed);
   }
   // 閉じられないフェンスは文書末尾まで続く（CommonMark）
   if (open) finish();
@@ -167,9 +224,9 @@ export function checkDirs(dirs) {
   for (const entry of entries) {
     for (const d of diagnostics.get(entry.name)) {
       const { line, character } = d.file.getLineAndCharacterOfPosition(d.start ?? 0);
-      // 本文 1 行目はフェンス行の次の行。列はインデントを取り除く前の位置に戻す
+      // 本文 1 行目はフェンス行の次の行。列は引用記号・インデントを取り除く前の位置に戻す
       const mdLine = entry.fenceLine + 1 + line;
-      const mdCol = entry.indent + character + 1;
+      const mdCol = (entry.removed[line] ?? 0) + character + 1;
       const message = ts.flattenDiagnosticMessageText(d.messageText, ' ');
       errors.push(`${entry.rel}:${mdLine}:${mdCol} TS${d.code}: ${message}`);
     }

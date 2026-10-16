@@ -109,13 +109,13 @@ npm run lint:md
 | `npm run build:spec-index`          | ルート → `node scripts/build-spec-index.mjs`。`docs/specs/**` 検証＋索引生成（不在時は specs=0 で `dist/spec-index.json` を空索引として書き出し exit 0）。 |
 | `npm run lint:md`                   | ルート、`markdownlint-cli2` 対象パスを指定。                                                                                                               |
 
-**注**: ルートの `package.json` には `format:md`（Prettier 書き込み）/ `format:md:check`（Prettier 検査）が存在するが、本 §3.2 は **旧 `ci.yml` のステップ順** を再現するセクションのため列挙していない（旧 `ci.yml` には Prettier ステップが含まれていなかった）。**`quality:local` の実体には `format:md:check` が含まれる**（§3.3 参照）。
+**注**: ルートの `package.json` には `format:md`（Prettier 書き込み）/ `format:md:check`（Prettier 検査）が存在するが、本 §3.2 は **旧 `ci.yml` のステップ順** を再現するセクションのため列挙していない（旧 `ci.yml` には Prettier ステップが含まれていなかった）。**`quality:local` の実体には `format:md:check` が含まれる**（§3.3 参照）。同じく `check:md-ts`（Markdown 内 TypeScript の構文検査、Issue #512）も旧 `ci.yml` に無かった段なので §3.2 には列挙せず、§3.3 の順序にだけ載せる。
 
 <a id="quality-local-detail"></a>
 
 ### 3.3 `quality:local` npm スクリプト（実装済み）
 
-- **ルート `package.json`**: `quality:local` は `bash scripts/quality-local.sh` を呼ぶ。チェーンは **3.2 と同順**だが、**`npm ci` および `npm --prefix mcp ci` を含まない**（日々の実行時間を抑える）。
+- **ルート `package.json`**: `quality:local` は `bash scripts/quality-local.sh` を呼ぶ。チェーンは **3.2 と同順**（§3.2 に無い `format:md:check` / `check:md-ts` を加えたもの）だが、**`npm ci` および `npm --prefix mcp ci` を含まない**（日々の実行時間を抑える）。
 - **実行前の前提**: クローン直後・依存を揃えるとき・未変更ファイルが `format:md:check` で落ちたときは、先に `npm ci` と `npm --prefix mcp ci` を実行する（§3.2 冒頭の 2 ステップ）。`npm install` だと lockfile 以外のパッチが入り、prettier のような整形ツールでは**触っていない Markdown が赤くなる**（Issue #485）。prettier はキャレットなしの固定バージョン（`package.json` の `devDependencies.prettier`）なので、`npm ci` 後は lockfile の版だけが使われる。`quality:local` はルートと `mcp/` のどちらか（または両方）の `node_modules` が無いとき、段を 1 つも実行せずに不在のディレクトリと `npm ci` / `npm --prefix mcp ci` を案内して止まり（gate-record は `fail`、exit 1。`npm ci` は自動実行しない）、依存不在が TS2688 や `'vitest' は認識されていません` のような別の失敗に見えないようにする（Issue #565）。
 - **中身の順序**: `build:mcp` → `check` → `mcp test` → `test:ace-scripts` → `validate -- docs-template` → `check:md-ts` → `build:spec-index` → `format:md:check` → `lint:md`。
 - **Markdown 内 TypeScript の構文検査**（Issue #512）: `check:md-ts`（`scripts/check-md-typescript.mjs`）が `docs-template/**/*.md` の情報文字列の先頭語が `typescript` / `ts` / `tsx` のフェンスを抜き出し、TypeScript の構文診断を `<ファイル>:<行>:<列> TS<コード>: <メッセージ>` で報告する。コード例はファイル横断で識別子を参照するため、型検査はしない。意図的に構文を崩した悪い例は ` ```typescript no-check: <理由> ` で検査から外す（理由の無い `no-check` は違反）。JSON やルート一覧のような TypeScript でない例は `jsonc` / `text` など実際の言語でフェンスを書く。構文が正しいブロックは prettier の埋め込み整形の対象になるので、修正後は `format:md` で整形する。

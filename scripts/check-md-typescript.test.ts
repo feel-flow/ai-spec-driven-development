@@ -125,6 +125,60 @@ describe("check-md-typescript (Issue #512)", () => {
     expect(r.stdout).toContain("0 ブロックを構文検査しました");
   });
 
+  it("no-check で始まる別の語（no-checking など）は除外マーカーとして受理しない", () => {
+    const cwd = fixture({ "docs/a.md": `${FENCE}typescript no-checking\n} catch {\n${FENCE}\n` });
+    const r = run(cwd, "docs");
+    expect(r.status).toBe(EXIT_VIOLATION);
+    expect(r.stderr).toMatch(/^docs\/a\.md:2:1 TS\d+: /m);
+  });
+
+  it.each([
+    ["引用の中", ["> 例:", ">", `> ${FENCE}typescript`, "> } catch (e) {", `> ${FENCE}`], "4:3"],
+    ["リスト項目の開始行", [`- ${FENCE}typescript`, "  } catch (e) {", `  ${FENCE}`], "2:3"],
+    ["タブでインデントした位置", ["1. 手順", "", `\t${FENCE}ts`, "\t} catch (e) {", `\t${FENCE}`], "4:2"],
+  ])("%sのフェンスも検査し、元の行の列で報告する", (_label, lines, at) => {
+    const cwd = fixture({ "docs/a.md": [...lines, ""].join("\n") });
+    const r = run(cwd, "docs");
+    expect(r.status).toBe(EXIT_VIOLATION);
+    expect(r.stderr).toMatch(new RegExp(`^docs/a\\.md:${at} TS\\d+: `, "m"));
+  });
+
+  it("引用が終わるとフェンスも閉じ、後ろの本文を TypeScript として読まない", () => {
+    const cwd = fixture({
+      "docs/a.md": ["> " + FENCE + "typescript", "> const a = 1;", "", "引用の外の文章 { ...", ""].join("\n"),
+    });
+    expect(run(cwd, "docs").status).toBe(EXIT_OK);
+  });
+
+  it("複数ファイル・複数ブロックの違反を、それぞれのファイルと行へ戻して報告する", () => {
+    const ok = `${FENCE}ts\nconst ok = 1;\n${FENCE}\n`;
+    const cwd = fixture({
+      "docs/a.md": [ok, "本文", "", `${FENCE}typescript`, "const a = 1;", "} x", FENCE, ""].join("\n"),
+      "docs/b.md": [`${FENCE}ts`, "} y", FENCE, ""].join("\n"),
+    });
+    const r = run(cwd, "docs");
+    expect(r.status).toBe(EXIT_VIOLATION);
+    // a.md: 1〜3 行目が正しいブロック、4 行目が空行、7 行目が 2 つ目のフェンス、9 行目が `} x`
+    expect(r.stderr).toMatch(/^docs\/a\.md:9:1 TS\d+: /m);
+    expect(r.stderr).toMatch(/^docs\/b\.md:2:1 TS\d+: /m);
+    expect(r.stderr).not.toMatch(/^docs\/a\.md:[1-8]:/m);
+  });
+
+  it("チルダのフェンス・大文字の言語名・閉じられないフェンスも検査する", () => {
+    const tilde = run(fixture({ "docs/a.md": "~~~TypeScript\n} catch {\n~~~\n" }), "docs");
+    expect(tilde.stderr).toMatch(/^docs\/a\.md:2:1 TS\d+: /m);
+    const unclosed = run(fixture({ "docs/a.md": `# 末尾\n\n${FENCE}ts\n} catch {\n` }), "docs");
+    expect(unclosed.stderr).toMatch(/^docs\/a\.md:4:1 TS\d+: /m);
+  });
+
+  it("node_modules 配下の Markdown は辿らない", () => {
+    const cwd = fixture({
+      "docs/ok.md": "# ok\n",
+      "docs/node_modules/pkg/README.md": `${FENCE}ts\n} catch {\n${FENCE}\n`,
+    });
+    expect(run(cwd, "docs").status).toBe(EXIT_OK);
+  });
+
   it("対象ディレクトリが無い・Markdown が無いときは 0 件の緑にしない", () => {
     const cwd = fixture({ "docs/readme.txt": "not markdown" });
     expect(run(cwd, "missing").status).toBe(EXIT_NO_TARGET);
