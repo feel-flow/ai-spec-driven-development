@@ -1,12 +1,12 @@
 ---
 title: "PLAYBOOK"
-version: "1.67.0"
+version: "1.68.0"
 status: "approved"
 created: "2026-03-10"
 updated: "2026-10-16"
 owner: "@fffokazaki"
 changeImpact: "medium"
-ace_entry_count: 51
+ace_entry_count: 53
 tags: [ace, playbook, knowledge-management]
 references:
   - https://github.com/feel-flow/ai-spec-driven-development/blob/HEAD/docs/ACE_FRAMEWORK.md
@@ -860,9 +860,42 @@ PR #551 では PATTERNS.md §3 を新設の ERRORS.md へ移し、配布物リ�
 
 ---
 
+<a id="ace-569-1"></a>
+
+### ACE-569-1: 構文の壊れたコード例は、構文検査だけでなく Markdown 整形ツールの埋め込み整形からも黙って外れる
+
+| Category | documentation-quality | Origin | PR #569 |
+| Date | 2026-10-16 |
+| Helpful | 0 | Harmful | 0 |
+| Status | active |
+
+Markdown の整形ツールはフェンス内のコードも言語ごとに整形するが、解析できないブロックはエラーにせず原文のまま残す。そのため、構文の壊れた例は整形検査も緑のまま通り、壊れていること自体がどのゲートにも現れない。構文が通るよう直したブロックは初めて整形の対象になり、引用符や改行の差分が出る。コード例の構文検査を導入するときは、既存違反を直した後に整形を書き込みモードで回し、その差分を同じ変更に含める。JSON やルート一覧のように TypeScript でない例は、検査を外すマーカーではなく実際の言語名でフェンスを書き直す。
+
+---
+
+<a id="ace-569-2"></a>
+
+### ACE-569-2: Markdown の入れ物（引用・リスト）を自前で解析するときは、始まりと終わりを対で実装し、終わりの側にも回帰テストを置く
+
+| Category | coding | Origin | PR #569 |
+| Date | 2026-10-16 |
+| Helpful | 0 | Harmful | 0 |
+| Status | active |
+
+引用やリストの中のコードフェンスを拾えるようにすると、その入れ物が終わったときにフェンスも閉じなければならない。始まりだけを足すと、閉じられないフェンスが後ろの独立したブロックまで飲み込み、見逃しが別の形で戻る（PR #569 では 1 巡目の修正が 2 巡目のレビューでこの回帰として見つかった）。入れ物を 1 つ対応するたびに「開始を認識する」「終了で閉じて次の行を読み直す」を対で実装し、テストも両方を 1 組で書く。対応する入れ物が増えて境界の扱いが膨らむなら、自前の抽出をやめて CommonMark 準拠のパーサへ置き換える。
+
+---
+
 ## Changelog
 
 > [1.64.0] 以前の履歴は [PLAYBOOK-CHANGELOG.md](https://github.com/feel-flow/ai-spec-driven-development/blob/HEAD/docs-template/08-knowledge/PLAYBOOK-CHANGELOG.md) に移した（PLAYBOOK.md は /ace-setup で配布され、移動先は配置されないため絶対 URL）。
+
+### [1.68.0] - 2026-10-16
+
+#### 追加
+
+- ACE-569-1: 構文の壊れたコード例は、構文検査だけでなく Markdown 整形ツールの埋め込み整形からも黙って外れる（PR #569）
+- ACE-569-2: Markdown の入れ物（引用・リスト）を自前で解析するときは、始まりと終わりを対で実装し、終わりの側にも回帰テストを置く（PR #569）
 
 ### [1.67.0] - 2026-10-16
 

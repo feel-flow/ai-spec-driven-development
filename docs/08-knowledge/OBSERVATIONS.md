@@ -168,8 +168,8 @@ AC の grep を頭で組んで起票すると、検出式の穴（表記の必�
 
 ### OBS-010: ACE 系スキルは PLAYBOOK を `docs/08-knowledge/` 固定で参照するが、テンプレ配布リポジトリでは実体が `docs-template/08-knowledge/` にある
 
-| Kind | problem | Count | 4 |
-| First | 2026-09-06 | Last | 2026-10-15 |
+| Kind | problem | Count | 5 |
+| First | 2026-09-06 | Last | 2026-10-16 |
 | Status | promoted | Issue | feel-flow/feelflow-plugins#2142 |
 
 既定パスで grep・frontmatter 読みを組むと全コマンドが not found で空振りし、パスを直して再実行する往復が出る → 着手時に `package.json` の `ace:*` スクリプトが指すパスで実配置を確定してからコマンドを組む（`/retrospective` の「知見ストアの実配置を確定する」と同じ手順を curate 側にも置く余地）。
@@ -179,6 +179,7 @@ AC の grep を頭で組んで起票すると、検出式の穴（表記の必�
 - 2026-10-15: PR #547 の curate で `docs/08-knowledge/playbook/` を前提に組んだ grep が 3 回空振りし、直近 ACE コミットの `--stat` で実配置を特定した（再発・Count 3）。SSOT の curate.md は既に「配置先の解決（最初に実施）」で記録済み配置（本 repo では `docs/ACE_SETUP.md`）を読む手順を持っており、空振りは手順の読み飛ばしによるものだったため、起票せず mitigated とした
 - 2026-10-15: Issue #418 / PR #559 の着手前参照で、`knowledge-lookup.sh` が既定パスと `docs-template` を除いた探索だけで解決し「Playbook なし — ACE 未導入」と報告。`--playbook docs-template/08-knowledge/PLAYBOOK.md` を付けて再実行するまで 1 往復（再発・Count 4）
 - 2026-10-15: 状態移行: mitigated の対策（ace-curate の「配置先の解決」）が knowledge-lookup に及んでいない＝対策が効いていない（promotion.md 復帰条件 b）ため active へ戻し、Count 4 で昇格。SSOT develop `2ca0635` の `scripts/knowledge-lookup.sh` `resolve_store` が `ACE_PLAYBOOK_PATH`・記録済み配置を読まないことを照合して feel-flow/feelflow-plugins#2142 を起票。旧所在は feel-flow/feelflow-plugins@2ca0635 の curate.md「配置先の解決」
+- 2026-10-16: Issue #512 / PR #569 の着手前参照で、ff-dev-toolkit 0.151.0 の `knowledge-lookup.sh` がまた「Playbook なし — ACE 未導入」と報告した（`docs-template/08-knowledge/PLAYBOOK.md` は実在）。curate では直近 ACE コミットの `--stat` で実配置を確かめて 1 往復（再発・Count 5。#2142 は open）
 
 ---
 
@@ -207,6 +208,7 @@ AC の grep を頭で組んで起票すると、検出式の穴（表記の必�
 `quality:local` は fenced TypeScript を検査しない。写経される文書で同じ欠陥クラスが同一 PR 内で 2 回（1 巡目 SKILL.md §5、2 巡目 §6）再発した → fenced TS を抽出して構文チェック（少なくとも）するゲートを追加する（#512）。
 
 - 2026-09-06: PR #510 の 1 巡目で SKILL.md §5 の `} catch` 断片、2 巡目で §6 の同型を Toolkit code-reviewer が検出（初回・2 回目）
+- 2026-10-16: 完了照合: #512 は PR #569 で closed になった。構文の欠陥は develop `6e1bbce` の `scripts/check-md-typescript.mjs`（`quality:local` 6 段目 `check:md-ts`）で検出できるようになった。ただし主張に含まれる型の欠陥（サブクラスへ伝播しない引数＝TS2554）は #512 の範囲外で未対策のため、mitigated への移行は保留し、promoted のまま残す
 
 ---
 
@@ -608,13 +610,14 @@ clone 方式によっては `refs/remotes/origin/HEAD` が作られず、ACE / �
 
 ### OBS-040: CI checks が無い、または Windows で全件ゲートが完走しないリポジトリでは、WSL の Linux クローンで全件ゲートを回すとマージ判定の根拠が得られる
 
-| Kind | keep | Count | 1 |
+| Kind | keep | Count | 2 |
 | First | 2026-10-16 | Last | 2026-10-16 |
 | Status | active | Issue | なし |
 
 Windows の Git Bash では `tests/run-all.sh` が 2 時間超で完走せず、PR 単位の CI も無いため、`finish.sh precheck` が `RERUN_FULL_GATE=yes` のまま判定不能になる。WSL へブランチを `git clone` して高速モードの全件ゲートを回すと 140 suite が完走し、Windows では見えない赤（公開ミラー対象ファイルの番号参照）も検出できた → Windows ホストで全件ゲートが要る PR は、最初から WSL の Linux クローンで回す
 
 - 2026-10-16: feel-flow/feelflow-plugins PR #2145。WSL で 2 回実行し、1 回目で `sync-forbidden-patterns` の赤を検出、修正後 139 passed / 0 failed（初回）
+- 2026-10-16: Issue #512 / PR #569。Windows では `quality-local.test.ts` が読み込み時に落ちて `quality:local` が完走しない（#570）。そこで WSL のクリーンクローンで `npm ci` 後に 3 回ずつ全 9 段を通し、AC の実測（壊したブロックを入れて 6 段目で止まる）とマージ判定の根拠にした（再発）
 
 ---
 
@@ -636,13 +639,14 @@ Windows の Git Bash では `tests/run-all.sh` が 2 時間超で完走せず、
 
 ### OBS-042: Git Bash から `wsl.exe -- bash -lc '...'` に渡したコマンド文字列の中の `$?` は正しく展開されず、失敗したコマンドの終了コードが 0 に見える
 
-| Kind | problem | Count | 1 |
+| Kind | problem | Count | 2 |
 | First | 2026-10-16 | Last | 2026-10-16 |
 | Status | active | Issue | なし |
 
 `wsl.exe -d Ubuntu -- bash -lc 'false; echo "probe:$?"'` は `probe:0` を出す。終了コードを `$?` で読む検証を `bash -lc` の引数文字列に埋め込むと、実際は exit 1 のスクリプトが exit 0 に見え、存在しないバグを追って `bash -x` で 2 往復した → WSL での検証はスクリプトファイルへ書いて `MSYS_NO_PATHCONV=1 wsl.exe -d <distro> -- bash <ファイルの /mnt パス>` で実行し、終了コードはファイル内で読む
 
 - 2026-10-16: Issue #565 / PR #566 の Linux 検証で、`quality-local.sh` が依存不在で exit 1 を返すのに `EXIT=0` と表示された。スクリプトファイル経由の再測定で `rc:1` を確認（初回）
+- 2026-10-16: Issue #512 / PR #569 の WSL 検証。PowerShell から `wsl -- bash -lc '... $n ... $?'` を渡すと、ループ変数 `$n` と `$?` が外側のシェルで展開され、ログ名が `ql-.log`・`rc=0` 固定になった。Git Bash から `wsl.exe -- bash /mnt/c/...` を呼んだ回は、パスが `C:/Program Files/Git/mnt/c/...` に書き換えられて exit 127 になった。どちらもスクリプトファイルを PowerShell 経由で渡し直して解消（再発）
 
 ---
 
@@ -657,5 +661,33 @@ Windows の Git Bash では `tests/run-all.sh` が 2 時間超で完走せず、
 `git diff --name-only origin/develop -- '*.md'` はコミット前の未追跡ファイルを含まないため、新設した Markdown だけが markdownlint・prettier に掛からず「全段 EXIT=0」と報告された。実装者が個別に lint を回して MD051 違反を見つけ、判断待ちで 1 往復した → 作業ツリーの検証対象は `git diff` に加えて `git ls-files --others --exclude-standard` で未追跡ファイルも含めるか、コミット後に `git diff <base>...HEAD` で数える
 
 - 2026-10-16: Issue #567 / PR #568。PLAYBOOK-CHANGELOG.md（新設）の移動した本文にある `#ace-045` リンクが MD051 で赤になることを、検証スクリプトが拾わなかった（初回）
+
+---
+
+<a id="obs-044"></a>
+
+### OBS-044: Windows の `core.autocrlf=true` では、作業ツリーの改行が index とずれたまま `git status` は clean に見え、整形ゲートが偽の赤を出したりシェルスクリプトが壊れたりする
+
+| Kind | problem | Count | 1 |
+| First | 2026-10-16 | Last | 2026-10-16 |
+| Status | active | Issue | なし |
+
+`.gitattributes` に `*.md text eol=lf` を足す前にチェックアウトしたファイルは、作業ツリーで CRLF のまま残る。git は正規化して比べるので `git status` は clean だが、prettier は CRLF を整形違反として数える。`eol` 属性の無い `.sh` は、`git stash` の往復などで git が書き直すと CRLF になり、bash が読めなくなる → 整形ゲートが触っていないファイルで大量に赤くなったら、まず `git ls-files --eol` の `w/crlf` を確かめ、未変更ファイルは削除して checkout し直す。シェルスクリプトにも `eol=lf` を付ける
+
+- 2026-10-16: Issue #512 / PR #569。`format:md:check` が 142 ファイルで赤になり、原因は CRLF のまま残った 213 ファイルだった。再チェックアウトで解消した。同じセッションで、`git stash` / `pop` の往復のあと `scripts/quality-local.sh` が CRLF になった（初回）
+
+---
+
+<a id="obs-045"></a>
+
+### OBS-045: 依存を 1 つ追加しただけでも、ローカルの npm の版が lockfile を書いた版と違うと、無関係な欄の削除が lockfile の差分に混ざる
+
+| Kind | problem | Count | 1 |
+| First | 2026-10-16 | Last | 2026-10-16 |
+| Status | active | Issue | なし |
+
+`npm install -D --save-exact <pkg>` は、追加した依存のほかに lockfile 全体を手元の npm の形式で書き直す。そのため、optional 依存の `libc` 欄が消えるような、版の違いだけによる差分が入る。プラットフォーム別バイナリの選別に効く欄なので、そのままコミットすると別 OS の `npm ci` の結果が変わりうる → 依存を足したら `git diff package-lock.json` を読み、追加した依存の行以外の差分は元に戻してからコミットする
+
+- 2026-10-16: Issue #512 / PR #569。npm 11.5.2 で `typescript` を追加したところ、`libc` 欄の削除が 10 か所混ざった（16+/30-）。lockfile を戻し、`typescript` の 2 か所（15 行）だけを足し直した（初回）
 
 ---
