@@ -22,6 +22,8 @@ writeFileSync(
  * GIT_AUTHOR_* / GIT_COMMITTER_* に閉じ、local user.name は書かない。
  * extra の GIT_* は採用しない（GIT_DIR を戻すと #529 が再発する）。
  * GIT_CONFIG_NOSYSTEM で /etc/gitconfig を遮断し、GIT_CONFIG_SYSTEM は null device。
+ * scripts/export-toolkit-templates.mjs の gitEnvironment も同じ処方（Issue #573）。
+ * .mjs からは import できないので、処方を変えるときは両方を揃える。
  */
 export function gitFixtureEnv(
   extra: Record<string, string | undefined> = {},
