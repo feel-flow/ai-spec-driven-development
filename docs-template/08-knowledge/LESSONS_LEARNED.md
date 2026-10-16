@@ -286,7 +286,7 @@ async function processInBatches<T>(
 
 ```typescript
 // 安全なJWT検証実装
-import jwt from "jsonwebtoken";
+import jwt, { type JwtPayload } from "jsonwebtoken";
 
 class SecureJWTValidator {
   private readonly secretKey: string;
@@ -295,7 +295,7 @@ class SecureJWTValidator {
     this.secretKey = secretKey;
   }
 
-  verifyToken(token: string): any {
+  verifyToken(token: string): JwtPayload {
     try {
       // アルゴリズムを明示的に指定
       const decoded = jwt.verify(token, this.secretKey, {
@@ -303,6 +303,10 @@ class SecureJWTValidator {
         clockTolerance: 30, // 時刻の許容誤差（秒）
       });
 
+      // jwt.verify は string | JwtPayload を返す。文字列ペイロードはこのアプリでは扱わない
+      if (typeof decoded === "string") {
+        throw new Error("Unexpected string payload");
+      }
       return decoded;
     } catch (error) {
       throw new Error(`Token verification failed: ${error.message}`);
@@ -310,7 +314,7 @@ class SecureJWTValidator {
   }
 
   // トークンの有効性を追加チェック
-  validateTokenPayload(payload: any): boolean {
+  validateTokenPayload(payload: JwtPayload): boolean {
     const now = Math.floor(Date.now() / 1000);
 
     // 有効期限チェック

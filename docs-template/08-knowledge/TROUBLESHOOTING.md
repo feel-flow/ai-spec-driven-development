@@ -448,15 +448,19 @@
 
    ```typescript
    // 安全なJWT検証
-   import jwt from "jsonwebtoken";
+   import jwt, { type JwtPayload } from "jsonwebtoken";
 
-   function verifyToken(token: string): any {
+   function verifyToken(token: string): JwtPayload {
      try {
        const decoded = jwt.verify(token, process.env.JWT_SECRET, {
          algorithms: ["HS256"],
          clockTolerance: 30,
        });
 
+       // jwt.verify は string | JwtPayload を返す。文字列ペイロードは扱わない
+       if (typeof decoded === "string") {
+         throw new Error("Unexpected string payload");
+       }
        return decoded;
      } catch (error) {
        throw new Error(`Token verification failed: ${error.message}`);
