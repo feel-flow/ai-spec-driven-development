@@ -11,13 +11,31 @@ import {
 import { homedir, tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { describe, expect, it } from "vitest";
+import { beforeAll, describe, expect, it } from "vitest";
 import { gitFixtureEnv } from "./git-fixture-env";
 
 const REPO_ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const QUALITY_LOCAL = join(REPO_ROOT, "scripts", "quality-local.sh");
 const RECORD_HELPER = join(REPO_ROOT, "scripts", "record-quality-gate.sh");
 const BASE_PATH = "/usr/bin:/bin";
+
+// 実チェックアウトで quality-local.sh を走らせるテストの前提（Issue #565）。
+// 依存が無いと本物のスクリプトが先頭で止まり `expected 1 to be 0` としか読めないので、原因を先に名指しする。
+const REAL_CHECKOUT_DEPS: ReadonlyArray<{ dir: string; fix: string }> = [
+  { dir: "node_modules", fix: "npm ci" },
+  { dir: "mcp/node_modules", fix: "npm --prefix mcp ci" },
+];
+
+function requireRealCheckoutDeps(): void {
+  const missing = REAL_CHECKOUT_DEPS.filter(({ dir }) => !existsSync(join(REPO_ROOT, dir)));
+  if (missing.length > 0) {
+    throw new Error(
+      `実チェックアウトの依存が未導入です。${missing
+        .map(({ dir, fix }) => `${dir} が無い（先に実行: ${fix}）`)
+        .join(" / ")}`,
+    );
+  }
+}
 
 function gitEnv(): NodeJS.ProcessEnv {
   return gitFixtureEnv({
@@ -226,6 +244,7 @@ describe("quality:local gate record (Issue #515)", () => {
   });
 
   it("quality-local.sh は npm チェーン成功で pass、失敗で fail を書く", () => {
+    requireRealCheckoutDeps();
     const passDir = mkdtempSync(join(tmpdir(), "ql-npm-pass-"));
     const failDir = mkdtempSync(join(tmpdir(), "ql-npm-fail-"));
     const toolkit = mkdtempSync(join(tmpdir(), "ql-tk-"));
@@ -280,6 +299,8 @@ describe("quality:local gate record (Issue #515)", () => {
       "run lint:md",
     ];
     const FAILING_STEP_RC = 7;
+
+    beforeAll(requireRealCheckoutDeps);
 
     function runWithStub(failOn: string | null) {
       const binDir = mkdtempSync(join(tmpdir(), "ql-steps-"));
