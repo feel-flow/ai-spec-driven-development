@@ -168,7 +168,7 @@ git checkout -b "feature/123-user-auth"
 
 #### 作業中の判断ログ: `implementation-notes.md` を並走させる
 
-実装着手と同時に **作業ブランチ直下** に `implementation-notes.md` を作成し、コミットと一緒に追記する。コミット diff には残らない「なぜこの選択をしたか / spec から変えた点 / 捨てた選択肢」を保持することで、ステップ5（Self-Review）の精度とステップ10（ACE Generate）の入力品質が上がる。詳細根拠は [ACE-034](../docs-template/08-knowledge/PLAYBOOK.md#ace-034)。
+実装着手と同時に **作業ブランチ直下** に `implementation-notes.md` を作成し、コミットと一緒に追記する。コミット diff には残らない「なぜこの選択をしたか / spec から変えた点 / 捨てた選択肢」を保持することで、ステップ5（Self-Review）の精度とステップ10（ACE Generate）の入力品質が上がる。詳細根拠は [ACE-034](../docs-template/08-knowledge/playbook/archive/process.md#ace-034)。
 
 最小ひな形（コピペして使う）:
 
@@ -318,7 +318,7 @@ bash scripts/review-level.sh --base develop
 - **センシティブパス**（行数によらず Level 3）: (a) 実行系ディレクトリ（`scripts/`・`.husky/`・`.github/`・`mcp/src/`・`docs-template/scripts/`）、(b) すべてのシェルスクリプト（`*.sh`）、(c) `package.json`、(d) ルート直下の設定・コードファイル（`vitest.config.ts` 等）
 - 閾値は `REVIEW_LEVEL_LIGHT_MAX_LINES` / `REVIEW_LEVEL_STANDARD_MAX_LINES` で上書き可
 - 判定は**推奨**であり機械的にはブロックしない（強制ゲートは pre-push の `quality:local` が担う）
-- センシティブパスが行数によらず重点になるのは、レビュー・品質ゲートの実行系に潜伏バグが実在した教訓（[ACE-449-1](../docs-template/08-knowledge/PLAYBOOK.md#ace-449-1)）による
+- センシティブパスが行数によらず重点になるのは、レビュー・品質ゲートの実行系に潜伏バグが実在した教訓（[ACE-449-1](../docs-template/08-knowledge/playbook/archive/tooling.md#ace-449-1)）による
 
 #### 5つの観点
 
@@ -534,7 +534,7 @@ gh discussion create \
 
 **任意エスカレーション — chore PR**: 大人数チーム、または知見内容自体をレビューに残したい場合のみ、develop から `chore/ace-from-pr-<PR番号>` ブランチを切り、PLAYBOOK.md 追記を小さい chore PR として PR レビュー → squash merge する。
 
-> **ACE-012 との関係（混同しないこと）**: [ACE-012](../docs-template/08-knowledge/PLAYBOOK.md#ace-012) は「うっかり」feature 作業を develop に直接 push してしまう事故（ブランチ切り替わりの見落とし）を防ぐルール。一方、本セクションの「develop 直マージ」は `knowledge:` プレフィックス付きの PLAYBOOK 単独コミットに限定した「意図的・承認済み」のフローであり、両者は別物。ACE-012 は引き続き有効（deprecated にしない）。
+> **ACE-012 との関係（混同しないこと）**: [ACE-012](../docs-template/08-knowledge/playbook/archive/process.md#ace-012) は「うっかり」feature 作業を develop に直接 push してしまう事故（ブランチ切り替わりの見落とし）を防ぐルール。一方、本セクションの「develop 直マージ」は `knowledge:` プレフィックス付きの PLAYBOOK 単独コミットに限定した「意図的・承認済み」のフローであり、両者は別物。ACE-012 は引き続き有効（deprecated にしない）。
 
 ---
 

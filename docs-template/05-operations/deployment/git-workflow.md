@@ -122,7 +122,7 @@ git checkout -b "feature/${ISSUE_NUM}-user-auth"
 
 #### 作業中の判断ログ: `implementation-notes.md` を並走させる
 
-実装着手と同時に **作業ブランチ直下** に `implementation-notes.md` を作成し、コミットと一緒に追記する。コミット diff には残らない「なぜこの選択をしたか / spec から変えた点 / 捨てた選択肢」を保持することで、ステップ5（Self-Review）の精度とステップ10（ACE Generate）の入力品質が上がる。詳細根拠は [ACE-034](../../08-knowledge/PLAYBOOK.md#ace-034)。
+実装着手と同時に **作業ブランチ直下** に `implementation-notes.md` を作成し、コミットと一緒に追記する。コミット diff には残らない「なぜこの選択をしたか / spec から変えた点 / 捨てた選択肢」を保持することで、ステップ5（Self-Review）の精度とステップ10（ACE Generate）の入力品質が上がる。詳細根拠は [ACE-034](../../08-knowledge/playbook/archive/process.md#ace-034)。
 
 最小ひな形（コピペして使う）:
 
@@ -148,7 +148,7 @@ git checkout -b "feature/${ISSUE_NUM}-user-auth"
 
 **運用ルール**:
 
-- **書くタイミングは「気付いた瞬間」**: 後で書こうとすると確実に忘れる（[ACE-032](../../08-knowledge/PLAYBOOK.md#ace-032) の発見経緯と同じ構造）
+- **書くタイミングは「気付いた瞬間」**: 後で書こうとすると確実に忘れる（[ACE-032](../../08-knowledge/playbook/archive/documentation-quality.md#ace-032) の発見経緯と同じ構造）
 - **粒度は 1〜3 行**: 「なぜ A ではなく B を選んだか」を短文で残す
 - **スコープ外発見は本ファイルではなく Issue 化**: implementation-notes は「現 PR の判断ログ」、Issue は「別タスクへの分岐」と役割を分ける（[ワークフロー運用原則 原則2](./workflow-principles.md)）
 - **PR 作成時に PR description に転記**: ステップ6 でレビュアーが「なぜ」を読みやすくなる
@@ -805,7 +805,7 @@ GitHub Discussions への記録に加え、ACE Playbook への構造化記録を
 
 **任意エスカレーション — chore PR**: 大人数チーム、または知見内容自体をレビューに残したい場合のみ、develop から `chore/ace-from-pr-<PR番号>` ブランチを切り、PLAYBOOK.md 追記を小さい chore PR として PR レビュー → squash merge する。
 
-> **ACE-012 との関係（混同しないこと）**: [ACE-012](../../08-knowledge/PLAYBOOK.md#ace-012) は _うっかり_ feature 作業を develop に直接 push してしまう事故（ブランチ切り替わりの見落とし）を防ぐルール。一方、本セクションの「develop 直マージ」は `knowledge:` プレフィックス付きの **PLAYBOOK 単独コミット** に限定した _意図的・承認済み_ のフローであり、両者は別物。ACE-012 は引き続き有効（deprecated にしない）。
+> **ACE-012 との関係（混同しないこと）**: [ACE-012](../../08-knowledge/playbook/archive/process.md#ace-012) は _うっかり_ feature 作業を develop に直接 push してしまう事故（ブランチ切り替わりの見落とし）を防ぐルール。一方、本セクションの「develop 直マージ」は `knowledge:` プレフィックス付きの **PLAYBOOK 単独コミット** に限定した _意図的・承認済み_ のフローであり、両者は別物。ACE-012 は引き続き有効（deprecated にしない）。
 
 ## タスク管理（Task Tracking）
 
