@@ -645,3 +645,17 @@ Windows の Git Bash では `tests/run-all.sh` が 2 時間超で完走せず、
 - 2026-10-16: Issue #565 / PR #566 の Linux 検証で、`quality-local.sh` が依存不在で exit 1 を返すのに `EXIT=0` と表示された。スクリプトファイル経由の再測定で `rc:1` を確認（初回）
 
 ---
+
+<a id="obs-043"></a>
+
+### OBS-043: 検証スクリプトの対象ファイルを `git diff <base>` で決めると、まだ追跡していない新設ファイルが lint・整形検査から漏れる
+
+| Kind | problem | Count | 1 |
+| First | 2026-10-16 | Last | 2026-10-16 |
+| Status | active | Issue | なし |
+
+`git diff --name-only origin/develop -- '*.md'` はコミット前の未追跡ファイルを含まないため、新設した Markdown だけが markdownlint・prettier に掛からず「全段 EXIT=0」と報告された。実装者が個別に lint を回して MD051 違反を見つけ、判断待ちで 1 往復した → 作業ツリーの検証対象は `git diff` に加えて `git ls-files --others --exclude-standard` で未追跡ファイルも含めるか、コミット後に `git diff <base>...HEAD` で数える
+
+- 2026-10-16: Issue #567 / PR #568。PLAYBOOK-CHANGELOG.md（新設）の移動した本文にある `#ace-045` リンクが MD051 で赤になることを、検証スクリプトが拾わなかった（初回）
+
+---
