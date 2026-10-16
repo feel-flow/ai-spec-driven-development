@@ -107,7 +107,7 @@ ACE エントリ ID は **PRスコープ式** を採用する（このセクシ�
 ### 記述ガイドライン
 
 - **anchor**: 各エントリは見出し直前に `<a id="ace-XXX"></a>` を 1 行付与する。`XXX` は **エントリ ID を小文字化したもの**（新規は `ace-438-1` / `ace-i425-1`、旧エントリは `ace-001`。anchor 部分は常に小文字英数字＋ハイフン）。ファイルレベル参照（`PLAYBOOK.md` 単体）は常にファイル先頭に着地するため、anchor がなければ個別エントリへの誘導が成立しない。anchor 付与により他ドキュメントから `[ACE-438-1](path/to/PLAYBOOK.md#ace-438-1)` 形式で**特定エントリに直接ジャンプ可能**になる。
-- **参照リンク形式**: 他ドキュメントから ACE エントリを参照する場合は `[ACE-XXX](path/to/PLAYBOOK.md#ace-XXX)` 形式に統一する（`XXX` はエントリ ID の接頭辞 `ACE-` / `ace-` を除いた部分。新規は `438-1`、旧は 3 桁 `040`。label は `ACE-438-1`、anchor は `#ace-438-1`）。`[PLAYBOOK ACE-XXX]` / `[PLAYBOOK.md ACE-XXX]` 等の異なる label は使わない（[ACE-040](playbook/archive/process.md#ace-040) 語彙統一 / [ACE-024](playbook/archive/documentation-quality.md#ace-024) 用語衝突防止 の系。Origin: Issue [#425](https://github.com/feel-flow/ai-spec-driven-development/issues/425)）。参照先は、active エントリなら `PLAYBOOK.md#ace-xxx`、アーカイブ済みエントリなら `playbook/archive/<category>.md#ace-xxx` とする。どちらか迷うときは `playbook/archive/` を ID で grep して所在を確かめる。
+- **参照リンク形式**: 他ドキュメントから ACE エントリを参照する場合は `[ACE-XXX](path/to/PLAYBOOK.md#ace-XXX)` 形式に統一する（`XXX` はエントリ ID の接頭辞 `ACE-` / `ace-` を除いた部分。新規は `438-1`、旧は 3 桁 `040`。label は `ACE-438-1`、anchor は `#ace-438-1`）。`[PLAYBOOK ACE-XXX]` / `[PLAYBOOK.md ACE-XXX]` 等の異なる label は使わない（[ACE-040](https://github.com/feel-flow/ai-spec-driven-development/blob/HEAD/docs-template/08-knowledge/playbook/archive/process.md#ace-040) 語彙統一 / [ACE-024](https://github.com/feel-flow/ai-spec-driven-development/blob/HEAD/docs-template/08-knowledge/playbook/archive/documentation-quality.md#ace-024) 用語衝突防止 の系。Origin: Issue [#425](https://github.com/feel-flow/ai-spec-driven-development/issues/425)）。参照先は、active エントリなら `PLAYBOOK.md#ace-xxx`、アーカイブ済みエントリなら `playbook/archive/<category>.md#ace-xxx` とする（配布される文書（docs-template/ 配下・.claude/commands/）から archive を指すときは、`/ace-setup` が archive を配置しないため `blob/HEAD` の絶対 URL にする）。どちらか迷うときは `playbook/archive/` を ID で grep して所在を確かめる。
 - **本文の構成**: 1 文目 =「何を学んだか」（知見の本質）。2 文目 =「どんな状況で使うか」（非自明な適用条件。再現条件が明確であるほど価値が高い）。最後に「次回何をすべきか」（推奨アクション）。
 
 ---
@@ -1297,7 +1297,7 @@ PR #551 では PATTERNS.md §3 を新設の ERRORS.md へ移し、配布物リ�
 
 #### 更新
 
-- ACE-025（スクリプトの対象範囲を実装列挙で書く）Helpful: 0 → 1 — PR #429 で「不在で no-op」のような慣用語ではなく「specs=0 で `dist/spec-index.json` を空索引として書き出し exit 0」と実装挙動を字面で書く事例として補強。Related に [ACE-043](playbook/archive/documentation-quality.md#ace-043) を追加
+- ACE-025（スクリプトの対象範囲を実装列挙で書く）Helpful: 0 → 1 — PR #429 で「不在で no-op」のような慣用語ではなく「specs=0 で `dist/spec-index.json` を空索引として書き出し exit 0」と実装挙動を字面で書く事例として補強。Related に [ACE-043](https://github.com/feel-flow/ai-spec-driven-development/blob/HEAD/docs-template/08-knowledge/playbook/archive/documentation-quality.md#ace-043) を追加
 
 ### [1.20.0] - 2026-05-20
 

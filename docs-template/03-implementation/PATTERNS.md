@@ -728,7 +728,7 @@ ACE Playbook で `Helpful >= 5` に達した知見を、`/ace-refine` が蒸留�
 
 ### クロスモデルレビューを省略しない
 
-PR を作る前のセルフレビューでは、別系列モデルの CLI（Codex 等）が使えるなら、ホスト自身のセルフレビューにそのクロスモデルレビューを加え、省略しない。モデルの系列ごとに検出できる問題のカテゴリが違うため、同系列だけでは見落としが残る。
+PR を作る前のセルフレビューでは、別系列モデルの CLI（Codex 等）が使えるなら、ホスト自身のセルフレビューにそのクロスモデルレビューを加え、省略しない。モデルの系列ごとに検出できる問題のカテゴリが違うため、同系列だけでは見落としが残る。.asdd/config.json で複数 AI レビューを無効にしている場合（`features.multiReview=false`）は適用しない。
 
 出典: [ACE-001](https://github.com/feel-flow/ai-spec-driven-development/blob/HEAD/docs-template/08-knowledge/PLAYBOOK.md#ace-001)
 
