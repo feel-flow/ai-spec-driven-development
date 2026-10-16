@@ -10,7 +10,7 @@ tags: [asdd, standard, dialogue, citizen-development]
 references:
   - docs/ASDD_2_0_CONFORMANCE.md
   - docs/ASDD_2_0_MIGRATION.md
-changeImpact: high
+changeImpact: medium
 visibility: public
 ---
 

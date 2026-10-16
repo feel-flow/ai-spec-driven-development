@@ -1,10 +1,10 @@
 ---
 title: "DEPLOYMENT"
-version: "1.5.0"
+version: "1.6.0"
 status: "draft"
 owner: "@your-github-handle"
 created: "YYYY-MM-DD"
-updated: "2026-10-15"
+updated: "2026-10-16"
 changeImpact: "medium"
 ---
 
@@ -306,7 +306,12 @@ PRマージ後のブランチ切り替え忘れを防ぐため、セッション
 ## Changelog
 
 - 2026-09-08 追記: プラグイン変数がない直接利用でも取得できる公開配布元を明記（ai-spec-driven-development#525）。
-- 2026-10-16 追記: 構成表と検索クエリマッピングに `deployment/key-inventory.md`（外部連携のキー一覧）を追加（Issue #541）。
+
+### [1.6.0] - 2026-10-16
+
+#### 追加
+
+- 構成表と検索クエリマッピングに `deployment/key-inventory.md`（外部連携のキー一覧）を追加（Issue #541）
 
 ### [1.5.0] - 2026-10-15
 
