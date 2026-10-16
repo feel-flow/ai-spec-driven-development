@@ -1,0 +1,2 @@
+# Windows の autocrlf=true でも作業ツリーの Markdown を LF にし、CRLF のコミットも防ぐ。prettier 既定の endOfLine: lf と揃える
+*.md text eol=lf
