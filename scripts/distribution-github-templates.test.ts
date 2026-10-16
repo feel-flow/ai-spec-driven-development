@@ -151,7 +151,7 @@ function findOutOfSetLinks(
 }
 
 const MD_FILES = listMarkdown(DIST_GITHUB);
-// 相対リンクの検査対象: .github/ 配下 + 初期セット内の docs 本体
+// リンク・inline code パス・上流レイアウト混入の検査対象: .github/ 配下 + 初期セット内の docs 本体
 const LINK_CHECKED_FILES = [...MD_FILES, ...listInitialSetFiles()];
 
 // 相対リンク（絶対 URL・ページ内アンカー・mailto を除く、拡張子付きファイルへのリンク）。
@@ -203,9 +203,12 @@ const UPSTREAM_LAYOUT_PATH = "docs-template/";
 //      直接利用」の配布元リンク、PATTERNS.md の ACE 出典リンクなど。URL は相対解決されない
 // 「docs-template ディレクトリ」のようなスラッシュ無しの散文は UPSTREAM_LAYOUT_PATH に
 // 一致しないので規則は不要。ここに載せる場合は理由を書く（黙って増やすと検査が骨抜きになる）。
+// URL は ASCII の印字可能文字に限り、括弧・引用符・`|`・バッククォートで終端する。全角の句読点や
+// 括弧（「URL、docs-template/…」「（URL）docs-template/…」）の向こうまで食うと混入を見逃す。
+// `replace` 専用（g フラグの lastIndex を持つので `.test()` / `.exec()` には使わない）。
 const UPSTREAM_PATH_EXEMPT_PATTERNS: readonly RegExp[] = [
   /\$\{CLAUDE_PLUGIN_ROOT\}\/docs-template\//g,
-  /https?:\/\/[^\s)\]>`]+/g,
+  /https?:\/\/(?:(?![)\]>`"'|])[!-~])+/g,
 ];
 
 /**
@@ -344,7 +347,8 @@ describe("配布版 GitHub テンプレートの参照解決", () => {
     for (const file of LINK_CHECKED_FILES) {
       leaked.push(
         ...findUpstreamLayoutPaths(
-          relative(REPO_ROOT, file),
+          // 報告のラベルは OS によらず `/` 区切り（自己検証のラベルと同じ形）
+          toPosixPath(relative(REPO_ROOT, file)),
           readFileSync(file, "utf8"),
         ),
       );
@@ -484,6 +488,20 @@ describe("検出器の自己検証", () => {
       findUpstreamLayoutPaths(
         label,
         "`${CLAUDE_PLUGIN_ROOT}/docs-template/README.md` を `docs-template/README.md` に置く",
+      ),
+    ).toHaveLength(1);
+    // URL と混入の同居（空白無し）。URL のマスクが `)` で止まらないと見逃す
+    expect(
+      findUpstreamLayoutPaths(
+        label,
+        "[配布元](https://github.com/x/docs-template/a.md)と[x](docs-template/MASTER.md)",
+      ),
+    ).toHaveLength(1);
+    // URL の直後が全角の句読点・括弧でも、URL のマスクはそこで止まる
+    expect(
+      findUpstreamLayoutPaths(
+        label,
+        "https://github.com/x/README.md、docs-template/MASTER.md を参照（https://github.com/x）docs-template/a.md",
       ),
     ).toHaveLength(1);
     // スラッシュ無しの散文（配布元の所在説明）は対象外
