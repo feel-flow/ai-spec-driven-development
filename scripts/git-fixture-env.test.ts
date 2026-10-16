@@ -9,7 +9,9 @@ import {
   gitFixtureEnv,
 } from "./git-fixture-env";
 
-const NULL_CONFIG = process.platform === "win32" ? "NUL" : "/dev/null";
+// Issue #573: Git が文書化する「この階層の設定を読まない」値。Git for Windows も MSYS 経由で解決する。
+// Windows の Git は NUL を `unable to access 'NUL': Invalid argument` で拒否するので OS で切り替えない。
+const NULL_GIT_CONFIG = "/dev/null";
 const PROBE_NAME = "real-user";
 const PROBE_EMAIL = "real@example.com";
 
@@ -27,8 +29,10 @@ function isolatedEnv(
   for (const [key, value] of Object.entries(process.env)) {
     if (value !== undefined && !key.startsWith("GIT_")) env[key] = value;
   }
-  env.GIT_CONFIG_GLOBAL = NULL_CONFIG;
-  env.GIT_CONFIG_SYSTEM = NULL_CONFIG;
+  // gitFixtureEnv と同じ処方（Issue #573）: system は GIT_CONFIG_NOSYSTEM で遮断し、global は読まない。
+  env.GIT_CONFIG_GLOBAL = NULL_GIT_CONFIG;
+  env.GIT_CONFIG_SYSTEM = NULL_GIT_CONFIG;
+  env.GIT_CONFIG_NOSYSTEM = "1";
   env.GIT_AUTHOR_NAME = name;
   env.GIT_AUTHOR_EMAIL = email;
   env.GIT_COMMITTER_NAME = name;

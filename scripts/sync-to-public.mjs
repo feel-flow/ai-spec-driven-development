@@ -117,7 +117,17 @@ function readVisibility(content) {
   return { kind: 'frontmatter', visibility: undefined };
 }
 
-/** dir 以下の .md ファイルを相対パスで列挙する（dir が無ければ空） */
+/**
+ * OS のパス区切りを `/` に揃える（Issue #575）。
+ * Windows では path.relative が `\` 区切りを返し、利用者向け出力と
+ * PUBLIC_OWNED_DOCS（`/` 区切り）の照合が OS で食い違っていた。
+ * 列挙の時点で揃え、以降は `/` 区切りだけを扱う（path.join は `/` を受理する）。
+ */
+function toPosixPath(p) {
+  return p.split(path.sep).join('/');
+}
+
+/** dir 以下の .md ファイルを `/` 区切りの相対パスで列挙する（dir が無ければ空） */
 function listMarkdownFiles(rootDir, subDir) {
   const base = path.join(rootDir, subDir);
   if (!fs.existsSync(base)) return [];
@@ -128,7 +138,7 @@ function listMarkdownFiles(rootDir, subDir) {
       if (entry.isDirectory()) {
         walk(abs);
       } else if (entry.isFile() && entry.name.endsWith('.md')) {
-        results.push(path.relative(rootDir, abs));
+        results.push(toPosixPath(path.relative(rootDir, abs)));
       }
     }
   };
@@ -194,7 +204,7 @@ function main() {
         relPath,
         reason: `不正な visibility 値 "${visibility}" (許容値: ${VALID_VISIBILITY_VALUES.join(' | ')})`,
       });
-    } else if (PUBLIC_OWNED_DOCS.has(relPath.split(path.sep).join('/'))) {
+    } else if (PUBLIC_OWNED_DOCS.has(relPath)) {
       publicOwnedFiles.push(relPath);
     } else if (visibility === 'public') {
       publishFiles.push({ relPath, content });
@@ -247,7 +257,7 @@ function main() {
 
   // orphan 報告: target にあるが同期対象になっていないファイル（削除はしない）
   const publishSet = new Set(publishFiles.map((f) => f.relPath));
-  const orphans = listMarkdownFiles(target, SYNC_ROOT).filter((rel) => !publishSet.has(rel) && !PUBLIC_OWNED_DOCS.has(rel.split(path.sep).join('/')));
+  const orphans = listMarkdownFiles(target, SYNC_ROOT).filter((rel) => !publishSet.has(rel) && !PUBLIC_OWNED_DOCS.has(rel));
   if (orphans.length > 0) {
     console.log(`\nℹ️  orphan（target に存在するが同期対象外。public 側で凍結扱い。削除はしません）:`);
     for (const rel of orphans) {
