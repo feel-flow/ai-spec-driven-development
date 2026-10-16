@@ -1,6 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { readdirSync, readFileSync, existsSync, statSync } from "node:fs";
-import { join, resolve, dirname, normalize, relative, sep } from "node:path";
+import { join, resolve, dirname, normalize, relative } from "node:path";
+import { toPosixPath } from "./path-utils";
 
 // 配布版 GitHub テンプレート (docs-template/.github/) の参照が、
 // 「利用者側レイアウト」で解決することを検証する（Issue #483）。
@@ -67,15 +68,6 @@ const INITIAL_SET = new Set([
   "docs/07-project-management/TASKS.md",
   "docs/07-project-management/RISKS.md",
 ]);
-
-/**
- * OS のパス区切りを `/` に揃える（Issue #575）。
- * 利用者側レイアウトのパスは `.github/...` `docs/...` の `/` 区切りで扱うが、
- * normalize / join / relative は Windows で `\` を返すので、判定・比較の前に必ず通す。
- */
-function toPosixPath(p: string): string {
-  return p.split(sep).join("/");
-}
 
 /** 利用者側レイアウトのパス（.github/... または docs/...）を実ファイルへ写像する */
 function toTemplatePath(deployedPath: string): string | null {

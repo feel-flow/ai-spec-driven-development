@@ -34,8 +34,6 @@ const SCRIPTS: ReviewScript[] = [
   { script: "cursor-review.sh", cli: "cursor-agent", envPrefix: "CURSOR" },
 ];
 
-// 子の PATH は childPath()（git 等の基本コマンドだけを含む最小 PATH。実 CLI を確実に見えなくする）
-
 let passStubDir: string | undefined;
 let failStubDir: string | undefined;
 let fixtureRepo: string | undefined;
@@ -128,6 +126,7 @@ function runReview(
       // TMPDIR を落とすと macOS の git が confstr 警告を stderr に出し、
       // review-common.sh の `git diff ... 2>&1` に混入して誤判定するため引き継ぐ
       TMPDIR: process.env.TMPDIR,
+      // 子の PATH は childPath()（git 等の基本コマンドだけを含む最小 PATH。実 CLI を確実に見えなくする）
       PATH: childPath(...(opts.stubDirs ?? [])),
       // Claude Code セッション検出による early-skip を無効化（明示テスト以外）
       CLAUDECODE: "",

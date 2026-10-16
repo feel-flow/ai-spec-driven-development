@@ -1,6 +1,7 @@
 import { spawnSync } from "node:child_process";
 import { existsSync } from "node:fs";
 import { delimiter, join, resolve } from "node:path";
+import { toPosixPath } from "./path-utils";
 
 // Issue #572: bash / git / sh を子プロセスとして起動するテスト（quality-local / review-scripts /
 // review-cli-config / codex-review-shim）が共有するヘルパー。元は quality-local.test.ts（Issue #570）に
@@ -64,23 +65,25 @@ export function childPath(...stubDirs: string[]): string {
   return [...stubDirs, ...TOOLS.baseDirs].join(delimiter);
 }
 
-// env の PATH を childPath(...stubDirs) に置き換える。Windows の env キーは大文字小文字を区別しないので、
-// 継承した Path と PATH が並ぶとどちらが効くか定まらない。PATH 系のキーを全部落としてから 1 つだけ置く。
+// env の PATH を childPath(...stubDirs) に置き換えたコピーを返す（引数の env は書き換えない）。
+// Windows の env キーは大文字小文字を区別しないので、継承した Path と PATH が並ぶとどちらが効くか定まらない。
+// PATH 系のキーを全部落としてから 1 つだけ置く。
 export function withChildPath<T extends Record<string, string | undefined>>(
   env: T,
   ...stubDirs: string[]
 ): T {
-  for (const key of Object.keys(env)) {
-    if (key.toUpperCase() === "PATH") delete env[key];
+  const out: Record<string, string | undefined> = { ...env };
+  for (const key of Object.keys(out)) {
+    if (key.toUpperCase() === "PATH") delete out[key];
   }
-  (env as Record<string, string>).PATH = childPath(...stubDirs);
-  return env;
+  out.PATH = childPath(...stubDirs);
+  return out as T;
 }
 
 // bash へ渡すパス。MSYS の dirname は "\" を区切りと見なさず、quality-local.sh の
 // ROOT="$(cd "$(dirname "$0")/.." && pwd)" がずれるので、Windows では "/" へ寄せる（C:/... は Node も読める）。
 export function shellPath(path: string): string {
-  return IS_WINDOWS ? path.replace(/\\/g, "/") : path;
+  return IS_WINDOWS ? toPosixPath(path) : path;
 }
 
 // bash が出したパスを Node の existsSync で読める形へ直す（Windows の /c/... → C:/...）。

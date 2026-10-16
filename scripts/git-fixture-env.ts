@@ -5,7 +5,10 @@ import { join } from "node:path";
 export const GIT_FIXTURE_USER_NAME = "test";
 export const GIT_FIXTURE_USER_EMAIL = "test@example.com";
 
-const NULL_CONFIG = process.platform === "win32" ? "NUL" : "/dev/null";
+// Issue #573: Git が文書化する「この階層の設定を読まない」値。Git for Windows は /dev/null を内部で nul に
+// 読み替える。Windows の Git は NUL を `unable to access 'NUL': Invalid argument` で拒否するので OS で切り替えない。
+// 名前は scripts/export-toolkit-templates.mjs の同名定数と揃える。
+const NULL_GIT_CONFIG = "/dev/null";
 const CONFIG_DIR = mkdtempSync(join(tmpdir(), "asdd-git-fixture-config-"));
 const GLOBAL_CONFIG = join(CONFIG_DIR, "global.gitconfig");
 
@@ -21,9 +24,10 @@ writeFileSync(
  * 継承 GIT_* は捨て、identity は専用 GIT_CONFIG_GLOBAL と
  * GIT_AUTHOR_* / GIT_COMMITTER_* に閉じ、local user.name は書かない。
  * extra の GIT_* は採用しない（GIT_DIR を戻すと #529 が再発する）。
- * GIT_CONFIG_NOSYSTEM で /etc/gitconfig を遮断し、GIT_CONFIG_SYSTEM は null device。
- * scripts/export-toolkit-templates.mjs の gitEnvironment も同じ処方（Issue #573）。
- * .mjs からは import できないので、処方を変えるときは両方を揃える。
+ * system の遮断（GIT_CONFIG_NOSYSTEM=1 ＋ GIT_CONFIG_SYSTEM=/dev/null）は
+ * scripts/export-toolkit-templates.mjs の gitEnvironment と共通（Issue #573）。global は
+ * あちらでは読まない（/dev/null）が、こちらは identity 用の専用ファイルを渡す点が違う。
+ * .mjs からは import できないので、system の遮断を変えるときは両方を揃える。
  */
 export function gitFixtureEnv(
   extra: Record<string, string | undefined> = {},
@@ -38,7 +42,7 @@ export function gitFixtureEnv(
     else env[key] = value;
   }
   env.GIT_CONFIG_GLOBAL = GLOBAL_CONFIG;
-  env.GIT_CONFIG_SYSTEM = NULL_CONFIG;
+  env.GIT_CONFIG_SYSTEM = NULL_GIT_CONFIG;
   env.GIT_CONFIG_NOSYSTEM = "1";
   env.GIT_AUTHOR_NAME = GIT_FIXTURE_USER_NAME;
   env.GIT_AUTHOR_EMAIL = GIT_FIXTURE_USER_EMAIL;

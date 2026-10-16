@@ -5,6 +5,8 @@ import os from 'node:os';
 import { execFileSync, spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { gitFixtureEnv } from './git-fixture-env';
+// Issue #575: 出力先は path.join 由来で Windows では `\` 区切りになる。`/` 区切りの期待値と比べる前に揃える。
+import { toPosixPath } from './path-utils';
 // @ts-expect-error 検証対象はNode.jsで直接実行するESMスクリプト
 import { FILES, prepare, applyExport, verify, gitEnvironment } from './export-toolkit-templates.mjs';
 
@@ -14,10 +16,9 @@ function temp() { const root = fs.mkdtempSync(path.join(os.tmpdir(), 'template-e
 const env = gitFixtureEnv();
 const git = (root: string, ...args: string[]) => execFileSync('git', args, { cwd: root, encoding: 'utf8', env, stdio: ['ignore', 'pipe', 'pipe'] }).trim();
 function put(root: string, name: string, data: string) { const p = path.join(root, name); fs.mkdirSync(path.dirname(p), { recursive: true }); fs.writeFileSync(p, data); }
-// Issue #575: 出力先は path.join 由来で Windows では `\` 区切りになる。`/` 区切りの期待値と比べる前に揃える。
-const toPosixPath = (p: string) => p.split(path.sep).join('/');
 // Issue #574: symlink の作成可否は OS ではなく実際に試して判定する（Windows は開発者モード無効や
 // SeCreateSymbolicLinkPrivilege 無しで EPERM になる。ジャンクションはディレクトリ限定なのでファイルの代替にならない）。
+// skip に変えるのは Windows の EPERM だけ。それ以外の例外は環境の壊れ方を隠さずそのまま投げる。
 function probeFileSymlink(): { supported: boolean; reason: string } {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), 'symlink-probe-'));
   try {
@@ -26,8 +27,11 @@ function probeFileSymlink(): { supported: boolean; reason: string } {
     fs.symlinkSync(target, path.join(root, 'link'), 'file');
     return { supported: true, reason: '' };
   } catch (error: unknown) {
-    const code = (error as { code?: string }).code ?? 'unknown';
-    return { supported: false, reason: `この環境ではファイルの symlink を作成できない（${code}）ため skip（Issue #574）` };
+    const code = (error as NodeJS.ErrnoException).code;
+    if (process.platform === 'win32' && code === 'EPERM') {
+      return { supported: false, reason: `この環境ではファイルの symlink を作成できない（${code}）ため skip（Issue #574）` };
+    }
+    throw error;
   } finally {
     fs.rmSync(root, { recursive: true, force: true });
   }
@@ -51,7 +55,7 @@ function fixture() {
   return { source, target, ref: 'release-fixture', commit, prefix };
 }
 describe('固定コミットからのテンプレート直接配布', () => {
-  it('symlink経由のCLIでも計画・出力・実ファイル不一致を判定する', { timeout: 15_000 }, (ctx) => {
+  it('symlink経由のCLIでも計画・出力・実ファイル不一致を判定する', (ctx) => {
     ctx.skip(!FILE_SYMLINK.supported, FILE_SYMLINK.reason);
     const f = fixture(), cli = path.join(temp(), 'export-alias.mjs');
     fs.symlinkSync(fileURLToPath(new URL('./export-toolkit-templates.mjs', import.meta.url)), cli);
@@ -168,6 +172,8 @@ describe('固定コミットからのテンプレート直接配布', () => {
     fs.unlinkSync(path.join(f.source, f.prefix, 'docs-template/MASTER.md'));
     fs.symlinkSync('/etc/hosts', path.join(f.source, f.prefix, 'docs-template/MASTER.md'));
     git(f.source, 'add', '.'); git(f.source, 'commit', '-m', 'symlink');
+    // Node が symlink を作れても git が symlink（mode 120000）として保存するかは別（Windows は core.symlinks）
+    expect(git(f.source, 'ls-files', '-s')).toMatch(/^120000 /m);
     expect(() => prepare({ ...f, ref: 'HEAD', commit: git(f.source, 'rev-parse', 'HEAD') })).toThrow(/non-file source/);
     fs.unlinkSync(path.join(f.target, 'docs-template/MASTER.md'));
     fs.symlinkSync('/etc/hosts', path.join(f.target, 'docs-template/MASTER.md'));
