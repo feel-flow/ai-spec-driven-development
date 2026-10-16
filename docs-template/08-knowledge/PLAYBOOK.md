@@ -1,12 +1,12 @@
 ---
 title: "PLAYBOOK"
-version: "1.69.0"
+version: "1.70.0"
 status: "approved"
 created: "2026-03-10"
 updated: "2026-10-16"
 owner: "@fffokazaki"
 changeImpact: "medium"
-ace_entry_count: 55
+ace_entry_count: 67
 tags: [ace, playbook, knowledge-management]
 references:
   - https://github.com/feel-flow/ai-spec-driven-development/blob/HEAD/docs/ACE_FRAMEWORK.md
@@ -254,7 +254,7 @@ Markdown の anchor はラベル側ではなく URL 側の `#section` だけが�
 | Category | documentation-quality | Origin | PR #397 / Issue #396 |
 | Related | ACE-014 / ACE-015 |
 | Date | 2026-05-06 |
-| Helpful | 5 | Harmful | 0 |
+| Helpful | 6 | Harmful | 0 |
 | Status | active |
 
 番号・順序の横断変更は、想定の 2〜3 倍のファイルに散らばっている（PR #397 では想定 6 ファイルが実際は 10 ファイル）。番号への直接参照・順序の散文・状態の説明（「マージ前」等）・メタデータ・段階数への言及は、意味が等価でも字面が違うため、1 種類の grep キーワードでは拾いきれない。着手前に意味的に等価な複数の grep パターンで対象を全部列挙して作業リストに登録し、ナビゲーション表・対応表も対象に含め、「旧表現の grep ヒットなし」を受け入れ条件に書く（経緯として意図的に旧表現を残す注記は除外する）。
@@ -892,7 +892,7 @@ Markdown の整形ツールはフェンス内のコードも言語ごとに整�
 
 | Category | testing | Origin | PR #571 |
 | Date | 2026-10-16 |
-| Helpful | 0 | Harmful | 0 |
+| Helpful | 1 | Harmful | 0 |
 | Status | active |
 
 Windows の Node は、`spawnSync` の実行ファイルを子の `env.PATH` から探す。外部ツールへの依存を断つ目的で `/usr/bin:/bin` に絞ると、bash も git も見つからず、`status` が `null`・`stdout` が `undefined` の、原因の読めない失敗になる。PATH の順で bash を探すと、System32 にある WSL の起動ランチャーを拾うこともある。Windows では Git for Windows の配置（`git --exec-path` を起点）から bash.exe / git.exe を絶対パスで決め、子の PATH はその 2 ディレクトリだけを `path.delimiter` で連結する。macOS / Linux 側の絞り込みはそのまま残す。
@@ -912,9 +912,187 @@ Windows の Node は、`spawnSync` の実行ファイルを子の `env.PATH` か
 
 ---
 
+<a id="ace-578-1"></a>
+
+### ACE-578-1: 文書の索引や Changelog に追記するときは日付付きの追記行で済ませず、version・updated・changeImpact・版付き Changelog の 4 点を同時に揃える
+
+| Category | documentation-quality | Origin | PR #578 |
+| Date | 2026-10-16 |
+| Helpful | 0 | Harmful | 0 |
+| Status | active |
+
+索引への 1 行追加のような小さな追記でも、version を上げずに「YYYY-MM-DD 追記」の行だけを足すと、frontmatter の updated と本文の日付が食い違い、利用者や版差分を読む処理が新しい索引を旧版の内容と誤認する（PR #578 では Toolkit と Codex が独立に同じ漏れを指摘した）。前の PR が残した古い changeImpact も次の bump で引き継がれるので、minor なら medium、patch なら low に合わせて置き直す。文書を変更する PR では、追記の大小にかかわらず 4 点を 1 セットで更新し、版付きの Changelog エントリに記録する。
+
+---
+
+<a id="ace-578-2"></a>
+
+### ACE-578-2: 運用テンプレートの表は、本文が約束した運用（期限の監視・個体の照合）を列だけで回せるかを突き合わせ、多義的な動詞には対象を書く
+
+| Category | documentation-quality | Origin | PR #578 |
+| Date | 2026-10-16 |
+| Helpful | 0 | Harmful | 0 |
+| Status | active |
+
+本文で「有効期限を見て放置を見つける」「新旧キーの併存を区別する」と約束しながら、テンプレートの表にその列が無いと、利用者は本文の運用を実行できない（PR #578 のキー一覧テンプレートで有効期限と識別子の列が抜けていた）。同じ文書で「公開を妨げない」のような多義的な動詞を対象なしで書くと、別節で禁じた「一覧そのものの公開」を許すように読める。テンプレートを書いたら、本文の各運用について「どの列を見れば実行できるか」を 1 対 1 で確かめ、動詞には必ず対象（運用開始・リリース・一覧）を添える。
+
+---
+
+<a id="ace-578-3"></a>
+
+### ACE-578-3: 公開配布するテンプレートの受け入れ確認では、鍵の接頭辞・長い英数字列・実在の組織名を grep して実値の混入が無いことを機械的に確かめる
+
+| Category | security | Origin | PR #578 |
+| Date | 2026-10-16 |
+| Helpful | 0 | Harmful | 0 |
+| Status | active |
+
+秘密情報を扱うテンプレートは記入例を架空の値で書くが、先行試行の実値や実在サービス名が混入すると、配布物が公開された時点で漏えいになる。目視の確認は見落とすので、受け入れ確認では `sk_` / `pk_` / `AKIA` / `ghp_` などの鍵接頭辞、32 文字以上の英数字列、自社名・実在サービス名を grep し、0 件であることを完了報告の根拠にする（PR #578 の DoD 照合で実施）。記入例の値は `YYYY-MM-DD` や `EX-0000` のように、形だけ分かる明らかなダミーにする。
+
+---
+
+<a id="ace-579-1"></a>
+
+### ACE-579-1: 「pre-push がゲートを実行するので手動実行を省いてよい」という規約は、hook が発火しない・回避した・環境要因で実測にならない場合の例外と申告の義務をセットで書く
+
+| Category | process | Origin | PR #579 |
+| Date | 2026-10-16 |
+| Helpful | 0 | Harmful | 0 |
+| Status | active |
+
+省略規約を無条件に書くと、`npm ci` 未実行の新規 worktree（husky の `.husky/_` が無く pre-push が黙って発火しない）、`SKIP_QUALITY_GATE=1` や `--no-verify` での回避、既知の赤がある OS など、実測が無いまま push される経路が規約上は正当になる（PR #579 で Toolkit と Codex が独立に指摘）。規約には「省略できるのは hook が発火する状態のとき」「push 時に `Running quality gate before push` が出ることを確認する」「出なかった・回避した・実測にならない場合は手動実行して PR 本文で申告する」を 1 文にまとめて書き、pre-push が測るのは作業ツリーであり未コミット変更があれば HEAD の実測にならないことも添える。同じ趣旨の記述は入口文書だけでなく専門ガイド・PR テンプレート・設計書にも残るので、grep で洗い出して同時に揃える。
+
+---
+
+<a id="ace-579-2"></a>
+
+### ACE-579-2: `fetch` に再試行をかぶせるラッパーは、呼び出し元の `init.signal` を `AbortSignal.any` でタイムアウトと合成し、中断後は再試行せず、読まない本文は cancel する
+
+| Category | coding | Origin | PR #579 |
+| Date | 2026-10-16 |
+| Helpful | 0 | Harmful | 0 |
+| Status | active |
+
+`RequestInit` を受け取る汎用ラッパーでタイムアウト用のシグナルを `signal` に直接書くと、呼び出し元の中断シグナルが上書きされ、利用者が中断しても通信と再試行がタイムアウトまで続く（PR #579 のドキュメント例で Codex が指摘）。`AbortSignal.any([AbortSignal.timeout(ms), init.signal])` で合成し、再試行判定には `() => !init.signal?.aborted` を渡して中断後の再試行を止める。`!res.ok` で失敗にするときは `await res.body?.cancel()` で接続を返してから、`status` 付きの Error を投げて分類を正典（`normalizeExternalError`）に任せ、タイムアウト値は型に無い `timeout` オプションではなく名前付き定数の `AbortSignal.timeout` で持つ。
+
+---
+
+<a id="ace-580-1"></a>
+
+### ACE-580-1: Git 設定の隔離は Windows でも `NUL` を使わず `/dev/null` と `GIT_CONFIG_NOSYSTEM=1` を併用し、隔離が効いていることは陽性対照付きのテストで実測する
+
+| Category | testing | Origin | PR #580 |
+| Date | 2026-10-16 |
+| Helpful | 0 | Harmful | 0 |
+| Status | active |
+
+Windows の Git は `GIT_CONFIG_GLOBAL=NUL` / `GIT_CONFIG_SYSTEM=NUL` を `unable to access 'NUL'` で拒否するが、`/dev/null` は git 自身の互換層が `nul` に読み替えるのでどの OS でも通り、`GIT_CONFIG_NOSYSTEM=1` を併せれば system 側は開かれない（PR #580。`SYSTEM=NUL` 単独は exit 128、`NOSYSTEM=1` 併用は exit 0）。OS で値を切り替える分岐を持たず、`.mjs` と `.ts` のように import し合えないファイルに同じ処方があるときはコメントで相互参照する。隔離の検証は、一時 HOME に目印付き設定を置き「隔離なしなら目印が見える」陽性対照を先に確かめてから、`git config --list --show-origin` の由来が対象の `.git/config` だけであることを assert する。
+
+---
+
+<a id="ace-580-2"></a>
+
+### ACE-580-2: 環境依存の機能（symlink など）は OS 名ではなく実際に試して判定し、skip にするのは想定した失敗（win32 かつ EPERM）だけに限る
+
+| Category | testing | Origin | PR #580 |
+| Date | 2026-10-16 |
+| Helpful | 0 | Harmful | 0 |
+| Status | active |
+
+`process.platform` で skip を決めると、開発者モードの Windows のように機能が使える環境でもテストが走らず、逆に POSIX で一時ディレクトリが壊れているような無関係の失敗まで skip に化ける。プローブで実際に作ってみて、想定した失敗コードのときだけ理由付きで `ctx.skip` し、それ以外の例外はそのまま投げる（PR #580。理由は `--reporter=verbose` で表示されることを確認）。Node で symlink を作れても git が mode 120000 で保存するかは `core.symlinks` 次第なので、git 経由の検証では `git ls-files -s` の 120000 を別に assert する。
+
+---
+
+<a id="ace-580-3"></a>
+
+### ACE-580-3: `.gitattributes` の LF 固定を拡張子で書くと拡張子の無いフック（`.husky/*`）が漏れる。属性を足した後の既存チェックアウトは `rm <path> && git checkout -- <path>` で取り直す
+
+| Category | tooling | Origin | PR #580 |
+| Date | 2026-10-16 |
+| Helpful | 0 | Harmful | 0 |
+| Status | active |
+
+`*.sh text eol=lf` を足しても `.husky/pre-push` / `pre-commit` は対象外で、autocrlf=true の新規チェックアウトでは CRLF のまま残り、sh で実行されるフックが品質ゲートに届く前に落ちる（PR #580 で Codex が P1 として指摘。`.husky/* text eol=lf` と `.gitattributes text eol=lf` を追加して解決）。属性の追加は既存の作業ツリーには効かず、`git checkout -- <path>` 単独は stat が一致したままなので何もせず、`git add --renormalize` は index を直すだけで作業ツリーは残る。`git ls-files --eol | grep w/crlf` で対象を確かめ、未変更ファイルを削除してから checkout し直す手順を `.gitattributes` のコメントと手順書に書く。
+
+---
+
+<a id="ace-580-4"></a>
+
+### ACE-580-4: 受け入れ条件が複数 Issue の和集合でしか実測できないときは 1 PR に束ね、担当ファイルを排他にした並列 worktree で「片方だけ入れたときの残る失敗 = もう片方の担当」を確かめてから統合する
+
+| Category | process | Origin | PR #580 |
+| Date | 2026-10-16 |
+| Helpful | 0 | Harmful | 0 |
+| Status | active |
+
+OS 固有のテスト失敗を Issue 単位の PR に分けると、各 PR は単独では pre-push ゲートが赤のまま push できず、AC「ゲートで X が落ちない」を間接形でしか示せない（PR #580 は 6 Issue を 1 PR に束ねた）。実装は担当ファイルを重ならないように分けた worktree で並列に進め、基準線（全件の失敗一覧）に対して「W1 だけで残る失敗が W2 の担当と完全一致」「W2 だけで残る失敗が W1 の担当の部分集合」を機械的に照合してから統合し、統合後に親が AC の実行形態（全体実行を複数回・ゲート 1 回）で測り直す。PR 本文には分割しない理由とレビュー観点ガイド（読む順序）を書く。
+
+---
+
+<a id="ace-580-5"></a>
+
+### ACE-580-5: OS のパス区切りは比較する箇所ごとに直さず列挙の時点で一度だけ `/` に揃え、その純粋なユーティリティは import 時に子プロセスを起動するモジュールとは別ファイルに置く
+
+| Category | coding | Origin | PR #580 |
+| Date | 2026-10-16 |
+| Helpful | 0 | Harmful | 0 |
+| Status | active |
+
+`path.relative` / `join` / `normalize` の結果を `/` 区切りの期待値と比べる箇所が散らばると、Windows では `\` 区切りのまま比較される箇所が残って落ちる（PR #580 では 2 つのテストと本番スクリプトで計 16 件）。ファイルを列挙した時点で `split(sep).join("/")` に揃えれば、読み込み・照合・出力・差分の判定がすべて `/` で揃う。`toPosixPath` のような純粋関数は、import した時点で `git --exec-path` を起動するヘルパーと同居させず副作用の無いファイルに置き、`.mjs` と `.ts` が import し合えない場合だけコピーを許してコメントで相互参照する。
+
+---
+
+<a id="ace-581-1"></a>
+
+### ACE-581-1: 実ファイルでは違反ゼロを期待する文字列検査は、除外形を行ごとにマスクしてから判定し、検出器を合成入力の自己検証で固定する（同居行・空白無しの隣接・全角終端・散文を含める）
+
+| Category | testing | Origin | PR #581 |
+| Date | 2026-10-16 |
+| Helpful | 0 | Harmful | 0 |
+| Status | active |
+
+正当な言及（プラグイン同梱パス・絶対 URL）を含む行を丸ごとスキップする方式は、同じ行にある混入を見逃して検査が骨抜きになる（PR #581 の対象文書には正当な言及が 20 行以上ある）。除外形を `replace` で取り除いてから禁止文字列を `includes` で判定し、URL の除外は ASCII 印字可能文字に限って括弧・引用符・`|` で終端する（`\S+` 系は日本語の「、」「（」の先まで食う）。実ファイルは常に 0 件なので、検出器そのものを合成入力の自己検証テストで固定し、ケースには同居行・URL と混入の空白無し隣接・全角終端・スラッシュ無しの散文（不検出）を入れ、1 行には違反を 1 つだけ置く。
+
+---
+
+<a id="ace-581-2"></a>
+
+### ACE-581-2: follow-up Issue の「前の PR で修正済み」という記述は検査範囲を狭める理由にせず、拡張した検出器で全件を洗い出してヒットを修正と除外に分類して PR に残す
+
+| Category | process | Origin | PR #581 |
+| Date | 2026-10-16 |
+| Helpful | 0 | Harmful | 0 |
+| Status | active |
+
+Issue #509 は「DECISION_TREE.md の 2 箇所は PR #508 で修正済み」と書いていたが、実際に #508 が直したのは 1 箇所で、拡張した検査が残りの 1 箇所を検出した。follow-up Issue の本文は起票時点の認識であり、前 PR のコミットメッセージの件数が実態とずれることがある。検査を広げる PR では Issue の記述を前提に対象を絞らず、まず全件を走らせてヒット一覧を作り、修正するもの・除外規則で通すものに分類した表を PR 本文に残す。
+
+---
+
 ## Changelog
 
 > [1.64.0] 以前の履歴は [PLAYBOOK-CHANGELOG.md](https://github.com/feel-flow/ai-spec-driven-development/blob/HEAD/docs-template/08-knowledge/PLAYBOOK-CHANGELOG.md) に移した（PLAYBOOK.md は /ace-setup で配布され、移動先は配置されないため絶対 URL）。
+
+### [1.70.0] - 2026-10-16
+
+#### 追加
+
+- ACE-578-1: 文書の索引や Changelog に追記するときは日付付きの追記行で済ませず、version・updated・changeImpact・版付き Changelog の 4 点を同時に揃える（PR #578）
+- ACE-578-2: 運用テンプレートの表は、本文が約束した運用（期限の監視・個体の照合）を列だけで回せるかを突き合わせ、多義的な動詞には対象を書く（PR #578）
+- ACE-578-3: 公開配布するテンプレートの受け入れ確認では、鍵の接頭辞・長い英数字列・実在の組織名を grep して実値の混入が無いことを機械的に確かめる（PR #578）
+- ACE-579-1: 「pre-push がゲートを実行するので手動実行を省いてよい」という規約は、hook が発火しない・回避した・環境要因で実測にならない場合の例外と申告の義務をセットで書く（PR #579）
+- ACE-579-2: `fetch` に再試行をかぶせるラッパーは、呼び出し元の `init.signal` を `AbortSignal.any` でタイムアウトと合成し、中断後は再試行せず、読まない本文は cancel する（PR #579）
+- ACE-580-1: Git 設定の隔離は Windows でも `NUL` を使わず `/dev/null` と `GIT_CONFIG_NOSYSTEM=1` を併用し、隔離が効いていることは陽性対照付きのテストで実測する（PR #580）
+- ACE-580-2: 環境依存の機能（symlink など）は OS 名ではなく実際に試して判定し、skip にするのは想定した失敗（win32 かつ EPERM）だけに限る（PR #580）
+- ACE-580-3: `.gitattributes` の LF 固定を拡張子で書くと拡張子の無いフック（`.husky/*`）が漏れる。属性を足した後の既存チェックアウトは `rm <path> && git checkout -- <path>` で取り直す（PR #580）
+- ACE-580-4: 受け入れ条件が複数 Issue の和集合でしか実測できないときは 1 PR に束ね、担当ファイルを排他にした並列 worktree で「片方だけ入れたときの残る失敗 = もう片方の担当」を確かめてから統合する（PR #580）
+- ACE-580-5: OS のパス区切りは比較する箇所ごとに直さず列挙の時点で一度だけ `/` に揃え、その純粋なユーティリティは import 時に子プロセスを起動するモジュールとは別ファイルに置く（PR #580）
+- ACE-581-1: 実ファイルでは違反ゼロを期待する文字列検査は、除外形を行ごとにマスクしてから判定し、検出器を合成入力の自己検証で固定する（同居行・空白無しの隣接・全角終端・散文を含める）（PR #581）
+- ACE-581-2: follow-up Issue の「前の PR で修正済み」という記述は検査範囲を狭める理由にせず、拡張した検出器で全件を洗い出してヒットを修正と除外に分類して PR に残す（PR #581）
+
+#### カウンター更新
+
+- ACE-571-1: Helpful 0→1（PR #580 で同じ処方（`git --exec-path` 起点の絶対パスと `path.delimiter`）を 3 テストファイルへ横展開）
+- ACE-018: Helpful 5→6（PR #579 で運用ルール変更の同趣旨記述を専門ガイド・PR テンプレート・設計書へ grep で洗い出して同時に揃えた）
 
 ### [1.69.0] - 2026-10-16
 

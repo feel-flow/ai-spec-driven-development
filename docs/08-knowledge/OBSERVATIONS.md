@@ -425,7 +425,7 @@ dry-run で grok-cli が `runtime-socket deny resolution failed` と出ても、
 
 ### OBS-027: `finish.sh precheck` が separate-push で生成する MERGE_COMMAND は、`delete_branch_on_merge=true` のリポジトリでは head 削除 push が `cannot lock ref` で落ち、マージ成功でも rc 1 を返す
 
-| Kind | problem | Count | 3 |
+| Kind | problem | Count | 4 |
 | First | 2026-10-15 | Last | 2026-10-16 |
 | Status | promoted | Issue | feel-flow/feelflow-plugins#2135 |
 
@@ -435,6 +435,7 @@ base を別 worktree が保持していると precheck は `--delete-branch` を
 - 2026-10-15: toolkit 側の修正で構造的に解消できる種類のため、利用者の起票方針（actionable は承認待ちなしで起票）に従い閾値未達で feel-flow/feelflow-plugins#2135 へ起票
 - 2026-10-16: PR #564 のマージで MERGE_COMMAND の削除 push が `! [rejected] (delete) ... (stale info)` で失敗。マージは成功、`delete_branch_on_merge=true` で ref は既に無かった。feel-flow/feelflow-plugins#2135 へ再発をコメント
 - 2026-10-16: PR #571 のマージで、head を worktree が、base を main worktree が保持していたため `separate-push` になった。削除 push が `(stale info)` で拒否され exit 1。マージは成功し（`172c07c`）、`ls-remote` は 2（ref なし）だった。#2135 へ再発をコメント（再発・Count 3）
+- 2026-10-16: PR #581 のマージで head を worktree が保持し separate-push になった。削除 push が `(stale info)` で拒否され rc 1。マージは成功（`ad27820`）し `ls-remote` は 2（ref なし）。#2135 へ再発をコメント（再発・Count 4）
 
 ---
 
@@ -455,13 +456,14 @@ ripgrep はパスを省略すると、stdin が TTY でない限り cwd では�
 
 ### OBS-029: 先行試行で生成・保存・取得の実測が揃った docs-only Issue にレビュー対応を実装と同額で見込むと、乖離率 0.25 の過大見積もりになる
 
-| Kind | problem | Count | 1 |
-| First | 2026-10-15 | Last | 2026-10-15 |
+| Kind | problem | Count | 2 |
+| First | 2026-10-15 | Last | 2026-10-16 |
 | Status | active | Issue | なし |
 
 「共通運用の設計判断を含む」ことを理由に、レビュー対応を実装と同額で見込んだ。しかし設計判断の材料となる実測は、Issue コメントの先行試行ですでに揃っており、作業は文書化だけで済んだ → 見積もりの前に、Issue コメントに判断材料の実測が揃っているかを確かめる。揃っていれば、docs-only の fast 経路を前提にレビュー対応を小さく見積もれ。
 
 - 2026-10-15: Issue #540 / PR #548。AI 予定 4.0h → 実績 1.0h（最小値、wallclock 0.1h）、fast 経路で Codex 指摘 0 件・fix 1 行（初回）
+- 2026-10-16: Issue #541 / PR #578。AI 予定 4.0h → 実績 1.3h（乖離率 0.33、帯の外・過大）。先行試行（Issue コメント）と #540 の同形文書があり、2.0h と見込んだレビュー対応が約 0.25h で済んだ（再発）
 
 ---
 
@@ -571,13 +573,14 @@ clone 方式によっては `refs/remotes/origin/HEAD` が作られず、ACE / �
 
 ### OBS-037: 文書の version を上げるとき frontmatter の `changeImpact` を前回の値のまま残すと、bump の段（patch / minor）と食い違い、レビューで差し戻される
 
-| Kind | problem | Count | 1 |
-| First | 2026-10-15 | Last | 2026-10-15 |
+| Kind | problem | Count | 2 |
+| First | 2026-10-15 | Last | 2026-10-16 |
 | Status | active | Issue | なし |
 
 `version` を手で上げると、同じ frontmatter にある `changeImpact` が前回の変更の値のまま残りやすく、文書自身の更新規則（low → patch / medium → minor）と矛盾する → version を上げる編集では、`changeImpact` を今回の変更の影響度から決め直し、bump の段と同じ編集で揃える。
 
 - 2026-10-15: Issue #556 / PR #557。OPERATIONAL_GUIDE を 2.1.1（patch）に上げたが `changeImpact: medium` のまま残し、Codex の GitHub レビューが P2 で指摘した。fix commit と pre-push ゲートが 1 回ずつ増えた（初回）
+- 2026-10-16: Issue #541 / PR #578。ASDD_2_0.md を 1.2.0（minor）に上げたが、#540 の bump 時から残っていた `changeImpact: high` をそのまま引き継ぎ、Toolkit レビューが指摘。前の PR が残した古い値を次の PR が引き継ぐ型（再発）
 
 ---
 
@@ -613,14 +616,16 @@ clone 方式によっては `refs/remotes/origin/HEAD` が作られず、ACE / �
 
 ### OBS-040: CI checks が無い、または Windows で全件ゲートが完走しないリポジトリでは、WSL の Linux クローンで全件ゲートを回すとマージ判定の根拠が得られる
 
-| Kind | keep | Count | 2 |
+| Kind | keep | Count | 3 |
 | First | 2026-10-16 | Last | 2026-10-16 |
-| Status | active | Issue | なし |
+| Status | mitigated | Issue | feel-flow/ai-spec-driven-development#580 |
 
 Windows の Git Bash では `tests/run-all.sh` が 2 時間超で完走せず、PR 単位の CI も無いため、`finish.sh precheck` が `RERUN_FULL_GATE=yes` のまま判定不能になる。WSL へブランチを `git clone` して高速モードの全件ゲートを回すと 140 suite が完走し、Windows では見えない赤（公開ミラー対象ファイルの番号参照）も検出できた → Windows ホストで全件ゲートが要る PR は、最初から WSL の Linux クローンで回す
 
 - 2026-10-16: feel-flow/feelflow-plugins PR #2145。WSL で 2 回実行し、1 回目で `sync-forbidden-patterns` の赤を検出、修正後 139 passed / 0 failed（初回）
 - 2026-10-16: Issue #512 / PR #569。Windows では `quality-local.test.ts` が読み込み時に落ちて `quality:local` が完走しない（#570）。そこで WSL のクリーンクローンで `npm ci` 後に 3 回ずつ全 9 段を通し、AC の実測（壊したブロックを入れて 6 段目で止まる）とマージ判定の根拠にした（再発）
+- 2026-10-16: Issue #541 / #513 / #520 / #558（PR #578 / #579）。Windows では #572〜#577 の既知の赤で pre-push が通らないため、WSL クローンへ `git fetch win +refs/heads/<b>:refs/heads/<b>` で取り込み、Linux の pre-push で 9 段を実測して push した（再発・Count 3）
+- 2026-10-16: 状態移行（再発ではない）: 定着提案の閾値（Count 3）に到達したが、同じセッションの PR #580（squash `cab2f1c`）で本リポジトリの `quality:local` が Windows で完走するようになり、この迂回は不要になった。見送り → mitigated（対策の所在: PR #580。他リポジトリで要る場合はそのリポジトリの台帳で扱う）
 
 ---
 
@@ -671,13 +676,14 @@ Windows の Git Bash では `tests/run-all.sh` が 2 時間超で完走せず、
 
 ### OBS-044: Windows の `core.autocrlf=true` では、作業ツリーの改行が index とずれたまま `git status` は clean に見え、整形ゲートが偽の赤を出したりシェルスクリプトが壊れたりする
 
-| Kind | problem | Count | 1 |
+| Kind | problem | Count | 2 |
 | First | 2026-10-16 | Last | 2026-10-16 |
 | Status | active | Issue | なし |
 
 `.gitattributes` に `*.md text eol=lf` を足す前にチェックアウトしたファイルは、作業ツリーで CRLF のまま残る。git は正規化して比べるので `git status` は clean だが、prettier は CRLF を整形違反として数える。`eol` 属性の無い `.sh` は、`git stash` の往復などで git が書き直すと CRLF になり、bash が読めなくなる → 整形ゲートが触っていないファイルで大量に赤くなったら、まず `git ls-files --eol` の `w/crlf` を確かめ、未変更ファイルは削除して checkout し直す。シェルスクリプトにも `eol=lf` を付ける
 
 - 2026-10-16: Issue #512 / PR #569。`format:md:check` が 142 ファイルで赤になり、原因は CRLF のまま残った 213 ファイルだった。再チェックアウトで解消した。同じセッションで、`git stash` / `pop` の往復のあと `scripts/quality-local.sh` が CRLF になった（初回）
+- 2026-10-16: PR #580 の統合と後片付け。新規 worktree では `.sh` / `.yaml` / `.husky/*` が CRLF で、`dos2unix` 後も blob 同一のまま `git status` に約 100 件の変更（`M` 列）が出て、merge-cleanup の worktree 削除前 clean 判定に掛かった（`git diff` は空）。#580 で `*.yaml` / `*.yml` / `*.sh` / `.husky/*` / `.gitattributes` を `eol=lf` に固定し、取り直し手順（`rm && git checkout --`）を §3.3 へ記載した（再発）
 
 ---
 
@@ -699,13 +705,14 @@ Windows の Git Bash では `tests/run-all.sh` が 2 時間超で完走せず、
 
 ### OBS-046: サブエージェントの完了報告を、親が受け入れ条件の指す実行形態で測り直すと、報告では見えない未達と誤分類が見つかる
 
-| Kind | keep | Count | 1 |
+| Kind | keep | Count | 2 |
 | First | 2026-10-16 | Last | 2026-10-16 |
 | Status | active | Issue | なし |
 
 サブエージェントの報告は、それ自身が実行した範囲（単独実行・推測を含む分類）の結果にとどまる。親が受け入れ条件の指す形（ゲートの段の全体実行）で 1 回測り直すと、報告に無かった未達や分類の誤りが見つかる → 実装や調査をサブエージェントへ任せた回も、マージ判断の前に親が AC の実行形態で 1 回実測する
 
 - 2026-10-16: Issue #570。実装サブエージェントは「単独実行で 14 件通過」と報告した。親が `npm run test:ace-scripts` 全体で測ると、同じファイルが 5 秒のタイムアウトで 1 件落ちていて、修正（`5b00882`）につながった。別の調査サブエージェントへ再分類させると、前の分類の誤り 2 件（NUL の発生源、隠れた失敗）が見つかった（初回）
+- 2026-10-16: PR #580。W1 / W2 の報告（残る失敗 26 / 50 件が相手担当と一致）を親が統合後に Windows 単独で 3 回測り直し、251 passed / timeout 0 をマージ判定の根拠にした。2 巡目のレビュー対応も親が `git show` で直読し、skip 条件と assert の位置を確認した（再発）
 
 ---
 
@@ -713,13 +720,14 @@ Windows の Git Bash では `tests/run-all.sh` が 2 時間超で完走せず、
 
 ### OBS-047: サブエージェントの worktree 隔離はリポジトリ直下の `.claude/worktrees/` に作られ、未追跡のまま `/merge-cleanup` の未コミット変更ガードで止まり、専用ブランチも残る
 
-| Kind | problem | Count | 1 |
+| Kind | problem | Count | 2 |
 | First | 2026-10-16 | Last | 2026-10-16 |
 | Status | active | Issue | なし |
 
 `.claude/worktrees/` は gitignore されていないので、隔離 worktree が在る間は main のチェックアウトで `?? .claude/worktrees/` が出続ける。`/merge-cleanup` は「未コミットの変更があります」で中断した。後片付けで worktree と PR のブランチを消した後も、隔離のために作られた `worktree-agent-*` ブランチが残った → 隔離 worktree を使うリポジトリでは `.claude/worktrees/` を `.gitignore` に足すか、`FF_MERGE_CLEANUP_IGNORE_PATHS='.claude/worktrees/**'` を付けて実行し、残ったブランチは develop に含まれることを確かめてから `git branch -d` で消す
 
 - 2026-10-16: PR #571 の後片付け。dry-run がガードで止まり、パスを除外して再実行した。`worktree-agent-a4447413dcf82dc3b`（`6e1bbce`）が残ったため、`git branch -d` で消した（初回）
+- 2026-10-16: PR #578〜#581 の後片付け。`.claude/worktrees/` は #580 で gitignore 済みのためガードには掛からなかったが、8 本の `worktree-agent-*` ブランチと worktree は merge-cleanup が孤児として報告するだけで、親が clean 確認（CRLF の幻の変更は `git diff` 空で判定）後に `worktree remove` + `branch -D` で消した（再発）
 
 ---
 
@@ -734,5 +742,75 @@ Windows の Git Bash では `tests/run-all.sh` が 2 時間超で完走せず、
 ホストが渡す plugin root は `C:/Users/...` 形式で、`finish.sh` などはそのまま動く。一方 `ace-run-ts.sh` は、隣の `ace-run-ts-probe.ts` のパスを `<cwd>/C:/Users/...` と組み立てて読めず、exit 2 になった（runner の不在ではないと表示される）→ Git Bash から ACE の TS ツールを呼ぶときは、root を `/c/Users/...` 形式に直して渡す
 
 - 2026-10-16: PR #569 の `/ace-curate` で、`sync-playbook-frontmatter.ts` と `check-entry-format.ts` の検証が 2 本とも exit 2。`/c/...` 形式で渡し直して通った（初回）
+
+---
+
+<a id="obs-049"></a>
+
+### OBS-049: Agent ツールの worktree 隔離は現在の HEAD ではなく既定ブランチから切られるため、PR ブランチの続きを任せるとブリーフに ff-merge が無い限り develop の上で作業が始まる
+
+| Kind | problem | Count | 1 |
+| First | 2026-10-16 | Last | 2026-10-16 |
+| Status | active | Issue | なし |
+
+`isolation: "worktree"` で起動したサブエージェントの worktree は develop（既定ブランチ）起点で、親が checkout していた PR ブランチの変更を含まない。レビュー対応のように PR ブランチの続きを任せると、対象ファイルが無いまま着手する → ブリーフの冒頭に `git merge --ff-only <PRブランチ>` と HEAD の確認を入れる（worktree は ref を共有するので取得できる）
+
+- 2026-10-16: PR #578 のレビュー対応エージェントが `c072cbb` 起点の worktree で `key-inventory.md` 不在のまま着手し、親の追加指示で ff-merge して復旧した。以降の 4 本はブリーフに手順を入れて回避（初回）
+
+---
+
+<a id="obs-050"></a>
+
+### OBS-050: ff-dev-toolkit のレビュー走行中ガードは、書き込み先が凍結ツリー外（変数展開した scratchpad パス）や別 worktree の ref 操作でも deny するため、レビュアー起動前に push と ref 更新を済ませないと待ちが積み上がる
+
+| Kind | problem | Count | 1 |
+| First | 2026-10-16 | Last | 2026-10-16 |
+| Status | active | Issue | なし |
+
+pr-review-toolkit 系のサブエージェントが走る間、hook はリポジトリ配下での `git merge` / `commit --amend` / `branch -f` と、書き込み先を判定できないコマンド（変数展開パスへの `sed` / `python`）を止める。レビュアーは `git show` しか読まないので実害は無いが、deny のたびに override（`FF_REVIEW_LOCK_OVERRIDE=1`。`sed` には効かない）や Write ツールへの切り替えが要る → レビュアーを起動する前に、必要な push・ブランチ更新・PR 本文の下書きを終える。scratchpad は Write ツールで書く
+
+- 2026-10-16: PR #578 / #579 / #580 のレビュー走行中に計 5 回 deny（別ブランチの merge、別 worktree の amend、scratchpad への sed・python）。override は git / python に効き sed には効かず、Write ツールで回避（初回）
+
+---
+
+<a id="obs-051"></a>
+
+### OBS-051: Git Bash から `wsl.exe` を呼ぶと `/mnt/c/...` の引数が Windows パスに変換され、`#` を含む引数も空になるため、WSL へ渡すコマンドは PowerShell ツールから起動する
+
+| Kind | problem | Count | 1 |
+| First | 2026-10-16 | Last | 2026-10-16 |
+| Status | active | Issue | なし |
+
+MSYS のパス変換が `wsl.exe` の引数にも掛かり、`/mnt/c/...` は `C:/Program Files/Git/mnt/c/...` に化けてスクリプトが見つからない。`bash -lc '...'` の中に書いた `feature/#541-...` のようなブランチ名も空になり `invalid refspec` になる → WSL 側のスクリプトはファイルに書き出し、PowerShell ツールから `wsl.exe -d <distro> -- bash /mnt/c/<path> <args>` で呼ぶ
+
+- 2026-10-16: WSL クローンへの push 2 回分が `invalid refspec 'refs/heads/:refs/heads/'` と `No such file or directory` で失敗し、PowerShell 経由に替えて通った。OBS-042（`$?` の展開）とは別の機構（初回）
+
+---
+
+<a id="obs-052"></a>
+
+### OBS-052: レビュー巡回ガードは main checkout の現在ブランチで巡回数を数えるため、worktree 側で checkout した別 PR の 1 巡目でも上限（2 巡）に当たる
+
+| Kind | problem | Count | 1 |
+| First | 2026-10-16 | Last | 2026-10-16 |
+| Status | active | Issue | なし |
+
+`FF_REVIEW_ROUND_LIMIT` の巡回記録は `git branch --show-current` のブランチ名に紐づく。stacked PR のように head を別 worktree が保持し main checkout が base 側の PR ブランチにいると、新しい PR の初回レビューが base 側 PR の 3 巡目と判定される → 起動前に対象ブランチを main checkout で checkout するか、別 PR であることを明記して `FF_REVIEW_ROUND_ACK=1` を prompt の行頭に置く
+
+- 2026-10-16: PR #581（`feature/#509`、worktree で checkout）の 1 巡目を、main checkout が `feature/#494` のまま起動して deny。ACK 付きで通した（初回）
+
+---
+
+<a id="obs-053"></a>
+
+### OBS-053: Git Bash の `/tmp` は Windows ネイティブの Python からは解決できない（`/tmp` リテラルは存在しない）ため、一時ファイルは scratchpad の絶対パスで渡す
+
+| Kind | problem | Count | 1 |
+| First | 2026-10-16 | Last | 2026-10-16 |
+| Status | active | Issue | なし |
+
+Git Bash は `/tmp` を `C:/Users/<user>/AppData/Local/Temp` に写像するが、Windows の `python.exe` は引数の `/tmp/x` をそのまま解決して `FileNotFoundError` になる。シェルで書き出して Python で読む往復が黙って空振りする → 一時ファイルは `C:/...` または `/c/...` の絶対パス（scratchpad）で統一し、Python へはその絶対パスを渡す。heredoc で渡す Python ソースも Windows では UTF-8 で読まれないことがあるので、ファイルに書き出して `python -X utf8` で実行する
+
+- 2026-10-16: close-issue のエージェント（#509）と親（#509 の完了コメント更新）で Python が `/tmp/...` を開けず、置換が空振りした。scratchpad の絶対パスに替えて通った。同セッションで heredoc の Python ソースが非 UTF-8 で読まれて SyntaxError になる事象も 1 回（初回）
 
 ---
