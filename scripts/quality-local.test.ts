@@ -80,6 +80,10 @@ function nodePath(path: string): string {
   return r.status === 0 && r.stdout ? r.stdout.trim() : path;
 }
 
+// 各テストは bash を起動して quality-local.sh を走らせるので、Windows では起動が重い。単独なら最長 3.3 秒の
+// テストが、vitest 全体（他スイートと並列）では既定の 5 秒を超えて落ちた（Issue #570）。単独時の約 6 倍まで待つ（ms）
+const SPAWN_TEST_TIMEOUT_MS = 20_000;
+
 // quality-local.sh の STEPS と同じ順序（段を足したらここも足す。段数はこの配列から数える）
 const EXPECTED_ORDER = [
   "run build:mcp",
@@ -227,7 +231,7 @@ function recordMap(path: string): Record<string, string> {
   return out;
 }
 
-describe("quality:local gate record (Issue #515)", () => {
+describe("quality:local gate record (Issue #515)", { timeout: SPAWN_TEST_TIMEOUT_MS }, () => {
   it("package.json は scripts/quality-local.sh を呼ぶ", () => {
     const pkg = JSON.parse(readFileSync(join(REPO_ROOT, "package.json"), "utf8")) as {
       scripts?: { "quality:local"?: string };
