@@ -126,7 +126,7 @@ gh pr create --base develop --title "knowledge: ACE-<PR番号>-<連番> [categor
 # レビュー後 squash merge → /merge-cleanup
 ```
 
-> `knowledge:` 付き PLAYBOOK 単独コミットの develop 直 push は意図的フローであり、[ACE-012](../../docs-template/08-knowledge/playbook/archive/process.md#ace-012)（うっかり develop 直 push の事故防止）とは別物。
+> `knowledge:` 付き PLAYBOOK 単独コミットの develop 直 push は意図的フローであり、[ACE-012](../../docs-template/08-knowledge/PLAYBOOK.md#ace-012)（うっかり develop 直 push の事故防止）とは別物。
 
 ### 6. 結果レポート
 

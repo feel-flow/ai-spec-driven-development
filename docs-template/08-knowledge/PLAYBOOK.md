@@ -6,7 +6,7 @@ created: "2026-03-10"
 updated: "2026-10-16"
 owner: "@fffokazaki"
 changeImpact: "medium"
-ace_entry_count: 47
+ace_entry_count: 49
 tags: [ace, playbook, knowledge-management]
 references:
   - https://github.com/feel-flow/ai-spec-driven-development/blob/HEAD/docs/ACE_FRAMEWORK.md
@@ -107,7 +107,7 @@ ACE エントリ ID は **PRスコープ式** を採用する（このセクシ�
 ### 記述ガイドライン
 
 - **anchor**: 各エントリは見出し直前に `<a id="ace-XXX"></a>` を 1 行付与する。`XXX` は **エントリ ID を小文字化したもの**（新規は `ace-438-1` / `ace-i425-1`、旧エントリは `ace-001`。anchor 部分は常に小文字英数字＋ハイフン）。ファイルレベル参照（`PLAYBOOK.md` 単体）は常にファイル先頭に着地するため、anchor がなければ個別エントリへの誘導が成立しない。anchor 付与により他ドキュメントから `[ACE-438-1](path/to/PLAYBOOK.md#ace-438-1)` 形式で**特定エントリに直接ジャンプ可能**になる。
-- **参照リンク形式**: 他ドキュメントから ACE エントリを参照する場合は `[ACE-XXX](path/to/PLAYBOOK.md#ace-XXX)` 形式に統一する（`XXX` はエントリ ID の接頭辞 `ACE-` / `ace-` を除いた部分。新規は `438-1`、旧は 3 桁 `040`。label は `ACE-438-1`、anchor は `#ace-438-1`）。`[PLAYBOOK ACE-XXX]` / `[PLAYBOOK.md ACE-XXX]` 等の異なる label は使わない（[ACE-040](playbook/archive/process.md#ace-040) 語彙統一 / [ACE-024](playbook/archive/documentation-quality.md#ace-024) 用語衝突防止 の系。Origin: Issue [#425](https://github.com/feel-flow/ai-spec-driven-development/issues/425)）。
+- **参照リンク形式**: 他ドキュメントから ACE エントリを参照する場合は `[ACE-XXX](path/to/PLAYBOOK.md#ace-XXX)` 形式に統一する（`XXX` はエントリ ID の接頭辞 `ACE-` / `ace-` を除いた部分。新規は `438-1`、旧は 3 桁 `040`。label は `ACE-438-1`、anchor は `#ace-438-1`）。`[PLAYBOOK ACE-XXX]` / `[PLAYBOOK.md ACE-XXX]` 等の異なる label は使わない（[ACE-040](playbook/archive/process.md#ace-040) 語彙統一 / [ACE-024](playbook/archive/documentation-quality.md#ace-024) 用語衝突防止 の系。Origin: Issue [#425](https://github.com/feel-flow/ai-spec-driven-development/issues/425)）。参照先は、active エントリなら `PLAYBOOK.md#ace-xxx`、アーカイブ済みエントリなら `playbook/archive/<category>.md#ace-xxx` とする。どちらか迷うときは `playbook/archive/` を ID で grep して所在を確かめる。
 - **本文の構成**: 1 文目 =「何を学んだか」（知見の本質）。2 文目 =「どんな状況で使うか」（非自明な適用条件。再現条件が明確であるほど価値が高い）。最後に「次回何をすべきか」（推奨アクション）。
 
 ---
@@ -202,6 +202,19 @@ CLI フラグは Web 検索や AI 生成の情報では正確性が保証され�
 | Status | active |
 
 ドキュメントの「自動」「手動」「並列」「順次」といった動作表現が実装メカニズムと食い違うと、人も AI も誤った前提で動き、トラブルシューティングで混乱する。「こうなるべき」を「こうなっている」として書いたときに起きる（PR #350 では、AI が CLAUDE.md の指示で順次実行する仕組みを「自動実行」と書き、未定義の npm script も記載していた）。動作説明を書くときは実装コード・設定で実際の動作を確かめ、記載するコマンドは `package.json` の scripts や `--help` で実在を検証する。
+
+---
+
+<a id="ace-012"></a>
+
+### ACE-012: PR マージ・push 前は必ず `git status` でブランチを確認する（develop 直 push 事故防止）
+
+| Category | process | Origin | PR #391 / PR #393 / Issue #295 |
+| Date | 2026-05-06 |
+| Helpful | 0 | Harmful | 0 |
+| Status | active |
+
+バックグラウンドでブランチが切り替わる事象は外部プロセス（他作業者の `gh pr merge`、IDE 拡張、自動化フック等）で発生しうるため、自分のターン内で `git checkout` していないことは、現在のブランチが想定通りである保証にならない（Issue #295 では PR #391 の突然のマージで HEAD が develop に切り替わり、気づかず push したレビュー対応コミットが develop に直接乗って revert + 新 PR #393 が必要になった）。Git 操作の前後で状態を確かめるべき場面は、`git push` の直前、PR のマージ・ready 操作の前、Issue 着手時（同 Issue の他ブランチや未追跡ファイルによる重複作業の防止）である。`git push` 直前に `git branch --show-current` で想定ブランチを確認し、PR 操作前は `gh pr view` で他者によるマージ・close と PR head の一致（`--json headRefOid`）を確かめ、Issue 着手時は `git branch | grep -w <issue-number>` と `git status -uall` を実行する。develop / main に直 push した場合は `git reset --hard` + force push を避け、`git revert <SHA>` で打ち消し、同内容を新ブランチへ cherry-pick して正規 PR で再投入する。
 
 ---
 
@@ -341,6 +354,20 @@ Markdown の anchor はラベル側ではなく URL 側の `#section` だけが�
 | Status | active |
 
 shell スクリプトや hook の実行要件は shebang だけでは判断できず、本体が使う `grep` / `xargs` 等のコマンドまで要件になる（PR #414 では `#!/bin/sh` の hook を「sh.exe があれば動く」と書いたが、実際は coreutils も必要だった）。インストーラ経由の PATH の扱いもオプション次第で変わるため、一般論では断定できない。実行要件を書く前に本体を grep して依存コマンドを、`head -1` で shebang を列挙し、インストーラはオプション名を引用して手動で PATH に追加する経路も併記し、実機で確かめていない主張は未検証と明記する。
+
+---
+
+<a id="ace-034"></a>
+
+### ACE-034: 実装中は implementation-notes.md を作業ブランチに並走させて spec 乖離・トレードオフ・判断理由を捕捉する
+
+| Category | process | Origin | 外部知見（Anthropic エンジニア公開実装プロンプト） |
+| Related | ACE-009 / ACE-023 / ACE-032 |
+| Date | 2026-05-19 |
+| Helpful | 0 | Harmful | 0 |
+| Status | active |
+
+コミット diff とレビューコメントには「why / 捨てた選択肢 / spec との差分」が残らず、ACE Phase 1 Generate の raw material の品質に上限が生じるため、in-flight でしか書けない判断ログを作業ブランチの `implementation-notes.md` に並走させて残す（ACE-032 のように、気付いた瞬間に書いておけば反映漏れがなかったケースが頻発していた）。実装着手から PR 作成までの間、spec にない判断・spec から変えた点・採った/捨てた選択肢とトレードオフ・未決事項の 4 見出しで、コミットと一緒に 1〜3 行ずつ逐次追記する。PR 作成時に中身を PR description へ転記し、squash merge 後にルート直下へ前 PR のファイルが残って次ブランチと衝突しないよう、マージ前に `git rm` で削除する（長期保存するなら `notes/<issue-num>.md` の per-PR 化も可）。Generate の入力はファイル本体ではなく転記済みの PR description（`gh pr view --json body`）とし、スコープ外発見は引き続き Issue 化して、notes は現 PR の判断ログという役割に留める。
 
 ---
 
@@ -811,8 +838,8 @@ PR #551 では PATTERNS.md §3 を新設の ERRORS.md へ移し、配布物リ�
 
 #### 整理（/ace-refine）
 
-- Archived: ACE-003, ACE-005, ACE-006, ACE-007, ACE-008, ACE-009, ACE-010, ACE-011, ACE-012, ACE-013, ACE-015, ACE-017, ACE-024, ACE-026, ACE-027, ACE-028, ACE-030, ACE-031, ACE-032, ACE-033, ACE-034, ACE-036, ACE-037, ACE-038, ACE-039, ACE-040, ACE-041, ACE-043, ACE-441-1, ACE-441-2, ACE-443-1, ACE-447-1, ACE-449-1, ACE-459-2, ACE-460-1, ACE-462-1, ACE-464-1, ACE-464-2, ACE-465-1, ACE-469-1, ACE-469-2, ACE-502-1, ACE-508-1, ACE-508-2, ACE-510-1, ACE-510-2, ACE-516-1, ACE-516-2, ACE-516-3, ACE-519-1, ACE-519-2, ACE-519-3, ACE-526-1, ACE-527-1, ACE-532-1, ACE-533-1, ACE-533-2, ACE-534-1, ACE-535-1, ACE-536-1, ACE-536-2, ACE-537-1, ACE-539-1, ACE-539-2（helpful=0・30日以上参照なし。原文は playbook/archive/ のカテゴリ別ファイルへ verbatim 保全）
-- Compacted: ACE-001, ACE-002, ACE-004, ACE-014, ACE-016, ACE-018, ACE-019, ACE-020, ACE-021, ACE-022, ACE-023, ACE-025, ACE-029, ACE-035, ACE-042, ACE-044, ACE-045, ACE-046, ACE-445-1, ACE-447-2, ACE-447-3, ACE-449-2, ACE-449-3, ACE-459-1, ACE-464-3, ACE-465-2, ACE-484-1, ACE-484-2, ACE-484-3, ACE-489-1（旧テーブル形式を正準フォーマットへ要約。原文は playbook/archive/ のカテゴリ別ファイルが正）
+- Archived: ACE-003, ACE-005, ACE-006, ACE-007, ACE-008, ACE-009, ACE-010, ACE-011, ACE-013, ACE-015, ACE-017, ACE-024, ACE-026, ACE-027, ACE-028, ACE-030, ACE-031, ACE-032, ACE-033, ACE-036, ACE-037, ACE-038, ACE-039, ACE-040, ACE-041, ACE-043, ACE-441-1, ACE-441-2, ACE-443-1, ACE-447-1, ACE-449-1, ACE-459-2, ACE-460-1, ACE-462-1, ACE-464-1, ACE-464-2, ACE-465-1, ACE-469-1, ACE-469-2, ACE-502-1, ACE-508-1, ACE-508-2, ACE-510-1, ACE-510-2, ACE-516-1, ACE-516-2, ACE-516-3, ACE-519-1, ACE-519-2, ACE-519-3, ACE-526-1, ACE-527-1, ACE-532-1, ACE-533-1, ACE-533-2, ACE-534-1, ACE-535-1, ACE-536-1, ACE-536-2, ACE-537-1, ACE-539-1, ACE-539-2（helpful=0・30日以上参照なし。原文は playbook/archive/ のカテゴリ別ファイルへ verbatim 保全）
+- Compacted: ACE-001, ACE-002, ACE-004, ACE-012, ACE-014, ACE-016, ACE-018, ACE-019, ACE-020, ACE-021, ACE-022, ACE-023, ACE-025, ACE-029, ACE-034, ACE-035, ACE-042, ACE-044, ACE-045, ACE-046, ACE-445-1, ACE-447-2, ACE-447-3, ACE-449-2, ACE-449-3, ACE-459-1, ACE-464-3, ACE-465-2, ACE-484-1, ACE-484-2, ACE-484-3, ACE-489-1（旧テーブル形式を正準フォーマットへ要約。原文は playbook/archive/ のカテゴリ別ファイルが正）
 - Promoted: ACE-001, ACE-018, ACE-445-1, ACE-489-1（PATTERNS.md §14 へ蒸留。元エントリは live に active のまま残す）
 - live の旧テーブル形式が 0 件になったため、legacy-format-allowlist.txt を空にした（Issue #561）
 

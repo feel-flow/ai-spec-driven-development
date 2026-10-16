@@ -168,7 +168,7 @@ git checkout -b "feature/123-user-auth"
 
 #### 作業中の判断ログ: `implementation-notes.md` を並走させる
 
-実装着手と同時に **作業ブランチ直下** に `implementation-notes.md` を作成し、コミットと一緒に追記する。コミット diff には残らない「なぜこの選択をしたか / spec から変えた点 / 捨てた選択肢」を保持することで、ステップ5（Self-Review）の精度とステップ10（ACE Generate）の入力品質が上がる。詳細根拠は [ACE-034](../docs-template/08-knowledge/playbook/archive/process.md#ace-034)。
+実装着手と同時に **作業ブランチ直下** に `implementation-notes.md` を作成し、コミットと一緒に追記する。コミット diff には残らない「なぜこの選択をしたか / spec から変えた点 / 捨てた選択肢」を保持することで、ステップ5（Self-Review）の精度とステップ10（ACE Generate）の入力品質が上がる。詳細根拠は [ACE-034](../docs-template/08-knowledge/PLAYBOOK.md#ace-034)。
 
 最小ひな形（コピペして使う）:
 
@@ -534,7 +534,7 @@ gh discussion create \
 
 **任意エスカレーション — chore PR**: 大人数チーム、または知見内容自体をレビューに残したい場合のみ、develop から `chore/ace-from-pr-<PR番号>` ブランチを切り、PLAYBOOK.md 追記を小さい chore PR として PR レビュー → squash merge する。
 
-> **ACE-012 との関係（混同しないこと）**: [ACE-012](../docs-template/08-knowledge/playbook/archive/process.md#ace-012) は「うっかり」feature 作業を develop に直接 push してしまう事故（ブランチ切り替わりの見落とし）を防ぐルール。一方、本セクションの「develop 直マージ」は `knowledge:` プレフィックス付きの PLAYBOOK 単独コミットに限定した「意図的・承認済み」のフローであり、両者は別物。ACE-012 は引き続き有効（deprecated にしない）。
+> **ACE-012 との関係（混同しないこと）**: [ACE-012](../docs-template/08-knowledge/PLAYBOOK.md#ace-012) は「うっかり」feature 作業を develop に直接 push してしまう事故（ブランチ切り替わりの見落とし）を防ぐルール。一方、本セクションの「develop 直マージ」は `knowledge:` プレフィックス付きの PLAYBOOK 単独コミットに限定した「意図的・承認済み」のフローであり、両者は別物。ACE-012 は引き続き有効（deprecated にしない）。
 
 ---
 

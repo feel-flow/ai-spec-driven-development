@@ -17,7 +17,7 @@ ACE 知見コミットのマージ方針は **[git-workflow.md ステップ10 §
 
 - **既定（推奨）**: develop に直接 commit + push（PLAYBOOK.md は append-only ＋ PRスコープ式 ID で衝突しない）。
 - **任意エスカレーション**: 大人数チーム / 知見レビューを残したい場合のみ `chore/ace-from-pr-<PR番号>` の小 PR。
-- ここでの develop 直 push は `knowledge:` 付き PLAYBOOK 単独コミットに限った意図的フローであり、[ACE-012](../../08-knowledge/playbook/archive/process.md#ace-012)（うっかり develop 直 push の事故防止）とは別物。
+- ここでの develop 直 push は `knowledge:` 付き PLAYBOOK 単独コミットに限った意図的フローであり、[ACE-012](../../08-knowledge/PLAYBOOK.md#ace-012)（うっかり develop 直 push の事故防止）とは別物。
 
 **autonomous（任意）**: subagent と専用 worktree で ACE キャプチャを非同期化するパターン。導入は [ace-autonomous.md](./ace-autonomous.md) と `docs-template/scripts/ace/` のテンプレートを参照（Issue [#367](https://github.com/feel-flow/ai-spec-driven-development/issues/367)）。
 
@@ -29,13 +29,13 @@ ACE 知見コミットのマージ方針は **[git-workflow.md ステップ10 §
 
 ### 対象データ
 
-| データソース     | 取得方法                                              | 主な知見                                                                                                                                                 |
-| ---------------- | ----------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| PR diff          | `gh pr diff ${PR_NUMBER}`                             | コード変更のパターン、設計判断                                                                                                                           |
-| PR description   | `gh pr view ${PR_NUMBER} --json body`                 | spec にない判断 / spec から変更した点 / 捨てた選択肢（implementation-notes 転記済み、[ACE-034](../../08-knowledge/playbook/archive/process.md#ace-034)） |
-| Issue 内容       | `gh issue view ${ISSUE_NUM}`                          | 元々の課題、要件                                                                                                                                         |
-| レビューコメント | `gh api repos/OWNER/REPO/pulls/${PR_NUMBER}/comments` | 指摘事項、改善点                                                                                                                                         |
-| CI/CD ログ       | GitHub Actions の結果                                 | ビルド・テストの教訓                                                                                                                                     |
+| データソース     | 取得方法                                              | 主な知見                                                                                                                                 |
+| ---------------- | ----------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
+| PR diff          | `gh pr diff ${PR_NUMBER}`                             | コード変更のパターン、設計判断                                                                                                           |
+| PR description   | `gh pr view ${PR_NUMBER} --json body`                 | spec にない判断 / spec から変更した点 / 捨てた選択肢（implementation-notes 転記済み、[ACE-034](../../08-knowledge/PLAYBOOK.md#ace-034)） |
+| Issue 内容       | `gh issue view ${ISSUE_NUM}`                          | 元々の課題、要件                                                                                                                         |
+| レビューコメント | `gh api repos/OWNER/REPO/pulls/${PR_NUMBER}/comments` | 指摘事項、改善点                                                                                                                         |
+| CI/CD ログ       | GitHub Actions の結果                                 | ビルド・テストの教訓                                                                                                                     |
 
 ### AIプロンプトテンプレート
 
@@ -54,7 +54,7 @@ ACE 知見コミットのマージ方針は **[git-workflow.md ステップ10 §
 4. **パフォーマンス**: 最適化のヒント
 5. **アーキテクチャ**: 構造上の決定事項
 6. **プロセス**: ワークフロー・ツール活用の改善点
-7. **判断ログ**: spec にない判断 / spec から変更した点 / 捨てた選択肢（#1「採用した判断」を補完するレイヤ。データソースは上記表「PR description」行、[ACE-034](../../08-knowledge/playbook/archive/process.md#ace-034)。カテゴリは `process` または `architecture` を推奨。試行中: [Issue #421](https://github.com/feel-flow/ai-spec-driven-development/issues/421)、5 PR で評価）
+7. **判断ログ**: spec にない判断 / spec から変更した点 / 捨てた選択肢（#1「採用した判断」を補完するレイヤ。データソースは上記表「PR description」行、[ACE-034](../../08-knowledge/PLAYBOOK.md#ace-034)。カテゴリは `process` または `architecture` を推奨。試行中: [Issue #421](https://github.com/feel-flow/ai-spec-driven-development/issues/421)、5 PR で評価）
 
 ## 出力形式
 各知見について以下を出力してください:
@@ -319,7 +319,7 @@ ACE_REUSE_STALE_DAYS=120 npm run ace:reuse-report
 
 #### 追加
 
-- Phase 1 分析観点に「7. 判断ログ」を追加（試行中、5 PR で評価）。詳細は §Phase 1 観点 7（Issue [#421](https://github.com/feel-flow/ai-spec-driven-development/issues/421)、[ACE-034](../../08-knowledge/playbook/archive/process.md#ace-034) 連動）
+- Phase 1 分析観点に「7. 判断ログ」を追加（試行中、5 PR で評価）。詳細は §Phase 1 観点 7（Issue [#421](https://github.com/feel-flow/ai-spec-driven-development/issues/421)、[ACE-034](../../08-knowledge/PLAYBOOK.md#ace-034) 連動）
 
 ### [1.0.0] - YYYY-MM-DD
 
