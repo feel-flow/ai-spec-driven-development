@@ -116,7 +116,7 @@ npm run lint:md
 ### 3.3 `quality:local` npm スクリプト（実装済み）
 
 - **ルート `package.json`**: `quality:local` は `bash scripts/quality-local.sh` を呼ぶ。チェーンは **3.2 と同順**だが、**`npm ci` および `npm --prefix mcp ci` を含まない**（日々の実行時間を抑える）。
-- **実行前の前提**: クローン直後・依存を揃えるとき・未変更ファイルが `format:md:check` で落ちたときは、先に `npm ci` と `npm --prefix mcp ci` を実行する（§3.2 冒頭の 2 ステップ）。`npm install` だと lockfile 以外のパッチが入り、prettier のような整形ツールでは**触っていない Markdown が赤くなる**（Issue #485）。prettier はキャレットなしの固定バージョン（`package.json` の `devDependencies.prettier`）なので、`npm ci` 後は lockfile の版だけが使われる。
+- **実行前の前提**: クローン直後・依存を揃えるとき・未変更ファイルが `format:md:check` で落ちたときは、先に `npm ci` と `npm --prefix mcp ci` を実行する（§3.2 冒頭の 2 ステップ）。`npm install` だと lockfile 以外のパッチが入り、prettier のような整形ツールでは**触っていない Markdown が赤くなる**（Issue #485）。prettier はキャレットなしの固定バージョン（`package.json` の `devDependencies.prettier`）なので、`npm ci` 後は lockfile の版だけが使われる。`quality:local` はルートと `mcp/` のどちらか（または両方）の `node_modules` が無いとき、段を 1 つも実行せずに不在のディレクトリと `npm ci` / `npm --prefix mcp ci` を案内して止まり（gate-record は `fail`、exit 1。`npm ci` は自動実行しない）、依存不在が TS2688 や `'vitest' は認識されていません` のような別の失敗に見えないようにする（Issue #565）。
 - **中身の順序**: `build:mcp` → `check` → `mcp test` → `test:ace-scripts` → `validate -- docs-template` → `build:spec-index` → `format:md:check` → `lint:md`。
 - **段ラベル**（Issue #389）: 各段の開始を `==> quality:local [n/8] <コマンド>` として stdout に出す。最初に失敗した段で止め、`✗ quality:local: [n/8] <コマンド> が失敗しました（exit <rc>）。この段だけ再実行: <コマンド>` を stderr に出す。全段が通過したときは `✓ quality:local: 全 8 段が通過しました` を stdout に出す。終了コードは失敗した段の値をそのまま返す（旧 `&&` 連結と同じ）。段の定義は `scripts/quality-local.sh` の `STEPS` 配列 1 か所で、ラベルと実行コマンドの両方をそこから作る。
 - **個別段の実行**: 各段はそれぞれ npm script なので、失敗ラベルに出たコマンドをそのまま実行する。`quality:local` に `--only` は設けない。部分実行にゲート記録の `STATUS=pass` を書かせると、`/close-issue` の鮮度照合が全段の通過と区別できなくなるため。

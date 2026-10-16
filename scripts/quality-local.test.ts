@@ -11,13 +11,32 @@ import {
 import { homedir, tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { describe, expect, it } from "vitest";
+import { beforeAll, describe, expect, it } from "vitest";
 import { gitFixtureEnv } from "./git-fixture-env";
 
 const REPO_ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const QUALITY_LOCAL = join(REPO_ROOT, "scripts", "quality-local.sh");
 const RECORD_HELPER = join(REPO_ROOT, "scripts", "record-quality-gate.sh");
 const BASE_PATH = "/usr/bin:/bin";
+
+// 実チェックアウトで quality-local.sh を走らせるテストの前提（Issue #565）。
+// 依存が無いと本物のスクリプトが先頭で止まるが、テスト側の失敗は終了コードの不一致や calls ログ不在などで
+// 原因（依存不在）を名指ししないので、先にここで原因を名指しして止める。
+const REAL_CHECKOUT_DEPS: ReadonlyArray<{ dir: string; fix: string }> = [
+  { dir: "node_modules", fix: "npm ci" },
+  { dir: "mcp/node_modules", fix: "npm --prefix mcp ci" },
+];
+
+function requireRealCheckoutDeps(): void {
+  const missing = REAL_CHECKOUT_DEPS.filter(({ dir }) => !existsSync(join(REPO_ROOT, dir)));
+  if (missing.length > 0) {
+    throw new Error(
+      `実チェックアウトの依存が未導入です。${missing
+        .map(({ dir, fix }) => `${dir} が無い（先に実行: ${fix}）`)
+        .join(" / ")}`,
+    );
+  }
+}
 
 function gitEnv(): NodeJS.ProcessEnv {
   return gitFixtureEnv({
@@ -226,6 +245,7 @@ describe("quality:local gate record (Issue #515)", () => {
   });
 
   it("quality-local.sh は npm チェーン成功で pass、失敗で fail を書く", () => {
+    requireRealCheckoutDeps();
     const passDir = mkdtempSync(join(tmpdir(), "ql-npm-pass-"));
     const failDir = mkdtempSync(join(tmpdir(), "ql-npm-fail-"));
     const toolkit = mkdtempSync(join(tmpdir(), "ql-tk-"));
@@ -280,6 +300,8 @@ describe("quality:local gate record (Issue #515)", () => {
       "run lint:md",
     ];
     const FAILING_STEP_RC = 7;
+
+    beforeAll(requireRealCheckoutDeps);
 
     function runWithStub(failOn: string | null) {
       const binDir = mkdtempSync(join(tmpdir(), "ql-steps-"));
@@ -344,6 +366,82 @@ describe("quality:local gate record (Issue #515)", () => {
         expect(status).toBe("fail");
       },
     );
+  });
+
+  describe("依存未導入のプリフライト (Issue #565)", () => {
+    const ROOT_FIX = "npm ci";
+    const MCP_FIX = "npm --prefix mcp ci";
+
+    // 一時ディレクトリに scripts を複製した偽のチェックアウトを作る（ROOT は scripts の親）。
+    function runInFixture(present: { root: boolean; mcp: boolean }) {
+      const dir = mkdtempSync(join(tmpdir(), "ql-deps-"));
+      const binDir = mkdtempSync(join(tmpdir(), "ql-deps-bin-"));
+      const toolkit = mkdtempSync(join(tmpdir(), "ql-tk-"));
+      const log = join(binDir, "calls.log");
+      try {
+        mkdirSync(join(dir, "scripts"));
+        for (const name of ["quality-local.sh", "record-quality-gate.sh"]) {
+          writeFileSync(
+            join(dir, "scripts", name),
+            readFileSync(join(REPO_ROOT, "scripts", name)),
+          );
+        }
+        if (present.root) mkdirSync(join(dir, "node_modules"));
+        if (present.mcp) mkdirSync(join(dir, "mcp", "node_modules"), { recursive: true });
+        writeFixtureToolkit(toolkit);
+        initRepo(dir);
+        writeFileSync(join(binDir, "npm"), `#!/bin/sh\necho "$*" >> "${log}"\nexit 0\n`);
+        chmodSync(join(binDir, "npm"), 0o755);
+        const gateFile = join(binDir, "gate-record");
+        // 前回の緑が残っている状態から始める
+        writeFileSync(gateFile, "STATUS=pass\n");
+        const r = spawnSync("bash", [join(dir, "scripts", "quality-local.sh")], {
+          cwd: dir,
+          encoding: "utf8",
+          env: {
+            ...gitEnv(),
+            PATH: `${binDir}:${BASE_PATH}`,
+            FF_DEV_TOOLKIT_ROOT: toolkit,
+            FF_GATE_RECORD_FILE: gateFile,
+          },
+        });
+        const calls = existsSync(log) ? readFileSync(log, "utf8").trim().split("\n") : [];
+        return { r, calls, status: recordMap(gateFile).STATUS };
+      } finally {
+        rmSync(dir, { recursive: true, force: true });
+        rmSync(binDir, { recursive: true, force: true });
+        rmSync(toolkit, { recursive: true, force: true });
+      }
+    }
+
+    it.each([
+      { name: "ルートの node_modules だけ無い", root: false, mcp: true, named: ["node_modules"], fix: [ROOT_FIX], notNamed: ["mcp/node_modules"] },
+      { name: "mcp/node_modules だけ無い", root: true, mcp: false, named: ["mcp/node_modules"], fix: [MCP_FIX], notNamed: [] },
+      { name: "両方無い", root: false, mcp: false, named: ["node_modules", "mcp/node_modules"], fix: [ROOT_FIX, MCP_FIX], notNamed: [] },
+    ])(
+      "$name: 段を 1 つも実行せず、不在名と案内コマンドを stderr に出して exit 1、gate-record は fail",
+      ({ root, mcp, named, fix, notNamed }) => {
+        const { r, calls, status } = runInFixture({ root, mcp });
+        expect(r.status, r.stderr).toBe(1);
+        expect(calls).toEqual([]);
+        expect(r.stdout).not.toContain("==> quality:local");
+        expect(r.stderr).toContain("✗ quality:local:");
+        for (const n of named) expect(r.stderr).toContain(n);
+        for (const f of fix) expect(r.stderr).toContain(f);
+        for (const n of notNamed) expect(r.stderr).not.toContain(n);
+        if (!root) expect(r.stderr).toContain(ROOT_FIX);
+        if (root) expect(r.stderr).not.toContain(ROOT_FIX);
+        if (mcp) expect(r.stderr).not.toContain(MCP_FIX);
+        expect(status).toBe("fail");
+      },
+    );
+
+    it("両方在るときは従来どおり 8 段を実行して exit 0", () => {
+      const { r, calls, status } = runInFixture({ root: true, mcp: true });
+      expect(r.status, r.stderr).toBe(0);
+      expect(calls).toHaveLength(8);
+      expect(status).toBe("pass");
+    });
   });
 
   it.skipIf(!TOOLKIT_ROOT)(
