@@ -25,7 +25,7 @@
 
 ## Self-Review Results
 
-- [ ] **ローカル品質ゲート**: `npm run quality:local` が **PR 提出前** に通り、**失敗がない** ことを確認した（通常の push では pre-push の実行が実測と記録を兼ねるので、push 予定のコミットでは手動実行は省いてよい。pre-push を回避した（`SKIP_QUALITY_GATE=1` / `--no-verify`）場合や、環境要因で pre-push が実測にならない場合（例: Windows で既知の失敗があり別環境で測る）は、手動実行で測り PR 本文で申告する。依存ロック厳密再現が必要な場合は事前に `npm ci` / `npm --prefix mcp ci`。実体チェーンは [`docs/NO_GITHUB_ACTIONS_MIGRATION_DESIGN.md` §3.3](https://github.com/feel-flow/ai-spec-driven-development/blob/HEAD/docs/NO_GITHUB_ACTIONS_MIGRATION_DESIGN.md#quality-local-detail)）
+- [ ] **ローカル品質ゲート**: `npm run quality:local` が **PR 提出前** に通り、**失敗がない** ことを確認した（通常の push では pre-push の実行が実測と記録を兼ねるので、push 予定のコミットでは手動実行は省いてよい。pre-push を回避した（`SKIP_QUALITY_GATE=1` / `--no-verify`）場合、pre-push が発火しなかった（新しい worktree / clone で `npm ci` 未実行など。push 時に `Running quality gate before push` が出ない）場合、環境要因で pre-push が実測にならない場合（例: Windows で既知の失敗があり別環境で測る）は、手動実行で測り PR 本文で申告する。依存ロック厳密再現が必要な場合は事前に `npm ci` / `npm --prefix mcp ci`。実体チェーンは [`docs/NO_GITHUB_ACTIONS_MIGRATION_DESIGN.md` §3.3](https://github.com/feel-flow/ai-spec-driven-development/blob/HEAD/docs/NO_GITHUB_ACTIONS_MIGRATION_DESIGN.md#quality-local-detail)）
 - [ ] `markdownlint`: 該当 Markdown に問題なし（Husky pre-commit と整合）
 - [ ] MCP: `npm run check` 相当でエラーなし（該当する場合）
 - [ ] テスト: `npm --prefix mcp test` および `npm run test:ace-scripts`（該当する場合）がパス

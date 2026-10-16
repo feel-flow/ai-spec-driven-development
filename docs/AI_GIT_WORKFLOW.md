@@ -235,7 +235,7 @@ Closes #123"
 npm run quality:local
 ```
 
-**手動実行を省ける場合**（[Issue #558](https://github.com/feel-flow/ai-spec-driven-development/issues/558)）: 通常の push では `.husky/pre-push` が `npm run quality:local`（ゲート記録 gate-record の書き込みを含む。記録器が無い環境では記録しない）を実行する。push する予定のコミットでは手動実行を省いてよく、pre-push の実行がゲートの実測と記録を兼ねる。ただし pre-push は作業ツリーを測るため、未コミットの変更が残っていると HEAD の実測にならない。手動実行は push しない段階の確認（commit 前の挙動確認、push 前に失敗を早く知りたい場合）に限り、手動実行と pre-push で同じ HEAD を二重に測らない。pre-push を回避した（`SKIP_QUALITY_GATE=1` / `--no-verify`）場合や、環境要因で pre-push が実測にならない場合（例: Windows で既知の失敗があり別環境で測る）は、手動実行で測り PR 本文で申告する（[NO_GITHUB_ACTIONS_MIGRATION_DESIGN.md §4.2](./NO_GITHUB_ACTIONS_MIGRATION_DESIGN.md) の「スキップした場合は PR 本文等で申告する」と同じ運用）。
+**手動実行を省ける場合**（[Issue #558](https://github.com/feel-flow/ai-spec-driven-development/issues/558)）: 通常の push では `.husky/pre-push` が `npm run quality:local`（ゲート記録 gate-record の書き込みを含む。記録器が無い環境では記録しない）を実行する。push する予定のコミットでは手動実行を省いてよく、pre-push の実行がゲートの実測と記録を兼ねる。ただし pre-push は作業ツリーを測るため、未コミットの変更が残っていると HEAD の実測にならない。手動実行は push しない段階の確認（commit 前の挙動確認、push 前に失敗を早く知りたい場合）に限り、手動実行と pre-push で同じ HEAD を二重に測らない。省略の前提は hook が発火する状態であること。新しい worktree / clone では先に `npm ci` を実行し（`prepare` が husky を設定して `.husky/_` を作る。未実行だと pre-push は無言で発火しない）、push 時に `Running quality gate before push` が出ることを確認する。これが出なかった場合、pre-push を回避した（`SKIP_QUALITY_GATE=1` / `--no-verify`）場合、環境要因で pre-push が実測にならない場合（例: Windows で既知の失敗があり別環境で測る）は、手動実行で測り PR 本文で申告する（[NO_GITHUB_ACTIONS_MIGRATION_DESIGN.md §4.2](./NO_GITHUB_ACTIONS_MIGRATION_DESIGN.md) の「スキップした場合は PR 本文等で申告する」と同じ運用）。
 
 **汎用プロジェクト向けの例**（各リポジトリの `package.json` に従う）:
 

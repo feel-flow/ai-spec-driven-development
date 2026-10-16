@@ -212,7 +212,7 @@ npm run quality:local
 
 - 全作業はIssueから開始する
 - ブランチ命名: `feature/#<issue-number>-<description>`
-- **`quality:local` の手動実行**: push する予定のコミットでは省いてよい。通常の push では `.husky/pre-push` が `npm run quality:local` を実行し、ゲートの実測と記録（gate-record。記録器が無い環境では記録しない）を兼ねる。ただし pre-push は作業ツリーを測るため、未コミットの変更が残っていると HEAD の実測にならない。手動実行は push しない段階の確認（commit 前の挙動確認、push 前に失敗を早く知りたい場合）に限り、手動実行と pre-push で同じ HEAD を二重に測らない。手動実行を省いた場合、ゲートの合否は push 時に確定する。pre-push を回避した（`SKIP_QUALITY_GATE=1` / `--no-verify`）場合や、環境要因で pre-push が実測にならない場合（例: Windows で既知の失敗があり別環境で測る）は、手動実行で測り PR 本文で申告する
+- **`quality:local` の手動実行**: push する予定のコミットでは省いてよい。通常の push では `.husky/pre-push` が `npm run quality:local` を実行し、ゲートの実測と記録（gate-record。記録器が無い環境では記録しない）を兼ねる。ただし pre-push は作業ツリーを測るため、未コミットの変更が残っていると HEAD の実測にならない。手動実行は push しない段階の確認（commit 前の挙動確認、push 前に失敗を早く知りたい場合）に限り、手動実行と pre-push で同じ HEAD を二重に測らない。手動実行を省いた場合、ゲートの合否は push 時に確定する。省略の前提は hook が発火する状態であること。新しい worktree / clone では先に `npm ci` を実行し（`prepare` が husky を設定して `.husky/_` を作る。未実行だと pre-push は無言で発火しない）、push 時に `Running quality gate before push` が出ることを確認する。これが出なかった場合、pre-push を回避した（`SKIP_QUALITY_GATE=1` / `--no-verify`）場合、環境要因で pre-push が実測にならない場合（例: Windows で既知の失敗があり別環境で測る）は、手動実行で測り PR 本文で申告する
 - マージ先: develop（Squash merge）
 - ACEはマージ後・cleanup後に develop で実行する（**既定（推奨）: develop 直マージ**＝知見追記を develop に直接 commit + push。大人数チーム/知見内容のレビューを残したい場合のみ `chore/ace-from-pr-<PR番号>` の小PRに切り替え）。エントリ ID は PRスコープ式（`ACE-<PR番号>-<連番>`）で衝突しない。詳細・ACE-012 との関係は [docs/AI_GIT_WORKFLOW.md ステップ10](docs/AI_GIT_WORKFLOW.md) 参照
 - 詳細: [docs/AI_GIT_WORKFLOW.md](docs/AI_GIT_WORKFLOW.md)

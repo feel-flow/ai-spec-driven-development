@@ -260,9 +260,13 @@
      // 再試行は GET 等の冪等な呼び出し、または冪等キー付きの呼び出しに限る（FALLBACK.md §6）
      return retryWithBackoff(
        async () => {
+         // 呼び出し元の中断（init.signal）とタイムアウトを合成する。init.signal を
+         // 上書きすると、利用者が中断しても通信がタイムアウトまで続く
+         const signals = [AbortSignal.timeout(EXTERNAL_API_TIMEOUT_MS)];
+         if (init.signal) signals.push(init.signal);
          const res = await fetch(url, {
            ...init,
-           signal: AbortSignal.timeout(EXTERNAL_API_TIMEOUT_MS),
+           signal: AbortSignal.any(signals),
          });
          // fetch は 4xx/5xx で reject しない。status を持つエラーを投げ、
          // normalizeExternalError()（03-implementation/ERRORS.md）に分類させる
@@ -275,7 +279,12 @@
          }
          return res;
        },
-       { operation: "externalApi.fetch" },
+       {
+         operation: "externalApi.fetch",
+         // 中断による失敗は status を持たず transient に分類される（ERRORS.md）。
+         // 呼び出し元が中断したら再試行しない
+         isRetryable: () => !init.signal?.aborted,
+       },
      );
    }
    ```

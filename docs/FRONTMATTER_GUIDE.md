@@ -1,10 +1,10 @@
 ---
 id: frontmatter-guide
 title: Frontmatter ガイド - なぜ・どこで・何を書くか
-version: 1.7.0
+version: 1.7.1
 status: draft
 created: 2026-05-19
-updated: 2026-10-15
+updated: 2026-10-16
 owner: feel-flow
 phase: mvp
 tags: [documentation, frontmatter, metadata, spec-kit, governance]
@@ -16,7 +16,7 @@ references:
   - scripts/build-spec-index.mjs
   - scripts/sync-to-public.mjs
   - mcp/src/utils.ts
-changeImpact: medium
+changeImpact: low
 visibility: public
 ---
 
@@ -88,11 +88,11 @@ frontmatter の `title` / `tags` / `references` / `status` / `changeImpact` は�
 
 ## 2. What - 付けると何が起きるのか
 
-| パイプライン                   | 入力                                                                                    | frontmatter から拾うフィールド                                        | 出力 / 効果                                                            |
-| ------------------------------ | --------------------------------------------------------------------------------------- | --------------------------------------------------------------------- | ---------------------------------------------------------------------- |
-| `scripts/validate-docs.mjs`    | `docs-template/` 配下の **固定 7 ファイル**（CORE_DOCS 配列で列挙）                     | `title`, `version`, `status`, `owner`, `created`, `updated`           | 必須フィールド・enum・SemVer 検証。失敗で exit 1                       |
-| `scripts/build-spec-index.mjs` | `docs/specs/**/*.md`                                                                    | `specId`, `title`, `status`, `version`, `tags`, `links`, `metrics` 他 | `dist/spec-index.json` を生成。`specId` 重複・enum 違反で exit 1       |
-| `npm run quality:local`        | `bash scripts/quality-local.sh`（validate / build-spec-index / lint / prettier を含む） | 上記すべて                                                            | 品質ゲート（PR 前に手動実行。public リポでは CI も同じコマンドを実行） |
+| パイプライン                   | 入力                                                                                    | frontmatter から拾うフィールド                                        | 出力 / 効果                                                                                                         |
+| ------------------------------ | --------------------------------------------------------------------------------------- | --------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------- |
+| `scripts/validate-docs.mjs`    | `docs-template/` 配下の **固定 7 ファイル**（CORE_DOCS 配列で列挙）                     | `title`, `version`, `status`, `owner`, `created`, `updated`           | 必須フィールド・enum・SemVer 検証。失敗で exit 1                                                                    |
+| `scripts/build-spec-index.mjs` | `docs/specs/**/*.md`                                                                    | `specId`, `title`, `status`, `version`, `tags`, `links`, `metrics` 他 | `dist/spec-index.json` を生成。`specId` 重複・enum 違反で exit 1                                                    |
+| `npm run quality:local`        | `bash scripts/quality-local.sh`（validate / build-spec-index / lint / prettier を含む） | 上記すべて                                                            | 品質ゲート（PR 前に通す。push 予定のコミットでは pre-push の実行で代替可。public リポでは CI も同じコマンドを実行） |
 
 > **重要**: `validate-docs.mjs` は **CORE_DOCS 配列で列挙された 7 ファイルだけ**を検証する。拡張文書（GLOSSARY, DECISIONS 等）や `PLAYBOOK.md`、`docs/` 配下の方法論ガイド類は **CI で frontmatter 検証されない**。拡張対象にしたい場合は `CORE_DOCS` 配列への追加か別スクリプト化が必要。
 
@@ -271,7 +271,7 @@ metrics:
 - [ ] `status` を変えたか確認（`draft` → `review` 等）
 - [ ] `changeImpact: high` の場合は本文末尾の **Changelog セクションにエントリ追記**
 - [ ] 参照（`references`）が増えたら追加
-- [ ] `npm run quality:local` を実行して `validate-docs.mjs` が通ることを確認
+- [ ] `npm run quality:local` で `validate-docs.mjs` が通ることを確認（push 予定のコミットでは pre-push の実行で代替できる。pre-push を回避した・発火しなかった・実測にならない場合は手動実行し、PR 本文で申告する。条件の詳細は [AI_GIT_WORKFLOW.md](AI_GIT_WORKFLOW.md) の「手動実行を省ける場合」）
 
 ### 5.4 注意点・つまずきポイント
 
@@ -482,6 +482,12 @@ frontmatter 管理（編集・検証・索引化）は Node スクリプトと�
 ---
 
 ## Changelog
+
+### [1.7.1] - 2026-10-16
+
+#### 変更
+
+- §2 表と §5.3 チェックリストの `quality:local` の扱いを、push 予定のコミットでは pre-push の実行で代替できる運用に同期（[Issue #558](https://github.com/feel-flow/ai-spec-driven-development/issues/558)）
 
 ### [1.7.0] - 2026-10-15
 
