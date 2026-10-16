@@ -110,14 +110,16 @@ Vercel を使わないリポジトリでも Vercel プラグインの SessionSta
 
 ### OBS-006: Issue の AC に書く検証コマンドは、起票時に実行して「拾うべきものを拾う」ことを確かめてから書く
 
-| Kind | problem | Count | 2 |
-| First | 2026-09-06 | Last | 2026-09-07 |
-| Status | active | Issue | なし |
+| Kind | problem | Count | 3 |
+| First | 2026-09-06 | Last | 2026-10-16 |
+| Status | promoted | Issue | feel-flow/feelflow-plugins#2156 |
 
 AC の grep を頭で組んで起票すると、検出式の穴（表記の必須化・境界の欠落）がそのまま「残存なし」の緑になり、レビューで検出器ごと差し戻される → 起票前に既知の残存 1 件を含む状態でコマンドを実行し、その 1 件が検出されることを見てから AC に書く。
 
 - 2026-09-06: Issue #499 の AC grep が `node.js` 表記を必須にしていて「Node 20+」を拾えず、Toolkit が Warning として検出器の是正を要求した（初回）
 - 2026-09-07: Issue #517 の AC grep がファイル引数で 2 ファイルに限定されており、同じ無条件主張を持つ `.cursorrules` と `docs/FRONTMATTER_GUIDE.md` を拾えなかった。起票時に引数なしで実行していれば 4 ファイル出ていた（再発。ACE-519-1 として知見化）
+- 2026-10-16: Issue #570 を `/out-of-scope-issue` で起票したとき、AC 2「Windows で `quality:local` の 4 段目が通る」を、その段を実行しないまま書いた。実装後に測ると他に 8 スイート以上が落ちていて（計 78 件）、AC を絞り直し、#572〜#577 として起票し直す往復になった（再発・Count 3）
+- 2026-10-16: 昇格: SSOT develop `3abbab1` の `create-issue/SKILL.md` 手順 4 には「AC が前提にする値・資料・配置を実測したか」がある。`out-of-scope-issue/references/filing.md` §3.3 には同じ趣旨の確認が無い（一部対応済み）ため、残りに絞って feel-flow/feelflow-plugins#2156 を起票した
 
 ---
 
@@ -423,7 +425,7 @@ dry-run で grok-cli が `runtime-socket deny resolution failed` と出ても、
 
 ### OBS-027: `finish.sh precheck` が separate-push で生成する MERGE_COMMAND は、`delete_branch_on_merge=true` のリポジトリでは head 削除 push が `cannot lock ref` で落ち、マージ成功でも rc 1 を返す
 
-| Kind | problem | Count | 2 |
+| Kind | problem | Count | 3 |
 | First | 2026-10-15 | Last | 2026-10-16 |
 | Status | promoted | Issue | feel-flow/feelflow-plugins#2135 |
 
@@ -432,6 +434,7 @@ base を別 worktree が保持していると precheck は `--delete-branch` を
 - 2026-10-15: PR #546 のマージで MERGE_COMMAND が rc 1。`gh pr view` は MERGED、`git ls-remote` は該当 ref なし、`delete_branch_on_merge=true` を確認（初回）
 - 2026-10-15: toolkit 側の修正で構造的に解消できる種類のため、利用者の起票方針（actionable は承認待ちなしで起票）に従い閾値未達で feel-flow/feelflow-plugins#2135 へ起票
 - 2026-10-16: PR #564 のマージで MERGE_COMMAND の削除 push が `! [rejected] (delete) ... (stale info)` で失敗。マージは成功、`delete_branch_on_merge=true` で ref は既に無かった。feel-flow/feelflow-plugins#2135 へ再発をコメント
+- 2026-10-16: PR #571 のマージで、head を worktree が、base を main worktree が保持していたため `separate-push` になった。削除 push が `(stale info)` で拒否され exit 1。マージは成功し（`172c07c`）、`ls-remote` は 2（ref なし）だった。#2135 へ再発をコメント（再発・Count 3）
 
 ---
 
@@ -689,5 +692,47 @@ Windows の Git Bash では `tests/run-all.sh` が 2 時間超で完走せず、
 `npm install -D --save-exact <pkg>` は、追加した依存のほかに lockfile 全体を手元の npm の形式で書き直す。そのため、optional 依存の `libc` 欄が消えるような、版の違いだけによる差分が入る。プラットフォーム別バイナリの選別に効く欄なので、そのままコミットすると別 OS の `npm ci` の結果が変わりうる → 依存を足したら `git diff package-lock.json` を読み、追加した依存の行以外の差分は元に戻してからコミットする
 
 - 2026-10-16: Issue #512 / PR #569。npm 11.5.2 で `typescript` を追加したところ、`libc` 欄の削除が 10 か所混ざった（16+/30-）。lockfile を戻し、`typescript` の 2 か所（15 行）だけを足し直した（初回）
+
+---
+
+<a id="obs-046"></a>
+
+### OBS-046: サブエージェントの完了報告を、親が受け入れ条件の指す実行形態で測り直すと、報告では見えない未達と誤分類が見つかる
+
+| Kind | keep | Count | 1 |
+| First | 2026-10-16 | Last | 2026-10-16 |
+| Status | active | Issue | なし |
+
+サブエージェントの報告は、それ自身が実行した範囲（単独実行・推測を含む分類）の結果にとどまる。親が受け入れ条件の指す形（ゲートの段の全体実行）で 1 回測り直すと、報告に無かった未達や分類の誤りが見つかる → 実装や調査をサブエージェントへ任せた回も、マージ判断の前に親が AC の実行形態で 1 回実測する
+
+- 2026-10-16: Issue #570。実装サブエージェントは「単独実行で 14 件通過」と報告した。親が `npm run test:ace-scripts` 全体で測ると、同じファイルが 5 秒のタイムアウトで 1 件落ちていて、修正（`5b00882`）につながった。別の調査サブエージェントへ再分類させると、前の分類の誤り 2 件（NUL の発生源、隠れた失敗）が見つかった（初回）
+
+---
+
+<a id="obs-047"></a>
+
+### OBS-047: サブエージェントの worktree 隔離はリポジトリ直下の `.claude/worktrees/` に作られ、未追跡のまま `/merge-cleanup` の未コミット変更ガードで止まり、専用ブランチも残る
+
+| Kind | problem | Count | 1 |
+| First | 2026-10-16 | Last | 2026-10-16 |
+| Status | active | Issue | なし |
+
+`.claude/worktrees/` は gitignore されていないので、隔離 worktree が在る間は main のチェックアウトで `?? .claude/worktrees/` が出続ける。`/merge-cleanup` は「未コミットの変更があります」で中断した。後片付けで worktree と PR のブランチを消した後も、隔離のために作られた `worktree-agent-*` ブランチが残った → 隔離 worktree を使うリポジトリでは `.claude/worktrees/` を `.gitignore` に足すか、`FF_MERGE_CLEANUP_IGNORE_PATHS='.claude/worktrees/**'` を付けて実行し、残ったブランチは develop に含まれることを確かめてから `git branch -d` で消す
+
+- 2026-10-16: PR #571 の後片付け。dry-run がガードで止まり、パスを除外して再実行した。`worktree-agent-a4447413dcf82dc3b`（`6e1bbce`）が残ったため、`git branch -d` で消した（初回）
+
+---
+
+<a id="obs-048"></a>
+
+### OBS-048: Git Bash で `FF_DEV_TOOLKIT_ROOT` を `C:/...` 形式のまま渡すと、`ace-run-ts.sh` が相対パスとして扱い「インストールが壊れています」で止まる
+
+| Kind | problem | Count | 1 |
+| First | 2026-10-16 | Last | 2026-10-16 |
+| Status | active | Issue | なし |
+
+ホストが渡す plugin root は `C:/Users/...` 形式で、`finish.sh` などはそのまま動く。一方 `ace-run-ts.sh` は、隣の `ace-run-ts-probe.ts` のパスを `<cwd>/C:/Users/...` と組み立てて読めず、exit 2 になった（runner の不在ではないと表示される）→ Git Bash から ACE の TS ツールを呼ぶときは、root を `/c/Users/...` 形式に直して渡す
+
+- 2026-10-16: PR #569 の `/ace-curate` で、`sync-playbook-frontmatter.ts` と `check-entry-format.ts` の検証が 2 本とも exit 2。`/c/...` 形式で渡し直して通った（初回）
 
 ---

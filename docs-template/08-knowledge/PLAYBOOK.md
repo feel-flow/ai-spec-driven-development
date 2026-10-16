@@ -1,12 +1,12 @@
 ---
 title: "PLAYBOOK"
-version: "1.68.0"
+version: "1.69.0"
 status: "approved"
 created: "2026-03-10"
 updated: "2026-10-16"
 owner: "@fffokazaki"
 changeImpact: "medium"
-ace_entry_count: 53
+ace_entry_count: 55
 tags: [ace, playbook, knowledge-management]
 references:
   - https://github.com/feel-flow/ai-spec-driven-development/blob/HEAD/docs/ACE_FRAMEWORK.md
@@ -886,9 +886,42 @@ Markdown の整形ツールはフェンス内のコードも言語ごとに整�
 
 ---
 
+<a id="ace-571-1"></a>
+
+### ACE-571-1: Windows で子プロセスを起動するテストは、子に渡す PATH から実行ファイルが探されるため、POSIX 形式の PATH を渡すと起動自体に失敗する
+
+| Category | testing | Origin | PR #571 |
+| Date | 2026-10-16 |
+| Helpful | 0 | Harmful | 0 |
+| Status | active |
+
+Windows の Node は、`spawnSync` の実行ファイルを子の `env.PATH` から探す。外部ツールへの依存を断つ目的で `/usr/bin:/bin` に絞ると、bash も git も見つからず、`status` が `null`・`stdout` が `undefined` の、原因の読めない失敗になる。PATH の順で bash を探すと、System32 にある WSL の起動ランチャーを拾うこともある。Windows では Git for Windows の配置（`git --exec-path` を起点）から bash.exe / git.exe を絶対パスで決め、子の PATH はその 2 ディレクトリだけを `path.delimiter` で連結する。macOS / Linux 側の絞り込みはそのまま残す。
+
+---
+
+<a id="ace-571-2"></a>
+
+### ACE-571-2: 単独で通ったテストを受け入れ条件の根拠にせず、条件が指す実行形態（ゲートの段の全体実行）で測る
+
+| Category | testing | Origin | PR #571 |
+| Date | 2026-10-16 |
+| Helpful | 0 | Harmful | 0 |
+| Status | active |
+
+子プロセスを起動するテストは、単独なら数秒で通っても、テストランナー全体（他スイートと並列）では既定のタイムアウトを超えて落ちることがある。PR #571 では、単独で 14 件通過を確認した後、全体実行で同じファイルが 5 秒のタイムアウトで 1 件落ち、受け入れ条件が未達だとわかった。受け入れ条件が「ゲートで通る」を指すなら、そのゲートの段と同じ全体実行で確かめ、フレークの可能性がある場合は複数回測る。タイムアウトを延ばすときは、実測した所要時間を根拠にして名前付き定数で持つ。
+
+---
+
 ## Changelog
 
 > [1.64.0] 以前の履歴は [PLAYBOOK-CHANGELOG.md](https://github.com/feel-flow/ai-spec-driven-development/blob/HEAD/docs-template/08-knowledge/PLAYBOOK-CHANGELOG.md) に移した（PLAYBOOK.md は /ace-setup で配布され、移動先は配置されないため絶対 URL）。
+
+### [1.69.0] - 2026-10-16
+
+#### 追加
+
+- ACE-571-1: Windows で子プロセスを起動するテストは、子に渡す PATH から実行ファイルが探されるため、POSIX 形式の PATH を渡すと起動自体に失敗する（PR #571）
+- ACE-571-2: 単独で通ったテストを受け入れ条件の根拠にせず、条件が指す実行形態（ゲートの段の全体実行）で測る（PR #571）
 
 ### [1.68.0] - 2026-10-16
 
