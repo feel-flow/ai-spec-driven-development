@@ -245,7 +245,7 @@ npm run lint:md
 
 Issue #377 の設計時点（2026-04）の改稿案は、**PR テンプレートの Self-Review 節を「リモート CI が検証する」前提から「ローカルで品質ゲートを明示実行し、その結果をチェックリストで申告する」前提の文言へ改める**ことだった。§5 および §9-7 が指す「付録 A に沿った更新」はこの意図を指す。
 
-- **現行の正本**: [`.github/pull_request_template.md`](../.github/pull_request_template.md)（`quality:local` の明示実行、public リポジトリでの Actions 併用注記を含む現行版）
+- **現行の正本**: [`.github/pull_request_template.md`](../.github/pull_request_template.md)（`quality:local` の通過確認（push 予定のコミットでは pre-push で代替可）、public リポジトリでの Actions 併用注記を含む現行版）
 - **改稿案の逐語テキスト**: 本書の git 履歴を参照。ミラーは本体との乖離が ACE-045 の失敗モードとして 3 度再発したため撤去した（[Issue #521](https://github.com/feel-flow/ai-spec-driven-development/issues/521)）
 
 ---

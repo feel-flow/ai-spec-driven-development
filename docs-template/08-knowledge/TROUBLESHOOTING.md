@@ -196,7 +196,12 @@
    }
 
    // バッチ処理でメモリ使用量を制御
-   async function processInBatches(data: any[], batchSize: number = 1000) {
+   const DEFAULT_BATCH_SIZE = 1000; // 件。1 バッチで処理する上限
+
+   async function processInBatches<T>(
+     data: readonly T[],
+     batchSize: number = DEFAULT_BATCH_SIZE,
+   ): Promise<void> {
      for (let i = 0; i < data.length; i += batchSize) {
        const batch = data.slice(i, i + batchSize);
        await processBatch(batch);
@@ -242,33 +247,45 @@
 
 2. **アプリケーション側の対応**:
 
+   再試行は正典の `retryWithBackoff(fn, { operation })`（`03-implementation/FALLBACK.md` §4「再試行ユーティリティ」）を呼ぶ。接続断（ECONNREFUSED）は一時障害として再試行され、429 を除く 4xx などの恒久的な拒否は再試行されない。判定・Jitter・試行ごとのログは正典側に内蔵されているため、再試行ループを手書きしない。
+
    ```typescript
-   // リトライ機能付きHTTPクライアント
-   class ResilientHttpClient {
-     private async requestWithRetry(
-       url: string,
-       options: RequestInit,
-       maxRetries: number = 3,
-     ): Promise<Response> {
-       for (let i = 0; i < maxRetries; i++) {
-         try {
-           const response = await fetch(url, {
-             ...options,
-             timeout: 5000,
+   // レスポンス待ちの上限（マジックナンバー禁止 / MASTER.md）
+   const EXTERNAL_API_TIMEOUT_MS = 5000; // ms
+
+   async function fetchExternalApi(
+     url: string,
+     init: RequestInit,
+   ): Promise<Response> {
+     // 再試行は GET 等の冪等な呼び出し、または冪等キー付きの呼び出しに限る（FALLBACK.md §6）
+     return retryWithBackoff(
+       async () => {
+         // 呼び出し元の中断（init.signal）とタイムアウトを合成する。init.signal を
+         // 上書きすると、利用者が中断しても通信がタイムアウトまで続く
+         const signals = [AbortSignal.timeout(EXTERNAL_API_TIMEOUT_MS)];
+         if (init.signal) signals.push(init.signal);
+         const res = await fetch(url, {
+           ...init,
+           signal: AbortSignal.any(signals),
+         });
+         // fetch は 4xx/5xx で reject しない。status を持つエラーを投げ、
+         // normalizeExternalError()（03-implementation/ERRORS.md）に分類させる
+         if (!res.ok) {
+           // 読まない本文は破棄して接続を解放する（再試行中に接続を占有しない）
+           await res.body?.cancel();
+           throw Object.assign(new Error(`HTTP ${res.status}`), {
+             status: res.status,
            });
-
-           if (response.ok) {
-             return response;
-           }
-         } catch (error) {
-           if (i === maxRetries - 1) {
-             throw error;
-           }
-
-           await this.sleep(Math.pow(2, i) * 1000);
          }
-       }
-     }
+         return res;
+       },
+       {
+         operation: "externalApi.fetch",
+         // 中断による失敗は status を持たず transient に分類される（ERRORS.md）。
+         // 呼び出し元が中断したら再試行しない
+         isRetryable: () => !init.signal?.aborted,
+       },
+     );
    }
    ```
 
@@ -443,19 +460,40 @@
 
    ```typescript
    // 安全なJWT検証
-   import jwt from "jsonwebtoken";
+   import jwt, { type JwtPayload } from "jsonwebtoken";
 
-   function verifyToken(token: string): any {
-     try {
-       const decoded = jwt.verify(token, process.env.JWT_SECRET, {
-         algorithms: ["HS256"],
-         clockTolerance: 30,
-       });
+   // マジックナンバー禁止（MASTER.md）
+   const JWT_ALGORITHM = "HS256"; // 許可する署名アルゴリズム（明示して alg 差し替えを防ぐ）
+   const JWT_CLOCK_TOLERANCE_SEC = 30; // 秒。時刻の許容誤差
 
-       return decoded;
-     } catch (error) {
-       throw new Error(`Token verification failed: ${error.message}`);
+   function verifyToken(token: string): JwtPayload {
+     // process.env の値は string | undefined。未設定は検証失敗と区別して先に弾く
+     const secret = process.env.JWT_SECRET;
+     if (!secret) {
+       throw new Error("JWT_SECRET is not set");
      }
+
+     let decoded: string | JwtPayload;
+     try {
+       decoded = jwt.verify(token, secret, {
+         algorithms: [JWT_ALGORITHM],
+         clockTolerance: JWT_CLOCK_TOLERANCE_SEC,
+       });
+     } catch (error) {
+       // strict（useUnknownInCatchVariables）では error は unknown。元エラーは cause で保持する
+       // （new Error(message, { cause }) は tsconfig の lib に ES2022 が必要 / ERRORS.md）
+       const reason = error instanceof Error ? error.message : String(error);
+       throw new Error(`Token verification failed: ${reason}`, {
+         cause: error,
+       });
+     }
+
+     // jwt.verify は string | JwtPayload を返す。文字列ペイロードは扱わない
+     // （try の外で判定し、検証失敗のラップに巻き込まない）
+     if (typeof decoded === "string") {
+       throw new Error("Unexpected string payload");
+     }
+     return decoded;
    }
    ```
 
@@ -609,11 +647,12 @@
 
 ## 更新履歴
 
-| 日付       | 更新者 | 更新内容                         |
-| ---------- | ------ | -------------------------------- |
-| 2024-01-15 | 田中   | データベース関連の問題を追加     |
-| 2024-01-20 | 佐藤   | アプリケーション関連の問題を追加 |
-| 2024-01-25 | 山田   | セキュリティ関連の問題を追加     |
-| 2024-02-01 | 田中   | デプロイメント関連の問題を追加   |
-| 2024-02-05 | 佐藤   | パフォーマンス関連の問題を追加   |
-| 2024-02-10 | 山田   | 緊急時連絡先を追加               |
+| 日付       | 更新者           | 更新内容                                                                                                                                                                  |
+| ---------- | ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 2024-01-15 | 田中             | データベース関連の問題を追加                                                                                                                                              |
+| 2024-01-20 | 佐藤             | アプリケーション関連の問題を追加                                                                                                                                          |
+| 2024-01-25 | 山田             | セキュリティ関連の問題を追加                                                                                                                                              |
+| 2024-02-01 | 田中             | デプロイメント関連の問題を追加                                                                                                                                            |
+| 2024-02-05 | 佐藤             | パフォーマンス関連の問題を追加                                                                                                                                            |
+| 2024-02-10 | 山田             | 緊急時連絡先を追加                                                                                                                                                        |
+| 2026-10-16 | テンプレート保守 | 再試行例を正典 `retryWithBackoff()` の呼び出しに置換、`any` を `JwtPayload` / ジェネリクスに置換、JWT 例を定数化し strict 対応（`cause` 付きラップ）（Issue #513 / #558） |
