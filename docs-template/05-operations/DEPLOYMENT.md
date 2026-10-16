@@ -1,10 +1,10 @@
 ---
 title: "DEPLOYMENT"
-version: "1.5.0"
+version: "1.6.0"
 status: "draft"
 owner: "@your-github-handle"
 created: "YYYY-MM-DD"
-updated: "2026-10-15"
+updated: "2026-10-16"
 changeImpact: "medium"
 ---
 
@@ -41,6 +41,7 @@ changeImpact: "medium"
 | `deployment/workflow-principles.md`               | ワークフロー運用原則（3原則＋TodoWrite）          | ⭐⭐⭐⭐ -     |
 | `deployment/monitoring.md`                        | モニタリング                                      | ⭐⭐ -         |
 | `deployment/sbom.md`                              | SBOM（自動生成する部品表）の生成・保存・利用      | ⭐⭐ -         |
+| `deployment/key-inventory.md`                     | 外部連携のキー一覧（人が確認する管理文書）        | ⭐⭐ -         |
 
 ## 🚀 クイックスタート（30秒で理解）
 
@@ -287,6 +288,7 @@ PRマージ後のブランチ切り替え忘れを防ぐため、セッション
 | インフラ構成             | `deployment/infrastructure.md`                    | Terraform            |
 | モニタリング             | `deployment/monitoring.md`                        | CloudWatch           |
 | SBOM・部品の影響調査     | `deployment/sbom.md`                              | 全体                 |
+| 外部連携のキー一覧       | `deployment/key-inventory.md`                     | 全体                 |
 
 ### AIツール向けプロンプトテンプレート
 
@@ -304,6 +306,12 @@ PRマージ後のブランチ切り替え忘れを防ぐため、セッション
 ## Changelog
 
 - 2026-09-08 追記: プラグイン変数がない直接利用でも取得できる公開配布元を明記（ai-spec-driven-development#525）。
+
+### [1.6.0] - 2026-10-16
+
+#### 追加
+
+- 構成表と検索クエリマッピングに `deployment/key-inventory.md`（外部連携のキー一覧）を追加（Issue #541）
 
 ### [1.5.0] - 2026-10-15
 

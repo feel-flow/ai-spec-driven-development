@@ -1,10 +1,10 @@
 ---
 title: "MASTER"
-version: "1.9.0"
+version: "1.10.0"
 status: "draft"
 owner: "@your-github-handle"
 created: "YYYY-MM-DD"
-updated: "2026-10-15"
+updated: "2026-10-16"
 changeImpact: "medium"
 ---
 
@@ -543,6 +543,7 @@ metrics:
 - 04-quality/GUARDRAILS_THREE_LAYERS.md — ガードレール3層（仕様・自動チェック・人間レビュー）
 - 04-quality/SECURITY_REVIEW_CHECKLIST.md — セキュリティレビューチェックリスト（PR用）
 - 05-operations/deployment/sbom.md — SBOM の生成・保存・利用。SBOM 本体は依存関係から生成する成果物で手で編集しない（人が書くのはこの運用文書）。継続運用・外部公開で採用を検討する
+- 05-operations/deployment/key-inventory.md — 外部連携のキー一覧のテンプレートと運用ルール。SBOM が依存部品から生成する成果物であるのに対し、キー一覧は運用事実を人が確認して書く管理文書。どちらも秘密の値の保管庫ではない。実際の一覧はアクセス制限したプロジェクト文書に置き、公開テンプレートに混ぜない
 
 ### ナレッジベース（初期セット外・`/ace-setup` が作成）
 
@@ -719,6 +720,12 @@ Changelog エントリには以下のカテゴリを使用する（[Keep a Chang
 ## Changelog
 
 - 2026-09-08 追記: プラグイン変数がない直接利用でも取得できる公開配布元を明記（ai-spec-driven-development#525）。
+
+### [1.10.0] - 2026-10-16
+
+#### 追加
+
+- 「品質・セキュリティ」にキー一覧の運用文書（`05-operations/deployment/key-inventory.md`）への参照を追加し、SBOM（生成する成果物）とキー一覧（人が確認する管理文書）の役割の違いを明記（Issue #541）
 
 ### [1.9.0] - 2026-10-15
 
