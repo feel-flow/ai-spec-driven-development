@@ -6,6 +6,7 @@
   "scripts": {
     "setup": "npm install && npm --prefix mcp install && npm --prefix mcp run build",
     "validate": "node scripts/validate-docs.mjs",
+    "check:md-ts": "node scripts/check-md-typescript.mjs docs-template",
     "lint:md": "markdownlint-cli2 \"docs/**/*.md\" \"docs-template/**/*.md\" \"*.md\"",
     "format:md": "prettier --write \"docs/**/*.md\" \"docs-template/**/*.md\" \"*.md\"",
     "format:md:check": "prettier --check \"docs/**/*.md\" \"docs-template/**/*.md\" \"*.md\"",
@@ -24,6 +25,7 @@
     "husky": "^9.1.0",
     "markdownlint-cli2": "^0.23.2",
     "prettier": "3.8.3",
+    "typescript": "5.9.3",
     "vitest": "^4.1.5"
   },
   "engines": {

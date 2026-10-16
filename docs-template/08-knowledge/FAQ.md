@@ -286,7 +286,7 @@ const config = {
 
 1. **RESTfulな設計**
 
-   ```typescript
+   ```text
    // ✅ 推奨
    GET    /api/users          // ユーザー一覧取得
    GET    /api/users/:id      // 特定ユーザー取得
@@ -313,7 +313,7 @@ const config = {
 
 3. **一貫性のあるレスポンス形式**
 
-   ```typescript
+   ```jsonc
    // 成功レスポンス
    {
      "success": true,

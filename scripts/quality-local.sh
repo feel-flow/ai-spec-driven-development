@@ -25,6 +25,7 @@ STEPS=(
   "--prefix mcp test"
   "run test:ace-scripts"
   "run validate -- docs-template"
+  "run check:md-ts"
   "run build:spec-index"
   "run format:md:check"
   "run lint:md"
