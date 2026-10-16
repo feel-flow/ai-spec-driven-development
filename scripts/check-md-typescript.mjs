@@ -115,11 +115,18 @@ function stripColumns(text, cols) {
 /** 引用・リスト記号・インデントの後ろにあるフェンスの開始を読む。フェンスでなければ null。 */
 function readFenceOpen(line) {
   const q = stripQuotes(line);
-  const prefix = (q.rest.match(LIST_MARKER) ?? q.rest.match(LEADING_WHITESPACE))[0];
+  const listMarker = q.rest.match(LIST_MARKER);
+  const prefix = (listMarker ?? q.rest.match(LEADING_WHITESPACE))[0];
   const m = q.rest.slice(prefix.length).match(FENCE_OPEN);
   // バッククォートのフェンスは情報文字列にバッククォートを含められない（CommonMark）
   if (!m || (m[1][0] === '`' && m[2].includes('`'))) return null;
-  return { quoteDepth: q.depth, indentCols: columnsOf(q.rest, prefix.length), fence: m[1], info: parseInfo(m[2]) };
+  return {
+    quoteDepth: q.depth,
+    indentCols: columnsOf(q.rest, prefix.length),
+    inListItem: listMarker !== null,
+    fence: m[1],
+    info: parseInfo(m[2]),
+  };
 }
 
 /**
@@ -145,8 +152,13 @@ export function extractBlocks(text) {
       continue;
     }
     const q = stripQuotes(line, open.quoteDepth);
-    if (q.depth < open.quoteDepth) {
-      // 引用が終わるとフェンスも閉じる（CommonMark）。この行は改めてフェンスの開始として読む
+    // 引用が終わる、またはリスト項目の開始行で開いたフェンスで内容の桁より浅い非空行が来ると、
+    // その入れ物が終わりフェンスも閉じる（CommonMark）。この行は改めてフェンスの開始として読む。
+    // 空白だけでインデントしたフェンスは、リストの中か外かを追わないのでこの判定をしない
+    const leftContainer =
+      q.depth < open.quoteDepth ||
+      (open.inListItem && q.rest.trim() !== '' && columnsOf(q.rest, q.rest.match(LEADING_WHITESPACE)[0].length) < open.indentCols);
+    if (leftContainer) {
       finish();
       i--;
       continue;

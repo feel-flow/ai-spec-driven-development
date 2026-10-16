@@ -150,6 +150,25 @@ describe("check-md-typescript (Issue #512)", () => {
     expect(run(cwd, "docs").status).toBe(EXIT_OK);
   });
 
+  it("リスト項目の開始行で開いたフェンスは、リストが終わると閉じ、後ろの TS ブロックを飲み込まない", () => {
+    const cwd = fixture({
+      "docs/a.md": [
+        `- ${FENCE}text`,
+        "  example",
+        "",
+        "outside paragraph",
+        "",
+        `${FENCE}ts`,
+        "} catch {",
+        FENCE,
+        "",
+      ].join("\n"),
+    });
+    const r = run(cwd, "docs");
+    expect(r.status).toBe(EXIT_VIOLATION);
+    expect(r.stderr).toMatch(/^docs\/a\.md:7:1 TS\d+: /m);
+  });
+
   it("複数ファイル・複数ブロックの違反を、それぞれのファイルと行へ戻して報告する", () => {
     const ok = `${FENCE}ts\nconst ok = 1;\n${FENCE}\n`;
     const cwd = fixture({
