@@ -28,9 +28,31 @@ STEPS=(
   "run lint:md"
 )
 
+# Issue #565: 段を回す前に依存の導入を確かめる。「node_modules のディレクトリ|導入コマンド」を
+# 1 か所に置き、判定と案内の対応がずれないようにする。npm ci は自動実行しない
+# （§3.3 の方針）。壊れかけの node_modules までは見ない（在る/無いだけ）。
+DEPS=(
+  "node_modules|npm ci"
+  "mcp/node_modules|npm --prefix mcp ci"
+)
+
 STEP_COUNT=${#STEPS[@]}
 GATE_RC=0
+
+MISSING_DEPS=()
+for dep in "${DEPS[@]}"; do
+  [ -d "$ROOT/${dep%%|*}" ] || MISSING_DEPS+=("$dep")
+done
+
 i=0
+if [ "${#MISSING_DEPS[@]}" -gt 0 ]; then
+  GATE_RC=1
+  i=$STEP_COUNT
+  for dep in "${MISSING_DEPS[@]}"; do
+    echo "✗ quality:local: ${dep%%|*} がありません。段を実行せず止めます。先に実行: ${dep#*|}" >&2
+  done
+fi
+
 while [ "$i" -lt "$STEP_COUNT" ]; do
   read -r -a step_args <<< "${STEPS[$i]}"
   label="npm ${STEPS[$i]}"
