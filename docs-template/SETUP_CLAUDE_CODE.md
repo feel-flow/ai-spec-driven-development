@@ -310,17 +310,17 @@ docs-template/TESTING.mdのテスト戦略に従って、以下の機能のユ�
 
 ## 🚨 Git Workflow（必須）
 
-**常にIssue作成から始める。PRにはセルフレビュー結果を記載すること。**
+**常にIssue作成から始める。セルフレビューは PR 作成後に行い、結果は PR 本文へ追記（`gh pr edit --body-file`）すること。**
 
 ### ワークフロー
 
 1. **Issue作成** → `gh issue create --title "タイトル" --body "説明"`
 2. **Branch作成** → `git checkout -b feature/#123-description`（developから）
 3. **実装** → MASTER.mdの規約に従う
-4. **セルフレビュー** → 後述のチェックリストを確認
-5. **テスト実行** → 全テスト合格必須
-6. **Commit** → `git commit -m "feat: #123 説明"`
-7. **PR作成** → `gh pr create --base develop`（セルフレビューセクション + `Closes #XXX` 付き）
+4. **テスト実行** → 全テスト合格必須
+5. **Commit** → `git commit -m "feat: #123 説明"`
+6. **Push + PR作成** → `gh pr create --base develop`（`Closes #XXX` 付き。セルフレビューセクションは枠だけ）
+7. **セルフレビュー** → PR の head SHA を対象に後述のチェックリストを確認し、指摘は修正して push、結果を PR 本文へ追記
 8. **マージ後** → developに戻り、featureブランチを削除
 
 ### ブランチ命名
@@ -344,9 +344,9 @@ Types: `feat`, `fix`, `docs`, `style`, `refactor`, `test`, `chore`
 変更内容は commit abc1234 に反映されています。
 ```
 
-## 🚨 セルフレビューチェックリスト（PR前に必須）
+## 🚨 セルフレビューチェックリスト（マージ前に必須）
 
-PR作成前に以下を確認すること:
+PR 作成後・マージ前に以下を確認すること:
 
 1. **DRY原則**: 重複コード・インポート・マジックナンバーなし
 2. **コード品質**: 型注釈、エラーハンドリング、命名規則、デバッグログなし
