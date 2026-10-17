@@ -306,19 +306,19 @@ agents:
 
 ### Git Workflow への組み込み
 
-[AI駆動Git Workflow](./git-workflow.md) のステップ5（セルフレビュー）に統合します：
+[AI駆動Git Workflow](./git-workflow.md) のステップ6（セルフレビュー。PR 作成後）に統合します：
 
 ```
 ステップ3: 実装 & コミット（Implement）
     ↓
 ステップ4: テスト・検証（Test）
     ↓
-ステップ5: セルフレビュー（Self-Review）
+ステップ5: PR作成（push → gh pr create）
+    ↓
+ステップ6: セルフレビュー（Self-Review。対象は PR の head SHA）
     ├── multi-review.sh（Multi-CLI分散レビュー）
     ├── pr-review-toolkit（Claude Code サブエージェント）
     └── codex review --base develop（Codex クロスモデルレビュー）
-    ↓
-ステップ6: PR作成
 ```
 
 ### Husky pre-push フックとの統合
