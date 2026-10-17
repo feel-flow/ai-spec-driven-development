@@ -1,12 +1,12 @@
 ---
 title: "PLAYBOOK"
-version: "1.71.0"
+version: "1.72.0"
 status: "approved"
 created: "2026-03-10"
 updated: "2026-10-17"
 owner: "@fffokazaki"
 changeImpact: "medium"
-ace_entry_count: 71
+ace_entry_count: 73
 tags: [ace, playbook, knowledge-management]
 references:
   - https://github.com/feel-flow/ai-spec-driven-development/blob/HEAD/docs/ACE_FRAMEWORK.md
@@ -1120,9 +1120,43 @@ Issue #509 は「DECISION_TREE.md の 2 箇所は PR #508 で修正済み」と�
 
 ---
 
+<a id="ace-587-1"></a>
+
+### ACE-587-1: 手動移植した兄弟文書のコード例は、正本の検査成功で代用せず実際の失敗経路を実行する
+
+| Category | testing | Origin | PR #587 |
+| Date | 2026-10-17 |
+| Helpful | 0 | Harmful | 0 |
+| Status | active |
+
+正本のエラー処理を検査しても、手動移植した兄弟文書で消した変数を失敗時だけ参照する欠陥は検出できない。部分的なコード例を構文検査するだけでは、未定義識別子の参照も通る。移植先 Markdown の実コードを抽出して失敗経路を実行し、元のエラー値の保持・ログの内容を検証するとともに、欠陥を戻した変異で検査が赤になることを確かめる。
+
+---
+
+<a id="ace-587-2"></a>
+
+### ACE-587-2: 共通 Logger の契約を外部 Logger の使用例へ移すときは、実装固有の引数形式に合わせて構造化メタデータを渡す
+
+| Category | coding | Origin | PR #587 |
+| Date | 2026-10-17 |
+| Helpful | 0 | Harmful | 0 |
+| Status | active |
+
+共通 Logger が内部で unknown をシリアライズしていても、外部 Logger が同じ引数を同じ構造で記録するとは限らない。外部 Logger を直接使う例では、シリアライズ済みエラーと既知の相関 ID をその実装のメタデータ引数へ明示し、失敗結果には元のエラー値を保持する。失敗した処理から未取得の利用者 ID を捏造せず、実際に Logger へ渡る値を実行検査する。
+
+---
+
 ## Changelog
 
 > [1.64.0] 以前の履歴は [PLAYBOOK-CHANGELOG.md](https://github.com/feel-flow/ai-spec-driven-development/blob/HEAD/docs-template/08-knowledge/PLAYBOOK-CHANGELOG.md) に移した（PLAYBOOK.md は /ace-setup で配布され、移動先は配置されないため絶対 URL）。
+
+### [1.72.0] - 2026-10-17
+
+#### 追加
+
+- ACE-587-1: 手動移植した兄弟文書の実コードも失敗経路を実行し、欠陥を戻した変異で検査する（PR #587）
+- ACE-587-2: 外部 Logger の引数形式に合わせて構造化メタデータを渡し、元のエラー値を保持する（PR #587）
+- domain: 業務固有の確定知識は対象差分にないため候補 0 件
 
 ### [1.71.0] - 2026-10-17
 

@@ -170,8 +170,8 @@ AC の grep を頭で組んで起票すると、検出式の穴（表記の必�
 
 ### OBS-010: ACE 系スキルは PLAYBOOK を `docs/08-knowledge/` 固定で参照するが、テンプレ配布リポジトリでは実体が `docs-template/08-knowledge/` にある
 
-| Kind | problem | Count | 5 |
-| First | 2026-09-06 | Last | 2026-10-16 |
+| Kind | problem | Count | 6 |
+| First | 2026-09-06 | Last | 2026-10-17 |
 | Status | promoted | Issue | feel-flow/feelflow-plugins#2142 |
 
 既定パスで grep・frontmatter 読みを組むと全コマンドが not found で空振りし、パスを直して再実行する往復が出る → 着手時に `package.json` の `ace:*` スクリプトが指すパスで実配置を確定してからコマンドを組む（`/retrospective` の「知見ストアの実配置を確定する」と同じ手順を curate 側にも置く余地）。
@@ -182,6 +182,8 @@ AC の grep を頭で組んで起票すると、検出式の穴（表記の必�
 - 2026-10-15: Issue #418 / PR #559 の着手前参照で、`knowledge-lookup.sh` が既定パスと `docs-template` を除いた探索だけで解決し「Playbook なし — ACE 未導入」と報告。`--playbook docs-template/08-knowledge/PLAYBOOK.md` を付けて再実行するまで 1 往復（再発・Count 4）
 - 2026-10-15: 状態移行: mitigated の対策（ace-curate の「配置先の解決」）が knowledge-lookup に及んでいない＝対策が効いていない（promotion.md 復帰条件 b）ため active へ戻し、Count 4 で昇格。SSOT develop `2ca0635` の `scripts/knowledge-lookup.sh` `resolve_store` が `ACE_PLAYBOOK_PATH`・記録済み配置を読まないことを照合して feel-flow/feelflow-plugins#2142 を起票。旧所在は feel-flow/feelflow-plugins@2ca0635 の curate.md「配置先の解決」
 - 2026-10-16: Issue #512 / PR #569 の着手前参照で、ff-dev-toolkit 0.151.0 の `knowledge-lookup.sh` がまた「Playbook なし — ACE 未導入」と報告した（`docs-template/08-knowledge/PLAYBOOK.md` は実在）。curate では直近 ACE コミットの `--stat` で実配置を確かめて 1 往復（再発・Count 5。#2142 は open）
+
+- 2026-10-17: Issue #586 の着手前参照で、正本の knowledge-lookup が既定解決では Playbook absent を返した。実在する docs-template/08-knowledge/PLAYBOOK.md を --playbook で指定して再実行した（再発・Count 6。feel-flow/feelflow-plugins#2142 は open）
 
 ---
 
