@@ -189,7 +189,7 @@ async function fetchFromServiceB(
         signal: AbortSignal.any(signals),
       });
       // fetch は 4xx/5xx で reject しない。status を持つエラーを投げ、
-      // normalizeExternalError()（03-implementation/ERRORS.md）に分類させる
+      // normalizeExternalError() に分類させる。未知の値を一時障害へ丸めない（03-implementation/ERRORS.md）
       if (!res.ok) {
         // 読まない本文は破棄して接続を解放する（再試行中に接続を占有しない）
         await res.body?.cancel();
@@ -201,7 +201,7 @@ async function fetchFromServiceB(
     },
     {
       operation: "serviceB.fetch",
-      // 中断による失敗は status を持たず transient に分類される（ERRORS.md）。
+      // 標準 TimeoutError は transient、利用者キャンセルの AbortError は再試行対象外（ERRORS.md）。
       // 呼び出し元が中断したら再試行しない
       isRetryable: () => !init.signal?.aborted,
     },

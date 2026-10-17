@@ -1,10 +1,10 @@
 ---
 title: "TESTING"
-version: "1.4.0"
+version: "1.5.0"
 status: "draft"
 owner: "@your-github-handle"
 created: "YYYY-MM-DD"
-updated: "2026-10-16"
+updated: "2026-10-17"
 changeImpact: "medium"
 ---
 
@@ -254,7 +254,10 @@ describe("UserRepository Integration", () => {
 ```typescript
 // モックサービス
 class MockPaymentService implements IPaymentService {
+  failure?: AppError;
+
   async createPaymentIntent(amount: number): Promise<PaymentIntent> {
+    if (this.failure) throw this.failure;
     return {
       id: "pi_test_123",
       amount,
@@ -266,13 +269,12 @@ class MockPaymentService implements IPaymentService {
 // 統合テスト
 describe("Payment Integration", () => {
   let app: Application;
+  let payment: MockPaymentService;
 
-  beforeAll(async () => {
-    // テスト環境でモックサービスを注入
-    container.register("PaymentService", {
-      useClass:
-        process.env.NODE_ENV === "test" ? MockPaymentService : PaymentService,
-    });
+  beforeEach(async () => {
+    // NODE_ENV に依存せず、テストでは常に新しいモックを注入する
+    payment = new MockPaymentService();
+    container.register("PaymentService", { useValue: payment });
 
     app = await createApp();
   });
@@ -287,6 +289,17 @@ describe("Payment Integration", () => {
       .expect(200);
 
     expect(response.body).toHaveProperty("paymentIntentId");
+  });
+
+  it("should report payment failure without returning success", async () => {
+    payment.failure = new UpstreamError("Payment provider unavailable");
+    // API は AppError.statusCode を返す契約。実プロジェクトのレスポンス契約に合わせる
+    const response = await request(app)
+      .post("/payments")
+      .send({ amount: 1000, currency: "usd" })
+      .expect(502);
+
+    expect(response.body).not.toHaveProperty("paymentIntentId");
   });
 });
 ```
@@ -766,6 +779,12 @@ echo "変異適用: OK"       # 報告には検査結果と並べてこの成否
 ```
 
 ## Changelog
+
+### [1.5.0] - 2026-10-17
+
+#### 修正
+
+- 外部サービス統合テストは環境値に依存せずモックを登録し、決済失敗時に成功を返さないケースを追加する
 
 - 2026-09-08 追記: プラグイン変数がない直接利用でも取得できる公開配布元を明記（ai-spec-driven-development#525）。
 

@@ -2,10 +2,10 @@
   "schemaVersion": 1,
   "source": {
     "repository": "feel-flow/feelflow-plugins",
-    "ref": "2a8bd46e9d68f933478c52b8c298cf722551e9a2",
-    "commit": "2a8bd46e9d68f933478c52b8c298cf722551e9a2",
+    "ref": "aba5a3fa45375c9fc74f257b3d7a7edf5c790a93",
+    "commit": "aba5a3fa45375c9fc74f257b3d7a7edf5c790a93",
     "plugin": "ff-dev-toolkit",
-    "version": "0.153.0",
+    "version": "0.154.0",
     "license": "Apache-2.0"
   },
   "files": {
@@ -13,8 +13,8 @@
     "01-context/PROJECT.md": "80bd764da5f266b10e09791b7f645173ee0217dd052130cf08e47fa224125529",
     "02-design/DOMAIN.md": "ddf558132d593c780c2973692d4facf9b049039e6970381c16b342aabc9d9843",
     "02-design/ARCHITECTURE.md": "f5599619de84ec821022b2b66577219e889104a23a40831a15c67965e8768111",
-    "03-implementation/PATTERNS.md": "1ef8749670013b22e40142c8a1eeb54733e5f150058ed041b344feb23504ef85",
-    "04-quality/TESTING.md": "dff37d9c7f9afb9666332307612a85c6adce9bb92cb0cd2c90a121f7fd0de483",
+    "03-implementation/PATTERNS.md": "fc753bf513c3116520c405c4011119bd0eaee3e418025dee871ac5e8a443564e",
+    "04-quality/TESTING.md": "48b7c9f3fa9c942420be1483ac6ecd46cd970aba796952a2a06089caff18e40f",
     "05-operations/DEPLOYMENT.md": "924d45afe5808dcf97f68bbc37f9304447ad055d366d8d74c7731eecae1d2a63",
     "SOURCE_LICENSE.txt": "f3ea7ac89bd824d39509a2b10a5515cb9e2a39c4bb7aaa5cc76e4d149d55f7b6"
   }

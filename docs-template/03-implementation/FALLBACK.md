@@ -1,11 +1,11 @@
 ---
 title: "FALLBACK"
-version: "1.2.0"
+version: "2.0.0"
 status: "draft"
 owner: "@your-github-handle"
 created: "YYYY-MM-DD"
-updated: "2026-09-06"
-changeImpact: "MEDIUM"
+updated: "2026-10-17"
+changeImpact: "high"
 ---
 
 # フォールバック戦略（Fail-Fast in Dev, Graceful in Prod）
@@ -32,6 +32,7 @@ changeImpact: "MEDIUM"
 - **データ整合性エラー** — トランザクション一貫性の維持
 - **セキュリティ関連エラー** — 脆弱性の露出防止
 - **上流の恒久的な拒否（400 / 422 等、専用クラスを持たない 4xx）** — こちらの要求が誤っているサイン。本番でフォールバックすると自コードの欠陥が隠れる（404 は NotFoundError = permanent、429 は transient として別扱い。写像は ERRORS.md `normalizeExternalError()`）
+- **原因不明の外部エラー** — 一時障害の根拠が無い。設定キー不在などの素の Error を含む（ERRORS.md `UnknownExternalError`）
 
 ### 可観測性の原則
 
@@ -143,7 +144,7 @@ function fallbackInProdOnly<T>(
 ): T {
   // 型注釈だけでは JS からの呼び出しや any 経由を防げないので実行時にも確認する
   if (!(error instanceof AppError)) {
-    throw error instanceof Error ? error : new Error(String(error));
+    throw error; // Error でない値もそのまま呼び出し元へ返す
   }
 
   // フォールバック禁止カテゴリは環境に関係なく常にスロー
@@ -154,8 +155,8 @@ function fallbackInProdOnly<T>(
   logger.error("Fallback activated", error, context);
 
   const env = process.env.NODE_ENV;
-  // ホワイトリスト方式: dev/testのみスロー。未定義・staging等は安全にフォールバック
-  if (env === "development" || env === "test") {
+  // 明示的な production だけを許可する。未設定・未知の値・テストは fail-fast
+  if (env !== "production") {
     throw error;
   }
 
@@ -163,7 +164,7 @@ function fallbackInProdOnly<T>(
 }
 ```
 
-> **NODE_ENV未設定時の挙動**: ホワイトリスト方式を採用しているため、`NODE_ENV` が未定義やその他の値の場合はフォールバックが動作する（本番環境の安全性を優先）。staging環境でもfail-fastを有効にしたい場合は、`APP_ENV` 等の独立した環境変数で制御すること（`NODE_ENV=development` への変更はアプリ全体の挙動を変えるため非推奨）。
+> **NODE_ENV未設定時の挙動**: フォールバックを許可するのは `NODE_ENV=production` だけ。未設定・staging・未知の値ではエラーをスローする。テストはユーティリティを使う場合も環境を明示して管理し、終了時に元の値へ戻す。
 
 ### ❌ NG: AI生成コードによくあるパターン
 
@@ -222,7 +223,7 @@ async function getConfig(key: string): Promise<string> {
     }
 
     const env = process.env.NODE_ENV;
-    if (env === "development" || env === "test") {
+    if (env !== "production") {
       throw normalizedError;
     }
 
@@ -235,8 +236,8 @@ async function getConfig(key: string): Promise<string> {
 
 | シナリオ                                                     | 開発時                 | 本番時                  |
 | ------------------------------------------------------------ | ---------------------- | ----------------------- |
-| DB/API通信エラー（5xx / 429 / ステータス不明 = transient）   | スロー（即座に検出）   | フォールバック + ログ   |
-| 設定値の取得失敗                                             | スロー（設定ミス検出） | デフォルト値 + アラート |
+| DB/API通信エラー（5xx / 429 / 既知の接続断・タイムアウト）   | スロー（即座に検出）   | フォールバック + ログ   |
+| 原因不明の外部エラー・設定キー不在                           | スロー                 | スロー（環境問わず）    |
 | データ変換エラー                                             | スロー（型不整合検出） | 安全なデフォルト + ログ |
 | 認証/認可エラー                                              | スロー                 | スロー（環境問わず）    |
 | バリデーションエラー                                         | スロー                 | スロー（環境問わず）    |
@@ -281,9 +282,8 @@ interface RetryOptions {
  * 場合にのみ再試行すること（INTEGRATIONS.md「決済システム統合」の Stripe 例）。
  *
  * 対象は HTTP 境界（外部 API / SDK）のみ。内部で normalizeExternalError() を無条件に
- * 呼ぶため、DB ドライバ・キュー等ステータスを持たないエラー源をそのまま渡すと
- * 一意制約違反まで transient に化けて再試行される。リポジトリ層のマッパーで
- * AppError に写した fn を渡すこと。
+ * 呼ぶ。DB ドライバ・キュー等の専用エラーは、原因不明として扱うのではなく
+ * リポジトリ層のマッパーで AppError に写した fn を渡すこと。
  *
  * @throws {Error} maxAttempts が 1 以上の整数でない（0 以下・NaN・小数）のはプログラミングエラー（fn を一度も呼ばずに投げる）
  * @throws {AppError} 再試行不可のエラー、または上限到達時に正規化済みのエラーを再スロー
@@ -344,7 +344,7 @@ async function retryWithBackoff<T>(
 
 ### Result patternとの使い分け
 
-[PATTERNS.md](./PATTERNS.md) Section 3 の Result pattern（`Result.ok` / `Result.fail`）とフォールバック戦略は併用できる。
+[ERRORS.md](./ERRORS.md) §3 の Result pattern（`Result.ok` / `Result.fail`）とフォールバック戦略は併用できる。
 
 - **Result pattern**: ビジネスロジック層で使用。呼び出し元がエラーの種類に応じて処理を分岐する場合に適する
 - **`fallbackInProdOnly`**: UI境界層・APIレスポンス整形など、最終消費者にフォールバック値を返す場面で使用
@@ -380,9 +380,9 @@ async function retryWithBackoff<T>(
 - [ ] try-catch ブロックでエラーを握りつぶしていないか
 - [ ] フォールバック値（空配列、デフォルトオブジェクト等）を返す箇所に環境分岐があるか
 - [ ] AI生成コードのcatch句が `fallbackInProdOnly()` を使用しているか（`NODE_ENV` 分岐だけの場合は、禁止カテゴリの判定が添えてあるか）
-- [ ] 禁止カテゴリの 5 種すべて（認証・認可 / バリデーション / データ整合性 / セキュリティ / 上流の恒久的な拒否）にフォールバックが入っていないか
+- [ ] 禁止カテゴリのすべて（認証・認可 / バリデーション / データ整合性 / セキュリティ / 上流の恒久的な拒否 / 原因不明の外部エラー）にフォールバックが入っていないか
 - [ ] `fallbackInProdOnly()` に渡すエラーを `normalizeExternalError()`（HTTP 境界）またはリポジトリ層のマッパー（DB 等）で AppError に写しているか（生エラーは deny-by-default でスローされる）
-- [ ] `retryWithBackoff()` の fn は HTTP 境界の呼び出しか（内部で無条件に正規化するため、ステータスを持たないエラー源を渡すと transient に化けて再試行される）
+- [ ] `retryWithBackoff()` の fn は HTTP 境界の呼び出しか（内部で無条件に正規化するため、ステータスも既知の通信障害の根拠も無いエラーは再試行しない）
 - [ ] 新しいエラークラスが `category`（never-fallback / transient / permanent）を正しく宣言しているか
 - [ ] 再試行する呼び出しに副作用（決済・送信・作成）がある場合、冪等キーで上流側の重複排除が効くか
 
@@ -395,6 +395,13 @@ async function retryWithBackoff<T>(
 - [ ] Feature Flag による機能無効化が可能な構成か
 
 ## Changelog
+
+### [2.0.0] - 2026-10-17
+
+#### 変更
+
+- **破壊的変更**: フォールバックを明示的な production のみへ限定し、未設定・未知の環境値ではスローする。Error でない生の値も変換せず再スローする
+- 原因不明の外部エラー・設定キー不在を環境によらずスローする分類へ追随
 
 ### [1.2.0] - 2026-09-06
 

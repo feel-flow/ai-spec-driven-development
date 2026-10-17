@@ -1,3 +1,13 @@
+---
+title: "INTEGRATIONS"
+version: "1.0.0"
+status: "draft"
+owner: "@your-github-handle"
+created: "YYYY-MM-DD"
+updated: "2026-10-17"
+changeImpact: "medium"
+---
+
 # INTEGRATIONS.md - 統合・連携ガイド
 
 ## 1. 外部サービス一覧
@@ -148,7 +158,7 @@ app.post(
       res.json({ received: true });
     } catch (error) {
       // 業務処理（DB 書き込み等）の失敗は HTTP ステータスを持たないので
-      // normalizeExternalError には通さない（一意制約違反が transient に化ける）。
+      // normalizeExternalError には通さず、リポジトリ層で意味を保って写す。
       // AppError はそのまま、それ以外は InternalError（cause 付き）にする
       const normalized =
         error instanceof AppError
@@ -772,3 +782,9 @@ class MetricsService {
 - **フォールバック**: [FALLBACK.md](./FALLBACK.md) §4 `fallbackInProdOnly()` — AppError 以外は deny-by-default でスロー
 - **統合テスト**: [TESTING.md](../04-quality/TESTING.md) §3「外部サービス統合テスト（モック注入）」— 外部サービスをモック実装に差し替えて結合を検証する
 - **ログ**: [PATTERNS.md](./PATTERNS.md)「ログパターン」の `Logger` 規約 — `error(message, error, meta?)` / `warn|info(message, meta?)`
+
+## Changelog
+
+### [1.0.0] - 2026-10-17
+
+- エラー処理の境界分類・元の cause 保持に説明を合わせた（Issue #586）。

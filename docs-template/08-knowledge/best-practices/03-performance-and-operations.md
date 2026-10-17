@@ -191,11 +191,10 @@ class UserService {
 
       return { success: true, data: user };
     } catch (error) {
-      // Logger 規約（PATTERNS.md §9）: error(message, error: Error, meta?)。
-      // Error 実体を第 2 引数で渡せば name / message / stack は Logger 側が構造化する
-      const err = error instanceof Error ? error : new Error(String(error));
+      // Logger 規約（PATTERNS.md §9）: error(message, error: unknown, meta?)。
+      // 元の値を第 2 引数で渡し、Logger 側で serializeError により構造化する
       // 作成に失敗した時点では userId は確定していないので requestId で追跡する
-      logger.error("Failed to create user", err, { requestId: req.id });
+      logger.error("Failed to create user", error, { requestId: req.id });
 
       return { success: false, error: err };
     }
