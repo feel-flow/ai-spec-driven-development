@@ -1,12 +1,12 @@
-# セルフレビュー（PR作成前）
+# セルフレビュー（PR作成後）
 
-> **Parent**: [DEPLOYMENT.md](../DEPLOYMENT.md) | **Workflow Step**: 5 | **Related**: [自動コードレビュー](./automated-code-review.md)
+> **Parent**: [DEPLOYMENT.md](../DEPLOYMENT.md) | **Workflow Step**: 6 | **Related**: [自動コードレビュー](./automated-code-review.md)
 
 ## 目的
 
-PRレビュー時の単純な指摘を事前に防ぎ、レビュー品質を向上させる。
+PR 上のレビュー（人間・自動）で単純な指摘を受ける前に潰し、レビュー品質を向上させる。
 
-PRを作成する前に、AIツールを活用して自己レビューを実施します。これにより、コーディング規約違反や単純なミスを事前に検出し、レビュワーの負担を軽減します。
+PR を作成し push した後、マージの前に AI ツールを活用して自己レビューを実施します（レビュー対象は PR の head SHA。段の並びは [Git Workflow ステップ6](./git-workflow.md#ステップ6-セルフレビューpr作成後重要)）。これにより、コーディング規約違反や単純なミスを人間レビューの前に検出し、レビュワーの負担を軽減します。
 
 ---
 
@@ -191,7 +191,7 @@ bash scripts/setup-multi-review.sh
 
 ## セルフレビュー結果の記録
 
-セルフレビューの結果をPR本文に含めることで、レビュワーに品質保証の証跡を提供します。
+セルフレビューの結果を PR 本文へ追記（`gh pr edit --body-file`）することで、レビュワーに品質保証の証跡を提供します。
 
 ### 記録テンプレート
 
@@ -240,7 +240,7 @@ bash scripts/setup-multi-review.sh
 
 ### 結論
 
-すべての必須項目をクリアしています。PR作成準備完了。
+すべての必須項目をクリアしています。マージ準備完了。
 ```
 
 ---
@@ -278,7 +278,7 @@ bash scripts/setup-multi-review.sh
 
 ### 問題が見つかった場合
 
-修正してコミット:
+修正してコミットし、PR へ push する:
 
 ```bash
 git add .
@@ -289,8 +289,9 @@ git commit -m "fix: セルフレビュー指摘事項を修正
 - テストケースを追加
 
 参照: docs/PATTERNS.md:87"
+git push
 ```
 
 ### 問題がない場合
 
-次ステップ（PR作成）へ進む。
+次ステップ（レビュー対応 → マージ）へ進む。

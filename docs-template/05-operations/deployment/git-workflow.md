@@ -122,7 +122,7 @@ git checkout -b "feature/${ISSUE_NUM}-user-auth"
 
 #### 作業中の判断ログ: `implementation-notes.md` を並走させる
 
-実装着手と同時に **作業ブランチ直下** に `implementation-notes.md` を作成し、コミットと一緒に追記する。コミット diff には残らない「なぜこの選択をしたか / spec から変えた点 / 捨てた選択肢」を保持することで、ステップ5（Self-Review）の精度とステップ10（ACE Generate）の入力品質が上がる。詳細根拠は [ACE-034](../../08-knowledge/PLAYBOOK.md#ace-034)。
+実装着手と同時に **作業ブランチ直下** に `implementation-notes.md` を作成し、コミットと一緒に追記する。コミット diff には残らない「なぜこの選択をしたか / spec から変えた点 / 捨てた選択肢」を保持することで、ステップ6（Self-Review）の精度とステップ10（ACE Generate）の入力品質が上がる。詳細根拠は [ACE-034](../../08-knowledge/PLAYBOOK.md#ace-034)。
 
 最小ひな形（コピペして使う）:
 
@@ -151,7 +151,7 @@ git checkout -b "feature/${ISSUE_NUM}-user-auth"
 - **書くタイミングは「気付いた瞬間」**: 後で書こうとすると確実に忘れる（[ACE-032](https://github.com/feel-flow/ai-spec-driven-development/blob/HEAD/docs-template/08-knowledge/playbook/archive/documentation-quality.md#ace-032) の発見経緯と同じ構造）
 - **粒度は 1〜3 行**: 「なぜ A ではなく B を選んだか」を短文で残す
 - **スコープ外発見は本ファイルではなく Issue 化**: implementation-notes は「現 PR の判断ログ」、Issue は「別タスクへの分岐」と役割を分ける（[ワークフロー運用原則 原則2](./workflow-principles.md)）
-- **PR 作成時に PR description に転記**: ステップ6 でレビュアーが「なぜ」を読みやすくなる
+- **PR 作成時に PR description に転記**: ステップ5 でレビュアーが「なぜ」を読みやすくなる
 - **マージ前にファイルを削除する（推奨）**: squash merge を標準とするチームでは、ファイルを残すと次 PR がルート直下で衝突する。pr-ready 直前に PR description へ転記 → `git rm implementation-notes.md` → 1 commit で削除。長期保存したい場合は `notes/<issue-num>.md` 形式で per-PR ファイル化する代替案あり（並行 PR で衝突しないが notes/ が累積するトレードオフ）
 
 #### コミット
@@ -212,11 +212,63 @@ npm audit --audit-level=moderate
 | テストカバレッジ | 80%以上                 |
 | セキュリティ     | moderate以上の脆弱性0件 |
 
-**ポイント**: 全テスト通過後にセルフレビュー（ステップ5）へ進む
+**ポイント**: 全テスト通過後に push・PR 作成（ステップ5）を経てセルフレビュー（ステップ6）へ進む
 
-### ステップ5: セルフレビュー（PR作成前）【重要】
+### ステップ5: Pull Request作成
 
-**目的**: PRレビュー時の単純な指摘を事前に防ぎ、レビュー品質を向上させる
+**原則**: PRは自己完結型（レビュワーが全体像を把握できる情報を含める）
+
+テスト（ステップ4）を通した commit を push して PR を作る。セルフレビュー（ステップ6）は PR 作成の**後**に、PR の head SHA を対象として 1 回行う。
+
+```bash
+# ブランチをプッシュ
+git push -u origin "feature/${ISSUE_NUM}-user-auth"
+
+# PRを作成
+gh pr create \
+  --base develop \
+  --title "feat: ユーザー認証機能を実装" \
+  --body "## 概要
+ユーザー認証機能をJWTベースで実装しました。
+
+## 変更内容
+- 認証ミドルウェアの追加 (src/middleware/auth.ts:1-85)
+- ログイン/ログアウトAPI実装 (src/routes/auth.ts:12-156)
+- リフレッシュトークン機構 (src/services/token.ts:45-120)
+
+## テスト結果
+- 単体テスト: 42件 全てパス
+- カバレッジ: 85.3%
+
+## セルフレビュー結果
+（ステップ6 の完了後に gh pr edit --body-file で追記）
+
+## チェックリスト
+- [x] MASTER.mdのコード生成ルールに準拠
+- [x] マジックナンバー禁止ルールを遵守
+- [x] 型安全性を確保
+- [x] テストカバレッジ80%以上達成
+
+## 関連Issue
+Closes #${ISSUE_NUM}
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)" \
+  --label "enhancement" \
+  --reviewer "team-lead"
+```
+
+**PRの原則**:
+
+- タイトルは変更内容を端的に表現
+- 変更ファイルと行番号を明記
+- テスト結果を含める
+- セルフレビュー結果を含める（ステップ6 の完了後に追記する。PR 作成時点では枠だけでよい）
+
+### ステップ6: セルフレビュー（PR作成後）【重要】
+
+**目的**: PR 上のレビュー（人間・自動）で単純な指摘を受ける前に潰し、レビュー品質を向上させる
+
+レビュー対象は push 済みの PR の head SHA に固定する（レビュー結果の記録先も同じ PR に揃う）。
 
 #### セルフレビューの5つの観点
 
@@ -317,7 +369,7 @@ Claude Codeのpr-review-toolkitサブエージェントを活用した包括的�
 
 #### セルフレビュー結果の記録
 
-PR本文にセルフレビュー結果を含めることで、レビュワーに品質保証の証跡を提供します。
+PR 本文（`gh pr edit --body-file`）にセルフレビュー結果を追記することで、レビュワーに品質保証の証跡を提供します。
 
 ```markdown
 ## セルフレビュー結果
@@ -352,62 +404,14 @@ PR本文にセルフレビュー結果を含めることで、レビュワーに
 
 ### 結論
 
-すべての必須項目をクリアしています。PR作成準備完了。
+すべての必須項目をクリアしています。マージ準備完了。
 ```
-
-### ステップ6: Pull Request作成
-
-**原則**: PRは自己完結型（レビュワーが全体像を把握できる情報を含める）
-
-```bash
-# ブランチをプッシュ
-git push -u origin "feature/${ISSUE_NUM}-user-auth"
-
-# PRを作成
-gh pr create \
-  --base develop \
-  --title "feat: ユーザー認証機能を実装" \
-  --body "## 概要
-ユーザー認証機能をJWTベースで実装しました。
-
-## 変更内容
-- 認証ミドルウェアの追加 (src/middleware/auth.ts:1-85)
-- ログイン/ログアウトAPI実装 (src/routes/auth.ts:12-156)
-- リフレッシュトークン機構 (src/services/token.ts:45-120)
-
-## テスト結果
-- 単体テスト: 42件 全てパス
-- カバレッジ: 85.3%
-
-## セルフレビュー結果
-[上記のセルフレビュー結果を記載]
-
-## チェックリスト
-- [x] MASTER.mdのコード生成ルールに準拠
-- [x] マジックナンバー禁止ルールを遵守
-- [x] 型安全性を確保
-- [x] テストカバレッジ80%以上達成
-
-## 関連Issue
-Closes #${ISSUE_NUM}
-
-🤖 Generated with [Claude Code](https://claude.com/claude-code)" \
-  --label "enhancement" \
-  --reviewer "team-lead"
-```
-
-**PRの原則**:
-
-- タイトルは変更内容を端的に表現
-- 変更ファイルと行番号を明記
-- テスト結果を含める
-- セルフレビュー結果を含める
 
 ### ステップ7: レビュー対応（Review）
 
 #### 7a. クロスモデルレビュー（PR作成後）
 
-**原則**: PR作成後、マージ前に `/multi-review --mode cross-model` でクロスモデルレビューを実施する（pr-review-toolkit や `codex-review.sh` を先に重ねない）
+**原則**: `/multi-review --mode cross-model` によるクロスモデルレビューは、[ステップ6](#ステップ6-セルフレビューpr作成後重要)（PR 作成後・マージ前）で PR の head SHA を対象に 1 回だけ実施する（pr-review-toolkit や `codex-review.sh` を先に重ねない）。本節では同じレビューを別途やり直さず、実行方法と統合レポートの読み方を示す
 
 > **レビュー深度（Risk-Based Workflow）**: `bash scripts/review-level.sh --base develop` で変更の規模・種別から 3 段階（1: 軽量 = docs のみ ≤50行は Toolkit のみ / 2: 標準 = Toolkit + Codex / 3: 重点 = 400 行超・実行系ディレクトリ・`*.sh`・`package.json`・ルート直下設定ファイルは multi-review 併用推奨）を判定し、深度を変更のリスクに釣り合わせる。判定は推奨でありブロックしない。
 >
@@ -818,8 +822,8 @@ GitHub Discussions への記録に加え、ACE Playbook への構造化記録を
 2. [ ] Branch: feature ブランチ作成
 3. [ ] Implement: 実装・コミット
 4. [ ] Test: テスト実行・合格確認
-5. [ ] Self-Review: PR Review Toolkit + Codex CLI クロスモデルレビュー
-6. [ ] PR: Push + Pull Request 作成
+5. [ ] PR: Push + Pull Request 作成
+6. [ ] Self-Review: PR の head SHA を対象に PR Review Toolkit + Codex CLI クロスモデルレビュー
 7. [ ] Review: レビュー指摘修正・コミット（修正ループ）
 8. [ ] Merge: Squash merge
 9. [ ] Cleanup: develop 復帰 + `git fetch --prune` + ブランチ削除

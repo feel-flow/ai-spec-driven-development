@@ -293,6 +293,6 @@ Devinの全タスクで以下のワークフローを適用：
 
 ## 関連ドキュメント
 
-- [セルフレビュー（PR作成前）](./self-review.md)
+- [セルフレビュー（PR作成後）](./self-review.md)
 - [自動コードレビュー](./automated-code-review.md)
 - [AI駆動 Git Workflow](./git-workflow.md)
