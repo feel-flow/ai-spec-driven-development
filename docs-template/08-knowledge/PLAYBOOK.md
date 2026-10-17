@@ -1,12 +1,12 @@
 ---
 title: "PLAYBOOK"
-version: "1.72.0"
+version: "1.73.0"
 status: "approved"
 created: "2026-03-10"
 updated: "2026-10-17"
 owner: "@fffokazaki"
 changeImpact: "medium"
-ace_entry_count: 73
+ace_entry_count: 74
 tags: [ace, playbook, knowledge-management]
 references:
   - https://github.com/feel-flow/ai-spec-driven-development/blob/HEAD/docs/ACE_FRAMEWORK.md
@@ -1126,7 +1126,7 @@ Issue #509 は「DECISION_TREE.md の 2 箇所は PR #508 で修正済み」と�
 
 | Category | testing | Origin | PR #587 |
 | Date | 2026-10-17 |
-| Helpful | 0 | Harmful | 0 |
+| Helpful | 1 | Harmful | 0 |
 | Status | active |
 
 正本のエラー処理を検査しても、手動移植した兄弟文書で消した変数を失敗時だけ参照する欠陥は検出できない。部分的なコード例を構文検査するだけでは、未定義識別子の参照も通る。移植先 Markdown の実コードを抽出して失敗経路を実行し、元のエラー値の保持・ログの内容を検証するとともに、欠陥を戻した変異で検査が赤になることを確かめる。
@@ -1146,9 +1146,32 @@ Issue #509 は「DECISION_TREE.md の 2 箇所は PR #508 で修正済み」と�
 
 ---
 
+<a id="ace-588-1"></a>
+
+### ACE-588-1: 外部境界では原因だけでなく分類も保持し、不明エラーを内部エラーへ包み直さない
+
+| Category | coding | Origin | PR #588 |
+| Date | 2026-10-17 |
+| Helpful | 0 | Harmful | 0 |
+| Status | active |
+
+不明な外部エラーを内部エラーへ包むと、元の cause が残っていても再試行・フォールバックの禁止分類を失う。外部 SDK / HTTP の境界では正規化してから Result へ返すか再スローし、既存の分類済みエラーは同一値で通す。規則の説明だけでなく、その説明が指すコード例を抽出して禁止経路も実行する。
+
+---
+
 ## Changelog
 
 > [1.64.0] 以前の履歴は [PLAYBOOK-CHANGELOG.md](https://github.com/feel-flow/ai-spec-driven-development/blob/HEAD/docs-template/08-knowledge/PLAYBOOK-CHANGELOG.md) に移した（PLAYBOOK.md は /ace-setup で配布され、移動先は配置されないため絶対 URL）。
+
+### [1.73.0] - 2026-10-17
+
+#### 追加
+
+- ACE-588-1: 外部境界の正規化では元の cause と禁止分類の両方を保持する（PR #588）。domain 評価済み、候補0件。
+
+#### カウンター更新
+
+- ACE-587-1: Helpful +1（同梱スキルの実コードを抽出し、外部境界を InternalError へ戻す変異も検出した）
 
 ### [1.72.0] - 2026-10-17
 
