@@ -1,15 +1,15 @@
 ---
 id: template-export
 title: ff-dev-toolkit正本からのテンプレート直接配布
-version: 1.0.0
+version: 1.1.0
 status: active
 created: 2026-09-08
-updated: 2026-09-08
+updated: 2026-10-17
 owner: feel-flow
 tags: [asdd, templates, distribution]
 references:
   - docs/DESIGN_PRINCIPLES.md
-changeImpact: high
+changeImpact: medium
 visibility: public
 ---
 
@@ -75,6 +75,20 @@ node scripts/export-toolkit-templates.mjs \
 
 途中で書き込みが止まった場合は、`--check` とGit差分から保存された範囲を確認する。前の計画を無理に再適用せず、現在のハッシュを含む新しい計画をレビューして再実行する。利用者の後続編集を消すような一括リセットをしない。
 
+## 出力対象の手編集と運用上の判断
+
+出力対象の 7 文書をこのリポジトリで直接編集すると、`.template-source.json` の SHA と食い違い、次の出力で手編集が失われる（2026-10 に MASTER / PATTERNS / TESTING / DEPLOYMENT の 4 文書で起きた。[Issue #583](https://github.com/feel-flow/ai-spec-driven-development/issues/583)）。追記が要るときは、先に正本（`feelflow-plugins` の同梱 `docs-template/`）へ反映し、マージ後に出力し直す。
+
+- **このリポジトリ自身の ACE 昇格例**: `/ace-refine` が PATTERNS.md §14 へ昇格させた内容は、正本の汎用テンプレート（導入先の雛形）には含めないため、次の出力で外れる。昇格した知見は ACE Playbook のエントリ（`Status: active` のまま残る）を正とする。2026-10-17 の出力で ACE-001 / ACE-445-1 / ACE-018 / ACE-489-1 の 4 件が §14 から外れた
+- **`--check` を品質ゲートに入れない**: `--check` は正本の checkout を必要とし、`quality:local` の前提（このリポジトリだけで完結する）を崩すため、ゲートには入れない。記録の SHA だけと照合する形も、`/ace-refine` の昇格のような正当な手編集まで止めるため採らない。手編集は出力前の計画の差分（手順 4）で確認する
+
+### 出力の記録
+
+| 日付       | 正本のコミット                             | プラグイン版 | 備考                                                                                                                                                                                                                         |
+| ---------- | ------------------------------------------ | ------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 2026-09-08 | `5dd43c160342c3c8044de1cebdba145e314017f1` | 0.92.0       | 初回出力（[Issue #525](https://github.com/feel-flow/ai-spec-driven-development/issues/525)）                                                                                                                                 |
+| 2026-10-17 | `2a8bd46e9d68f933478c52b8c298cf722551e9a2` | 0.153.0      | 正本の develop のマージ後コミットから出力した（未リリースの候補の検証。リリースの版と一致することは、リリース後の `--check` で確かめる）。4 文書の手編集を正本へ反映してから出力（feelflow-plugins の bundle #2137 / #2167） |
+
 ## 直接利用者の読み方
 
 プラグインを使わずファイルを参照・コピーする場合、本文中の `${CLAUDE_PLUGIN_ROOT}` をシェルで展開する必要はない。文書にある公開配布元の同じ相対パスから、利用する配布版に対応するファイルを参照する。必要な拡張文書だけを追加し、既存の手編集や合意を残す。
@@ -82,6 +96,10 @@ node scripts/export-toolkit-templates.mjs \
 スキルの導入、Hookの対応、文書検索、書籍の改訂・公開は、静的テンプレートの出力だけでは完了しない。それぞれの配布版と実際の動作・公開状態を確認する。
 
 ## Changelog
+
+### [1.1.0] - 2026-10-17
+
+- 追加: 出力対象の手編集の扱い（先に正本へ反映）、このリポジトリ自身の ACE 昇格例を出力で外す判断、`--check` を品質ゲートに入れない判断、出力の記録（[Issue #583](https://github.com/feel-flow/ai-spec-driven-development/issues/583)）。
 
 ### [1.0.0] - 2026-09-08
 

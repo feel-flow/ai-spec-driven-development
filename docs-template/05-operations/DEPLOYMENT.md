@@ -1,11 +1,11 @@
 ---
 title: "DEPLOYMENT"
-version: "1.6.0"
+version: "1.7.1"
 status: "draft"
 owner: "@your-github-handle"
 created: "YYYY-MM-DD"
-updated: "2026-10-16"
-changeImpact: "medium"
+updated: "2026-10-17"
+changeImpact: "low"
 ---
 
 # DEPLOYMENT.md - デプロイメント・運用ガイド
@@ -26,7 +26,7 @@ changeImpact: "medium"
 | ------------------------------------------------- | ------------------------------------------------- | -------------- |
 | `deployment/github-setup.md`                      | GitHub初期設定（ラベル・Release Drafter）         | ⭐⭐⭐⭐⭐ 0th |
 | `deployment/git-workflow.md`                      | AI駆動Git Workflow全体                            | ⭐⭐⭐⭐⭐ 1st |
-| `deployment/self-review.md`                       | セルフレビュー詳細（PR作成前）                    | ⭐⭐⭐⭐ 2nd   |
+| `deployment/self-review.md`                       | セルフレビュー詳細（PR作成後）                    | ⭐⭐⭐⭐ 2nd   |
 | `deployment/devin-pre-pr-review.md`               | Devin Pre-PRレビューシステム（5エージェント並列） | ⭐⭐⭐⭐ 2.5th |
 | `deployment/automated-code-review.md`             | 自動コードレビュー（Claude Code + Husky）         | ⭐⭐⭐⭐ -     |
 | `deployment/agent-deletion-prevention-harness.md` | 削除事故防止ハーネス設計                          | ⭐⭐⭐⭐ -     |
@@ -38,7 +38,7 @@ changeImpact: "medium"
 | `deployment/infrastructure.md`                    | インフラ構成                                      | ⭐⭐⭐ -       |
 | `deployment/multi-cli-review-orchestration.md`    | Multi-CLI分散レビュー                             | ⭐⭐⭐ -       |
 | `deployment/review-response-policy.md`            | PRレビュー対応ポリシー                            | ⭐⭐⭐⭐ -     |
-| `deployment/workflow-principles.md`               | ワークフロー運用原則（3原則＋TodoWrite）          | ⭐⭐⭐⭐ -     |
+| `deployment/workflow-principles.md`               | ワークフロー運用原則（各原則＋TodoWrite）         | ⭐⭐⭐⭐ -     |
 | `deployment/monitoring.md`                        | モニタリング                                      | ⭐⭐ -         |
 | `deployment/sbom.md`                              | SBOM（自動生成する部品表）の生成・保存・利用      | ⭐⭐ -         |
 | `deployment/key-inventory.md`                     | 外部連携のキー一覧（人が確認する管理文書）        | ⭐⭐ -         |
@@ -58,11 +58,11 @@ gh issue create --title "feat: ..." --body "..."
 # 2. ブランチ作成
 git checkout -b "feature/123-feature-name"
 
-# 3. セルフレビュー（AIツールに依頼）
-「MASTER.mdとPATTERNS.mdに基づいて、今回の変更をレビューしてください」
-
-# 4. PR作成
+# 3. PR作成（push の直後に通常 PR として作る）
 gh pr create --base develop --title "..." --body "..."
+
+# 4. セルフレビュー（PR 作成後に AI ツールへ依頼。対象は PR の head SHA）
+「MASTER.mdとPATTERNS.mdに基づいて、今回の変更をレビューしてください」
 
 # 5. ナレッジ記録（マージ後）
 gh discussion create --category "..." --title "..." --body-file knowledge.md
@@ -72,7 +72,7 @@ gh discussion create --category "..." --title "..." --body-file knowledge.md
 
 ### 概要
 
-Git Flowベースで、**テスト・セルフレビュー（PR前）** と **ACEナレッジ体系化（マージ後・cleanup後）** を組み込んだワークフロー。
+Git Flowベースで、**テスト・セルフレビュー（PR 作成後・マージ前）** と **ACEナレッジ体系化（マージ後・cleanup後）** を組み込んだワークフロー。
 
 ### 主要ステップ
 
@@ -84,16 +84,16 @@ Git Flowベースで、**テスト・セルフレビュー（PR前）** と **AC
 2. **ブランチ作成** - `feature/{issue-num}-{name}`
 3. **実装・コミット** - AI駆動開発
 4. **テスト・検証** - `npm run quality:local` 等
-5. **セルフレビュー** ← 詳細: `deployment/self-review.md`
-6. **PR作成** - 構造化されたPR本文
+5. **PR作成** - push の直後に通常 PR として作る（構造化されたPR本文）
+6. **セルフレビュー** - PR の head SHA を対象に 1 回 ← 詳細: `deployment/self-review.md`
 7. **レビュー対応** - **レビュワーへのコメント必須**（修正内容・理由・変更箇所を明記）← 詳細: `deployment/git-workflow.md`
 8. **マージ** - Squash推奨
 9. **クリーンアップ** - ブランチ削除、`git fetch --prune`
 10. **ナレッジ体系化** - マージ後・cleanup 後 ← 詳細: `deployment/knowledge-management.md` | ACE Playbook: `deployment/ace-cycle.md`
 
-ステップ 10 の後、チェーン末尾として `/retrospective`（セッション振り返り）を毎回実行する。実測した手戻り・無駄時間・Keep・過剰動作を観測台帳へ記録し、閾値到達の再発からプロセス/ツール改善を最大 3 件提案し、起票はユーザー承認後のみ（利用者の包括的な実行指示がある場合はその範囲内で確認を省く。特急レーンは除く） ← 詳細: `deployment/git-workflow.md` の「チェーン末尾: セッション振り返り」
+ステップ 10 の後、チェーン末尾として `/retrospective`（セッション振り返り）を毎回実行する。実測した手戻り・無駄時間・Keep・過剰動作を観測台帳へ記録し、閾値到達の再発からプロセス/ツール改善を最大 3 件提案し、起票は既定では承認を待たずに実行して発行番号を報告する（`RETROSPECTIVE_FILING=ask` で承認待ち式） ← 詳細: `deployment/git-workflow.md` の「チェーン末尾: セッション振り返り」
 
-対応ホストでは `UserPromptSubmit` hook が応答前に注入し、`Stop` hook は実行漏れ時だけ自動継続する。ただし Codex の非対話単発実行（codex exec — hook 入力に `model` があり `permission_mode` が `bypassPermissions`）には注入されない（レビュー等のツール的起動の stdout を振り返り出力が奪わないため。判別できない入力へは従来どおり注入する）。`RETROSPECTIVE_MODE=ask` で実施前確認、`off` で自動発火を無効にできる。
+対応ホストでは `UserPromptSubmit` hook が応答前に注入し、`Stop` hook は実行漏れ時だけ自動継続する。ただし Codex の非対話単発実行（codex exec — hook 入力に `model` があり `permission_mode` が `bypassPermissions`）には注入されない（レビュー等のツール的起動の stdout を振り返り出力が奪わないため。判別できない入力へは従来どおり注入する）。入れ子で起動された非対話の `claude -p` は hook 入力に print/headless 相当のフィールドが無く判別できないため、**起動側のスクリプトが子プロセスの環境へ `RETROSPECTIVE_MODE=off` を載せて**抑止する。`RETROSPECTIVE_MODE=ask` で実施前確認、`off` で自動発火を無効にできる。
 
 #### 変更規模による tier
 
@@ -307,17 +307,38 @@ PRマージ後のブランチ切り替え忘れを防ぐため、セッション
 
 - 2026-09-08 追記: プラグイン変数がない直接利用でも取得できる公開配布元を明記（ai-spec-driven-development#525）。
 
-### [1.6.0] - 2026-10-16
+### [1.7.1] - 2026-10-17
+
+#### 修正
+
+- 1.4.1 の記述にあった裸の URL をリンク記法に改めた（Markdown の bare URL 検査に通るように。内容は変えていない）
+
+### [1.7.0] - 2026-10-16
 
 #### 追加
 
-- 構成表と検索クエリマッピングに `deployment/key-inventory.md`（外部連携のキー一覧）を追加（Issue #541）
+- 構成表と検索クエリマッピングに `deployment/sbom.md`（SBOM の生成・保存・利用）と `deployment/key-inventory.md`（外部連携のキー一覧）を追加（[ai-spec-driven-development#540](https://github.com/feel-flow/ai-spec-driven-development/issues/540) / [ai-spec-driven-development#541](https://github.com/feel-flow/ai-spec-driven-development/issues/541)）。公開配布元で 1.5.0・1.6.0 として記録した追記を本版へ統合した。版番号は両系統の最大を超える値にした
 
-### [1.5.0] - 2026-10-15
+### [1.5.1] - 2026-09-18
 
-#### 追加
+#### 変更
 
-- 構成表と検索クエリマッピングに `deployment/sbom.md`（SBOM の生成・保存・利用）を追加（Issue #540）
+- `workflow-principles.md` の索引キャプションを件数なし（各原則＋TodoWrite）に改めた（原則4「定型判断の即決と熟慮の起動条件」の追加に追従）
+
+### [1.5.0] - 2026-09-10
+
+#### 変更
+
+- §ワークフロー のチェーン末尾 `/retrospective` の起票を「ユーザー承認後のみ」から「既定では承認を待たずに実行して発行番号を報告する（`RETROSPECTIVE_FILING=ask` で承認待ち式）」へ更新した
+
+### [1.4.1] - 2026-09-10
+
+#### 変更
+
+- §自動振り返り に、入れ子で起動された非対話の `claude -p` は hook 入力に print / headless 相当の
+  フィールドが無く hook 側で判別できないため、**起動側が子プロセスの環境へ `RETROSPECTIVE_MODE=off` を
+  載せて**抑止する、という利用者向けの契約を追記した
+  （[ff-dev-toolkit#94](https://github.com/feel-flow/ff-dev-toolkit/issues/94)）。
 
 ### [1.4.0] - 2026-09-08
 

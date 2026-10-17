@@ -2,20 +2,20 @@
   "schemaVersion": 1,
   "source": {
     "repository": "feel-flow/feelflow-plugins",
-    "ref": "5dd43c160342c3c8044de1cebdba145e314017f1",
-    "commit": "5dd43c160342c3c8044de1cebdba145e314017f1",
+    "ref": "2a8bd46e9d68f933478c52b8c298cf722551e9a2",
+    "commit": "2a8bd46e9d68f933478c52b8c298cf722551e9a2",
     "plugin": "ff-dev-toolkit",
-    "version": "0.92.0",
+    "version": "0.153.0",
     "license": "Apache-2.0"
   },
   "files": {
-    "MASTER.md": "ec9bf6993748faa5624c394b1d04814e8344e5728a3ef9d951bb25944e0824dc",
+    "MASTER.md": "2a8be62a7a1e0d2486bb1e1a5072569e0619e0f85d954c3fb0385518f2aba87f",
     "01-context/PROJECT.md": "80bd764da5f266b10e09791b7f645173ee0217dd052130cf08e47fa224125529",
     "02-design/DOMAIN.md": "ddf558132d593c780c2973692d4facf9b049039e6970381c16b342aabc9d9843",
     "02-design/ARCHITECTURE.md": "f5599619de84ec821022b2b66577219e889104a23a40831a15c67965e8768111",
-    "03-implementation/PATTERNS.md": "e16cfcda7ca3dade395f427fd4193d6c77c3ce3353d28e086f71d7465002d6f5",
-    "04-quality/TESTING.md": "3c2f54f2e31ad53f2eb30dd9e54c6f23a0d7e4554269f1ee99028a0f3985aff1",
-    "05-operations/DEPLOYMENT.md": "189d92faec2f64655eaa5916f80a2399ae11e970212b886057416072f79014c1",
+    "03-implementation/PATTERNS.md": "1ef8749670013b22e40142c8a1eeb54733e5f150058ed041b344feb23504ef85",
+    "04-quality/TESTING.md": "dff37d9c7f9afb9666332307612a85c6adce9bb92cb0cd2c90a121f7fd0de483",
+    "05-operations/DEPLOYMENT.md": "924d45afe5808dcf97f68bbc37f9304447ad055d366d8d74c7731eecae1d2a63",
     "SOURCE_LICENSE.txt": "f3ea7ac89bd824d39509a2b10a5515cb9e2a39c4bb7aaa5cc76e4d149d55f7b6"
   }
 }

@@ -1,6 +1,6 @@
 ---
 title: "MASTER"
-version: "1.10.0"
+version: "1.11.0"
 status: "draft"
 owner: "@your-github-handle"
 created: "YYYY-MM-DD"
@@ -382,7 +382,7 @@ AIツールがランタイム・依存のバージョンを選定する際は、
 - すべての作業はIssueから開始
 - ブランチ名: `feature/{issue-number}-{description}`
 - コミットメッセージにドキュメント参照を含める（例: `docs/MASTER.md:29`）
-- **【重要】PR作成前にセルフレビューを実施** - AIツールを活用してコーディング規約・仕様整合性・テスト充実度を事前確認
+- **【重要】PR 作成後・マージ前にセルフレビューを実施** - AIツールを活用してコーディング規約・仕様整合性・テスト充実度を人間レビューの前に確認（対象は PR の head SHA）
 - AIがPRレビュー指摘を自動読み取り・対応
 - **【重要】マージ後にナレッジを体系化** - ACE Playbook に構造化知見を追記（AIツール向け）し、重要な知見は GitHub Discussions にも記録（人間向け）
 - ロードマップ更新と次タスク提案
@@ -518,6 +518,7 @@ metrics:
 
 - SETUP_GITHUB_COPILOT.md — GitHub Copilot設定（約30分）。`${CLAUDE_PLUGIN_ROOT}/docs-template/SETUP_GITHUB_COPILOT.md` からコピー
 - SETUP_CLAUDE_CODE.md — Claude Code設定（約40分）。`${CLAUDE_PLUGIN_ROOT}/docs-template/SETUP_CLAUDE_CODE.md` からコピー
+- 03-implementation/AI_TOOL_INTEGRATION.md — AI開発ツール（Claude Code / GitHub Copilot / Cursor）から仕様文書を参照させる設定例（INTEGRATIONS.md から分離）。`${CLAUDE_PLUGIN_ROOT}/docs-template/03-implementation/AI_TOOL_INTEGRATION.md` からコピー
 
 ### 既存プロジェクト向け（初期セット外・必要時にコピー）
 
@@ -536,16 +537,14 @@ metrics:
 
 > コア7文書はプロジェクトの最小構成です。成長に応じて各フォルダ内に文書を追加してください。全文書が揃わなくてもAIと対話しながら段階的に仕様を策定できます。
 
-### 品質・セキュリティ（推奨拡張・初期セット外）
+### 品質・セキュリティ（推奨拡張・初期セット外・必要時にコピー）
 
-コア7以外に、次を参照すると品質ゲートとレビュー観点が揃いやすい。必要時に `${CLAUDE_PLUGIN_ROOT}/docs-template/` の同一相対パスからコピーする。
+コア7以外に、次を参照すると品質ゲートとレビュー観点が揃いやすい。
 
-- 04-quality/GUARDRAILS_THREE_LAYERS.md — ガードレール3層（仕様・自動チェック・人間レビュー）
-- 04-quality/SECURITY_REVIEW_CHECKLIST.md — セキュリティレビューチェックリスト（PR用）
-- 05-operations/deployment/sbom.md — SBOM の生成・保存・利用。SBOM 本体は依存関係から生成する成果物で手で編集しない（人が書くのはこの運用文書）。継続運用・外部公開で採用を検討する
-- 05-operations/deployment/key-inventory.md — 外部連携のキー一覧のテンプレートと運用ルール。SBOM が依存部品から生成する成果物であるのに対し、キー一覧は運用事実を人が確認して書く管理文書。どちらも秘密の値の保管庫ではない。実際の一覧はアクセス制限したプロジェクト文書に置き、公開テンプレートに混ぜない
+- 04-quality/GUARDRAILS_THREE_LAYERS.md（ガードレール3層: 仕様・自動チェック・人間レビュー）と 04-quality/SECURITY_REVIEW_CHECKLIST.md（セキュリティレビューチェックリスト。PR用）— 相互に参照するので 2 文書を一緒にコピーする。`${CLAUDE_PLUGIN_ROOT}/docs-template/04-quality/GUARDRAILS_THREE_LAYERS.md` と `${CLAUDE_PLUGIN_ROOT}/docs-template/04-quality/SECURITY_REVIEW_CHECKLIST.md` からコピー
+- 05-operations/deployment/sbom.md（SBOM の生成・保存・利用。SBOM 本体は依存関係から生成する成果物で手で編集しない — 人が書くのはこの運用文書。継続運用・外部公開で採用を検討する）と 05-operations/deployment/key-inventory.md（外部連携のキー一覧のテンプレートと運用ルール。SBOM が依存部品から生成する成果物であるのに対し、キー一覧は運用事実を人が確認して書く管理文書。どちらも秘密の値の保管庫ではない。実際の一覧はアクセス制限したプロジェクト文書に置き、本テンプレートや公開リポジトリに混ぜない）— 相互に参照するので 2 文書を一緒にコピーする。`${CLAUDE_PLUGIN_ROOT}/docs-template/05-operations/deployment/sbom.md` と `${CLAUDE_PLUGIN_ROOT}/docs-template/05-operations/deployment/key-inventory.md` からコピー
 
-### ナレッジベース（初期セット外・`/ace-setup` が作成）
+### ナレッジベース（初期セット外・PLAYBOOK.md は `/init-docs` と `/ace-setup` が配置）
 
 - 08-knowledge/LESSONS_LEARNED.md — 開発過程で得た知見・解決策
 - 08-knowledge/TROUBLESHOOTING.md — トラブルシューティング集
@@ -561,11 +560,11 @@ metrics:
 - 06-reference/DECISION_MATRIX.md — 「どの文書に書く？」判断ガイド（Decision Matrix・曖昧ケース例・機能×文書マトリクス）。`${CLAUDE_PLUGIN_ROOT}/docs-template/06-reference/DECISION_MATRIX.md` からコピー
 - 06-reference/COPILOT_AGENTS.md — GitHub Copilot Agents設定リファレンス（6種のレビューエージェントテンプレート）。`${CLAUDE_PLUGIN_ROOT}/docs-template/06-reference/COPILOT_AGENTS.md` からコピー
 - 06-reference/ISSUE_TEMPLATE_PATTERNS.md — Issue テンプレ設計パターン（ストーリー型=推奨 / 従来型=代替）。`${CLAUDE_PLUGIN_ROOT}/docs-template/06-reference/ISSUE_TEMPLATE_PATTERNS.md` からコピー
-- 05-operations/ORGANIZATIONAL_ROLLOUT.md — 組織展開ガイド索引（段階的導入の Phase 1〜4・文書分割・アーカイブ・月次ヘルスチェック）。`${CLAUDE_PLUGIN_ROOT}/docs-template/05-operations/ORGANIZATIONAL_ROLLOUT.md` からコピー
+- 05-operations/ORGANIZATIONAL_ROLLOUT.md — 組織展開ガイド索引（段階的導入の Phase 1〜4・文書分割・アーカイブ・月次ヘルスチェック）。索引と詳細 4 文書（organizational-rollout/）は相互にリンクするので一緒にコピーする。`${CLAUDE_PLUGIN_ROOT}/docs-template/05-operations/ORGANIZATIONAL_ROLLOUT.md` と `${CLAUDE_PLUGIN_ROOT}/docs-template/05-operations/organizational-rollout/` からコピー
 
 ## ドキュメント構造ガイド（AIツール向け）
 
-> **詳細ガイドは 05-operations/ORGANIZATIONAL_ROLLOUT.md（初期セット外・必要時に `${CLAUDE_PLUGIN_ROOT}/docs-template/05-operations/ORGANIZATIONAL_ROLLOUT.md` からコピー）を参照**。本節はサマリーのみを掲載する（SSOT は新ガイド）。
+> **詳細ガイドは 05-operations/ORGANIZATIONAL_ROLLOUT.md（初期セット外・必要時に組織展開ガイド一式として `${CLAUDE_PLUGIN_ROOT}/docs-template/05-operations/ORGANIZATIONAL_ROLLOUT.md` と `${CLAUDE_PLUGIN_ROOT}/docs-template/05-operations/organizational-rollout/` からコピー）を参照**。本節はサマリーのみを掲載する（SSOT は新ガイド）。
 
 ### AIツールの読み込み戦略
 
@@ -597,9 +596,9 @@ AI: DEPLOYMENT.md（索引）→ deployment/self-review.md を読み込み
 | 800 行超  | 分割を推奨     |
 | 1200 行超 | **分割を必須** |
 
-> 親（索引）+ 子（詳細）への分割手順・分割しない判断・実例は organizational-rollout/document-splitting.md（初期セット外・`${CLAUDE_PLUGIN_ROOT}/docs-template/05-operations/organizational-rollout/document-splitting.md` からコピー）を SSOT とする。
+> 親（索引）+ 子（詳細）への分割手順・分割しない判断・実例は organizational-rollout/document-splitting.md（初期セット外・組織展開ガイド一式として `${CLAUDE_PLUGIN_ROOT}/docs-template/05-operations/ORGANIZATIONAL_ROLLOUT.md` と `${CLAUDE_PLUGIN_ROOT}/docs-template/05-operations/organizational-rollout/` からコピー）を SSOT とする。
 >
-> **例外**: ACE `PLAYBOOK.md`（`docs/08-knowledge/PLAYBOOK.md` の「行数・件数の方針」）は上表ではなく件数導出の密度指標を優先する。固定 800/1200 行での分割はしない。
+> **例外**: ACE Playbook（`docs/08-knowledge/PLAYBOOK.md`。分割レイアウトでは `playbook/<category>.md` が対象で、索引は行数監視の対象外）の行数は上表ではなく、PLAYBOOK.md の運用ルールが定める件数由来の上限（密度の指標）を優先する。固定の 800 / 1200 行での分割はしない。
 
 ### 簡潔化の原則
 
@@ -618,7 +617,7 @@ AI: DEPLOYMENT.md（索引）→ deployment/self-review.md を読み込み
 
 ## 月次ドキュメント参照チェック
 
-毎月1日に以下4項目を確認する。手順・自動化スクリプト・レポートテンプレートは organizational-rollout/health-check.md（初期セット外・`${CLAUDE_PLUGIN_ROOT}/docs-template/05-operations/organizational-rollout/health-check.md` からコピー）を参照。
+毎月1日に以下4項目を確認する。手順・自動化スクリプト・レポートテンプレートは organizational-rollout/health-check.md（初期セット外・組織展開ガイド一式として `${CLAUDE_PLUGIN_ROOT}/docs-template/05-operations/ORGANIZATIONAL_ROLLOUT.md` と `${CLAUDE_PLUGIN_ROOT}/docs-template/05-operations/organizational-rollout/` からコピー）を参照。
 
 1. **MASTER.md からの参照確認** — 新規文書が索引から到達可能か
 2. **ファイルサイズ確認** — 上記閾値（500/800/1200）超過の検出
@@ -627,7 +626,7 @@ AI: DEPLOYMENT.md（索引）→ deployment/self-review.md を読み込み
 
 ### アーカイブ対象（要約）
 
-以下に該当する文書は `archive/` への退避を **検討**。判定フロー・手順・リダイレクト管理ルールは organizational-rollout/archive-strategy.md（初期セット外・`${CLAUDE_PLUGIN_ROOT}/docs-template/05-operations/organizational-rollout/archive-strategy.md` からコピー）を参照。
+以下に該当する文書は `archive/` への退避を **検討**。判定フロー・手順・リダイレクト管理ルールは organizational-rollout/archive-strategy.md（初期セット外・組織展開ガイド一式として `${CLAUDE_PLUGIN_ROOT}/docs-template/05-operations/ORGANIZATIONAL_ROLLOUT.md` と `${CLAUDE_PLUGIN_ROOT}/docs-template/05-operations/organizational-rollout/` からコピー）を参照。
 
 - 6 ヶ月参照なし
 - 技術的に陳腐化
@@ -642,7 +641,7 @@ AI: DEPLOYMENT.md（索引）→ deployment/self-review.md を読み込み
 
 > **注**: `docs/specs/` 配下の仕様ファイルには Spec Kit 運用ガイドの Front Matter スキーマ（6ステータス: draft/review/approved/implementing/done/deprecated）を適用すること。上記 Frontmatter ルールはコア7文書および拡張文書に適用される。
 >
-> **例外**: `08-knowledge/OBSERVATIONS.md`（`/retrospective` の観測台帳）は Frontmatter を付与しない。ACE PLAYBOOK.md は Frontmatter を持つ（現行は単一ファイル）。将来 `playbook/**` へ分割した場合のカテゴリファイルは Frontmatter を付与しない。
+> **例外**: `08-knowledge/OBSERVATIONS.md`（`/retrospective` の観測台帳）は Frontmatter を付与しない。ACE の `08-knowledge/PLAYBOOK.md`（カテゴリ別に分割したレイアウトでは索引）は Frontmatter を持つ。分割したカテゴリファイル（`08-knowledge/playbook/**`。`archive/` を含む）は機械管理の蓄積ファイルであり、Frontmatter を付与しない（文書レベルのメタデータは索引側または運用スキル側が持つ）。
 
 必須フィールド:
 
@@ -681,7 +680,7 @@ draft → review → approved
 | approved   | 承認済み                 | 正式な仕様として遵守         |
 | deprecated | 廃止準備・アーカイブ済み | 新規実装の参照元に使用しない |
 
-> `deprecated` はコア/拡張文書の終端状態。役目を終えた文書のアーカイブ（organizational-rollout/archive-strategy.md — 初期セット外・必要時に `${CLAUDE_PLUGIN_ROOT}/docs-template/05-operations/organizational-rollout/archive-strategy.md` からコピー）や、移動しない ADR の in-place 陳腐化に用いる。`docs/specs/` の 6 ステータス（中間 `implementing`/`done` を含む）とは異なり、コアは終端 1 つのみを持つ。
+> `deprecated` はコア/拡張文書の終端状態。役目を終えた文書のアーカイブ（organizational-rollout/archive-strategy.md — 初期セット外・必要時に組織展開ガイド一式として `${CLAUDE_PLUGIN_ROOT}/docs-template/05-operations/ORGANIZATIONAL_ROLLOUT.md` と `${CLAUDE_PLUGIN_ROOT}/docs-template/05-operations/organizational-rollout/` からコピー）や、移動しない ADR の in-place 陳腐化に用いる。`docs/specs/` の 6 ステータス（中間 `implementing`/`done` を含む）とは異なり、コアは終端 1 つのみを持つ。
 
 `review` ステータスの文書に対し1週間レビューコメントがなければ、ドキュメントオーナーが `approved` に昇格する。
 
@@ -698,6 +697,21 @@ draft → review → approved
 変更時は Frontmatter の `version`、`updated`、`changeImpact` を同時に更新し、末尾の Changelog セクションにエントリを追加すること。`changeImpact` は小文字（`low` / `medium` / `high`）で記録する。`changeImpact` は初版では省略可。初回変更時に Frontmatter へ追加する。
 
 `.version-claims` contract を持つプロジェクト（リポジトリルートに `.version-claims/` ディレクトリがある場合）では、`version` を変更する文書の claim（`.version-claims/<document>.claim`）も**同じ commit で**更新すること（リポジトリ固有ルールが claim を要求する文書は version 不変の更新でも同様）。claim を落とすと `shared-version-convergence` 系のゲートが赤くなり、provisional commit → claim 生成 → amend の復旧を後追いで行うことになる。生成手順の正本は `.version-claims/README.md` — 手順はそちらを参照し、ここへ複製しない。contract を持たないプロジェクトではこの手順は不要。
+
+### 実測の記録先
+
+正本（本書やコア7文書、`CLAUDE.md` 等）に実測の記録（実体数・版の一覧・時刻表・スコープ差の注記など）を書き足すと、レビューのたびに数字・単位・スコープの整合を取り直す面が増え、前巡の修正が次の指摘を生んで収束しなくなる。
+
+正本に残してよいのは次の範囲までとする。
+
+- 判断手順（どう判断するか）
+- 判断に直結する境界値（閾値・上限など）
+- 測り直すためのコマンド
+- 証跡文書へのリンク
+
+実体数・版の一覧・時刻表・スコープ差の注記のような**時間で腐る記述**は正本に置かず、`08-knowledge/` の日付付き証跡文書（`YYYY-MM-DD-<slug>-evidence.md`）へ置く。数字を引き直すときは証跡文書のコマンドを回し直し、結果を**行として追記**する（古い行は消さない）。
+
+証跡文書の命名・追記規律と `08-knowledge/` 配下の使い分け表は `08-knowledge/README.md`（初期セット外）が持つ。`${CLAUDE_PLUGIN_ROOT}/docs-template/08-knowledge/README.md` からコピーして使う。
 
 ### Changelog カテゴリ
 
@@ -721,17 +735,31 @@ Changelog エントリには以下のカテゴリを使用する（[Keep a Chang
 
 - 2026-09-08 追記: プラグイン変数がない直接利用でも取得できる公開配布元を明記（ai-spec-driven-development#525）。
 
-### [1.10.0] - 2026-10-16
+### [1.11.0] - 2026-10-16
 
 #### 追加
 
-- 「品質・セキュリティ」にキー一覧の運用文書（`05-operations/deployment/key-inventory.md`）への参照を追加し、SBOM（生成する成果物）とキー一覧（人が確認する管理文書）の役割の違いを明記（Issue #541）
+- 「品質・セキュリティ」に SBOM の運用文書（`05-operations/deployment/sbom.md`）とキー一覧の運用文書（`05-operations/deployment/key-inventory.md`）を追加。SBOM 本体は手で編集しない生成物、キー一覧は人が運用事実を確認して書く管理文書という役割の違いを明記し、相互に参照する 2 文書を 1 つのコピー単位にした（[ai-spec-driven-development#540](https://github.com/feel-flow/ai-spec-driven-development/issues/540) / [ai-spec-driven-development#541](https://github.com/feel-flow/ai-spec-driven-development/issues/541)）
+- 「AIツール初期設定ガイド」に `03-implementation/AI_TOOL_INTEGRATION.md`（INTEGRATIONS.md から分離した AI 開発ツールの設定例）を追加（[ai-spec-driven-development#511](https://github.com/feel-flow/ai-spec-driven-development/issues/511)）
+- エラーハンドリング方針に「エラー型」（`AppError` 階層と外部境界の正規化。正典は ERRORS.md）を追加（[ai-spec-driven-development#550](https://github.com/feel-flow/ai-spec-driven-development/issues/550)）
+- 文書サイズの閾値に、ACE Playbook は件数由来の行数上限を優先し固定行数で分割しない、という例外を追加（[ai-spec-driven-development#487](https://github.com/feel-flow/ai-spec-driven-development/issues/487)）
 
-### [1.9.0] - 2026-10-15
+#### 変更
 
-#### 追加
+- Frontmatter の例外を、PLAYBOOK.md（分割レイアウトでは索引）は Frontmatter を持ち、OBSERVATIONS.md と分割したカテゴリファイル（`playbook/**`）は持たない、と単一ファイル・分割のどちらのレイアウトでも成り立つ書き方に整理した（[ai-spec-driven-development#487](https://github.com/feel-flow/ai-spec-driven-development/issues/487)）
+- 公開配布元で 1.9.0・1.10.0 として記録した追記を本版へ統合した。版番号は両系統の最大を超える値にした
 
-- 「品質・セキュリティ」に SBOM 運用文書（`05-operations/deployment/sbom.md`）への参照を追加し、SBOM 本体は手で編集しない生成物であることを明記（Issue #540）
+### [1.9.2] - 2026-09-29
+
+- ナレッジベース節の見出しを、PLAYBOOK.md を `/init-docs`（ACE 最小構成の配置）と `/ace-setup` の両方が配置する実態へ合わせた。
+
+### [1.9.1] - 2026-09-26
+
+- 「必要時にコピー」の案内を、一緒にコピーしないとリンクが切れる文書の組（コピー単位）で示すよう整理。組織展開ガイドは索引 ORGANIZATIONAL_ROLLOUT.md と organizational-rollout/ の一式を 1 つの指示でコピーさせ、本文で索引や詳細文書を単体でコピーさせていた 5 か所も一式を指す形へ揃えた。品質・セキュリティ節の 2 文書も見出しと箇条を他節と同じ形にし、相互に参照する 2 文書を一緒にコピーさせる。
+
+### [1.9.0] - 2026-09-12
+
+- §文書運用ルール に「実測の記録先」を追加。正本に残すのは判断手順・判断に直結する境界値・測り直しコマンド・証跡へのリンクまでとし、実体数・版の一覧・時刻表・スコープ差の注記のような時間で腐る記述は `08-knowledge/` の日付付き証跡文書（`YYYY-MM-DD-<slug>-evidence.md`）へ置く規範を明文化。証跡文書の置き場の定義は新設した `08-knowledge/README.md` を参照。
 
 ### [1.8.0] - 2026-09-08
 
