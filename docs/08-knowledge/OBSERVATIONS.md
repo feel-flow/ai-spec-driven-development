@@ -170,7 +170,7 @@ AC の grep を頭で組んで起票すると、検出式の穴（表記の必�
 
 ### OBS-010: ACE 系スキルは PLAYBOOK を `docs/08-knowledge/` 固定で参照するが、テンプレ配布リポジトリでは実体が `docs-template/08-knowledge/` にある
 
-| Kind | problem | Count | 7 |
+| Kind | problem | Count | 8 |
 | First | 2026-09-06 | Last | 2026-10-17 |
 | Status | promoted | Issue | feel-flow/feelflow-plugins#2142 |
 
@@ -185,6 +185,7 @@ AC の grep を頭で組んで起票すると、検出式の穴（表記の必�
 
 - 2026-10-17: Issue #586 の着手前参照で、正本の knowledge-lookup が既定解決では Playbook absent を返した。実在する docs-template/08-knowledge/PLAYBOOK.md を --playbook で指定して再実行した（再発・Count 6。feel-flow/feelflow-plugins#2142 は open）
 - 2026-10-17: PR #589 の curate で、スキル例示の `docs/08-knowledge/PLAYBOOK.md` を `ls` すると OBSERVATIONS.md しか無く、`package.json` の `ace:*` が指す `docs-template/08-knowledge/` を確かめ直して 1 往復（再発・Count 7。feel-flow/feelflow-plugins#2142 は open）
+- 2026-10-17: PR #591 の curate で、実配置を直近 ACE コミットの `--stat` で特定した後も、同期検証・形式ゲートを `docs-template/scripts/ace/` 配下と見なして `npx tsx` で起動し、2 本とも `ERR_MODULE_NOT_FOUND`。同梱版（`ace-run-ts.sh`）で再実行して 1 往復（再発・Count 8。feel-flow/feelflow-plugins#2142 は open）
 
 ---
 
@@ -475,14 +476,15 @@ ripgrep はパスを省略すると、stdin が TTY でない限り cwd では�
 
 ### OBS-030: zsh の Bash ツールで `gh api` の URL 引数に未引用の `?ref=` を書くと NOMATCH で落ち、zsh-glob ガードはこの位置引数の形を検出しない
 
-| Kind | problem | Count | 1 |
-| First | 2026-10-15 | Last | 2026-10-15 |
+| Kind | problem | Count | 2 |
+| First | 2026-10-15 | Last | 2026-10-17 |
 | Status | promoted | Issue | feel-flow/feelflow-plugins#2138 |
 
 ガードが検出するのは、`-` で始まる語の `=` より右側にある glob 文字だけだった。そのため、位置引数の URL に含まれる `?` は素通りし、実行時に `no matches found` で呼び出しが落ちる → `gh api` に渡すクエリ付きパスは必ず引用せよ。
 
 - 2026-10-15: PR #548 の調査で、サイト側の文書を `gh api repos/.../contents/...?ref=develop` で取得しようとして失敗した。引用して再実行し、1 往復を失った（初回）
 - 2026-10-15: toolkit の Bash ガードで構造的に防げる種類のため、利用者の起票方針に従い閾値未達で feel-flow/feelflow-plugins#2138 へ起票
+- 2026-10-17: Issue #590 の配布物照合で `gh api repos/feel-flow/ff-dev-toolkit/git/trees/v0.154.1?recursive=1` を未引用で書き、`no matches found` で呼び出し全体（後続の blob 比較を含む）が実行されなかった。ガードは素通しで、引用して再実行し 1 往復（再発・Count 2。feel-flow/feelflow-plugins#2138 は open）
 
 ---
 

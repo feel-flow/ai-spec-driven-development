@@ -1,12 +1,12 @@
 ---
 title: "PLAYBOOK"
-version: "1.74.0"
+version: "1.75.0"
 status: "approved"
 created: "2026-03-10"
 updated: "2026-10-17"
 owner: "@fffokazaki"
 changeImpact: "medium"
-ace_entry_count: 76
+ace_entry_count: 78
 tags: [ace, playbook, knowledge-management]
 references:
   - https://github.com/feel-flow/ai-spec-driven-development/blob/HEAD/docs/ACE_FRAMEWORK.md
@@ -1185,9 +1185,43 @@ Issue #509 は「DECISION_TREE.md の 2 箇所は PR #508 で修正済み」と�
 
 ---
 
+<a id="ace-591-1"></a>
+
+### ACE-591-1: 手順書で禁止している状態は使い捨て fixture で実際に作り、案内している検査コマンドがそれを検出するかを実測してから記述する
+
+| Category | documentation-quality | Origin | PR #591 |
+| Date | 2026-10-17 |
+| Helpful | 0 | Harmful | 0 |
+| Status | active |
+
+「〜してはいけない」という警告が正しくても、同じ手順書が確認手段として挙げる検査コマンドは、その状態を成功として通すことがある。禁止した操作を fixture で再現し、検査コマンドの終了コードと出力、関連する Hook などの判定を記録する。検出できないなら、そのことと代わりの確認方法を手順書に書き、検査側の修正は実装のリポジトリへ起票する。
+
+---
+
+<a id="ace-591-2"></a>
+
+### ACE-591-2: Epic の未達 AC にユーザー判断待ちの工程と今すぐ検証できる工程が混ざるときは、検証できる部分だけを子 Issue に分け、PR は Refs で Epic を開いたまま残す
+
+| Category | process | Origin | PR #591 |
+| Date | 2026-10-17 |
+| Helpful | 0 | Harmful | 0 |
+| Status | active |
+
+保留理由が一部の工程にしかないのに AC を丸ごと待たせると、他の工程も止まる。一方で Epic 全体を 1 PR で扱うと、保留中の工程を独断で進めるか、`Closes` で Epic を誤って閉じる。保留でない部分を子 Issue に切って sub-issue として紐付け、PR は子を `Closes`・Epic を `Refs` にする。結果は「マージ済み・配布済み・利用確認済み・未完了」に分けて Epic に記録し、Epic の該当 AC はチェックしない。
+
+---
+
 ## Changelog
 
 > [1.64.0] 以前の履歴は [PLAYBOOK-CHANGELOG.md](https://github.com/feel-flow/ai-spec-driven-development/blob/HEAD/docs-template/08-knowledge/PLAYBOOK-CHANGELOG.md) に移した（PLAYBOOK.md は /ace-setup で配布され、移動先は配置されないため絶対 URL）。
+
+### [1.75.0] - 2026-10-17
+
+#### 追加
+
+- ACE-591-1: 手順書で禁止している状態は fixture で作り、案内している検査コマンドが検出するかを実測してから記述する（PR #591）
+- ACE-591-2: Epic の未達 AC に保留工程が混ざるときは、検証できる部分だけを子 Issue に分け、Epic は Refs で開いたまま残す（PR #591）
+- domain: 評価済み（候補 0 件）。PR は方法論文書と配布物の検証で、業務ルールの知見を含まない
 
 ### [1.74.0] - 2026-10-17
 
