@@ -163,25 +163,21 @@ async function processUser(userId: string): Promise<Result<User>> {
 ## 5. Try-Catch のベストプラクティス
 
 ```typescript
-// ✅ 良い例: エラー型に応じた具体的な処理
+// ✅ 良い例: 外部 SDK / HTTP の境界で正規化し、エラー型に応じて処理
 try {
   await riskyOperation();
 } catch (error) {
-  if (error instanceof ValidationError) {
-    return Result.fail(error); // そのまま返却
+  const normalized = normalizeExternalError(error);
+  if (normalized instanceof ValidationError) {
+    return Result.fail(normalized); // そのまま返却
   }
-  if (error instanceof NotFoundError) {
+  if (normalized instanceof NotFoundError) {
     // warn の meta に Error 実体は入れない（Logger 規約 / PATTERNS.md §9）
-    logger.warn("Resource not found", { code: error.code });
-    return Result.fail(error);
+    logger.warn("Resource not found", { code: normalized.code });
+    return Result.fail(normalized);
   }
-  // AppError の分類を降格させない。HTTP 境界は normalizeExternalError を先に通す
-  if (error instanceof AppError) return Result.fail(error);
-  // 内部処理の未知エラーは InternalError でラップし、cause で元の値を保持する
-  logger.error("Unexpected error", error);
-  return Result.fail(
-    new InternalError("Unexpected error occurred", { cause: error }),
-  );
+  logger.error("External operation failed", error);
+  return Result.fail(normalized);
 }
 
 // ❌ 悪い例: 汎用的な catch のみ
@@ -191,11 +187,11 @@ try {
   throw new Error("Failed"); // 元のエラー情報が失われる
 }
 
-// ✅ ラップするなら cause で元エラーを保持する
+// ✅ 外部境界で再スローするなら分類と元の cause を保持する
 try {
   await riskyOperation();
 } catch (error) {
-  throw new InternalError("Failed", { cause: error });
+  throw normalizeExternalError(error);
 }
 ```
 
