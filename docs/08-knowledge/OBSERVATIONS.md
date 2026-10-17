@@ -170,7 +170,7 @@ AC の grep を頭で組んで起票すると、検出式の穴（表記の必�
 
 ### OBS-010: ACE 系スキルは PLAYBOOK を `docs/08-knowledge/` 固定で参照するが、テンプレ配布リポジトリでは実体が `docs-template/08-knowledge/` にある
 
-| Kind | problem | Count | 6 |
+| Kind | problem | Count | 7 |
 | First | 2026-09-06 | Last | 2026-10-17 |
 | Status | promoted | Issue | feel-flow/feelflow-plugins#2142 |
 
@@ -184,6 +184,7 @@ AC の grep を頭で組んで起票すると、検出式の穴（表記の必�
 - 2026-10-16: Issue #512 / PR #569 の着手前参照で、ff-dev-toolkit 0.151.0 の `knowledge-lookup.sh` がまた「Playbook なし — ACE 未導入」と報告した（`docs-template/08-knowledge/PLAYBOOK.md` は実在）。curate では直近 ACE コミットの `--stat` で実配置を確かめて 1 往復（再発・Count 5。#2142 は open）
 
 - 2026-10-17: Issue #586 の着手前参照で、正本の knowledge-lookup が既定解決では Playbook absent を返した。実在する docs-template/08-knowledge/PLAYBOOK.md を --playbook で指定して再実行した（再発・Count 6。feel-flow/feelflow-plugins#2142 は open）
+- 2026-10-17: PR #589 の curate で、スキル例示の `docs/08-knowledge/PLAYBOOK.md` を `ls` すると OBSERVATIONS.md しか無く、`package.json` の `ace:*` が指す `docs-template/08-knowledge/` を確かめ直して 1 往復（再発・Count 7。feel-flow/feelflow-plugins#2142 は open）
 
 ---
 
@@ -843,5 +844,19 @@ Git Bash は `/tmp` を `C:/Users/<user>/AppData/Local/Temp` に写像するが�
 走行中ディレクトリには完了後も `.done.*` が残る設計なので、「ディレクトリが空」を終了条件にした待機はレーンが全部終わっても回り続ける → 待つなら `.done.*` を除いた走行中ファイルの有無で判定するか、レビューの完了通知（サブエージェントの終了）を待つ
 
 - 2026-10-17: PR #580〜#581 のレビュー後に置いたバックグラウンドの待機が終わらず、`.review-results/` を cleanup で消したときにようやく止まった（初回）
+
+---
+
+<a id="obs-056"></a>
+
+### OBS-056: 「ユーザー提供待ち」で保留した Issue は、着手時に手元の一次資料（隣接リポジトリの全履歴・配布物）で代替できないか先に確かめる
+
+| Kind | keep | Count | 1 |
+| First | 2026-10-17 | Last | 2026-10-17 |
+| Status | active | Issue | なし |
+
+依存を「ユーザー提供待ち」と書いた Issue は棚卸しのたびに保留が延長され、手元に一次資料があっても誰も確かめない → 着手・棚卸しの時点で、提供を待つ情報を手元のリポジトリ（`git log --all -p -S`）や配布物から抽出できないか確かめ、抽出した場合は出典と方法を Issue に記録してから進める。非公開の資料を使うときは、公開側へ書く前に公開状態を確かめる（ACE-589-2）。
+
+- 2026-10-17: Issue #468 は 2026-09-06 と 2026-09-14 の棚卸しで「書籍原稿の参照箇所一覧の提供待ち」とされていたが、手元の書籍原稿リポジトリの全履歴と配布 HTML から 1 セッションで一覧を抽出し、PR #589 でマージまで進んだ（初回）
 
 ---

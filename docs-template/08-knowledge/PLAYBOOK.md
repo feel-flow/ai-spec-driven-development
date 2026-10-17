@@ -1,12 +1,12 @@
 ---
 title: "PLAYBOOK"
-version: "1.73.0"
+version: "1.74.0"
 status: "approved"
 created: "2026-03-10"
 updated: "2026-10-17"
 owner: "@fffokazaki"
 changeImpact: "medium"
-ace_entry_count: 74
+ace_entry_count: 76
 tags: [ace, playbook, knowledge-management]
 references:
   - https://github.com/feel-flow/ai-spec-driven-development/blob/HEAD/docs/ACE_FRAMEWORK.md
@@ -1159,9 +1159,43 @@ Issue #509 は「DECISION_TREE.md の 2 箇所は PR #508 で修正済み」と�
 
 ---
 
+<a id="ace-589-1"></a>
+
+### ACE-589-1: 判定を順に並べた検証関数の自己テストは、各ケースが狙いの判定だけに当たる入力にし、件数ではなく問題文で照合する
+
+| Category | testing | Origin | PR #589 |
+| Date | 2026-10-17 |
+| Helpful | 0 | Harmful | 0 |
+| Status | active |
+
+1 つの入力が複数の判定に当たると、狙いの判定を消しても後段の判定が代わりに問題を出し、「1 件出る」を確かめるテストは緑のまま残る。ある判定を確かめるケースでは、それ以外の判定は満たす入力（参照先は実在させる等）にする。期待値は件数ではなく問題文の一部で照合し、狙いの判定を消す変異で赤になることを確かめる。
+
+---
+
+<a id="ace-589-2"></a>
+
+### ACE-589-2: 非公開の資料から抽出した結果を公開リポジトリへ書くときは、出典の公開状態を先に確かめ、パスや未公開の成果物名をコミットに入れる前に除く
+
+| Category | security | Origin | PR #589 |
+| Date | 2026-10-17 |
+| Helpful | 0 | Harmful | 0 |
+| Status | active |
+
+手元で読めるかどうかは公開状態を示さないので、非公開の資料の内部パスや未公開の成果物名が、Issue コメント・PR 本文・データファイル・コミット本文へそのまま流れる。squash 時にメッセージを書き直しても、PR のコミットには元の本文が残り、コメントの編集履歴も残る。外部の資料を出典として書く前に `gh repo view <owner/repo> --json visibility` で確かめ、PRIVATE なら公開済みの名前（出版物名など）だけで書いてからコミットする（リンクの扱いは [ACE-543-2](#ace-543-2)）。
+
+---
+
 ## Changelog
 
 > [1.64.0] 以前の履歴は [PLAYBOOK-CHANGELOG.md](https://github.com/feel-flow/ai-spec-driven-development/blob/HEAD/docs-template/08-knowledge/PLAYBOOK-CHANGELOG.md) に移した（PLAYBOOK.md は /ace-setup で配布され、移動先は配置されないため絶対 URL）。
+
+### [1.74.0] - 2026-10-17
+
+#### 追加
+
+- ACE-589-1: 判定を順に並べた検証関数の自己テストは、狙いの判定だけに当たる入力にし、問題文で照合する（PR #589）
+- ACE-589-2: 非公開資料から抽出した結果を公開リポジトリへ書く前に出典の公開状態を確かめ、内部パスや未公開の成果物名を除く（PR #589）
+- domain: 評価済み（候補 2 件）。書籍が参照する URL の不変条件は `scripts/book-referenced-urls.json` と FRONTMATTER_GUIDE §5.5 に反映済みのため Playbook には追記しない
 
 ### [1.73.0] - 2026-10-17
 
