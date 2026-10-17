@@ -196,6 +196,40 @@ export async function verifyErrorExamples(documents, check) {
     })()`,
       context,
     );
+    // §5 の良い例をそのまま関数へ入れる。外部境界を InternalError に戻す変異も検出する。
+    const skillCatch = block(skill, "// ✅ 良い例: 外部 SDK / HTTP の境界");
+    const resultExample = skillCatch.split("// ❌ 悪い例:")[0];
+    const throwMarker = "// ✅ 外部境界で再スローするなら";
+    assert.equal(
+      skillCatch.split(throwMarker).length,
+      2,
+      "external rethrow example must exist exactly once",
+    );
+    run(
+      `async function skillExternalResult() { ${resultExample} }
+      async function skillExternalThrow() { ${skillCatch.slice(skillCatch.indexOf(throwMarker))} }
+      async function riskyOperation() { throw globalThis.externalOriginal; }`,
+      context,
+    );
+    await run(
+      `(async () => {
+      for (const original of [new TypeError("Failed to fetch"), { status: 401 }, "raw", null]) {
+        globalThis.externalOriginal = original;
+        const result = await skillExternalResult();
+        assert.equal(result.error.category, "never-fallback");
+        assert.equal(result.error.cause, original);
+        process.env.NODE_ENV = "production";
+        assert.throws(() => fallbackInProdOnly("fallback", result.error), (thrown) => thrown === result.error);
+        await assert.rejects(() => skillExternalThrow(), (thrown) =>
+          thrown.category === "never-fallback" && thrown.cause === original);
+      }
+      const known = new NotFoundError("known");
+      globalThis.externalOriginal = known;
+      assert.equal((await skillExternalResult()).error, known);
+      await assert.rejects(() => skillExternalThrow(), (thrown) => thrown === known);
+    })()`,
+      context,
+    );
     run(block(patterns, "async function fetchUserWithPosts("), context);
     await run(
       `assert.rejects(() => fetchUserWithPosts("user"), (error) =>

@@ -39,6 +39,9 @@ test.each([
   "raw-cause",
   "environment",
   "real-payment",
+  "external-result-wrap",
+  "external-rethrow-wrap",
+  "external-example-missing",
 ])("安全契約を壊す変異を検出する: %s", async (mutation) => {
   const input = documents();
   const replace = (
@@ -72,6 +75,24 @@ test.each([
     );
   if (mutation === "real-payment")
     replace("testing", "useValue: payment", "useValue: new PaymentService(),");
+  if (mutation === "external-result-wrap")
+    replace(
+      "skill",
+      "const normalized = normalizeExternalError(error);",
+      'const normalized = new InternalError("Failed", { cause: error });',
+    );
+  if (mutation === "external-rethrow-wrap")
+    replace(
+      "skill",
+      "throw normalizeExternalError(error);",
+      'throw new InternalError("Failed", { cause: error });',
+    );
+  if (mutation === "external-example-missing")
+    replace(
+      "skill",
+      "// ✅ 良い例: 外部 SDK / HTTP の境界",
+      "// renamed example",
+    );
   const results = await verify(input);
   expect(
     results.some((result) => !result.pass),
