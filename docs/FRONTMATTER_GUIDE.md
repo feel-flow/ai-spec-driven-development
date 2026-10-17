@@ -1,10 +1,10 @@
 ---
 id: frontmatter-guide
 title: Frontmatter ガイド - なぜ・どこで・何を書くか
-version: 1.7.1
+version: 1.7.2
 status: draft
 created: 2026-05-19
-updated: 2026-10-16
+updated: 2026-10-17
 owner: feel-flow
 phase: mvp
 tags: [documentation, frontmatter, metadata, spec-kit, governance]
@@ -15,6 +15,7 @@ references:
   - scripts/validate-docs.mjs
   - scripts/build-spec-index.mjs
   - scripts/sync-to-public.mjs
+  - scripts/book-referenced-urls.json
   - mcp/src/utils.ts
 changeImpact: low
 visibility: public
@@ -351,6 +352,7 @@ visibility: public # public | internal
 - **非破壊**: 同期は削除を行わない。`internal` に変更された文書の public 側コピーは orphan（凍結）として報告のみされる
 - **雛形には含めない**: [docs/specs/spec-template.md](specs/spec-template.md) には `visibility` を意図的に入れていない（雛形コピーで新規 spec が公開既定になるのを防ぐため）。spec を公開したい場合のみ、作成後に `visibility: public` を明示する
 - 同期の実行方法: internal リポジトリの checkout から `node scripts/sync-to-public.mjs --target <public-checkout> [--dry-run]`（target の origin が public リポジトリでない場合は入口で拒否される）
+- **書籍参照先は動かさない**: 書籍が参照する本リポジトリの URL は [scripts/book-referenced-urls.json](../scripts/book-referenced-urls.json) に列挙し、参照先ファイルの実在を `scripts/book-referenced-urls.test.ts`（`quality:local` の vitest 段）で検証する。2026-10-17 時点で書籍が参照するのはリポジトリのルート URL だけで、リポジトリ名・owner・公開状態と既定ブランチの `README.md` が維持対象になる（前 3 つはテストの対象外。テストが見るのはチェックアウト中の作業ツリーで、既定ブランチへのマージ前のゲートとして働く）。書籍に新しい URL を載せたら同じ変更でリストへ追記する（[Issue #468](https://github.com/feel-flow/ai-spec-driven-development/issues/468)）
 
 ### 5.6 `docs/` 方法論ガイドスキーマ（本リポジトリ自身の運用）
 
@@ -482,6 +484,12 @@ frontmatter 管理（編集・検証・索引化）は Node スクリプトと�
 ---
 
 ## Changelog
+
+### [1.7.2] - 2026-10-17
+
+#### 追加
+
+- §5.5 運用ルールに、書籍参照 URL の不変リスト（`scripts/book-referenced-urls.json`）と存在検証テストを追加（[Issue #468](https://github.com/feel-flow/ai-spec-driven-development/issues/468)）
 
 ### [1.7.1] - 2026-10-16
 

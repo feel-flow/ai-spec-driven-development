@@ -1,0 +1,14 @@
+{
+  "$comment": "書籍が参照する本リポジトリの URL 不変リスト（Issue #468）。ここに載る URL の参照先を移動・削除しない。書籍に本リポジトリの新しい URL を載せたら、同じ変更でここへ追記する。検証は scripts/book-referenced-urls.test.ts。",
+  "source": "2026-10-17 調査。出版済み書籍の原稿の全履歴と配布版（日本語版 v1.5.1〜v1.5.5、英語版 v1.5.3〜v1.5.4）",
+  "entries": [
+    {
+      "url": "https://github.com/feel-flow/ai-spec-driven-development",
+      "repoPath": "README.md",
+      "referencedBy": [
+        "書籍『AI仕様駆動開発』（日本語版・あとがき）",
+        "書籍『AI Spec-Driven Development』（英語版・afterword）"
+      ]
+    }
+  ]
+}
