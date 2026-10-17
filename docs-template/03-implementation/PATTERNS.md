@@ -1,10 +1,10 @@
 ---
 title: "PATTERNS"
-version: "1.8.0"
+version: "1.9.0"
 status: "draft"
 owner: "@your-github-handle"
 created: "YYYY-MM-DD"
-updated: "2026-10-16"
+updated: "2026-10-17"
 changeImpact: "medium"
 ---
 
@@ -132,11 +132,9 @@ function fetchUserWithPosts(userId: string): Promise<UserWithPosts> {
   return fetchUser(userId)
     .then((user) => fetchPosts(user.id).then((posts) => ({ ...user, posts })))
     .catch((error: unknown) => {
-      const normalizedError =
-        error instanceof Error ? error : new Error(String(error));
-      logger.error("Failed to fetch user with posts", normalizedError);
+      logger.error("Failed to fetch user with posts", error);
       throw new DataFetchError("Could not load user data", {
-        cause: normalizedError,
+        cause: error,
       });
     });
 }
@@ -152,11 +150,9 @@ async function fetchUserWithPosts(userId: string): Promise<UserWithPosts> {
     const posts = await fetchPosts(user.id);
     return { ...user, posts };
   } catch (error) {
-    const normalizedError =
-      error instanceof Error ? error : new Error(String(error));
-    logger.error("Failed to fetch user with posts", normalizedError);
+    logger.error("Failed to fetch user with posts", error);
     throw new DataFetchError("Could not load user data", {
-      cause: normalizedError,
+      cause: error,
     });
   }
 }
@@ -445,14 +441,14 @@ class BatchProcessor<T> {
 
 ```typescript
 // Logger の呼び出し規約（テンプレート全体の正典。他文書のコード例もこの署名に従う）:
-//   error(message, error, meta?) — 第 2 引数は Error 型。catch 変数（unknown）は
-//     `error instanceof Error ? error : new Error(String(error))` で正規化してから渡す
+//   error(message, error, meta?) — 第 2 引数は unknown。元の値をそのまま渡し、
+//     serializeError で構造化する（String() に潰さず、cause とも同じ元の値を使う）
 //   warn / info(message, meta?) — meta は構造化コンテキスト。Error 実体は入れない
 //     （JSON.stringify で message / stack が落ちる）。必要なら name / code だけ載せる
 // 2 引数版 error(message, error) のみだと構造化コンテキストを渡す口が無く、
 // FALLBACK.md「フォールバック発動時は必ず構造化ログ」を満たせない。
 interface Logger {
-  error(message: string, error: Error, meta?: Record<string, unknown>): void;
+  error(message: string, error: unknown, meta?: Record<string, unknown>): void;
   warn(message: string, meta?: Record<string, unknown>): void;
   info(message: string, meta?: Record<string, unknown>): void;
 }
@@ -483,7 +479,7 @@ function pickHttpDiagnostics(value: object): Record<string, unknown> {
   };
   const body = v.body ?? v.response?.data ?? v.response?.body;
   const diagnostics: Record<string, unknown> = {};
-  const status = v.statusCode ?? v.status ?? v.response?.status;
+  const status = readHttpStatus(value); // ERRORS.md の SDK 対応と共用する
   if (status !== undefined) diagnostics.status = status;
   if (v.code !== undefined) diagnostics.code = v.code;
   if (body !== undefined) {
@@ -595,7 +591,7 @@ class JsonLogger implements Logger {
     );
   }
 
-  error(message: string, error: Error, meta?: Record<string, unknown>): void {
+  error(message: string, error: unknown, meta?: Record<string, unknown>): void {
     console.error(
       JSON.stringify({
         level: "error",
@@ -727,6 +723,12 @@ ACE Playbook で `Helpful >= 5` に達した知見を、`/ace-refine` が蒸留�
 - 該当なし（昇格発生後に追記）
 
 ## Changelog
+
+### [1.9.0] - 2026-10-17
+
+#### 修正
+
+- Promise Chain / async-await のラップ例で Error でない元の値も cause に保持する。Logger.error は unknown を直接受け取り、正典の serializeError で構造化する
 
 ### [1.8.0] - 2026-10-16
 

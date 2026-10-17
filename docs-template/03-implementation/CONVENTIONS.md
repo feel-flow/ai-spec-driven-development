@@ -1,3 +1,13 @@
+---
+title: "CONVENTIONS"
+version: "1.0.0"
+status: "draft"
+owner: "@your-github-handle"
+created: "YYYY-MM-DD"
+updated: "2026-10-17"
+changeImpact: "medium"
+---
+
 # CONVENTIONS.md - コーディング規約
 
 ## 0. ドキュメント命名規則
@@ -295,9 +305,8 @@ async function fetchUser(id: string): Promise<User> {
     }
     return user;
   } catch (error) {
-    // Logger 規約（PATTERNS.md §9）: error(message, error: Error, meta?)
-    const err = error instanceof Error ? error : new Error(String(error));
-    logger.error("Failed to fetch user", err, { id });
+    // Logger 規約（PATTERNS.md §9）: error(message, error: unknown, meta?)
+    logger.error("Failed to fetch user", error, { id });
     throw error;
   }
 }
@@ -337,9 +346,8 @@ try {
   }
 
   // 予期しないエラー（cause で元エラーを保持する）
-  const err = error instanceof Error ? error : new Error(String(error));
-  logger.error("Unexpected error", err);
-  throw new InternalError("Processing failed", { cause: err });
+  logger.error("Unexpected error", error);
+  throw new InternalError("Processing failed", { cause: error });
 }
 ```
 
@@ -695,3 +703,9 @@ function processUserInput(input: unknown): void {
   );
 }
 ```
+
+## Changelog
+
+### [1.0.0] - 2026-10-17
+
+- エラー処理の境界分類・元の cause 保持に説明を合わせた（Issue #586）。

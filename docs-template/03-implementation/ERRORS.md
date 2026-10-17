@@ -1,11 +1,11 @@
 ---
 title: "ERRORS"
-version: "1.0.0"
+version: "2.0.0"
 status: "draft"
 owner: "@your-github-handle"
 created: "YYYY-MM-DD"
-updated: "2026-10-15"
-changeImpact: "medium"
+updated: "2026-10-17"
+changeImpact: "high"
 ---
 
 # ERRORS.md - エラー型と外部境界の正規化
@@ -25,8 +25,8 @@ type AppErrorOptions = { cause?: unknown };
 
 // エラー分類。フォールバック可否・再試行可否は statusCode から推測せず、各サブクラスが
 // 宣言する（抽象メンバなので、サブクラスを追加した瞬間にコンパイルが宣言を要求する）。
-//   never-fallback: 認証・認可・バリデーション・データ整合性・セキュリティ・上流の恒久拒否
-//                   （自コードの要求誤り）— 環境を問わずスロー、再試行しない（FALLBACK.md Section 1）
+//   never-fallback: 認証・認可・バリデーション・データ整合性・セキュリティ・上流の恒久拒否・原因不明の外部エラー
+//                   — 環境を問わずスロー、再試行しない（FALLBACK.md Section 1）
 //   transient:      外部サービスの一時障害 — 再試行可、本番ではフォールバック可
 //   permanent:      再試行しても結果が変わらない失敗（未検出・自コードのバグ）
 //                   — 再試行しない、本番ではフォールバック可
@@ -140,6 +140,15 @@ class UpstreamError extends AppError {
   }
 }
 
+// 分類する根拠が無い外部エラー。原因の調査・境界マッパーの追加が必要で、
+// 一時障害と推測してフォールバックや再試行をしない。
+class UnknownExternalError extends AppError {
+  readonly category: ErrorCategory = "never-fallback";
+  constructor(message: string, options?: AppErrorOptions) {
+    super(message, "UNKNOWN_EXTERNAL_ERROR", HTTP_STATUS.BAD_GATEWAY, options);
+  }
+}
+
 // 外部サービスがこちらの要求を恒久的に拒否した（4xx）。利用者の入力検証エラー
 // （ValidationError）とは別物として扱う — 上流の拒否をローカルの入力エラーとして
 // 名乗ると、details をフィールドエラーとして描画するハンドラが誤動作し、
@@ -168,7 +177,8 @@ function readHttpStatus(error: unknown): number | undefined {
     status?: unknown;
     statusCode?: unknown;
     code?: unknown;
-    response?: { status?: unknown };
+    response?: { status?: unknown; statusCode?: unknown };
+    $metadata?: { httpStatusCode?: unknown };
   };
   // SendGrid の ResponseError は HTTP ステータスを数値の `code` に入れる（`response` に
   // headers / body を持つ）。範囲チェックだけでは MongoDB の WriteConflict(112) のような
@@ -176,16 +186,20 @@ function readHttpStatus(error: unknown): number | undefined {
   // オブジェクト）を伴う場合に限って数値 `code` を採用する
   const looksLikeHttpResponseError =
     typeof e.response === "object" && e.response !== null;
-  const candidate =
-    e.statusCode ??
-    e.status ??
-    e.response?.status ??
-    (looksLikeHttpResponseError &&
-    typeof e.code === "number" &&
-    isHttpStatusRange(e.code)
-      ? e.code
-      : undefined);
-  return typeof candidate === "number" ? candidate : undefined;
+  // 候補ごとに型と範囲を検証する。先頭の "401" / NaN / 範囲外の値で、
+  // 後続の有効なステータスを隠さない。文字列の数値への暗黙変換はしない。
+  const candidates = [
+    e.statusCode,
+    e.status,
+    e.response?.status,
+    e.response?.statusCode,
+    e.$metadata?.httpStatusCode,
+    looksLikeHttpResponseError ? e.code : undefined,
+  ];
+  return candidates.find(
+    (value): value is number =>
+      typeof value === "number" && isHttpStatusRange(value),
+  );
 }
 
 const HTTP_STATUS_MIN = 100;
@@ -198,26 +212,30 @@ function isHttpStatusRange(value: number): boolean {
   );
 }
 
-// Node のシステムエラーコード（ECONNREFUSED / ENOTFOUND / ETIMEDOUT 等）を cause に持つか
-function hasSystemErrorCode(error: unknown): boolean {
-  if (!(error instanceof Error)) return false;
-  // 形式は照合しない（ECONNREFUSED / EAI_AGAIN / UND_ERR_CONNECT_TIMEOUT 等、
-  // Node と undici で表記が揃わない）。素のプログラミング TypeError は cause を持たない
-  const code = (error.cause as { code?: unknown } | undefined)?.code;
-  return typeof code === "string" && code.length > 0;
-}
-
-// 自コードのバグ。HTTP ステータスを持たないので、放置すると「ステータス無し = 一時障害」
-// と誤分類され、本番でフォールバック・再試行される。
-// 例外: WHATWG fetch / undici はネットワーク障害を `TypeError: fetch failed`
-// （cause に ECONNREFUSED 等）で reject する。これはバグではなく一時障害
-function isProgrammingError(error: unknown): boolean {
-  if (error instanceof TypeError && hasSystemErrorCode(error)) return false;
-  return (
-    error instanceof TypeError ||
-    error instanceof RangeError ||
-    error instanceof ReferenceError ||
-    error instanceof SyntaxError
+// HTTP 境界で確認できた接続断・一時的な名前解決失敗・タイムアウトだけを許可する。
+// ENOTFOUND / 証明書エラー / 任意の code は設定ミス等も含むため推測しない。
+const TRANSIENT_NETWORK_CODES = new Set([
+  "ECONNRESET",
+  "ECONNREFUSED",
+  "ETIMEDOUT",
+  "EAI_AGAIN",
+  "UND_ERR_CONNECT_TIMEOUT",
+  "UND_ERR_HEADERS_TIMEOUT",
+  "UND_ERR_BODY_TIMEOUT",
+  "UND_ERR_SOCKET",
+]);
+function hasTransientNetworkCode(error: unknown): boolean {
+  // AbortSignal.timeout() の標準エラー。利用者キャンセルの AbortError は含めない。
+  if (
+    typeof DOMException !== "undefined" &&
+    error instanceof DOMException &&
+    error.name === "TimeoutError"
+  )
+    return true;
+  if (typeof error !== "object" || error === null) return false;
+  const e = error as { code?: unknown; cause?: { code?: unknown } };
+  return [e.code, e.cause?.code].some(
+    (code) => typeof code === "string" && TRANSIENT_NETWORK_CODES.has(code),
   );
 }
 
@@ -226,14 +244,16 @@ function isProgrammingError(error: unknown): boolean {
  *
  * 汎用 Error / AxiosError のままだと category の判定がすべて素通りし、外部 API の
  * 401/403 がフォールバックや再試行の対象になる（FALLBACK.md §4）。
- * ステータスは `status` / `statusCode` / `response.status` に加え、SendGrid の
+ * ステータスは `status` / `statusCode` / `response.status` / `response.statusCode` /
+ * `$metadata.httpStatusCode` に加え、SendGrid の
  * ResponseError のように数値の `code` に入っている場合も読む（`response` を伴い、
- * HTTP ステータスの範囲にある数値のみ）。読めないとすべて transient に化ける。
+ * HTTP ステータスの範囲にある数値のみ）。
  * 写像: 401 / 403 → 認証・認可（never-fallback）、404 → NotFoundError（permanent）、
- * 409 → ConflictError（never-fallback）、429 / 5xx / ステータス不明 → UpstreamError
+ * 409 → ConflictError（never-fallback）、429 / 5xx / 既知の接続断・タイムアウト → UpstreamError
  * （transient）、専用クラスを持たないその他の 4xx（400 / 422 等）→ UpstreamRejectedError
  * （never-fallback。こちらの要求誤りなので本番でも握りつぶさない）。
- * 1xx〜3xx をエラーとして投げる HTTP ラッパは想定外なので UpstreamError に寄せる。
+ * ステータス不明・想定外の 1xx〜3xx → UnknownExternalError（never-fallback）。
+ * TypeError / SyntaxError という型名だけでは自コードのバグと断定しない。
  * cause には元の値をそのまま保持する（Error でない値も String() に潰さない —
  * 上流のステータスやレスポンス本文は cause からしか辿れない）。
  *
@@ -249,9 +269,6 @@ function normalizeExternalError(
   message = "External service call failed",
 ): AppError {
   if (error instanceof AppError) return error;
-  if (isProgrammingError(error)) {
-    return new InternalError(message, { cause: error });
-  }
   const cause = error;
   const status = readHttpStatus(error);
 
@@ -265,18 +282,65 @@ function normalizeExternalError(
     case HTTP_STATUS.CONFLICT:
       return new ConflictError(message, { cause });
     case undefined:
+      return hasTransientNetworkCode(error)
+        ? new UpstreamError(message, { cause })
+        : new UnknownExternalError(message, { cause });
     case HTTP_STATUS.TOO_MANY_REQUESTS:
-      // ステータスを取り出せなかった（接続断・タイムアウト、または status を添えない
-      // HTTP ラッパ）。429 とともに一時障害として扱う
       return new UpstreamError(message, { cause });
     default:
-      // 4xx（専用クラスを持たないもの）だけが「こちらの要求誤り」。5xx と、エラーとして
-      // 投げられた 1xx〜3xx（リダイレクト等）は上流側の事情として transient に寄せる
-      return status >= HTTP_STATUS.BAD_REQUEST &&
-        status < HTTP_STATUS.INTERNAL_SERVER_ERROR
+      if (status >= HTTP_STATUS.INTERNAL_SERVER_ERROR) {
+        return new UpstreamError(message, { cause });
+      }
+      return status >= HTTP_STATUS.BAD_REQUEST
         ? new UpstreamRejectedError(message, status, { cause })
-        : new UpstreamError(message, { cause });
+        : new UnknownExternalError(message, { cause });
   }
+}
+```
+
+`TypeError: Failed to fetch` のようにステータスも既知のネットワークコードも無い場合は、ブラウザの通信障害か自コードの不具合かを判別できないため `UnknownExternalError` にする。自コードの不具合を確認した境界では `InternalError` を明示して渡す。
+
+上流の JSON 解析は、通信呼び出しや自コードの変換処理とは別の try 節で写像する。下の例は、API が JSON を返す契約を破った場合をフォールバック禁止にする（型名だけで `InternalError` にしない）。
+
+```typescript
+async function readUpstreamJson(response: Response): Promise<unknown> {
+  if (!response.ok) {
+    throw normalizeExternalError({ status: response.status });
+  }
+  try {
+    return await response.json();
+  } catch (error) {
+    if (error instanceof SyntaxError) {
+      throw new UnknownExternalError("Invalid upstream JSON response", {
+        cause: error,
+      });
+    }
+    // body の読取中の接続断・タイムアウトは構文エラーと区別する
+    throw normalizeExternalError(error, "Failed to read upstream response");
+  }
+}
+```
+
+SDK の配置の確認元: [Smithy ResponseMetadata](https://github.com/smithy-lang/smithy-typescript/blob/main/packages/types/src/response.ts)（AWS SDK v3）、[Got HTTPError](https://github.com/sindresorhus/got/blob/main/source/core/errors.ts)（確認日: 2026-10-17）。
+
+Axios の `ECONNABORTED` はタイムアウトと中断の両方で使われるため、コードだけで再試行可としない。タイムアウトを区別する呼び出しでは `transitional.clarifyTimeoutError: true` を設定して `ETIMEDOUT` を受け取る（[Axios XHR adapter](https://github.com/axios/axios/blob/v1.x/lib/adapters/xhr.js)）。標準 `AbortSignal.timeout()` の `DOMException` / `TimeoutError` は一時障害、利用者キャンセルの `AbortError` は再試行しない（[Node.js 実装](https://github.com/nodejs/node/blob/v24.x/lib/internal/abort_controller.js)）。
+
+HTTP ステータスだけでは分類できない SDK 固有の例外は、サービス専用の境界マッパーを先に通す。[DynamoDB GetItem](https://docs.aws.amazon.com/amazondynamodb/latest/APIReference/API_GetItem.html) のスロットリングは HTTP 400 でも再試行対象なので、確認済みの例外名とステータスの組だけを写す。SDK 自体の再試行との合計回数にも上限を設ける。
+
+```typescript
+function normalizeDynamoDbError(error: unknown): AppError {
+  const name =
+    typeof error === "object" && error !== null
+      ? (error as { name?: unknown }).name
+      : undefined;
+  if (
+    readHttpStatus(error) === HTTP_STATUS.BAD_REQUEST &&
+    (name === "ProvisionedThroughputExceededException" ||
+      name === "ThrottlingException")
+  ) {
+    return new UpstreamError("DynamoDB throttled", { cause: error });
+  }
+  return normalizeExternalError(error);
 }
 ```
 
@@ -294,19 +358,17 @@ async function processUser(userId: string): Promise<Result<User>> {
     const processed = await processUserData(user);
     return Result.ok(processed);
   } catch (error) {
-    const normalizedError =
-      error instanceof Error ? error : new Error(String(error));
-    logger.error("Failed to process user", normalizedError, { userId });
+    logger.error("Failed to process user", error, { userId });
 
     // AppError はそのまま返す。ValidationError だけ通して残りを InternalError に
     // 降格させると、UnauthorizedError 等の never-fallback が permanent に化け、
     // 上位の fallbackInProdOnly が本番で握りつぶす
-    if (normalizedError instanceof AppError) {
-      return Result.fail(normalizedError);
+    if (error instanceof AppError) {
+      return Result.fail(error);
     }
 
     return Result.fail(
-      new InternalError("Processing failed", { cause: normalizedError }),
+      new InternalError("Processing failed", { cause: error }),
     );
   }
 }
@@ -321,6 +383,14 @@ async function processUser(userId: string): Promise<Result<User>> {
 詳細な戦略・パターン・テンプレートは [FALLBACK.md](./FALLBACK.md) を参照。
 
 ## Changelog
+
+### [2.0.0] - 2026-10-17
+
+#### 変更
+
+- **破壊的変更**: 原因不明の外部エラーと想定外の 1xx〜3xx を `UnknownExternalError`（never-fallback）へ分類し、既知のネットワークコードのみ一時障害として許可する。TypeError / SyntaxError の型名で内部バグと推測しない
+- AWS SDK v3 / Got のステータス配置を読み、無効な先頭候補でも後続を検査する
+- エラー処理例の cause に Error でない元の値もそのまま保持する
 
 ### [1.0.0] - 2026-10-15
 
