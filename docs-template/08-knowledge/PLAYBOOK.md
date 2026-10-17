@@ -1,12 +1,12 @@
 ---
 title: "PLAYBOOK"
-version: "1.70.0"
+version: "1.71.0"
 status: "approved"
 created: "2026-03-10"
-updated: "2026-10-16"
+updated: "2026-10-17"
 owner: "@fffokazaki"
 changeImpact: "medium"
-ace_entry_count: 67
+ace_entry_count: 71
 tags: [ace, playbook, knowledge-management]
 references:
   - https://github.com/feel-flow/ai-spec-driven-development/blob/HEAD/docs/ACE_FRAMEWORK.md
@@ -254,7 +254,7 @@ Markdown の anchor はラベル側ではなく URL 側の `#section` だけが�
 | Category | documentation-quality | Origin | PR #397 / Issue #396 |
 | Related | ACE-014 / ACE-015 |
 | Date | 2026-05-06 |
-| Helpful | 6 | Harmful | 0 |
+| Helpful | 7 | Harmful | 0 |
 | Status | active |
 
 番号・順序の横断変更は、想定の 2〜3 倍のファイルに散らばっている（PR #397 では想定 6 ファイルが実際は 10 ファイル）。番号への直接参照・順序の散文・状態の説明（「マージ前」等）・メタデータ・段階数への言及は、意味が等価でも字面が違うため、1 種類の grep キーワードでは拾いきれない。着手前に意味的に等価な複数の grep パターンで対象を全部列挙して作業リストに登録し、ナビゲーション表・対応表も対象に含め、「旧表現の grep ヒットなし」を受け入れ条件に書く（経緯として意図的に旧表現を残す注記は除外する）。
@@ -826,7 +826,7 @@ PR #551 では PATTERNS.md §3 を新設の ERRORS.md へ移し、配布物リ�
 | Category | tooling | Origin | PR #559 / Issue #418 |
 | Related | ACE-484-3 |
 | Date | 2026-10-15 |
-| Helpful | 0 | Harmful | 0 |
+| Helpful | 1 | Harmful | 0 |
 | Status | active |
 
 開発環境の npm が CI より古いメジャーだと、`npm uninstall` は新しい npm が記録したフィールド（`libc` など）を書き出せずに黙って落とし、無関係なエントリの制約まで消す。`libc` が消えたネイティブ依存は「制限なし」として扱われ、Linux で GNU・musl 両方の tarball を取得し得るが、`npm ci` もテストも通るため品質ゲートでは見つからない。lockfile v3 は生成元の npm 版を記録しないので、版は CI の `setup-node` の `node-version`（`engines.node` と揃えたもの）に同梱の npm から決め、`npx npm@<その版>` で再生成する（Node 24 なら npm 11）。再生成後は削除行だけでなく追加行も含む差分全体を見て、対象パッケージと推移依存のエントリの削除以外に何も動いていないことを確かめてからコミットする。
@@ -1009,7 +1009,7 @@ Windows の Git は `GIT_CONFIG_GLOBAL=NUL` / `GIT_CONFIG_SYSTEM=NUL` を `unabl
 
 | Category | tooling | Origin | PR #580 |
 | Date | 2026-10-16 |
-| Helpful | 0 | Harmful | 0 |
+| Helpful | 1 | Harmful | 0 |
 | Status | active |
 
 `*.sh text eol=lf` を足しても `.husky/pre-push` / `pre-commit` は対象外で、autocrlf=true の新規チェックアウトでは CRLF のまま残り、sh で実行されるフックが品質ゲートに届く前に落ちる（PR #580 で Codex が P1 として指摘。`.husky/* text eol=lf` と `.gitattributes text eol=lf` を追加して解決）。属性の追加は既存の作業ツリーには効かず、`git checkout -- <path>` 単独は stat が一致したままなので何もせず、`git add --renormalize` は index を直すだけで作業ツリーは残る。`git ls-files --eol | grep w/crlf` で対象を確かめ、未変更ファイルを削除してから checkout し直す手順を `.gitattributes` のコメントと手順書に書く。
@@ -1068,9 +1068,76 @@ Issue #509 は「DECISION_TREE.md の 2 箇所は PR #508 で修正済み」と�
 
 ---
 
+<a id="ace-584-1"></a>
+
+### ACE-584-1: Vitest や tsx は esbuild で変換して実行するだけで型を見ないので、`tsc --noEmit` を品質ゲートの独立した段に置き、型エラーを仕込んだ陽性対照で止まることを確かめる
+
+| Category | testing | Origin | PR #584 |
+| Date | 2026-10-17 |
+| Helpful | 0 | Harmful | 0 |
+| Status | active |
+
+テストランナーが TypeScript を実行できていても、esbuild の変換は型を検査しないので、ジェネリック返り値の取り違えのような型エラーはテストが緑のまま残る（PR #584 では mcp/ の型を借りた `tsc --strict` で初めて 15 件見つかった）。型検査は `tsc --noEmit -p tsconfig.json` を独立した段として品質ゲートに入れ、`include` が対象を拾っているかを `--listFilesOnly` の件数で確かめる。足した段は、型エラーを 1 件仕込んでゲート全体が段名と `ファイル:行` で止まることを実測してからマージする。
+
+---
+
+<a id="ace-584-2"></a>
+
+### ACE-584-2: Node 専用の tsconfig で `lib` を省くと `target` から DOM を含む lib が選ばれ、`document` などが型検査を通って実行時に ReferenceError になるので、`lib` を明示する
+
+| Category | coding | Origin | PR #584 |
+| Date | 2026-10-17 |
+| Helpful | 0 | Harmful | 0 |
+| Status | active |
+
+`lib` を書かない tsconfig は `target`（例: ES2024）から `lib.es2024.full.d.ts` を選び、DOM と window のグローバルが入る（PR #584 のレビューで指摘）。宣言し忘れた `name` / `status` / `document` などが型検査を通り、Node では `ReferenceError` で落ちるので、Node で動かすコードの tsconfig は `"lib": ["ES2024"]` のように DOM を含めずに明示し、`types: ["node"]` で無関係な `@types` の自動読み込みも止める。`document` を仕込むと TS2584 で止まることを確かめてから入れる。
+
+---
+
+<a id="ace-585-1"></a>
+
+### ACE-585-1: 正本から一方向に出力する文書は下流で手編集せず、追記は先に正本へ反映してから正本のマージ後コミットで出力し直す（出力物のバイト照合は Linux か Git オブジェクトで測る）
+
+| Category | architecture | Origin | PR #585 |
+| Date | 2026-10-17 |
+| Helpful | 0 | Harmful | 0 |
+| Status | active |
+
+出力物を下流で手編集すると記録した SHA と食い違い、次の出力で編集が消える。PR #585 では 4 文書のこちら側の追記が正本に入っておらず、正本側も別に進んでいたため、記録時点・下流・正本最新の 3 点で差分を取り、3 方向統合した PR を正本へ先に出してから出力し直した。出力前には計画の差分を読み、正本の記述が下流のゲート（例: markdownlint の bare URL）で止まるなら正本側で直す。未リリースの正本コミットから出力した回は「候補の検証」と記録し、`plugin.json` の版を公開済みの版と読み替えない。バイト照合は CRLF に変換される Windows の作業ツリーではなく、`git show <ref>:<path> | sha256sum` か Linux のクローンで行う。
+
+---
+
+<a id="ace-585-2"></a>
+
+### ACE-585-2: このリポジトリ自身の ACE 昇格例を PATTERNS §14 に置いても、正本からの再出力で外れるので、`/ace-refine` の PATTERNS 昇格（R3-d）の候補は承認しない
+
+| Category | knowledge-management | Origin | PR #585 |
+| Date | 2026-10-17 |
+| Helpful | 0 | Harmful | 0 |
+| Status | active |
+
+このリポジトリの `docs-template/03-implementation/PATTERNS.md` は正本 feelflow-plugins から出力する文書で、正本の汎用テンプレートには配布元自身の昇格例を入れないため、§14 へ昇格させた内容は次の出力で外れる（PR #585 で ACE-001 / ACE-445-1 / ACE-018 / ACE-489-1 の 4 件が外れた。ユーザー合意済み）。`/ace-refine` は PATTERNS.md に ID が無いエントリを毎回昇格の候補に挙げるので、このリポジトリで回すときは R3-d の候補を承認せず、昇格した知見は Playbook のエントリ（active のまま）を正とする。判断の正本は `docs/TEMPLATE_EXPORT.md`。
+
+---
+
 ## Changelog
 
 > [1.64.0] 以前の履歴は [PLAYBOOK-CHANGELOG.md](https://github.com/feel-flow/ai-spec-driven-development/blob/HEAD/docs-template/08-knowledge/PLAYBOOK-CHANGELOG.md) に移した（PLAYBOOK.md は /ace-setup で配布され、移動先は配置されないため絶対 URL）。
+
+### [1.71.0] - 2026-10-17
+
+#### 追加
+
+- ACE-584-1: Vitest や tsx は esbuild で変換して実行するだけで型を見ないので、`tsc --noEmit` を品質ゲートの独立した段に置き、型エラーを仕込んだ陽性対照で止まることを確かめる（PR #584）
+- ACE-584-2: Node 専用の tsconfig で `lib` を省くと `target` から DOM を含む lib が選ばれ、`document` などが型検査を通って実行時に ReferenceError になるので、`lib` を明示する（PR #584）
+- ACE-585-1: 正本から一方向に出力する文書は下流で手編集せず、追記は先に正本へ反映してから正本のマージ後コミットで出力し直す（出力物のバイト照合は Linux か Git オブジェクトで測る）（PR #585）
+- ACE-585-2: このリポジトリ自身の ACE 昇格例を PATTERNS §14 に置いても、正本からの再出力で外れるので、`/ace-refine` の PATTERNS 昇格（R3-d）の候補は承認しない（PR #585）
+
+#### カウンター更新
+
+- ACE-559-1: Helpful 0→1（PR #584 で `@types/node` を足したときに lockfile へ混ざった無関係な `libc` 欄の削除 10 か所を戻し、追加分 18 行だけにした）
+- ACE-018: Helpful 6→7（PR #585 で、再出力した親文書の段の順序変更に合わせて、出力対象外の子文書 8 件の段番号・前後関係を grep で洗い出して揃えた）
+- ACE-580-3: Helpful 0→1（PR #585 で、出力物のバイト照合を CRLF に変換される Windows の作業ツリーではなく Linux のクローンで行った）
 
 ### [1.70.0] - 2026-10-16
 

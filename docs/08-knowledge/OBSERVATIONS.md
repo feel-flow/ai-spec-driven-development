@@ -392,8 +392,8 @@ dry-run で grok-cli が `runtime-socket deny resolution failed` と出ても、
 
 ### OBS-025: 依存未導入のチェックアウトで `quality:local` を走らせると tsc の TS2688 で落ち、原因が「npm ci 未実行」だと読めない
 
-| Kind | problem | Count | 3 |
-| First | 2026-10-15 | Last | 2026-10-16 |
+| Kind | problem | Count | 4 |
+| First | 2026-10-15 | Last | 2026-10-17 |
 | Status | mitigated | Issue | feel-flow/ai-spec-driven-development#565 |
 
 `quality:local` は意図的に `npm ci` を含まないため、ルートと `mcp/` の `node_modules` が無いと最初の `build:mcp` が `Cannot find type definition file for 'node'` で落ち、型定義の不備に見えて 1 回ゲートを空費する → ゲート冒頭で `node_modules` の有無を検査し、無ければ `npm ci`（ルートと `mcp/`）を名指しして止めよ。
@@ -402,6 +402,7 @@ dry-run で grok-cli が `runtime-socket deny resolution failed` と出ても、
 - 2026-10-15: Issue #406 / PR #553 の PR 前ゲートで、ルートの `node_modules` はあったが `mcp/node_modules` が無く TS2688 で exit 2。`npm --prefix mcp ci` 後の再実行で通過
 - 2026-10-16: PR #562 の PR 前ゲートで `mcp/node_modules` が無く [3/8] が `'vitest' は認識されていません` で exit 1。`npm --prefix mcp ci` 後はルートの `node_modules` 不在で [4/8] が同じ形で落ち、`npm ci` 後に 3 周目を回した（Count 3 で昇格）
 - 2026-10-16: 対策完了を照合。PR #566（1520ca03）で `scripts/quality-local.sh` が段の前に root / mcp の `node_modules` を確かめ、不在なら名指しで `npm ci` / `npm --prefix mcp ci` を案内して exit 1 で止まることを develop で確認し、mitigated へ移した
+- 2026-10-17: knowledge コミットの push で pre-push の `quality:local` が [3/10] `check:ts` の TS2688（`@types/node`）で exit 2。`node_modules` は在ったが、`@types/node` を足した PR #584 のマージ後に `npm ci` しておらず古かった。`npm ci` 後に通過。#565（closed）の対策は意図的に「在る/無いだけ」を見る方針で、今回はその範囲外の再発（再発・Count 4）。構造案は `node_modules/.package-lock.json` と `package-lock.json` の不一致をゲート冒頭で検出することだが、#565 の方針変更になるため起票は利用者の判断へ回し、状態と参照は保持する
 
 ---
 
@@ -812,5 +813,33 @@ MSYS のパス変換が `wsl.exe` の引数にも掛かり、`/mnt/c/...` は `C
 Git Bash は `/tmp` を `C:/Users/<user>/AppData/Local/Temp` に写像するが、Windows の `python.exe` は引数の `/tmp/x` をそのまま解決して `FileNotFoundError` になる。シェルで書き出して Python で読む往復が黙って空振りする → 一時ファイルは `C:/...` または `/c/...` の絶対パス（scratchpad）で統一し、Python へはその絶対パスを渡す。heredoc で渡す Python ソースも Windows では UTF-8 で読まれないことがあるので、ファイルに書き出して `python -X utf8` で実行する
 
 - 2026-10-16: close-issue のエージェント（#509）と親（#509 の完了コメント更新）で Python が `/tmp/...` を開けず、置換が空振りした。scratchpad の絶対パスに替えて通った。同セッションで heredoc の Python ソースが非 UTF-8 で読まれて SyntaxError になる事象も 1 回（初回）
+
+---
+
+<a id="obs-054"></a>
+
+### OBS-054: 全件ゲートを WSL のクローンで回し、`finish.sh precheck` を Windows で回すと、ゲート記録が precheck 側に無いので鮮度が判定不能になる。WSL の apt 版 gh（2.45）は `closingIssuesReferences` を持たず precheck 自体が WSL で動かない
+
+| Kind | problem | Count | 1 |
+| First | 2026-10-17 | Last | 2026-10-17 |
+| Status | active | Issue | なし |
+
+ゲート記録はゲートを回したクローンの `.git/ff-dev-toolkit/` に残る。toolkit を入れていない WSL クローンでは記録が作られず、Windows の precheck に `--gate-record` で WSL のパスを渡しても読めない。precheck を WSL へ寄せると、Ubuntu の apt が配る gh 2.45 は `closingIssuesReferences` 欄を知らずに止まる → WSL で全件ゲートを回すなら、WSL の gh を公式リポジトリ（cli.github.com）の版へ上げ、ゲートと precheck を同じクローンで回す。上げられない回は `FRESH_STATUS=2` を受け入れ、ゲートの実測結果（段数・終了コード）を完了報告へ手で書く
+
+- 2026-10-17: PR #585 の precheck。WSL で `quality:local` 全 10 段を通したが、WSL の precheck は gh 2.45 で失敗し、Windows の precheck は WSL のゲート記録を読めず `FRESH_STATUS=2`。CHECKS=passed を根拠にマージした（初回）
+
+---
+
+<a id="obs-055"></a>
+
+### OBS-055: レビューの走行中ディレクトリ（`.review-results/.review-in-flight.d`）が空になるのを待つループは、完了したレーンの `.done.*` マーカーが残るため終わらない
+
+| Kind | problem | Count | 1 |
+| First | 2026-10-17 | Last | 2026-10-17 |
+| Status | active | Issue | なし |
+
+走行中ディレクトリには完了後も `.done.*` が残る設計なので、「ディレクトリが空」を終了条件にした待機はレーンが全部終わっても回り続ける → 待つなら `.done.*` を除いた走行中ファイルの有無で判定するか、レビューの完了通知（サブエージェントの終了）を待つ
+
+- 2026-10-17: PR #580〜#581 のレビュー後に置いたバックグラウンドの待機が終わらず、`.review-results/` を cleanup で消したときにようやく止まった（初回）
 
 ---
