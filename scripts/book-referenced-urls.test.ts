@@ -1,5 +1,6 @@
 import {
   existsSync,
+  mkdirSync,
   mkdtempSync,
   readFileSync,
   rmSync,
@@ -16,6 +17,7 @@ const REPO_URL = "https://github.com/feel-flow/ai-spec-driven-development";
 // ルート URL を開くと GitHub が既定ブランチの README を表示する
 const ROOT_LANDING_PATH = "README.md";
 // /blob/<ref>/<path> と /tree/<ref>/<path>。<ref> にスラッシュを含むブランチ名は書籍に載せない前提
+// （載せると <ref> の残りがパス側に入り、repoPath 不一致として失敗する）
 const DEEP_LINK = /^\/(?:blob|tree)\/[^/]+\/(.+)$/;
 
 interface Entry {
@@ -49,53 +51,37 @@ function findProblems(entries: Entry[], root: string): string[] {
   return problems;
 }
 
+// [url, repoPath, 期待する問題文の一部（null は問題なし）]
+const SELF_TEST_CASES: [string, string, string | null][] = [
+  [REPO_URL, "README.md", null],
+  [`${REPO_URL}/`, "README.md", null],
+  [`${REPO_URL}/tree/develop/docs`, "docs", null],
+  [`${REPO_URL}/blob/develop/docs/GONE.md`, "docs/GONE.md", "が存在しない"],
+  // repoPath 側は実在させ、不一致の分岐だけが検出役になるようにする
+  [`${REPO_URL}/blob/develop/docs/GONE.md`, "README.md", "repoPath が"],
+  [`${REPO_URL}#readme`, "README.md", "アンカー付き URL"],
+  [`${REPO_URL}/issues/468`, "README.md", "blob / tree 以外"],
+  [
+    "https://github.com/feel-flow/other",
+    "README.md",
+    "本リポジトリの URL ではない",
+  ],
+];
+
 describe("book-referenced URLs stay resolvable (Issue #468)", () => {
-  it("reports missing targets, mismatched paths and unverified anchors", () => {
+  it("reports each kind of broken entry by its own branch", () => {
     const root = mkdtempSync(join(tmpdir(), "book-urls-"));
     try {
       writeFileSync(join(root, "README.md"), "");
-      expect(
-        findProblems([{ url: REPO_URL, repoPath: "README.md" }], root),
-      ).toEqual([]);
-      expect(
-        findProblems(
-          [
-            {
-              url: `${REPO_URL}/blob/develop/docs/GONE.md`,
-              repoPath: "docs/GONE.md",
-            },
-          ],
-          root,
-        ),
-      ).toHaveLength(1);
-      expect(
-        findProblems(
-          [
-            {
-              url: `${REPO_URL}/blob/develop/README.md`,
-              repoPath: "docs/OTHER.md",
-            },
-          ],
-          root,
-        ),
-      ).toHaveLength(1);
-      expect(
-        findProblems(
-          [{ url: `${REPO_URL}#readme`, repoPath: "README.md" }],
-          root,
-        ),
-      ).toHaveLength(1);
-      expect(
-        findProblems(
-          [
-            {
-              url: "https://github.com/feel-flow/other",
-              repoPath: "README.md",
-            },
-          ],
-          root,
-        ),
-      ).toHaveLength(1);
+      mkdirSync(join(root, "docs"));
+      for (const [url, repoPath, problem] of SELF_TEST_CASES) {
+        const found = findProblems([{ url, repoPath }], root);
+        if (problem === null) {
+          expect(found, url).toEqual([]);
+        } else {
+          expect(found, url).toEqual([expect.stringContaining(problem)]);
+        }
+      }
     } finally {
       rmSync(root, { recursive: true, force: true });
     }
