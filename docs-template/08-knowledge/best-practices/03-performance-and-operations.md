@@ -159,6 +159,8 @@ async function processUsersSequentially(userIds: string[]): Promise<User[]> {
 
 ```typescript
 import winston from "winston";
+// PATTERNS.md §9 の serializeError を共通 logger モジュールから公開する
+import { serializeError } from "./logger";
 
 const logger = winston.createLogger({
   level: "info",
@@ -191,12 +193,14 @@ class UserService {
 
       return { success: true, data: user };
     } catch (error) {
-      // Logger 規約（PATTERNS.md §9）: error(message, error: unknown, meta?)。
-      // 元の値を第 2 引数で渡し、Logger 側で serializeError により構造化する
+      // Winston の meta 引数へ、共通 serializeError の結果を明示して渡す。
       // 作成に失敗した時点では userId は確定していないので requestId で追跡する
-      logger.error("Failed to create user", error, { requestId: req.id });
+      logger.error("Failed to create user", {
+        error: serializeError(error),
+        requestId: req.id,
+      });
 
-      return { success: false, error: err };
+      return { success: false, error };
     }
   }
 }

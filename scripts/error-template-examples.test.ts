@@ -78,3 +78,34 @@ test.each([
     JSON.stringify(results),
   ).toBe(true);
 });
+
+test.each([false, true])(
+  "性能ガイドの失敗返却を実行し、未定義 err の変異も検出する: %s",
+  async (mutate) => {
+    const input = {
+      ...documents(),
+      performance: read(
+        "08-knowledge/best-practices/03-performance-and-operations.md",
+      ),
+    };
+    if (mutate) {
+      const needle = "return { success: false, error };";
+      expect(input.performance.split(needle)).toHaveLength(2);
+      input.performance = input.performance.replace(
+        needle,
+        "return { success: false, error: err };",
+      );
+    }
+    const { verifyPerformanceExample } = await import(
+      fileURLToPath(new URL("./error-template-examples.mjs", import.meta.url))
+    );
+    const results: { pass: boolean; label: string; detail?: string }[] = [];
+    await verifyPerformanceExample(
+      input,
+      (pass: boolean, label: string, detail?: string) =>
+        results.push({ pass, label, detail }),
+    );
+    expect(results, JSON.stringify(results)).toHaveLength(1);
+    expect(results[0].pass, JSON.stringify(results)).toBe(!mutate);
+  },
+);

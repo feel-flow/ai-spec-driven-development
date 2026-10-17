@@ -11,7 +11,7 @@ description: >-
   and HTTP status code mapping. Use when implementing error handling,
   reviewing catch blocks, or designing error responses.
 metadata:
-  version: "1.2.0"
+  version: "1.2.1"
   author: feel-flow
   tags: "error-handling, result-pattern, custom-errors, logging, silent-error"
   references: "docs/03-implementation/ERRORS.md, docs/03-implementation/PATTERNS.md, docs/03-implementation/FALLBACK.md, docs/MASTER.md"
@@ -102,19 +102,18 @@ class ValidationError extends AppError {
 
 ## 3. エラーコードと HTTP ステータスコード
 
-| エラークラス          | エラーコード           | HTTP ステータス | 分類           | 用途                                                                             |
-| --------------------- | ---------------------- | --------------- | -------------- | -------------------------------------------------------------------------------- |
-| ValidationError       | `VALIDATION_ERROR`     | 400             | never-fallback | 入力バリデーション失敗                                                           |
-| UnauthorizedError     | `UNAUTHORIZED`         | 401             | never-fallback | 未認証                                                                           |
-| ForbiddenError        | `FORBIDDEN`            | 403             | never-fallback | 権限不足                                                                         |
-| SecurityError         | `SECURITY_VIOLATION`   | 403             | never-fallback | 署名不一致・改ざん検知                                                           |
-| NotFoundError         | `NOT_FOUND`            | 404             | permanent      | リソース未検出                                                                   |
-| ConflictError         | `CONFLICT`             | 409             | never-fallback | 重複・競合                                                                       |
-| InternalError         | `INTERNAL_ERROR`       | 500             | permanent      | 予期しない内部エラー                                                             |
-| UpstreamError         | `UPSTREAM_UNAVAILABLE` | 502             | transient      | 外部サービスの一時障害（再試行可）                                               |
-| UpstreamRejectedError | `UPSTREAM_REJECTED`    | 502             | never-fallback | 外部サービスによる恒久的な拒否（自コードの要求誤り。本番でフォールバックしない） |
-
-| UnknownExternalError | `UNKNOWN_EXTERNAL_ERROR` | 502 | never-fallback | 原因不明の外部エラー（推測で再試行・フォールバックしない） |
+| エラークラス          | エラーコード             | HTTP ステータス | 分類           | 用途                                                                             |
+| --------------------- | ------------------------ | --------------- | -------------- | -------------------------------------------------------------------------------- |
+| ValidationError       | `VALIDATION_ERROR`       | 400             | never-fallback | 入力バリデーション失敗                                                           |
+| UnauthorizedError     | `UNAUTHORIZED`           | 401             | never-fallback | 未認証                                                                           |
+| ForbiddenError        | `FORBIDDEN`              | 403             | never-fallback | 権限不足                                                                         |
+| SecurityError         | `SECURITY_VIOLATION`     | 403             | never-fallback | 署名不一致・改ざん検知                                                           |
+| NotFoundError         | `NOT_FOUND`              | 404             | permanent      | リソース未検出                                                                   |
+| ConflictError         | `CONFLICT`               | 409             | never-fallback | 重複・競合                                                                       |
+| InternalError         | `INTERNAL_ERROR`         | 500             | permanent      | 予期しない内部エラー                                                             |
+| UpstreamError         | `UPSTREAM_UNAVAILABLE`   | 502             | transient      | 外部サービスの一時障害（再試行可）                                               |
+| UpstreamRejectedError | `UPSTREAM_REJECTED`      | 502             | never-fallback | 外部サービスによる恒久的な拒否（自コードの要求誤り。本番でフォールバックしない） |
+| UnknownExternalError  | `UNKNOWN_EXTERNAL_ERROR` | 502             | never-fallback | 原因不明の外部エラー（推測で再試行・フォールバックしない）                       |
 
 すべて ERRORS.md で定義済み。新しいエラー種別が必要な場合は、必ず AppError を継承し `category` を宣言して作成する（宣言しないとコンパイルエラーになる）。
 
@@ -204,7 +203,7 @@ try {
 
 - `instanceof` でエラー型をチェック
 - 具体的なエラーから順に処理
-- 未知のエラーは `InternalError` でラップして再スロー（`{ cause }` で元エラーを保持）
+- 内部の不具合と確認したエラーは `InternalError` でラップして再スロー（`{ cause }` で元の値を保持）。分類不能な外部エラーは `normalizeExternalError()` に渡し `UnknownExternalError`（never-fallback）にする
 - 元のエラー情報は必ずログに記録
 - 外部 SDK / HTTP クライアントのエラーは境界で `normalizeExternalError()`（ERRORS.md）により AppError へ正規化する
 
@@ -232,9 +231,7 @@ try {
 
 - `level`: エラーレベル（error / warn / info）
 - `message`: 人間が読めるエラー説明
-- `error.name`: エラークラス名
-- `error.message`: エラーメッセージ
-- `error.stack`: スタックトレース
+- `error`: `serializeError()` が返す構造化情報。Error は name / message / stack、非 Error は status / body または shape など、実際に取得できたフィールドを記録する（欠けた情報を作らない）
 - `timestamp`: ISO 8601 形式
 
 **禁止事項:**
@@ -252,10 +249,10 @@ try {
 - [ ] エラーコードと HTTP ステータスが正しくマッピングされているか
 - [ ] Result パターンが適切に使用されているか
 - [ ] `instanceof` でエラー型をチェックしているか
-- [ ] 未知のエラーが `InternalError` でラップされているか
+- [ ] 内部不具合は `InternalError`、分類不能な外部エラーは `UnknownExternalError` として区別し、元の cause を保持しているか
 - [ ] ログに個人情報が含まれていないか
 - [ ] ユーザー向けレスポンスにスタックトレースが露出していないか
-- [ ] フォールバック処理が環境分岐されているか（開発時スロー / 本番時フォールバック）
+- [ ] フォールバック処理は明示的な production だけで許可し、禁止カテゴリは環境にかかわらずスローしているか
 - [ ] AI生成のtry-catch + デフォルト値返却パターンが残っていないか
 
 ## 8. AI生成コードのフォールバックアンチパターン

@@ -267,3 +267,60 @@ export async function verifyErrorExamples(documents, check) {
     );
   }
 }
+
+// 手動移植する兄弟文書も実コードを通し、主要文書だけの成功で見落とさない。
+export async function verifyPerformanceExample(documents, check) {
+  try {
+    const captured = [];
+    const context = createContext({
+      assert,
+      req: { id: "request-test" },
+      captured,
+      winston: {
+        createLogger: () => ({
+          info() {},
+          error(...args) {
+            assert.equal(args.length, 2, "Winston receives structured meta");
+            captured.push(args[1]);
+          },
+        }),
+        format: { combine() {}, timestamp() {}, errors() {}, json() {} },
+        transports: { File: class {} },
+      },
+    });
+    run(block(documents.errors, "abstract class AppError"), context);
+    run(block(documents.errors, "function normalizeExternalError("), context);
+    run(block(documents.patterns, "interface Logger {"), context);
+    run(
+      block(
+        documents.performance,
+        "const logger = winston.createLogger({",
+      ).replace(/^import .*;\n/gm, ""),
+      context,
+    );
+    await run(
+      `(async () => {
+      for (const original of [{ status: 503, body: { reason: "upstream" } }, new Error("failure"), "failure", null]) {
+        const service = new UserService();
+        service.userRepository = { create: async () => { throw original; } };
+        captured.length = 0;
+        const result = await service.createUser({ email: "must-not-log@example.test" });
+        assert.equal(result.success, false);
+        assert.equal(result.error, original);
+        assert.equal(captured.length, 1);
+        assert.deepEqual(captured[0].error, serializeError(original));
+        assert.equal(captured[0].requestId, "request-test");
+        assert.equal(Object.hasOwn(captured[0], "userId"), false);
+        assert.ok(!JSON.stringify(captured).includes("must-not-log@example.test"));
+      }
+    })()`,
+      context,
+    );
+    check(
+      true,
+      "性能ガイドの失敗経路: 元の unknown 返却・Winston構造化ログ・requestId",
+    );
+  } catch (error) {
+    check(false, "性能ガイドの実コード実行", error.stack);
+  }
+}
