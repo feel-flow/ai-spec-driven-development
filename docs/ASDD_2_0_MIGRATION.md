@@ -1,7 +1,7 @@
 ---
 id: asdd-2-0-migration
 title: AI仕様駆動開発2.0 導入・移行ガイド
-version: 1.3.0
+version: 2.0.0
 status: active
 created: 2026-09-08
 updated: 2026-10-18
@@ -10,7 +10,7 @@ tags: [asdd, migration, setup]
 references:
   - docs/ASDD_2_0.md
   - docs/ASDD_2_0_CONFORMANCE.md
-changeImpact: medium
+changeImpact: high
 visibility: public
 ---
 
@@ -97,6 +97,10 @@ AIは目的・利用者・完成条件を整理し、保存先・範囲、推奨
 方法論・スキル・テンプレート・書籍は同じ仕様を参照しつつ、マージ済み、配布済み、利用確認済みを個別に記録する。方法論文書のPRをマージしただけで2.0全体を公開完了と報告しない。
 
 ## Changelog
+
+### [2.0.0] - 2026-10-18
+
+- 変更: 1.2.0〜1.3.0 で追記した「設定がなく生成管理情報だけが残る状態は従来環境として扱わない」は、「設定なしは従来動作」の再定義にあたる破壊的変更のため、標準仕様・適合条件（いずれも 2.0.0）とそろえて版をメジャーへ、`changeImpact` を `high` へ改める（本文は 1.3.0 から不変。#596）。
 
 ### [1.3.0] - 2026-10-18
 
