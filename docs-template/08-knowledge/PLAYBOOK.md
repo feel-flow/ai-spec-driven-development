@@ -1,12 +1,12 @@
 ---
 title: "PLAYBOOK"
-version: "1.75.0"
+version: "1.76.0"
 status: "approved"
 created: "2026-03-10"
-updated: "2026-10-17"
+updated: "2026-10-18"
 owner: "@fffokazaki"
 changeImpact: "medium"
-ace_entry_count: 78
+ace_entry_count: 79
 tags: [ace, playbook, knowledge-management]
 references:
   - https://github.com/feel-flow/ai-spec-driven-development/blob/HEAD/docs/ACE_FRAMEWORK.md
@@ -1211,9 +1211,29 @@ Issue #509 は「DECISION_TREE.md の 2 箇所は PR #508 で修正済み」と�
 
 ---
 
+<a id="ace-593-1"></a>
+
+### ACE-593-1: 版を明記したツールの制約は、修正が公開リリースのタグに入ったことを確かめてから版別の記述へ書き換え、旧版の挙動は消さずに残す
+
+| Category | documentation-quality | Origin | PR #593 |
+| Date | 2026-10-18 |
+| Helpful | 0 | Harmful | 0 |
+| Status | active |
+
+修正 PR がマージされても、利用者に届くのは公開リリースに入った後であり、旧版を使い続ける利用者には旧記述が正しいままである。リリース日時と修正のマージ日時を比べ、リリースタグ上のコードに修正の識別子があることと、タグから取得した実装で禁止状態の判定を実測する（develop やローカルの plugin cache では測らない）。そのうえで「vX 以降」「vY 以前」の二つに書き分け、復旧手順は両方の版で通る形にする。
+
+---
+
 ## Changelog
 
 > [1.64.0] 以前の履歴は [PLAYBOOK-CHANGELOG.md](https://github.com/feel-flow/ai-spec-driven-development/blob/HEAD/docs-template/08-knowledge/PLAYBOOK-CHANGELOG.md) に移した（PLAYBOOK.md は /ace-setup で配布され、移動先は配置されないため絶対 URL）。
+
+### [1.76.0] - 2026-10-18
+
+#### 追加
+
+- ACE-593-1: 版を明記したツールの制約は、修正が公開リリースのタグに入ったことを確かめてから版別の記述へ書き換え、旧版の挙動は残す（PR #593）
+- domain: 評価済み（候補 0 件）。PR は移行ガイドの版別記述の更新で、業務ルールの知見を含まない
 
 ### [1.75.0] - 2026-10-17
 

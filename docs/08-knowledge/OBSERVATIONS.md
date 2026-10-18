@@ -170,8 +170,8 @@ AC の grep を頭で組んで起票すると、検出式の穴（表記の必�
 
 ### OBS-010: ACE 系スキルは PLAYBOOK を `docs/08-knowledge/` 固定で参照するが、テンプレ配布リポジトリでは実体が `docs-template/08-knowledge/` にある
 
-| Kind | problem | Count | 8 |
-| First | 2026-09-06 | Last | 2026-10-17 |
+| Kind | problem | Count | 9 |
+| First | 2026-09-06 | Last | 2026-10-18 |
 | Status | promoted | Issue | feel-flow/feelflow-plugins#2142 |
 
 既定パスで grep・frontmatter 読みを組むと全コマンドが not found で空振りし、パスを直して再実行する往復が出る → 着手時に `package.json` の `ace:*` スクリプトが指すパスで実配置を確定してからコマンドを組む（`/retrospective` の「知見ストアの実配置を確定する」と同じ手順を curate 側にも置く余地）。
@@ -186,6 +186,7 @@ AC の grep を頭で組んで起票すると、検出式の穴（表記の必�
 - 2026-10-17: Issue #586 の着手前参照で、正本の knowledge-lookup が既定解決では Playbook absent を返した。実在する docs-template/08-knowledge/PLAYBOOK.md を --playbook で指定して再実行した（再発・Count 6。feel-flow/feelflow-plugins#2142 は open）
 - 2026-10-17: PR #589 の curate で、スキル例示の `docs/08-knowledge/PLAYBOOK.md` を `ls` すると OBSERVATIONS.md しか無く、`package.json` の `ace:*` が指す `docs-template/08-knowledge/` を確かめ直して 1 往復（再発・Count 7。feel-flow/feelflow-plugins#2142 は open）
 - 2026-10-17: PR #591 の curate で、実配置を直近 ACE コミットの `--stat` で特定した後も、同期検証・形式ゲートを `docs-template/scripts/ace/` 配下と見なして `npx tsx` で起動し、2 本とも `ERR_MODULE_NOT_FOUND`。同梱版（`ace-run-ts.sh`）で再実行して 1 往復（再発・Count 8。feel-flow/feelflow-plugins#2142 は open）
+- 2026-10-18: PR #593 の curate で、`package.json` の `ace:check-playbook-categories` が `docs-template/scripts/ace/` を指すため同期検証・形式ゲートも同じ配下と見なして `npx tsx` で起動し、2 本とも `ERR_MODULE_NOT_FOUND`。同梱版（`ace-run-ts.sh`）で再実行して 1 往復（再発・Count 9。PR #591 と同じ形。feel-flow/feelflow-plugins#2142 は open）
 
 ---
 
