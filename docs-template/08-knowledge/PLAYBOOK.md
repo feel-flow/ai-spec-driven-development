@@ -268,7 +268,7 @@ Markdown の anchor はラベル側ではなく URL 側の `#section` だけが�
 | Category | process | Origin | PR #397 / Issue #396 |
 | Related | ACE-012（修正対象） |
 | Date | 2026-05-06 |
-| Helpful | 2 | Harmful | 0 |
+| Helpful | 3 | Harmful | 0 |
 | Status | active |
 
 既存ルールに違反する新パターンを導入するとき、該当箇所に「これは X の例外」と明示しないと暗黙の方針分裂が生じ、後続の AI やレビュアーが違反として扱う（PR #397 では develop への直 commit を許すパターンが ACE-012 と衝突し、Critical 指摘を受けた）。新しい運用・規約を入れる前に「禁止」「MUST NOT」等の対立ルールを grep で列挙し、例外として明示するか、旧ルールを deprecated にするか、新パターンを撤回するかを選ぶ。例外は「宣言・許す条件・適用しないケース」の 3 点をそろえ、複数箇所に書くなら同じ文言にする。
@@ -918,7 +918,7 @@ Windows の Node は、`spawnSync` の実行ファイルを子の `env.PATH` か
 
 | Category | documentation-quality | Origin | PR #578 |
 | Date | 2026-10-16 |
-| Helpful | 0 | Harmful | 0 |
+| Helpful | 1 | Harmful | 0 |
 | Status | active |
 
 索引への 1 行追加のような小さな追記でも、version を上げずに「YYYY-MM-DD 追記」の行だけを足すと、frontmatter の updated と本文の日付が食い違い、利用者や版差分を読む処理が新しい索引を旧版の内容と誤認する（PR #578 では Toolkit と Codex が独立に同じ漏れを指摘した）。前の PR が残した古い changeImpact も次の bump で引き継がれるので、minor なら medium、patch なら low に合わせて置き直す。文書を変更する PR では、追記の大小にかかわらず 4 点を 1 セットで更新し、版付きの Changelog エントリに記録する。
@@ -1234,6 +1234,11 @@ Issue #509 は「DECISION_TREE.md の 2 箇所は PR #508 で修正済み」と�
 
 - ACE-593-1: 版を明記したツールの制約は、修正が公開リリースのタグに入ったことを確かめてから版別の記述へ書き換え、旧版の挙動は残す（PR #593）
 - domain: 評価済み（候補 0 件）。PR は移行ガイドの版別記述の更新で、業務ルールの知見を含まない
+
+#### カウンター更新
+
+- ACE-578-1: Helpful 0→1（PR #595 で、前の PR が残した `changeImpact: high` をマイナー bump に合わせて `medium` へ置き直した）
+- ACE-019: Helpful 2→3（PR #595 で、§4 に追加した設定欠落の例外と食い違う冒頭の無条件の保証へ、同じ例外を明示した）
 
 ### [1.75.0] - 2026-10-17
 

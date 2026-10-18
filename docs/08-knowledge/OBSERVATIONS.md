@@ -863,3 +863,17 @@ Git Bash は `/tmp` を `C:/Users/<user>/AppData/Local/Temp` に写像するが�
 - 2026-10-17: Issue #468 は 2026-09-06 と 2026-09-14 の棚卸しで「書籍原稿の参照箇所一覧の提供待ち」とされていたが、手元の書籍原稿リポジトリの全履歴と配布 HTML から 1 セッションで一覧を抽出し、PR #589 でマージまで進んだ（初回）
 
 ---
+
+<a id="obs-057"></a>
+
+### OBS-057: Codex CLI のレビューが 0 件でも、PR 上の Codex 自動レビューは別の指摘を返すことがあり、その完了前にマージすると指摘がマージ後に届いて follow-up の Issue と PR が要る
+
+| Kind | problem | Count | 1 |
+| First | 2026-10-18 | Last | 2026-10-18 |
+| Status | active | Issue | なし |
+
+`/multi-review` の fast 経路で Codex CLI レーンが完走して 0 件でも、同じ head に対する PR 上の Codex 自動レビューは別のプロンプト・文脈で動くため、異なる指摘を返す。マージ直前に PR コメントの `codex-review-state` の `status` が `completed` になっているかを確かめ、`running` なら完了を待ってからマージ判断する（OBS-035 の「CLI 不在時は待つ」を CLI がある回にも広げる形）。
+
+- 2026-10-18: PR #593 を bot の `status: running` のままマージし、P2 指摘 2 件（`changeImpact` と版の不一致、冒頭の無条件の保証）がマージ後に届いた。follow-up の #594 / PR #595 で解消し、PR #595 では bot の `completed` / 指摘なしを確かめてからマージした（初回）
+
+---
