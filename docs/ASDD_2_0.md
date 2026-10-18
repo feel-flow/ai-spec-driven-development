@@ -1,7 +1,7 @@
 ---
 id: asdd-2-0
 title: AI仕様駆動開発2.0 標準仕様
-version: 1.3.0
+version: 2.0.0
 status: active
 created: 2026-09-08
 updated: 2026-10-18
@@ -10,7 +10,7 @@ tags: [asdd, standard, dialogue, citizen-development]
 references:
   - docs/ASDD_2_0_CONFORMANCE.md
   - docs/ASDD_2_0_MIGRATION.md
-changeImpact: medium
+changeImpact: high
 visibility: public
 ---
 
@@ -154,6 +154,10 @@ SBOMは継続運用・外部公開で採用を検討する推奨候補とし、P
 2.0の公開方法論は本リポジトリ、スキル・生成処理・配布テンプレートは `feelflow-plugins`、公開プラグインは `ff-dev-toolkit` への一方向同期、書籍原稿は `ai-books` を正本とする。同一内容を各リポジトリで独立改訂しない。公開側で編集する標準・案内は [編集元の限定リスト](../scripts/public-owned-docs.json) で保護し、他の同期元で上書きしない。非公開の詳細知見・事例は別管理を維持する。直接利用用テンプレートの同期は [Issue #525](https://github.com/feel-flow/ai-spec-driven-development/issues/525) で追跡する。
 
 ## Changelog
+
+### [2.0.0] - 2026-10-18
+
+- 変更: 1.3.0 の例外追記は「設定なし」の再定義にあたる。生成管理情報だけが残る状態を従来動作として扱っていた実装が、以前の文面には沿い、新しい文面には反する破壊的変更のため、版をメジャーへ、`changeImpact` を `high` へ改める（本文は 1.3.0 から不変。#596）。
 
 ### [1.3.0] - 2026-10-18
 
