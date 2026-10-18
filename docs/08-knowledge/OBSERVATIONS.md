@@ -170,7 +170,7 @@ AC の grep を頭で組んで起票すると、検出式の穴（表記の必�
 
 ### OBS-010: ACE 系スキルは PLAYBOOK を `docs/08-knowledge/` 固定で参照するが、テンプレ配布リポジトリでは実体が `docs-template/08-knowledge/` にある
 
-| Kind | problem | Count | 9 |
+| Kind | problem | Count | 10 |
 | First | 2026-09-06 | Last | 2026-10-18 |
 | Status | promoted | Issue | feel-flow/feelflow-plugins#2142 |
 
@@ -187,6 +187,7 @@ AC の grep を頭で組んで起票すると、検出式の穴（表記の必�
 - 2026-10-17: PR #589 の curate で、スキル例示の `docs/08-knowledge/PLAYBOOK.md` を `ls` すると OBSERVATIONS.md しか無く、`package.json` の `ace:*` が指す `docs-template/08-knowledge/` を確かめ直して 1 往復（再発・Count 7。feel-flow/feelflow-plugins#2142 は open）
 - 2026-10-17: PR #591 の curate で、実配置を直近 ACE コミットの `--stat` で特定した後も、同期検証・形式ゲートを `docs-template/scripts/ace/` 配下と見なして `npx tsx` で起動し、2 本とも `ERR_MODULE_NOT_FOUND`。同梱版（`ace-run-ts.sh`）で再実行して 1 往復（再発・Count 8。feel-flow/feelflow-plugins#2142 は open）
 - 2026-10-18: PR #593 の curate で、`package.json` の `ace:check-playbook-categories` が `docs-template/scripts/ace/` を指すため同期検証・形式ゲートも同じ配下と見なして `npx tsx` で起動し、2 本とも `ERR_MODULE_NOT_FOUND`。同梱版（`ace-run-ts.sh`）で再実行して 1 往復（再発・Count 9。PR #591 と同じ形。feel-flow/feelflow-plugins#2142 は open）
+- 2026-10-18: PR #598 の curate で、`docs/08-knowledge/PLAYBOOK.md` を既定パスで grep して not found。直近の `knowledge:` コミットの `--stat` で `docs-template/08-knowledge/PLAYBOOK.md` を特定し直す 1 往復。検査スクリプトは最初から同梱版（`ace-run-ts.sh`）で起動し、`ERR_MODULE_NOT_FOUND` は出なかった（再発・Count 10）
 
 ---
 
@@ -868,12 +869,13 @@ Git Bash は `/tmp` を `C:/Users/<user>/AppData/Local/Temp` に写像するが�
 
 ### OBS-057: Codex CLI のレビューが 0 件でも、PR 上の Codex 自動レビューは別の指摘を返すことがあり、その完了前にマージすると指摘がマージ後に届いて follow-up の Issue と PR が要る
 
-| Kind | problem | Count | 1 |
+| Kind | problem | Count | 2 |
 | First | 2026-10-18 | Last | 2026-10-18 |
 | Status | active | Issue | なし |
 
 `/multi-review` の fast 経路で Codex CLI レーンが完走して 0 件でも、同じ head に対する PR 上の Codex 自動レビューは別のプロンプト・文脈で動くため、異なる指摘を返す。マージ直前に PR コメントの `codex-review-state` の `status` が `completed` になっているかを確かめ、`running` なら完了を待ってからマージ判断する（OBS-035 の「CLI 不在時は待つ」を CLI がある回にも広げる形）。
 
 - 2026-10-18: PR #593 を bot の `status: running` のままマージし、P2 指摘 2 件（`changeImpact` と版の不一致、冒頭の無条件の保証）がマージ後に届いた。follow-up の #594 / PR #595 で解消し、PR #595 では bot の `completed` / 指摘なしを確かめてからマージした（初回）
+- 2026-10-18: PR #597 を、fast 経路の Codex CLI が 0 件だった直後にマージしたところ、PR 上の Codex 自動レビュー（マージ時点で集計コメントは既に「指摘あり・completed」）の P2 3 件がマージの 4 秒後にスレッドとして届いた。#596 を再オープンして PR #598 で直し、その初回コミットにも P2 が 2 件付いた。修正コミットの push では Codex は自動で再レビューしないため、`@codex review` で依頼し、`c67ccb1` の completed・指摘なしを確かめてからマージした。Codex CLI は 2 回とも 0 件で、妥当な指摘 5 件はすべて PR 上の Codex だけが出した（再発・Count 2）
 
 ---

@@ -1,12 +1,12 @@
 ---
 title: "PLAYBOOK"
-version: "1.76.0"
+version: "1.77.0"
 status: "approved"
 created: "2026-03-10"
 updated: "2026-10-18"
 owner: "@fffokazaki"
 changeImpact: "medium"
-ace_entry_count: 79
+ace_entry_count: 81
 tags: [ace, playbook, knowledge-management]
 references:
   - https://github.com/feel-flow/ai-spec-driven-development/blob/HEAD/docs/ACE_FRAMEWORK.md
@@ -918,7 +918,7 @@ Windows の Node は、`spawnSync` の実行ファイルを子の `env.PATH` か
 
 | Category | documentation-quality | Origin | PR #578 |
 | Date | 2026-10-16 |
-| Helpful | 1 | Harmful | 0 |
+| Helpful | 2 | Harmful | 0 |
 | Status | active |
 
 索引への 1 行追加のような小さな追記でも、version を上げずに「YYYY-MM-DD 追記」の行だけを足すと、frontmatter の updated と本文の日付が食い違い、利用者や版差分を読む処理が新しい索引を旧版の内容と誤認する（PR #578 では Toolkit と Codex が独立に同じ漏れを指摘した）。前の PR が残した古い changeImpact も次の bump で引き継がれるので、minor なら medium、patch なら low に合わせて置き直す。文書を変更する PR では、追記の大小にかかわらず 4 点を 1 セットで更新し、版付きの Changelog エントリに記録する。
@@ -1165,7 +1165,7 @@ Issue #509 は「DECISION_TREE.md の 2 箇所は PR #508 で修正済み」と�
 
 | Category | testing | Origin | PR #589 |
 | Date | 2026-10-17 |
-| Helpful | 0 | Harmful | 0 |
+| Helpful | 1 | Harmful | 0 |
 | Status | active |
 
 1 つの入力が複数の判定に当たると、狙いの判定を消しても後段の判定が代わりに問題を出し、「1 件出る」を確かめるテストは緑のまま残る。ある判定を確かめるケースでは、それ以外の判定は満たす入力（参照先は実在させる等）にする。期待値は件数ではなく問題文の一部で照合し、狙いの判定を消す変異で赤になることを確かめる。
@@ -1224,9 +1224,48 @@ Issue #509 は「DECISION_TREE.md の 2 箇所は PR #508 で修正済み」と�
 
 ---
 
+<a id="ace-598-1"></a>
+
+### ACE-598-1: 適合条件や例外の境界は正本の判定条件そのもので書き、ディレクトリの有無のような近い代理条件に置き換えない
+
+| Category | documentation-quality | Origin | PR #598 |
+| Date | 2026-10-18 |
+| Helpful | 0 | Harmful | 0 |
+| Status | active |
+
+代理条件は一見同じ範囲を指すが、境界の外側で食い違い、正常な構成を試験から落とすか、別の理由で動作を変える実装を合格させる（PR #597 では「`.asdd/` 自体がない」と書き、空の `.asdd/` だけがある未移行構成を C7 から外した）。正本が「どのファイルが残っているか」で判定しているなら、条件文も同じ判定材料で書き、境界上の構成（空ディレクトリ・別用途のファイルだけ）をどちらに含めるかを明記する。同じ状態に至る経路が複数あるなら、経路ごとに前提手順を分けて試験する。
+
+---
+
+<a id="ace-598-2"></a>
+
+### ACE-598-2: 規範の「〜は従来どおり」に例外を足す変更や適合条件を狭める変更は、以前の文面に沿っていた実装を不適合にするので破壊的変更として扱い、同じ規則を書く文書をすべて同じ版区分にそろえる
+
+| Category | documentation-quality | Origin | PR #598 |
+| Date | 2026-10-18 |
+| Helpful | 0 | Harmful | 0 |
+| Status | active |
+
+例外の追記は「説明を足しただけ」に見えるためマイナー扱いにされやすいが、旧文面どおりに作った実装が新文面では違反になるなら既存概念の再定義である（PR #597 は標準仕様・適合条件をマイナーで上げ、Codex がメジャーへの訂正を求めた）。版を決める前に「旧文面に沿った実装が新文面で不合格になるか」を問い、なるならメジャー・`changeImpact: high` にする。同じ規則を書く文書（標準・適合条件・利用者向けガイド）を grep で洗い出し、版の区分と Changelog の理由を一度にそろえる（一部だけ上げると、その文書だけを見る利用者に互換変更と伝わる）。
+
+---
+
 ## Changelog
 
 > [1.64.0] 以前の履歴は [PLAYBOOK-CHANGELOG.md](https://github.com/feel-flow/ai-spec-driven-development/blob/HEAD/docs-template/08-knowledge/PLAYBOOK-CHANGELOG.md) に移した（PLAYBOOK.md は /ace-setup で配布され、移動先は配置されないため絶対 URL）。
+
+### [1.77.0] - 2026-10-18
+
+#### 追加
+
+- ACE-598-1: 適合条件や例外の境界は正本の判定条件そのもので書き、ディレクトリの有無のような近い代理条件に置き換えない（PR #598）
+- ACE-598-2: 規範の「〜は従来どおり」に例外を足す変更や適合条件を狭める変更は破壊的変更として扱い、同じ規則を書く文書をすべて同じ版区分にそろえる（PR #598）
+- domain: 評価済み（候補 0 件）。PR は方法論の正本の記述整合で、業務ルールの知見を含まない
+
+#### カウンター更新
+
+- ACE-578-1: Helpful 1→2（PR #597 / #598 で、3 文書の version・updated・changeImpact・版付き Changelog を 1 セットで更新した）
+- ACE-589-1: Helpful 0→1（PR #598 で、試用シナリオを managed.json だけ・apply.lock だけの 2 ケースに分け、各ケースが狙いの状態だけに当たる前提手順にした）
 
 ### [1.76.0] - 2026-10-18
 
