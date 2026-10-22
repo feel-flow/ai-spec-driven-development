@@ -1,9 +1,9 @@
 ---
 title: "PLAYBOOK"
-version: "1.77.0"
+version: "1.78.0"
 status: "approved"
 created: "2026-03-10"
-updated: "2026-10-18"
+updated: "2026-10-22"
 owner: "@fffokazaki"
 changeImpact: "medium"
 ace_entry_count: 81
@@ -102,7 +102,7 @@ ACE エントリ ID は **PRスコープ式** を採用する（このセクシ�
 - **メタ 4 行は各行の行頭に置く**: `Category` / `Date` / `Helpful` / `Status` を行頭のパイプ区切りで書くことが、フィールドを読む集計スクリプトのパース互換条件。1 行に畳んだ `H:n | #PR` のような形式は集計から漏れる
 - **GitHub 上でテーブル描画されない**: ヘッダ行・区切り行を持たないため、パイプ行はプレーンテキストとして表示される。Playbook は AI が参照するための構造化文書であり、これは意図した仕様
 - **旧形式との共存**: 旧テーブル形式（`| フィールド | 値 |` ヘッダ + **Insight**/**Context**/**Action** ブロック）のエントリは読み取り互換として共存させる。新規追記には使わない
-- **形式ゲート**: ff-dev-toolkit の `/ace-curate` 手順 4-f が実行する `check-entry-format.ts` が、PLAYBOOK.md と同階層の `legacy-format-allowlist.txt` に無い旧形式エントリを見つけると exit 1 でブロックする（allowlist 不在なら strict）。このリポジトリ同梱の `.claude/commands/ace-curate.md` には形式ゲート実行段は無い。**新規追記のために allowlist へ ID を足さない**
+- **形式ゲート**: ff-dev-toolkit の `/ace-curate` 手順 4-f が実行する `check-entry-format.ts` が、PLAYBOOK.md と同階層の `legacy-format-allowlist.txt` に無い旧形式エントリを見つけると exit 1 でブロックする（allowlist 不在なら strict）。ローカルの ACE コマンドは置かず、ゲートを持つ ff-dev-toolkit の `/ace-curate` で追記する。**新規追記のために allowlist へ ID を足さない**
 
 ### 記述ガイドライン
 
@@ -1253,6 +1253,12 @@ Issue #509 は「DECISION_TREE.md の 2 箇所は PR #508 で修正済み」と�
 ## Changelog
 
 > [1.64.0] 以前の履歴は [PLAYBOOK-CHANGELOG.md](https://github.com/feel-flow/ai-spec-driven-development/blob/HEAD/docs-template/08-knowledge/PLAYBOOK-CHANGELOG.md) に移した（PLAYBOOK.md は /ace-setup で配布され、移動先は配置されないため絶対 URL）。
+
+### [1.78.0] - 2026-10-22
+
+#### 変更
+
+- エントリテンプレート「形式ゲート」の但し書きから、削除した `.claude/commands/ace-curate.md` への言及を外し、ff-dev-toolkit の `/ace-curate` で追記する旨に改めた（エントリ本文・ID・カウンターは変えていない。Issue #603）
 
 ### [1.77.0] - 2026-10-18
 

@@ -33,13 +33,20 @@ cp -r docs-template/06-reference/ your-project/docs/
 
 ### 方法B: Claude Code Skills で初期化
 
-Claude Code でこのリポジトリを参照し、スラッシュコマンドで自動セットアップ:
+Claude Code に [ff-dev-toolkit](https://github.com/feel-flow/ff-dev-toolkit) プラグインを入れ、スキルで自動セットアップ（このリポジトリからコマンドファイルをコピーする必要はありません）:
+
+```bash
+claude plugin marketplace add feel-flow/ff-dev-toolkit
+claude plugin install ff-dev-toolkit@ff-dev-toolkit
+```
 
 ```
-/init-docs          # コア7文書 + 拡張フォルダ構造を初期化
+/init-docs          # コア7文書 + 拡張フォルダ構造と共通入口 AGENTS.md を初期化
 /validate-docs      # ドキュメント要件を検証
-/setup-ai-config    # CLAUDE.md / .cursorrules / copilot-instructions.md を生成
+/setup-ai-config    # CLAUDE.md / AGENTS.md / copilot-instructions.md を生成
 ```
+
+ACE（開発知見の蓄積）もプラグインのスキルで回します: `/ace-setup`（導入）・`/ace-curate`（PR マージ後の知見追記）・`/ace-refine`（定期整理）・`/knowledge-lookup`（着手前の参照）。手順は [docs/ACE_SETUP.md](./docs/ACE_SETUP.md) を参照してください。
 
 ### 方法C: MCP Server で AI ツール連携
 

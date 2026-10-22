@@ -1,10 +1,10 @@
 ---
 id: ace-framework
 title: ACE (Agentic Context Engineering) フレームワーク
-version: 1.2.0
+version: 1.3.0
 status: active
 created: 2026-03-02
-updated: 2026-10-15
+updated: 2026-10-22
 owner: feel-flow
 tags: [ace, knowledge-management, playbook, ai-driven, context-engineering]
 references:
@@ -306,17 +306,18 @@ ACE フレームワークをプロジェクトに導入する手順は [ACE_SETU
 
 ### クイックスタート
 
-- **Claude Code**: `/ace-setup` コマンドを実行
+- **Claude Code**: [ff-dev-toolkit](https://github.com/feel-flow/ff-dev-toolkit) プラグインを入れて `/ace-setup` を実行（導入手順は [ACE_SETUP.md の Claude Code の設定](./ACE_SETUP.md#claude-code-の設定)）
 - **GitHub Copilot / その他のAIツール**: このドキュメントの URL を渡して「ACEをセットアップしてください」と指示
 - **手動**: [ACE_SETUP.md](./ACE_SETUP.md) の手順に従う
 
 ### セットアップで配置されるファイル
 
-| ファイル                                     | 説明                                  |
-| -------------------------------------------- | ------------------------------------- |
-| `docs/08-knowledge/PLAYBOOK.md`              | ACE Playbook（知見の蓄積先）          |
-| `docs/05-operations/deployment/ace-cycle.md` | ACEサイクル運用手順                   |
-| `.claude/commands/ace-curate.md`             | Claude Code用 ACEサイクル実行コマンド |
+| ファイル                                     | 説明                         |
+| -------------------------------------------- | ---------------------------- |
+| `docs/08-knowledge/PLAYBOOK.md`              | ACE Playbook（知見の蓄積先） |
+| `docs/05-operations/deployment/ace-cycle.md` | ACEサイクル運用手順          |
+
+Claude Code 用の ACE コマンドはプロジェクトへ配置しません。`/ace-setup`・`/ace-curate`・`/ace-refine`・`/knowledge-lookup` は ff-dev-toolkit プラグインが提供します。プラグインの `/ace-setup` は上の 2 ファイルに加えて、ace-cycle.md と同じディレクトリへ `ace-domain.md` を配置します（旧形式エントリを持つ既存 Playbook では、形式ゲートの `legacy-format-allowlist.txt` も初期化します）。
 
 ---
 
@@ -329,6 +330,12 @@ ACE フレームワークをプロジェクトに導入する手順は [ACE_SETU
 ---
 
 ## Changelog
+
+### [1.3.0] - 2026-10-22
+
+#### 変更
+
+- §7 の配置ファイル表から `.claude/commands/ace-curate.md` を外し、Claude Code の ACE スキルは ff-dev-toolkit プラグインが提供する旨と、プラグインの `/ace-setup` が追加で配置するファイル（`ace-domain.md`・条件付きで `legacy-format-allowlist.txt`）を書いた（Issue #603）
 
 ### [1.2.0] - 2026-10-15
 
