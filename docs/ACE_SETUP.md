@@ -108,16 +108,16 @@ claude plugin marketplace add feel-flow/ff-dev-toolkit
 claude plugin install ff-dev-toolkit@ff-dev-toolkit
 ```
 
-| スキル              | 使う場面                                                 |
-| ------------------- | -------------------------------------------------------- |
-| `/ace-setup`        | ACE の導入（このガイドの Step 1〜5 に相当）              |
-| `/ace-curate`       | PR マージ・cleanup 後に知見を Playbook へ追記する        |
-| `/ace-refine`       | Playbook の定期整理（アーカイブ・圧縮・重複統合・昇格）  |
-| `/knowledge-lookup` | 実装・レビューの着手前に Playbook と観測台帳を同時に引く |
+| スキル              | 使う場面                                                                |
+| ------------------- | ----------------------------------------------------------------------- |
+| `/ace-setup`        | ACE の導入（このガイドの Step 1〜5 に相当。`ace-domain.md` も配置する） |
+| `/ace-curate`       | PR マージ・cleanup 後に知見を Playbook へ追記する                       |
+| `/ace-refine`       | Playbook の定期整理（アーカイブ・圧縮・重複統合・昇格）                 |
+| `/knowledge-lookup` | 実装・レビューの着手前に Playbook と観測台帳を同時に引く                |
 
 - **コマンドのコピーは不要**: プロジェクトの `.claude/commands/` へ ACE のコマンドファイルを置かない。同名のコマンドが残っていると `/ace-curate` がそちらを呼び、プラグインの形式ゲートを通らない古い手順で追記されることがある
 - **PLAYBOOK.md の配置先を記録する**: Step 2 で既定（`docs/08-knowledge/`）から変えた場合は、そのパスを `CLAUDE.md` に書く（`AGENTS.md` があれば同じパスを書く）。プラグインは `AGENTS.md`・`CLAUDE.md`・`docs/MASTER.md` に書かれたパスから Playbook を探す
-- **着手前の参照経路を書く**: `CLAUDE.md` に「着手前に `/knowledge-lookup` で ACE Playbook と観測台帳（`docs/08-knowledge/OBSERVATIONS.md`）の両方を引く。`promoted` / `mitigated` は対策あり、`active` だけが未対策」の 1 行を書く。`AGENTS.md` があれば同じ行を書く（Claude Code は `CLAUDE.md`、Codex 等は `AGENTS.md` を読む）
+- **着手前の参照経路を書く**: `CLAUDE.md` に「着手前に `/knowledge-lookup` で ACE Playbook と観測台帳（`docs/08-knowledge/OBSERVATIONS.md`）の両方を引く。台帳の `promoted`（対策 Issue あり。Issue が open なら対応中で、反映は未確認）と `mitigated`（対策の反映を確認済み）は対策あり、`active` だけが未対策」の 1 行を書く。`AGENTS.md` があれば同じ行を書く（Claude Code は `CLAUDE.md`、Codex 等は `AGENTS.md` を読む）
 - **既存チェック**: このガイドの 1.2.0 以前の手順でコピーした `.claude/commands/ace-curate.md` が残っている場合は、ユーザーに確認したうえで削除し、プラグインの `/ace-curate` に一本化する
 
 #### 指示ファイルへの ACE 運用ルール追記（GitHub Copilot / Cursor / Codex / その他）

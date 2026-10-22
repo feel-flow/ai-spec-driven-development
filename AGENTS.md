@@ -351,7 +351,7 @@ Always reference MASTER.md for project-specific requirements.
 
 **ACE の入口と配置**: ACE は ff-dev-toolkit プラグインのスキル（`/ace-curate`・`/ace-refine`・`/knowledge-lookup`）で回し、ローカルの ACE コマンドは置かない。このリポジトリの Playbook は `docs-template/08-knowledge/PLAYBOOK.md`（配布テンプレートと兼用。既定の `docs/08-knowledge/` には置いていない）、観測台帳は `docs/08-knowledge/OBSERVATIONS.md`。
 
-**着手前の参照**: 着手前に `/knowledge-lookup` で ACE Playbook（`docs-template/08-knowledge/PLAYBOOK.md`）と観測台帳（`docs/08-knowledge/OBSERVATIONS.md`）の両方を引く。台帳の `promoted` / `mitigated` は対策あり、`active` だけが未対策。
+**着手前の参照**: 着手前に `/knowledge-lookup` で ACE Playbook（`docs-template/08-knowledge/PLAYBOOK.md`）と観測台帳（`docs/08-knowledge/OBSERVATIONS.md`）の両方を引く。台帳の `promoted`（対策 Issue あり。Issue が open なら対応中で、反映は未確認）と `mitigated`（対策の反映を確認済み）は対策あり、`active` だけが未対策。
 
 **ACE（知見体系化）**: マージ・cleanup 後に PR から知見を抽出し PLAYBOOK.md に追記する。エントリ ID は **PRスコープ式** `ACE-<PR番号>-<連番>`（並行採番でも衝突しない）。採番ルールの SSOT は [PLAYBOOK.md §エントリID規則](docs-template/08-knowledge/PLAYBOOK.md#エントリid規則)、運用ルール本体は [ACE_SETUP.md §4 テンプレート](docs/ACE_SETUP.md#ace-ops-template)。
 

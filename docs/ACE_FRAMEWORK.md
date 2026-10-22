@@ -317,7 +317,7 @@ ACE フレームワークをプロジェクトに導入する手順は [ACE_SETU
 | `docs/08-knowledge/PLAYBOOK.md`              | ACE Playbook（知見の蓄積先） |
 | `docs/05-operations/deployment/ace-cycle.md` | ACEサイクル運用手順          |
 
-Claude Code 用の ACE コマンドはプロジェクトへ配置しません。`/ace-setup`・`/ace-curate`・`/ace-refine`・`/knowledge-lookup` は ff-dev-toolkit プラグインが提供します。
+Claude Code 用の ACE コマンドはプロジェクトへ配置しません。`/ace-setup`・`/ace-curate`・`/ace-refine`・`/knowledge-lookup` は ff-dev-toolkit プラグインが提供します。プラグインの `/ace-setup` は上の 2 ファイルに加えて、ace-cycle.md と同じディレクトリへ `ace-domain.md` を配置します（旧形式エントリを持つ既存 Playbook では、形式ゲートの `legacy-format-allowlist.txt` も初期化します）。
 
 ---
 
@@ -335,7 +335,7 @@ Claude Code 用の ACE コマンドはプロジェクトへ配置しません。
 
 #### 変更
 
-- §7 の配置ファイル表から `.claude/commands/ace-curate.md` を外し、Claude Code の ACE スキルは ff-dev-toolkit プラグインが提供する旨に改めた（Issue #603）
+- §7 の配置ファイル表から `.claude/commands/ace-curate.md` を外し、Claude Code の ACE スキルは ff-dev-toolkit プラグインが提供する旨と、プラグインの `/ace-setup` が追加で配置するファイル（`ace-domain.md`・条件付きで `legacy-format-allowlist.txt`）を書いた（Issue #603）
 
 ### [1.2.0] - 2026-10-15
 
