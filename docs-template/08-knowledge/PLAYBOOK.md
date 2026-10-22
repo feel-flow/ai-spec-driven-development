@@ -1,12 +1,12 @@
 ---
 title: "PLAYBOOK"
-version: "1.78.0"
+version: "1.79.0"
 status: "approved"
 created: "2026-03-10"
 updated: "2026-10-22"
 owner: "@fffokazaki"
 changeImpact: "medium"
-ace_entry_count: 81
+ace_entry_count: 82
 tags: [ace, playbook, knowledge-management]
 references:
   - https://github.com/feel-flow/ai-spec-driven-development/blob/HEAD/docs/ACE_FRAMEWORK.md
@@ -918,7 +918,7 @@ Windows の Node は、`spawnSync` の実行ファイルを子の `env.PATH` か
 
 | Category | documentation-quality | Origin | PR #578 |
 | Date | 2026-10-16 |
-| Helpful | 2 | Harmful | 0 |
+| Helpful | 3 | Harmful | 0 |
 | Status | active |
 
 索引への 1 行追加のような小さな追記でも、version を上げずに「YYYY-MM-DD 追記」の行だけを足すと、frontmatter の updated と本文の日付が食い違い、利用者や版差分を読む処理が新しい索引を旧版の内容と誤認する（PR #578 では Toolkit と Codex が独立に同じ漏れを指摘した）。前の PR が残した古い changeImpact も次の bump で引き継がれるので、minor なら medium、patch なら low に合わせて置き直す。文書を変更する PR では、追記の大小にかかわらず 4 点を 1 セットで更新し、版付きの Changelog エントリに記録する。
@@ -1250,9 +1250,33 @@ Issue #509 は「DECISION_TREE.md の 2 箇所は PR #508 で修正済み」と�
 
 ---
 
+<a id="ace-604-1"></a>
+
+### ACE-604-1: 配布物をコピー方式から更新の届く提供経路へ移すときは、コピー済みの同名旧版が新版より優先されて残るので、コピー指示の撤去と旧コピーの削除案内を同じ変更で行う
+
+| Category | architecture | Origin | PR #604 |
+| Date | 2026-10-22 |
+| Helpful | 0 | Harmful | 0 |
+| Status | active |
+
+利用先へコピーさせたコマンドや手順書は、提供元が別経路（プラグイン等）で新版を出しても同じ名前で呼び出しを受け続け、新版の検査段を持たない古い手順が黙って動く（PR #604 では `.claude/commands/ace-curate.md` が残ると、名前空間なしの `/ace-curate` がプラグインのスキルではなくローカル版に解決される余地があった）。提供経路を移す変更では、自リポジトリの旧コピーを削除し、公開文書のコピー指示を新しい導入手順へ置き換え、既にコピー済みの利用先へ「旧コピーが残っている場合」の扱いを書く。削除の前に、旧コピーにしか無い固有の規則が残っていないかを新版との差分で確かめる。
+
+---
+
 ## Changelog
 
 > [1.64.0] 以前の履歴は [PLAYBOOK-CHANGELOG.md](https://github.com/feel-flow/ai-spec-driven-development/blob/HEAD/docs-template/08-knowledge/PLAYBOOK-CHANGELOG.md) に移した（PLAYBOOK.md は /ace-setup で配布され、移動先は配置されないため絶対 URL）。
+
+### [1.79.0] - 2026-10-22
+
+#### 追加
+
+- ACE-604-1: 配布物をコピー方式から更新の届く提供経路へ移すときは、同名の旧コピーが新版より優先されて残るので、コピー指示の撤去と旧コピーの削除案内を同じ変更で行う（PR #604）
+- domain: 評価済み（候補 0 件）。PR はローカルコマンドの撤去と導入文書の書き換えで、業務ルールの知見を含まない
+
+#### カウンター更新
+
+- ACE-578-1: Helpful 2→3（PR #604 で、PLAYBOOK の但し書き変更に version・updated・changeImpact・版付き Changelog を 1 セットでそろえた）
 
 ### [1.78.0] - 2026-10-22
 
