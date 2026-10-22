@@ -1,10 +1,10 @@
 ---
 id: ace-setup
 title: ACE セットアップガイド
-version: 1.2.0
+version: 1.3.0
 status: active
 created: 2026-03-13
-updated: 2026-10-15
+updated: 2026-10-22
 owner: feel-flow
 tags: [ace, setup, knowledge-management, playbook]
 references:
@@ -23,7 +23,7 @@ visibility: public
 >
 > **クイックスタート**:
 >
-> - Claude Code: `/ace-setup` コマンドを実行
+> - Claude Code: [ff-dev-toolkit プラグイン](#claude-code-の設定)を入れて `/ace-setup` を実行（このリポジトリからコマンドファイルをコピーしない）
 > - その他のAIツール: このドキュメントの URL を渡して「ACEをセットアップしてください」と指示
 
 ## 目次
@@ -94,19 +94,31 @@ visibility: public
 
 ユーザーに対象 AI ツールを確認してください（複数選択可）:
 
-- **(a) Claude Code** — `/ace-curate` コマンドを使う
+- **(a) Claude Code** — ff-dev-toolkit プラグインのスキル（`/ace-curate` 等）を使う。コマンドファイルのコピーは不要
 - **(b) GitHub Copilot** — `.github/copilot-instructions.md` に追記
 - **(c) Cursor** — `.cursorrules` に追記
 - **(d) Codex / その他の AI エージェント** — `AGENTS.md` に追記
 
 #### Claude Code の設定
 
-`.claude/commands/ace-curate.md` をテンプレートリポジトリからコピーします。
+ACE のスキルは [ff-dev-toolkit](https://github.com/feel-flow/ff-dev-toolkit) プラグインが提供します。プラグインが未導入なら、次のコマンドで入れます:
 
-- **パス置換**: ファイル内の `docs-template/08-knowledge/PLAYBOOK.md` を、Step 2 で確認した PLAYBOOK.md のパスに置換する
-- **既存チェック**: `.claude/commands/ace-curate.md` が既に存在する場合は、ユーザーに確認する:
-  - **(a) スキップ** — 既存ファイルを維持する
-  - **(b) 上書き** — テンプレートで上書きする
+```bash
+claude plugin marketplace add feel-flow/ff-dev-toolkit
+claude plugin install ff-dev-toolkit@ff-dev-toolkit
+```
+
+| スキル              | 使う場面                                                 |
+| ------------------- | -------------------------------------------------------- |
+| `/ace-setup`        | ACE の導入（このガイドの Step 1〜5 に相当）              |
+| `/ace-curate`       | PR マージ・cleanup 後に知見を Playbook へ追記する        |
+| `/ace-refine`       | Playbook の定期整理（アーカイブ・圧縮・重複統合・昇格）  |
+| `/knowledge-lookup` | 実装・レビューの着手前に Playbook と観測台帳を同時に引く |
+
+- **コマンドのコピーは不要**: プロジェクトの `.claude/commands/` へ ACE のコマンドファイルを置かない。同名のコマンドが残っていると `/ace-curate` がそちらを呼び、プラグインの形式ゲートを通らない古い手順で追記されることがある
+- **PLAYBOOK.md の配置先を記録する**: Step 2 で既定（`docs/08-knowledge/`）から変えた場合は、そのパスを `CLAUDE.md` に書く（`AGENTS.md` があれば同じパスを書く）。プラグインは `AGENTS.md`・`CLAUDE.md`・`docs/MASTER.md` に書かれたパスから Playbook を探す
+- **着手前の参照経路を書く**: `CLAUDE.md` に「着手前に `/knowledge-lookup` で ACE Playbook と観測台帳（`docs/08-knowledge/OBSERVATIONS.md`）の両方を引く。`promoted` / `mitigated` は対策あり、`active` だけが未対策」の 1 行を書く。`AGENTS.md` があれば同じ行を書く（Claude Code は `CLAUDE.md`、Codex 等は `AGENTS.md` を読む）
+- **既存チェック**: このガイドの 1.2.0 以前の手順でコピーした `.claude/commands/ace-curate.md` が残っている場合は、ユーザーに確認したうえで削除し、プラグインの `/ace-curate` に一本化する
 
 #### 指示ファイルへの ACE 運用ルール追記（GitHub Copilot / Cursor / Codex / その他）
 
@@ -133,13 +145,12 @@ visibility: public
 | -------------------------- | ---------------------------------------------------------- | -------- |
 | PLAYBOOK.md                | docs/08-knowledge/PLAYBOOK.md                              | 新規作成 |
 | ace-cycle.md               | docs/05-operations/deployment/ace-cycle.md                 | 新規作成 |
-| ace-curate.md              | .claude/commands/ace-curate.md                             | 新規作成 |
 | 指示ファイル（選択ツール） | .github/copilot-instructions.md / .cursorrules / AGENTS.md | 追記     |
 
 ## 次のステップ
 
 1. PRマージ・cleanup 後に ACE サイクルを実行してみましょう:
-   - Claude Code: `/ace-curate` コマンドを実行
+   - Claude Code: ff-dev-toolkit の `/ace-curate` を実行
    - Copilot / Cursor / Codex 等: 指示ファイルの ACE 運用ルールに従い「ACEサイクルを実行してください」と指示
 2. ACE フレームワークの詳細は [ACE_FRAMEWORK.md](./ACE_FRAMEWORK.md) を参照
 ```
@@ -152,13 +163,14 @@ visibility: public
 
 テンプレートファイルは以下のリポジトリから取得してください:
 
-| ファイル      | リポジトリ内パス                                      | GitHub URL                                                                                                                         |
-| ------------- | ----------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
-| PLAYBOOK.md   | `docs-template/08-knowledge/PLAYBOOK.md`              | [GitHub](https://github.com/feel-flow/ai-spec-driven-development/blob/develop/docs-template/08-knowledge/PLAYBOOK.md)              |
-| ace-cycle.md  | `docs-template/05-operations/deployment/ace-cycle.md` | [GitHub](https://github.com/feel-flow/ai-spec-driven-development/blob/develop/docs-template/05-operations/deployment/ace-cycle.md) |
-| ace-curate.md | `.claude/commands/ace-curate.md`                      | [GitHub](https://github.com/feel-flow/ai-spec-driven-development/blob/develop/.claude/commands/ace-curate.md)                      |
+| ファイル     | リポジトリ内パス                                      | GitHub URL                                                                                                                         |
+| ------------ | ----------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
+| PLAYBOOK.md  | `docs-template/08-knowledge/PLAYBOOK.md`              | [GitHub](https://github.com/feel-flow/ai-spec-driven-development/blob/develop/docs-template/08-knowledge/PLAYBOOK.md)              |
+| ace-cycle.md | `docs-template/05-operations/deployment/ace-cycle.md` | [GitHub](https://github.com/feel-flow/ai-spec-driven-development/blob/develop/docs-template/05-operations/deployment/ace-cycle.md) |
 
 **リポジトリ**: `feel-flow/ai-spec-driven-development`
+
+Claude Code 用の ACE コマンドは、このリポジトリから配布しません。`/ace-setup`・`/ace-curate`・`/ace-refine`・`/knowledge-lookup` は [ff-dev-toolkit](https://github.com/feel-flow/ff-dev-toolkit) プラグインが提供します（導入は [Claude Code の設定](#claude-code-の設定)）。
 
 ---
 
@@ -297,11 +309,11 @@ PLAYBOOK.md のエントリ一覧セクション末尾に新エントリを追�
 
 **対応**: Step 4 で対象の指示ファイル（Copilot → `.github/copilot-instructions.md` / Cursor → `.cursorrules` / Codex 他 → `AGENTS.md`）が自動的に新規作成されます。特別な対応は不要です。
 
-### ace-curate.md が既に存在する
+### `.claude/commands/ace-curate.md` が残っている
 
-**原因**: 過去にコピー済み、またはテンプレートリポジトリから直接導入済み
+**原因**: このガイドの 1.2.0 以前の手順で、テンプレートリポジトリからコピーした
 
-**対応**: Step 4 の選択肢に従い、スキップまたは上書きを選択してください。パスの置換状態が最新であるか確認したい場合は上書きを選択してください。
+**対応**: ユーザーに確認したうえで削除し、ff-dev-toolkit の `/ace-curate` を使ってください（[Claude Code の設定](#claude-code-の設定)）。残したままだと、プラグインの形式ゲートを通らない古い手順で追記されることがあります。
 
 ### テンプレートファイルの取得に失敗する
 
@@ -312,6 +324,12 @@ PLAYBOOK.md のエントリ一覧セクション末尾に新エントリを追�
 ---
 
 ## Changelog
+
+### [1.3.0] - 2026-10-22
+
+#### 変更
+
+- Claude Code の設定を、`.claude/commands/ace-curate.md` のコピーから ff-dev-toolkit プラグインの導入（`/ace-setup`・`/ace-curate`・`/ace-refine`・`/knowledge-lookup`）へ置き換えた。Step 4 に Playbook の配置先と着手前の参照経路（`/knowledge-lookup`）を入口文書へ書く手順を足し、Step 5 の完了表・§3 の参照表・トラブルシューティングからコマンドのコピーを外した（Issue #603）
 
 ### [1.2.0] - 2026-10-15
 

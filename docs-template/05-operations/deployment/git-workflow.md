@@ -803,7 +803,7 @@ GitHub Discussions への記録に加え、ACE Playbook への構造化記録を
 
 #### 運用パターン（マージ方針）
 
-> このセクションが ACE 知見コミットのマージ方針の **SSOT**。ace-cycle.md / ace-curate.md はここを参照する。
+> このセクションが ACE 知見コミットのマージ方針の **SSOT**。ace-cycle.md / ff-dev-toolkit の `/ace-curate` はここを参照する。
 
 **既定（推奨）— develop 直マージ**: マージ・cleanup 後の develop で `/ace-curate <PR番号>` を実行し、PLAYBOOK.md 追記を **develop に直接 commit + push** する。PLAYBOOK.md は append-only で構造化されており、ID も PRスコープ式（[エントリID規則](../../08-knowledge/PLAYBOOK.md#エントリid規則)）で衝突しないため、ACE 1 サイクル分の小さな知見追加を毎回 PR 化するのは過剰なオーバーヘッド。
 
