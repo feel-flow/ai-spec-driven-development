@@ -837,6 +837,7 @@ GitHub Discussions への記録に加え、ACE Playbook への構造化記録を
 - 全ての作業はIssueから開始
 - Issue番号を必ずブランチ名・コミットメッセージに含める
 - Issueテンプレートを活用して情報を標準化
+- なぜ Issue から始めるか（AI エージェントへの注入対策としての効果と限界）は [GUARDRAILS_THREE_LAYERS.md「Issue駆動開発の効果と限界」](../../04-quality/GUARDRAILS_THREE_LAYERS.md#issue駆動開発の効果と限界) を参照
 
 ### 2. 小さく頻繁なコミット
 
