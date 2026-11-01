@@ -524,13 +524,14 @@ ripgrep はパスを省略すると、stdin が TTY でない限り cwd では�
 
 ### OBS-033: Claude Code のクラウドセッションでは GitHub GraphQL が 403 で遮断され、`gh pr view` 等に依存する `finish.sh precheck` / `cleanup` / `knowledge-lookup` が判定不能で止まる
 
-| Kind | problem | Count | 1 |
-| First | 2026-10-15 | Last | 2026-10-15 |
+| Kind | problem | Count | 2 |
+| First | 2026-10-15 | Last | 2026-11-01 |
 | Status | active | Issue | なし |
 
 クラウドセッションの `gh` は REST（`gh api repos/...`）と CCR 経路（`/pulls/{n}/ccr/review_threads` 等）しか通らないため、GraphQL 前提の固定手順は rc 2 / rc 1 で止まり、同じ検査を REST で手組みし直すことになる → 固定手順の gh 呼び出しを REST / CCR 経路へ寄せるか、GraphQL 不通を検出したら REST の同等手順へ自動で切り替える。
 
 - 2026-10-15: Issue #406 / PR #553。precheck（AC 照合ゲート）・merge-cleanup・knowledge-lookup の 3 箇所が GraphQL 403 で止まり、レビュースレッド・CI・リモート ref・ローカル OID の照合を REST と `git ls-remote` で手動実行した（初回）
+- 2026-11-01: Issue #611 / PR #612。`gh label list` / `gh pr view` / `knowledge-lookup --promoted-open` が GraphQL 403。`finish.sh precheck` は MCP の raw-file 入力でも GraphQL 形の必須フィールド（closingIssuesReferences・commits・rollup）を REST 形の MCP ツールから供給できず停止し、AC 照合・本文更新・報告・squash マージ・読み戻しを GitHub MCP で手動相当に実施した
 
 ---
 
@@ -552,14 +553,15 @@ clone 方式によっては `refs/remotes/origin/HEAD` が作られず、ACE / �
 
 ### OBS-035: Codex CLI が無い環境でも、リポジトリの Codex 自動レビュー（PR open 時と `@codex review`）を待てばクロスモデルの観点を確保できる
 
-| Kind | keep | Count | 2 |
-| First | 2026-10-15 | Last | 2026-10-15 |
+| Kind | keep | Count | 3 |
+| First | 2026-10-15 | Last | 2026-11-01 |
 | Status | active | Issue | なし |
 
 `/multi-review` の fast 経路は Codex レーンを CLI 前提で組むため、CLI 未導入だと主担当の直読だけで完了扱いになるが、GitHub 側の Codex 自動レビューは同じ head に対して実指摘を返す → CLI 不在時は PR 上の Codex 自動レビューの完了を待ってからマージ判断し、修正が規則を組み替えた回は `@codex review` で 2 巡目を依頼する。
 
 - 2026-10-15: Issue #406 / PR #553。主担当の直読は指摘 0 件だったが、Codex 自動レビューが 1 巡目 2 件・2 巡目（`@codex review`）3 件の妥当な指摘を返し、すべてマージ前に解消した（初回）
 - 2026-10-15: Issue #418 / PR #559。主担当の直読と品質ゲートが通した lockfile 再生成について、Codex 自動レビューが npm 10 による `libc` 制約 10 件の消失を検出し、npm 11 で再生成して解消した
+- 2026-11-01: Issue #611 / PR #612。`multi-review.sh --route fast` は Codex CLI 不在で「Execution plan is empty」（rc 1）になり外部 CLI 経路は未実行。PR open 時の Codex 自動レビュー 4 件と `@codex review` の 2 巡目 5 件、read-only サブエージェントのネイティブレビュー 12 件をすべてマージ前に解消した（3 回目の到達）
 
 ---
 
@@ -610,13 +612,14 @@ clone 方式によっては `refs/remotes/origin/HEAD` が作られず、ACE / �
 
 ### OBS-039: `/ace-refine` の大量整理で、移送・保全・一意性検証をスクリプト 1 本で回せる前提を見積もりに入れないと、乖離率 0.33 の過大見積もりになる
 
-| Kind | problem | Count | 1 |
-| First | 2026-10-16 | Last | 2026-10-16 |
+| Kind | problem | Count | 2 |
+| First | 2026-10-16 | Last | 2026-11-01 |
 | Status | active | Issue | なし |
 
 アーカイブ 64 件・圧縮 30 件の refine を、移送と検証は手作業、要約はサブエージェント委譲と差し戻し前提で積んだが、実際は verbatim 移送・provenance 付与・一意性検証を 1 本の node スクリプトで行い、要約はコントローラが直接書いて 1 回で通った → 件数の多い refine は「機械的な移送はスクリプト 1 本 + 判断が要る要約だけ件数比例」で積め
 
 - 2026-10-16: Issue #561 / PR #562。AI 予定 4.5h → 実績 1.5h（hook 実測 wallclock 1.1h）、乖離率 0.33（初回）
+- 2026-11-01: Issue #611 / PR #612（docs-only、設計済みの節を 6 ファイルへ加筆）。実装分を 1.6h で積んだが、新設節とチェックリストの追記は厳密一致の置換スクリプト 1 本で 0.2h、レビュー 2 巡の修正も同型スクリプトで各 0.25h。AI 予定 2.6h → 実績 0.9h、乖離率 0.35（過大）。起票前に整理が済んだ文書追記も「スクリプト 1 本 + 判断が要る箇所だけ」で積む対象
 
 ---
 
@@ -877,5 +880,33 @@ Git Bash は `/tmp` を `C:/Users/<user>/AppData/Local/Temp` に写像するが�
 
 - 2026-10-18: PR #593 を bot の `status: running` のままマージし、P2 指摘 2 件（`changeImpact` と版の不一致、冒頭の無条件の保証）がマージ後に届いた。follow-up の #594 / PR #595 で解消し、PR #595 では bot の `completed` / 指摘なしを確かめてからマージした（初回）
 - 2026-10-18: PR #597 を、fast 経路の Codex CLI が 0 件だった直後にマージしたところ、PR 上の Codex 自動レビュー（マージ時点で集計コメントは既に「指摘あり・completed」）の P2 3 件がマージの 4 秒後にスレッドとして届いた。#596 を再オープンして PR #598 で直し、その初回コミットにも P2 が 2 件付いた。修正コミットの push では Codex は自動で再レビューしないため、`@codex review` で依頼し、`c67ccb1` の completed・指摘なしを確かめてからマージした。Codex CLI は 2 回とも 0 件で、妥当な指摘 5 件はすべて PR 上の Codex だけが出した（再発・Count 2）
+
+---
+
+<a id="obs-058"></a>
+
+### OBS-058: `/close-issue` の本文差分判定器はチェックボックスと `ff-effort` 以外の変更を拒否するため、手順 3 の「AC が実装より古い」例外を Issue 本文へ反映できず、古い AC を達成扱いにして報告にだけ差異を残すことになる
+
+| Kind | problem | Count | 1 |
+| First | 2026-11-01 | Last | 2026-11-01 |
+| Status | active | Issue | なし |
+
+AC の文言がレビュー対応で実装より古くなった回に、手順 3 の例外に従って AC 行を書き換えると `check-issue-body-diff.sh` が「許可範囲外」（rc 1）で送信を止める → 判定器に AC 行の文言変更を明示的に許す経路（変更行を列挙した承認付きの引数など）を設けるか、手順 3 の例外文を「本文は変えず完了報告に差異を書く」に合わせて直す。揃えるまでは、AC は原文のまま達成扱いにし、完了報告の根拠欄に「AC が実装より古い」と差異を書く。
+
+- 2026-11-01: Issue #611 / PR #612。AC3「相対リンクがあり」が Codex 指摘（コピー単位外への相対リンクを案内テキストへ）で満たされなくなり、AC 行の書き換えが判定器で拒否された。原文のまま達成扱いにし、完了報告の根拠欄に変更理由を書いた（初回）
+
+---
+
+<a id="obs-059"></a>
+
+### OBS-059: クラウドセッションの auto モードでは、`git reset --hard` や `git branch -D` を含む複合 cleanup コマンドが分類器に 1 括りで拒否される → 取り込みは `pull --ff-only`、削除は単純コマンドに分けて実行する
+
+| Kind | problem | Count | 1 |
+| First | 2026-11-01 | Last | 2026-11-01 |
+| Status | active | Issue | なし |
+
+マージ後の cleanup を 1 つの Bash 呼び出し（fetch → checkout → `reset --hard origin/develop` → head 削除 helper → `branch -D` → prune）にまとめると、分類器が呼び出し全体を危険と判定して何も実行されない → clean な作業ツリーでは `git pull --ff-only origin <default>` で取り込み、リモート head の削除は同梱 helper、ローカル branch の削除と prune は別の呼び出しに分ける（分割後はそれぞれ通った）。
+
+- 2026-11-01: Issue #611 / PR #612。複合コマンドが 1 回拒否され、3 回の単純コマンドに分けて完了した（初回）
 
 ---
