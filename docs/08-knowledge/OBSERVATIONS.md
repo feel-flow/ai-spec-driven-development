@@ -910,3 +910,31 @@ AC の文言がレビュー対応で実装より古くなった回に、手順 3
 - 2026-11-01: Issue #611 / PR #612。複合コマンドが 1 回拒否され、3 回の単純コマンドに分けて完了した（初回）
 
 ---
+
+<a id="obs-060"></a>
+
+### OBS-060: 新規 worktree / clone でない既存のメインチェックアウトでも `.husky/_` が無いことがあり、そのまま push すると pre-push の品質ゲートが無言で発火しない
+
+| Kind | problem | Count | 1 |
+| First | 2026-11-02 | Last | 2026-11-02 |
+| Status | active | Issue | なし |
+
+CLAUDE.md の「先に `npm ci`」は新しい worktree / clone を対象に書かれているが、長く使っているメインのチェックアウトでも `.husky/_` が欠けていた → push を伴う作業の前は、チェックアウトの新旧に関係なく `ls .husky/_` を確かめ、無ければ `npm ci` してから push する。
+
+- 2026-11-02: Dependabot PR 10 件の一括処理。#610 へ修正を push する前に `ls .husky/_` が失敗し、`npm ci` 後に pre-push が 10 段を実測した（初回）
+
+---
+
+<a id="obs-061"></a>
+
+### OBS-061: Dependabot PR を一括で処理するときは、1 件マージ後に残りの mergeStateStatus を見て CLEAN を順に流し、DIRTY は `@dependabot rebase` を並行で頼み、メジャー更新を最後の結合ゲートにすると待ちが重ならない
+
+| Kind | keep | Count | 1 |
+| First | 2026-11-02 | Last | 2026-11-02 |
+| Status | active | Issue | なし |
+
+各 PR の CI は古い base に対する単独の検証なので、壊れやすいメジャー更新を最後に回して develop を取り込ませ、その CI を全更新の組み合わせの検証にする。ロックファイルの共通依存（vite と vitest など）で DIRTY になった PR は rebase を頼み、その CI 待ちの間に競合のない PR を流す。マージ直後は mergeStateStatus が UNKNOWN になるため、確定を待ってから次を流す。
+
+- 2026-11-02: open 10 件（うち #610 は zod 3→4 で CI 失敗）。vite の 2 件のマージで vitest の 2 件が DIRTY になったが、rebase 待ちの間に 5 件を流し、#610 に 1 行修正と develop を取り込んで最後にマージした（初回）
+
+---
