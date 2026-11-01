@@ -185,7 +185,7 @@ const ResourcesReadRequest = z.object({ method: z.literal('custom/resources/read
 type ResourcesReadReq = z.infer<typeof ResourcesReadRequest>;
 const ToolsListRequest = z.object({ method: z.literal('custom/tools/list'), params: z.object({}).optional() });
 type ToolsListReq = z.infer<typeof ToolsListRequest>;
-const ToolsCallRequest = z.object({ method: z.literal('custom/tools/call'), params: z.object({ name: z.string(), args: z.record(z.any()).optional() }) });
+const ToolsCallRequest = z.object({ method: z.literal('custom/tools/call'), params: z.object({ name: z.string(), args: z.record(z.string(), z.any()).optional() }) });
 type ToolsCallReq = z.infer<typeof ToolsCallRequest>;
 
 // ---------- Server init ----------
