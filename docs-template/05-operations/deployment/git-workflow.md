@@ -807,7 +807,7 @@ GitHub Discussions への記録に加え、ACE Playbook への構造化記録を
 
 **既定（推奨）— develop 直マージ**: マージ・cleanup 後の develop で `/ace-curate <PR番号>` を実行し、PLAYBOOK.md 追記を **develop に直接 commit + push** する。PLAYBOOK.md は append-only で構造化されており、ID も PRスコープ式（[エントリID規則](../../08-knowledge/PLAYBOOK.md#エントリid規則)）で衝突しないため、ACE 1 サイクル分の小さな知見追加を毎回 PR 化するのは過剰なオーバーヘッド。
 
-**任意エスカレーション — chore PR**: 大人数チーム、または知見内容自体をレビューに残したい場合のみ、develop から `chore/ace-from-pr-<PR番号>` ブランチを切り、PLAYBOOK.md 追記を小さい chore PR として PR レビュー → squash merge する。注入対策として統合ブランチへの直接 push をリポジトリホスティング側で禁止している場合（[GUARDRAILS_THREE_LAYERS.md「AIへの指示の信頼境界」](../../04-quality/GUARDRAILS_THREE_LAYERS.md#aiへの指示の信頼境界)）は、エージェントの資格情報にバイパス権限を与えず、この chore PR を既定にするか、知見コミットの push を人が行う。
+**任意エスカレーション — chore PR**: 大人数チーム、または知見内容自体をレビューに残したい場合のみ、develop から `chore/ace-from-pr-<PR番号>` ブランチを切り、PLAYBOOK.md 追記を小さい chore PR として PR レビュー → squash merge する。注入対策として統合ブランチへの直接 push をリポジトリホスティング側で禁止している場合（`docs/04-quality/GUARDRAILS_THREE_LAYERS.md`「AIへの指示の信頼境界」。初期セット外）は、エージェントの資格情報にバイパス権限を与えず、この chore PR を既定にするか、知見コミットの push を人が行う。
 
 > **ACE-012 との関係（混同しないこと）**: [ACE-012](../../08-knowledge/PLAYBOOK.md#ace-012) は _うっかり_ feature 作業を develop に直接 push してしまう事故（ブランチ切り替わりの見落とし）を防ぐルール。一方、本セクションの「develop 直マージ」は `knowledge:` プレフィックス付きの **PLAYBOOK 単独コミット** に限定した _意図的・承認済み_ のフローであり、両者は別物。ACE-012 は引き続き有効（deprecated にしない）。
 
@@ -837,7 +837,7 @@ GitHub Discussions への記録に加え、ACE Playbook への構造化記録を
 - 全ての作業はIssueから開始
 - Issue番号を必ずブランチ名・コミットメッセージに含める
 - Issueテンプレートを活用して情報を標準化
-- なぜ Issue から始めるか（AI エージェントへの注入対策としての効果と限界）は [GUARDRAILS_THREE_LAYERS.md「Issue駆動開発の効果と限界」](../../04-quality/GUARDRAILS_THREE_LAYERS.md#issue駆動開発の効果と限界) を参照
+- なぜ Issue から始めるか（AI エージェントへの注入対策としての効果と限界）は `docs/04-quality/GUARDRAILS_THREE_LAYERS.md`「Issue駆動開発の効果と限界」を参照（初期セット外。`SECURITY_REVIEW_CHECKLIST.md` と一緒に配布元の同じ相対パスからコピーする）
 
 ### 2. 小さく頻繁なコミット
 

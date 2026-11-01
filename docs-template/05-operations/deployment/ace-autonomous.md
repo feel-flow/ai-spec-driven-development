@@ -62,20 +62,20 @@ GUI の Git クライアントや一部の CI では、マージ実行時に **`
 
 **デフォルトは無効**とし、`.claude/settings.local.json` の env や CI のシークレットで **明示 opt-in** してください。
 
-| 変数                           | 意味                                                      | 推奨初期値                                                                                                                 |
-| ------------------------------ | --------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
-| `ACE_SUBAGENT_ENABLED`         | post-merge 等から subagent 起動を行うか                   | `0`（無効）                                                                                                                |
-| `ACE_SUBAGENT_AUTO_MERGE`      | ガード通過後に squash マージまで自動で行うか              | `0`（無効）                                                                                                                |
-| `ACE_GARDEN_WALL_PATHS`        | 編集を許可するパス（カンマ区切り）                        | プロジェクト固有（必須で設定）                                                                                             |
-| `ACE_PLAYBOOK_PATH`            | `check-category-size.ts` が読む Playbook ファイル         | 例: `docs/08-knowledge/PLAYBOOK.md`                                                                                        |
-| `ACE_MAX_ENTRIES_PER_CATEGORY` | カテゴリあたりのブロック上限（exit 1）                    | 省略時は `280`。refine 目安 `130` は警告のみ。**非数値や 0 以下は無効**として既定値にフォールバックし、stderr に警告を出す |
-| `ACE_MAX_PLAYBOOK_LINES`       | Playbook 総行数の固定警告閾値（**警告のみ・非ブロック**） | 正の整数を明示したときだけ固定上限。未設定・無効値は件数から導出（`ヘッダ + 件数 × 16`）                                   |
+| 変数                           | 意味                                                      | 推奨初期値                                                                                                                                                                                         |
+| ------------------------------ | --------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `ACE_SUBAGENT_ENABLED`         | post-merge 等から subagent 起動を行うか                   | `0`（無効）                                                                                                                                                                                        |
+| `ACE_SUBAGENT_AUTO_MERGE`      | ガード通過後に squash マージまで自動で行うか              | `0`（無効）。注入対策を採る構成では無効のまま。有効にするなら ACE の PR にリポジトリホスティング側の承認必須ルールを掛ける（`docs/04-quality/GUARDRAILS_THREE_LAYERS.md`「AIへの指示の信頼境界」） |
+| `ACE_GARDEN_WALL_PATHS`        | 編集を許可するパス（カンマ区切り）                        | プロジェクト固有（必須で設定）                                                                                                                                                                     |
+| `ACE_PLAYBOOK_PATH`            | `check-category-size.ts` が読む Playbook ファイル         | 例: `docs/08-knowledge/PLAYBOOK.md`                                                                                                                                                                |
+| `ACE_MAX_ENTRIES_PER_CATEGORY` | カテゴリあたりのブロック上限（exit 1）                    | 省略時は `280`。refine 目安 `130` は警告のみ。**非数値や 0 以下は無効**として既定値にフォールバックし、stderr に警告を出す                                                                         |
+| `ACE_MAX_PLAYBOOK_LINES`       | Playbook 総行数の固定警告閾値（**警告のみ・非ブロック**） | 正の整数を明示したときだけ固定上限。未設定・無効値は件数から導出（`ヘッダ + 件数 × 16`）                                                                                                           |
 
 ## Shadow 運用（段階導入）
 
 1. `ACE_SUBAGENT_ENABLED=1` かつ `ACE_SUBAGENT_AUTO_MERGE=0` で **draft PR のみ**自動生成し、人間がレビュー。
 2. 3〜5 PR 程度で成功率・ロールバック有無を記録（[CASE_STUDIES.md](https://github.com/feel-flow/ai-spec-driven-development/blob/HEAD/docs/CASE_STUDIES.md) へ追記可能）。
-3. 問題なければ `ACE_SUBAGENT_AUTO_MERGE=1` を限定メンバーまたは特定ブランチのみで有効化。
+3. 問題なければ `ACE_SUBAGENT_AUTO_MERGE=1` を限定メンバーまたは特定ブランチのみで有効化。有効化するとマージ時の人の確認が発生しない。subagent の入力（PR 本文・Issue・レビューコメント・CI ログ）に注入された指示による許可パス内の汚染は 4 ガードを通り得るので、ACE の PR にはリポジトリホスティング側の承認必須ルールを掛ける。
 
 ## Playbook 肥大化と別 Issue 起票
 
@@ -99,6 +99,12 @@ docs-only の自動 PR で、構造検証（例: `ace:verify`）が CI で保証
 - 実装元（別プロダクト）: FeelFlow ID Platform 等での運用検証後、[CASE_STUDIES.md](https://github.com/feel-flow/ai-spec-driven-development/blob/HEAD/docs/CASE_STUDIES.md) にメトリクスを追記する（プレースホルダー済み）
 
 ## Changelog
+
+### [1.0.2] - 2026-11-01
+
+#### 変更
+
+- `ACE_SUBAGENT_AUTO_MERGE` の推奨値と段階導入の手順 3 に、注入対策を採る構成では自動マージを無効のままにするか ACE の PR に承認必須ルールを掛ける条件を追記（[ai-spec-driven-development#611](https://github.com/feel-flow/ai-spec-driven-development/issues/611)）
 
 ### [1.0.1] - 2026-04-27
 
