@@ -123,7 +123,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: "24"
+          node-version: "26"
       - run: npm ci
       - run: npx depcruise --config .dependency-cruiser.cjs src
 ```

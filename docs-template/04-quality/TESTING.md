@@ -616,7 +616,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: "24"
+          node-version: "26"
           cache: "npm"
 
       - name: Install dependencies
