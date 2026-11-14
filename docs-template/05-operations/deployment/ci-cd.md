@@ -130,7 +130,7 @@
 
 #### Stage 1: Builder
 
-**ベースイメージ**: `node:18-alpine`
+**ベースイメージ**: `node:26-alpine`
 
 **役割**:
 
@@ -141,7 +141,7 @@
 **主要処理**:
 
 ```dockerfile
-FROM node:18-alpine AS builder
+FROM node:26-alpine AS builder
 WORKDIR /app
 COPY package*.json ./
 RUN npm ci --only=production
@@ -151,7 +151,7 @@ RUN npm run build
 
 #### Stage 2: Runtime
 
-**ベースイメージ**: `node:18-alpine`
+**ベースイメージ**: `node:26-alpine`
 
 **役割**:
 
@@ -162,7 +162,7 @@ RUN npm run build
 **主要処理**:
 
 ```dockerfile
-FROM node:18-alpine
+FROM node:26-alpine
 WORKDIR /app
 
 # 非rootユーザー作成
