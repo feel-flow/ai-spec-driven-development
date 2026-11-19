@@ -200,6 +200,7 @@ docs/
 - [AI駆動 Git Workflow](./docs/AI_GIT_WORKFLOW.md) — AIに最適化された10ステップのワークフロー
 - [運用ガイド (AIエージェント向け)](./docs/OPERATIONAL_GUIDE.md) — AIエージェントの操作仕様書
 - [OS ファイルディスクリプタ上限の設定ガイド](./docs/MAXFILES_SETUP_GUIDE.md) — macOS / Windows の fd 上限設定と VS Code 安定化手順
+- [develop → main 本番公開運用ガイド（参考）](./docs/RELEASE_BRANCH_GUIDE.md) — 本番ブランチ保護・マージ方式・デプロイ境界の任意レシピ
 
 ### Quick Start
 
