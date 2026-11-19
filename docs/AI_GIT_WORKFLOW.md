@@ -90,6 +90,8 @@ release/*     ← リリース準備（developから分岐）
 | 緊急修正 | `hotfix/{issue-num}-{description}`  | `hotfix/456-security-patch` |
 | リリース | `release/{version}`                 | `release/1.2.0`             |
 
+> **参考**: `develop → main` で本番公開を仕組みとして徹底したい場合は、[develop → main 本番公開運用ガイド](./RELEASE_BRANCH_GUIDE.md)（Ruleset・ソースブランチ制限・マージ方式・デプロイ境界の参考レシピ）を参照してください。
+
 ---
 
 ## 運用原則
@@ -586,6 +588,7 @@ gh discussion create \
 
 - [AI Spec Driven Development](./AI_SPEC_DRIVEN_DEVELOPMENT.md) - 7文書構造の概念
 - [Operational Guide](./OPERATIONAL_GUIDE.md) - AIエージェント向け運用ガイド
+- [RELEASE_BRANCH_GUIDE.md](./RELEASE_BRANCH_GUIDE.md) - `develop → main` 本番公開を徹底したいプロジェクト向けの参考ガイド（任意）
 
 ---
 
